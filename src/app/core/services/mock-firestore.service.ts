@@ -6,6 +6,7 @@ import type {
   Receta,
   Venta,
   Cliente,
+  CostoFijo,
 } from '../models';
 
 @Injectable()
@@ -251,5 +252,16 @@ export class MockFirestoreService {
     this.getOrCreate('historialPrecios').next([]);
     this.getOrCreate('movimientosStock').next([]);
     this.getOrCreate('gastosInsumos').next([]);
+
+    // --- Costos Fijos --------------------------------------------------------
+    const costosFijos: CostoFijo[] = [
+      { id: 'cf-1', nombre: 'Alquiler del local', descripcion: 'Pago el 1 de cada mes', monto: 150000, frecuencia: 'mensual', categoria: 'alquiler', activo: true },
+      { id: 'cf-2', nombre: 'Luz', descripcion: 'EDESUR — bimestral prorrateado', monto: 25000, frecuencia: 'mensual', categoria: 'servicios', activo: true },
+      { id: 'cf-3', nombre: 'Gas', descripcion: 'Metrogas', monto: 18000, frecuencia: 'mensual', categoria: 'servicios', activo: true },
+      { id: 'cf-4', nombre: 'Internet', descripcion: 'Fibertel', monto: 12000, frecuencia: 'mensual', categoria: 'servicios', activo: true },
+      { id: 'cf-5', nombre: 'Monotributo', descripcion: 'Categoría D', monto: 35000, frecuencia: 'mensual', categoria: 'impuestos', activo: true },
+      { id: 'cf-6', nombre: 'Seguro de comercio', descripcion: '', monto: 15000, frecuencia: 'mensual', categoria: 'otros', activo: true },
+    ];
+    this.getOrCreate('costosFijos').next(costosFijos);
   }
 }

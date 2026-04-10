@@ -15,13 +15,14 @@ import {
   MovimientoStock,
   GastoInsumo,
   HistorialPrecio,
+  CostoFijo,
 } from '../models';
 import { where, orderBy, Timestamp } from '@angular/fire/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
 
 // --- State shape ---
-export type Periodo = 'hoy' | 'semana' | 'mes';
+export type Periodo = 'mes';
 
 interface PasteleriaState {
   loading: boolean;
@@ -64,12 +65,18 @@ export const PasteleriaStore = signalStore(
       'clientes',
       orderBy('nombre', 'asc')
     );
+    const costosFijos$ = fs.getCollection<CostoFijo>(
+      'costosFijos',
+      where('activo', '==', true),
+      orderBy('nombre', 'asc')
+    );
 
     // Convert to signals (real-time sync from Firestore)
     const ingredientes = toSignal(ingredientes$, { initialValue: [] as Ingrediente[] });
     const recetas = toSignal(recetas$, { initialValue: [] as Receta[] });
     const ventas = toSignal(ventas$, { initialValue: [] as Venta[] });
     const clientes = toSignal(clientes$, { initialValue: [] as Cliente[] });
+    const costosFijos = toSignal(costosFijos$, { initialValue: [] as CostoFijo[] });
 
     // --- Pure calculation helpers ---
     function calcularCostoReceta(ingredientesReceta: RecetaIngrediente[]): number {
@@ -89,18 +96,9 @@ export const PasteleriaStore = signalStore(
     }
 
     // --- Period helpers ---
-    function obtenerInicioPeriodo(periodo: Periodo): Date {
+    function obtenerInicioPeriodo(_periodo: Periodo): Date {
       const now = new Date();
-      switch (periodo) {
-        case 'hoy': return new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        case 'semana': {
-          const d = new Date(now);
-          d.setDate(d.getDate() - d.getDay());
-          d.setHours(0, 0, 0, 0);
-          return d;
-        }
-        case 'mes': return new Date(now.getFullYear(), now.getMonth(), 1);
-      }
+      return new Date(now.getFullYear(), now.getMonth(), 1);
     }
 
     // --- Computed (derived state) ---
@@ -160,12 +158,30 @@ export const PasteleriaStore = signalStore(
       })
     );
 
+    const totalCostosFijosMensuales = computed(() =>
+      costosFijos().reduce((sum, c) => {
+        if (c.frecuencia === 'mensual') return sum + c.monto;
+        if (c.frecuencia === 'semanal') return sum + c.monto * 4;
+        return sum;
+      }, 0)
+    );
+
+    /** Costos fijos del mes seleccionado (siempre mensual) */
+    const costosFijosPeriodo = computed(() => totalCostosFijosMensuales());
+
+    /** Costos totales = ingredientes usados en ventas + costos fijos del período */
+    const gastosTotalesPeriodo = computed(() => gastosMes() + costosFijosPeriodo());
+
+    /** Ganancia neta = ganancia bruta de ventas - costos fijos del período */
+    const gananciaNeta = computed(() => gananciaMes() - costosFijosPeriodo());
+
     return {
       // --- Entity signals (read-only) ---
       ingredientes,
       recetas,
       ventas,
       clientes,
+      costosFijos,
 
       // --- Derived computed signals ---
       stockBajo,
@@ -173,12 +189,16 @@ export const PasteleriaStore = signalStore(
       ventasMes,
       gastosMes,
       gananciaMes,
+      costosFijosPeriodo,
+      gastosTotalesPeriodo,
+      gananciaNeta,
       pedidosPendientes,
       pedidosPendientesCount,
       ventasRecientes,
       totalRecetas,
       productoMasVendido,
       ingredientesOrdenadosPorStock,
+      totalCostosFijosMensuales,
 
       // --- Pure calculators ---
       calcularCostoReceta,
@@ -463,6 +483,39 @@ export const PasteleriaStore = signalStore(
           return gastoId;
         } catch (e: any) {
           patchState(store, { loading: false, error: e.message });
+          throw e;
+        }
+      },
+
+      // --- Costos Fijos mutations ---
+      async crearCostoFijo(costoFijo: Omit<CostoFijo, 'id'>) {
+        patchState(store, { loading: true, error: null });
+        try {
+          const id = await fs.addDocument('costosFijos', { ...costoFijo, activo: true } as any);
+          patchState(store, { loading: false });
+          return id;
+        } catch (e: any) {
+          patchState(store, { loading: false, error: e.message });
+          throw e;
+        }
+      },
+
+      async actualizarCostoFijo(id: string, changes: Partial<CostoFijo>) {
+        patchState(store, { loading: true, error: null });
+        try {
+          await fs.updateDocument('costosFijos', id, changes as Record<string, any>);
+          patchState(store, { loading: false });
+        } catch (e: any) {
+          patchState(store, { loading: false, error: e.message });
+          throw e;
+        }
+      },
+
+      async eliminarCostoFijo(id: string) {
+        try {
+          return await fs.softDelete('costosFijos', id);
+        } catch (e: any) {
+          patchState(store, { error: e.message });
           throw e;
         }
       },
