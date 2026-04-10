@@ -1,0 +1,54 @@
+@use '@angular/material' as mat;
+@use 'tailwindcss';
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$rose-palette,
+        tertiary: mat.$orange-palette,
+      ),
+      typography: Roboto,
+      density: -1,
+    )
+  );
+}
+
+body {
+  color-scheme: light;
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+  height: 100%;
+}
+
+// Utility classes for the bakery app
+.page-container {
+  padding: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+  padding-bottom: 80px; // Space for bottom nav
+}
+
+.fab-bottom-right {
+  position: fixed !important;
+  bottom: 80px;
+  right: 16px;
+  z-index: 100;
+}
+
+// Semáforo de stock
+.stock-ok { color: #4caf50; }
+.stock-warning { color: #ff9800; }
+.stock-danger { color: #f44336; }
+
+// Card touch-friendly
+.touch-card {
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+  &:active {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+}
