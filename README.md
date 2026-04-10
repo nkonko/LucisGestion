@@ -1,59 +1,79 @@
-# LucisGestion
+# Lucis Gestión
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.3.
+Sistema de gestión para pastelería artesanal. Permite administrar ingredientes, recetas con costeo automático, ventas con control de stock, clientes y dashboard de métricas.
 
-## Development server
+## Tech Stack
 
-To start a local development server, run:
+- **Angular 21** (standalone components, signals, OnPush)
+- **Angular Material 21** + Tailwind CSS 4
+- **NgRx Signals** (store reactivo)
+- **Firebase** (Auth, Firestore, Hosting)
+- **PWA** (Service Worker, offline support)
 
-```bash
-ng serve
-```
+## Requisitos
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+| Herramienta | Versión mínima |
+|---|---|
+| Node.js | 20+ |
+| npm | 10+ |
+| Angular CLI | 21+ |
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Instalación
 
 ```bash
-ng generate --help
+npm install
 ```
 
-## Building
+## Comandos
 
-To build the project run:
+| Comando | Descripción |
+|---|---|
+| `npm start` | Servidor de desarrollo (requiere Firebase configurado) |
+| `npm run start:mock` | **Servidor con datos de prueba** (sin Firebase, sin login) |
+| `npm run build` | Build de producción |
+| `npm test` | Tests unitarios con Vitest |
+
+## Modo Mock (demo sin Firebase)
+
+Para levantar la app sin necesidad de Firebase ni conexión a internet:
 
 ```bash
-ng build
+npm run start:mock
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Esto reemplaza los servicios de Firebase por implementaciones en memoria con datos de ejemplo preconfigurados:
+- 10 ingredientes con stock y precios
+- 4 recetas con costeo calculado
+- 4 clientes
+- 5 ventas (pendientes y entregadas)
 
-## Running unit tests
+El usuario queda auto-logueado como "owner". Todas las operaciones CRUD funcionan en memoria (los datos se pierden al refrescar la página).
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+**Ideal para**: demos, evaluación de la app, pruebas de UI sin dependencias externas.
 
-```bash
-ng test
+## Estructura del proyecto
+
+```
+src/app/
+├── core/
+│   ├── guards/         # Auth guard
+│   ├── models/         # Interfaces y tipos del dominio
+│   ├── services/       # FirestoreService, AuthService + mocks
+│   └── store/          # PasteleriaStore (NgRx Signals)
+├── features/
+│   ├── clientes/       # ABM de clientes
+│   ├── dashboard/      # KPIs, gráficos, alertas
+│   ├── ingredientes/   # ABM + historial de precios
+│   ├── login/          # Login con Google
+│   ├── recetas/        # ABM + costeo + catálogo
+│   ├── stock/          # Vista semáforo de stock
+│   └── ventas/         # Registro de ventas + historial
+└── shared/
+    ├── layout/         # Shell con sidenav y toolbar
+    └── pipes/          # Pipe ARS (formato moneda)
 ```
 
-## Running end-to-end tests
+## Documentación adicional
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- [`read first/GUIA-DESPLIEGUE.md`](read%20first/GUIA-DESPLIEGUE.md) — Guía paso a paso para desplegar en Firebase
+- [`read first/MANUAL-CASOS-DE-PRUEBA.md`](read%20first/MANUAL-CASOS-DE-PRUEBA.md) — 30 casos de prueba funcionales

@@ -1,0 +1,74 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner() {
+      return isSignedIn() && request.auth.token.role == 'owner';
+    }
+
+    function isAyudante() {
+      return isSignedIn() && request.auth.token.role == 'ayudante';
+    }
+
+    function isTeamMember() {
+      return isOwner() || isAyudante();
+    }
+
+    // Ingredientes: owner can CRUD, ayudante can read
+    match /ingredientes/{docId} {
+      allow read: if isTeamMember();
+      allow write: if isOwner();
+    }
+
+    // Recetas: owner can CRUD, ayudante can read
+    match /recetas/{docId} {
+      allow read: if isTeamMember();
+      allow write: if isOwner();
+    }
+
+    // Ventas: both can read and create, only owner can update/delete
+    match /ventas/{docId} {
+      allow read: if isTeamMember();
+      allow create: if isTeamMember();
+      allow update, delete: if isOwner();
+    }
+
+    // Clientes: both can read and create, only owner can update/delete
+    match /clientes/{docId} {
+      allow read: if isTeamMember();
+      allow create: if isTeamMember();
+      allow update, delete: if isOwner();
+    }
+
+    // Stock movements: both can read, created by system via sales
+    match /movimientosStock/{docId} {
+      allow read: if isTeamMember();
+      allow create: if isTeamMember();
+    }
+
+    // Gastos: owner only
+    match /gastosInsumos/{docId} {
+      allow read: if isTeamMember();
+      allow write: if isOwner();
+    }
+
+    // Users: anyone authenticated can create their own profile, owner can manage all
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isOwner();
+    }
+
+    // Historial de precios: read for team, created by system on price changes
+    match /historialPrecios/{docId} {
+      allow read: if isTeamMember();
+      allow create: if isTeamMember();
+    }
+  }
+}
