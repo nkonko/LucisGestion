@@ -23,8 +23,6 @@ import { ArsPipe } from '../../shared/pipes/ars.pipe';
       class="mb-4 w-full"
       [value]="store.periodoSeleccionado()"
       (change)="store.setPeriodo($event.value)">
-      <mat-button-toggle value="hoy" class="flex-1">Hoy</mat-button-toggle>
-      <mat-button-toggle value="semana" class="flex-1">Semana</mat-button-toggle>
       <mat-button-toggle value="mes" class="flex-1">Mes</mat-button-toggle>
     </mat-button-toggle-group>
 
@@ -41,8 +39,10 @@ import { ArsPipe } from '../../shared/pipes/ars.pipe';
       <mat-card class="touch-card">
         <mat-card-content class="text-center py-3">
           <mat-icon class="text-blue-600">savings</mat-icon>
-          <div class="text-2xl font-bold">{{ gananciaMes() | ars }}</div>
-          <div class="text-xs text-gray-500">Ganancia</div>
+          <div class="text-2xl font-bold" [class]="gananciaNeta() >= 0 ? 'text-blue-700' : 'text-red-600'">
+            {{ gananciaNeta() | ars }}
+          </div>
+          <div class="text-xs text-gray-500">Ganancia neta</div>
         </mat-card-content>
       </mat-card>
 
@@ -78,24 +78,44 @@ import { ArsPipe } from '../../shared/pipes/ars.pipe';
     }
 
     <!-- Ingresos vs Gastos Bar -->
-    <h3 class="text-base font-medium mb-2">Ingresos vs Costos</h3>
+    <h3 class="text-base font-medium mb-2">Ingresos vs Gastos</h3>
     <mat-card class="mb-4">
-      <mat-card-content class="py-3">
-        <div class="flex items-center gap-2 mb-2">
-          <span class="text-xs w-16 text-gray-500">Ingresos</span>
-          <div class="flex-1 bg-gray-100 rounded-full h-5 overflow-hidden">
-            <div class="bg-green-500 h-5 rounded-full transition-all"
+      <mat-card-content class="py-3 flex flex-col">
+        <div class="flex items-center gap-2 py-2">
+          <span class="text-xs w-20 text-gray-500 shrink-0">Ingresos</span>
+          <div class="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+            <div class="bg-green-500 h-6 rounded-full transition-all"
                  [style.width.%]="ingresosBarWidth()"></div>
           </div>
-          <span class="text-xs w-24 text-right font-medium">{{ ventasMes() | ars }}</span>
+          <span class="text-xs w-24 text-right font-medium shrink-0">{{ ventasMes() | ars }}</span>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="text-xs w-16 text-gray-500">Costos</span>
-          <div class="flex-1 bg-gray-100 rounded-full h-5 overflow-hidden">
-            <div class="bg-red-400 h-5 rounded-full transition-all"
-                 [style.width.%]="gastosBarWidth()"></div>
+        <div class="border-t border-dashed border-gray-200"></div>
+        <div class="flex items-center gap-2 py-2">
+          <span class="text-xs w-20 text-gray-500 shrink-0">Ingredientes</span>
+          <div class="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+            <div class="bg-orange-400 h-6 rounded-full transition-all"
+                 [style.width.%]="ingredientesBarWidth()"></div>
           </div>
-          <span class="text-xs w-24 text-right font-medium">{{ gastosMes() | ars }}</span>
+          <span class="text-xs w-24 text-right font-medium shrink-0">{{ gastosMes() | ars }}</span>
+        </div>
+        <div class="flex items-center gap-2 pb-2">
+          <span class="text-xs w-20 text-gray-500 shrink-0">C. fijos</span>
+          <div class="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+            <div class="bg-red-400 h-6 rounded-full transition-all"
+                 [style.width.%]="costosFijosBarWidth()"></div>
+          </div>
+          <span class="text-xs w-24 text-right font-medium shrink-0">{{ costosFijosPeriodo() | ars }}</span>
+        </div>
+        <div class="border-t pt-3 flex items-center justify-between">
+          <span class="text-xs text-gray-500">Gastos totales</span>
+          <span class="text-sm font-semibold text-red-700">{{ gastosTotalesPeriodo() | ars }}</span>
+        </div>
+        <div class="pt-1 flex items-center justify-between">
+          <span class="text-xs text-gray-500">Ganancia neta</span>
+          <span class="text-sm font-bold"
+                [class]="gananciaNeta() >= 0 ? 'text-green-700' : 'text-red-700'">
+            {{ gananciaNeta() | ars }}
+          </span>
         </div>
       </mat-card-content>
     </mat-card>
@@ -155,14 +175,27 @@ export class DashboardComponent {
   ventasMes = this.store.ventasMes;
   gastosMes = this.store.gastosMes;
   gananciaMes = this.store.gananciaMes;
+  costosFijosPeriodo = this.store.costosFijosPeriodo;
+  gastosTotalesPeriodo = this.store.gastosTotalesPeriodo;
+  gananciaNeta = this.store.gananciaNeta;
 
   ingresosBarWidth = computed(() => {
-    const max = Math.max(this.ventasMes(), this.gastosMes(), 1);
+    const max = Math.max(this.ventasMes(), this.gastosTotalesPeriodo(), 1);
     return (this.ventasMes() / max) * 100;
   });
 
-  gastosBarWidth = computed(() => {
-    const max = Math.max(this.ventasMes(), this.gastosMes(), 1);
+  ingredientesBarWidth = computed(() => {
+    const max = Math.max(this.ventasMes(), this.gastosTotalesPeriodo(), 1);
     return (this.gastosMes() / max) * 100;
+  });
+
+  costosFijosBarWidth = computed(() => {
+    const max = Math.max(this.ventasMes(), this.gastosTotalesPeriodo(), 1);
+    return (this.costosFijosPeriodo() / max) * 100;
+  });
+
+  gastosBarWidth = computed(() => {
+    const max = Math.max(this.ventasMes(), this.gastosTotalesPeriodo(), 1);
+    return (this.gastosTotalesPeriodo() / max) * 100;
   });
 }

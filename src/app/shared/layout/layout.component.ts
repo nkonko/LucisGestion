@@ -71,6 +71,10 @@ import { AuthService } from '../../core/services/auth.service';
         <mat-icon>menu_book</mat-icon>
         <span>Recetas</span>
       </a>
+      <a routerLink="/costos" routerLinkActive="active" class="nav-item">
+        <mat-icon>receipt_long</mat-icon>
+        <span>Costos</span>
+      </a>
       <a routerLink="/ventas" routerLinkActive="active" class="nav-item">
         <mat-icon>point_of_sale</mat-icon>
         <span>Ventas</span>

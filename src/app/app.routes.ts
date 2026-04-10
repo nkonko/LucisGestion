@@ -43,6 +43,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/clientes/clientes.component').then(m => m.ClientesComponent),
       },
+      {
+        path: 'costos',
+        loadComponent: () =>
+          import('./features/costos-fijos/costos-fijos.component').then(m => m.CostosFijosComponent),
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },
