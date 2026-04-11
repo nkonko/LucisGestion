@@ -12,14 +12,19 @@ import {
   CategoriaIngrediente,
   UNIDADES_DISPLAY,
   CATEGORIAS_INGREDIENTE_DISPLAY,
-} from '../../core/models';
+} from '../../core/models/ingrediente.model';
 
 @Component({
   selector: 'app-ingrediente-form',
   standalone: true,
   imports: [
-    MatDialogModule, MatFormFieldModule, MatInputModule,
-    MatSelectModule, MatButtonModule, MatIconModule, FormsModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatIconModule,
+    FormsModule,
   ],
   template: `
     <h2 mat-dialog-title>{{ isEdit ? 'Editar' : 'Nuevo' }} Ingrediente</h2>
@@ -27,7 +32,7 @@ import {
     <mat-dialog-content class="flex flex-col gap-3">
       <mat-form-field appearance="outline">
         <mat-label>Nombre</mat-label>
-        <input matInput [(ngModel)]="form.nombre" placeholder="Ej: Harina 000" required>
+        <input matInput [(ngModel)]="form.nombre" placeholder="Ej: Harina 000" required />
       </mat-form-field>
 
       <div class="grid grid-cols-2 gap-3">
@@ -52,19 +57,19 @@ import {
 
       <mat-form-field appearance="outline">
         <mat-label>Precio por {{ form.unidad || 'unidad' }}</mat-label>
-        <input matInput type="number" [(ngModel)]="form.precioUnitario" min="0" required>
+        <input matInput type="number" [(ngModel)]="form.precioUnitario" min="0" required />
         <span matPrefix>$&nbsp;</span>
       </mat-form-field>
 
       <div class="grid grid-cols-2 gap-3">
         <mat-form-field appearance="outline">
           <mat-label>Stock actual</mat-label>
-          <input matInput type="number" [(ngModel)]="form.stockActual" min="0" required>
+          <input matInput type="number" [(ngModel)]="form.stockActual" min="0" required />
         </mat-form-field>
 
         <mat-form-field appearance="outline">
           <mat-label>Stock mínimo</mat-label>
-          <input matInput type="number" [(ngModel)]="form.stockMinimo" min="0" required>
+          <input matInput type="number" [(ngModel)]="form.stockMinimo" min="0" required />
         </mat-form-field>
       </div>
     </mat-dialog-content>
@@ -98,7 +103,10 @@ export class IngredienteFormComponent {
   };
 
   unidades = Object.entries(UNIDADES_DISPLAY).map(([key, label]) => ({ key, label }));
-  categorias = Object.entries(CATEGORIAS_INGREDIENTE_DISPLAY).map(([key, label]) => ({ key, label }));
+  categorias = Object.entries(CATEGORIAS_INGREDIENTE_DISPLAY).map(([key, label]) => ({
+    key,
+    label,
+  }));
 
   isValid(): boolean {
     return !!(this.form.nombre && this.form.unidad && this.form.precioUnitario >= 0);
