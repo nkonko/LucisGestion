@@ -9,7 +9,7 @@ import { ArsPipe } from '../../shared/pipes/ars.pipe';
   selector: 'app-catalogo-dialog',
   standalone: true,
   imports: [MatDialogModule, MatButtonModule, MatIconModule, ArsPipe],
-  templateUrl: 'catalogo-dialog.component.html',
+  templateUrl: './catalogo-dialog.component.html',
   styles: [
     `
       .catalogo {
