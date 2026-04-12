@@ -41,7 +41,7 @@ export const IngredientesStore = signalStore(
         }),
       ),
 
-      async crearIngrediente(ingrediente: Omit<Ingrediente, 'id'>) {
+      async crearIngrediente(ingrediente: IngredienteInput) {
         patchState(store, { loading: true, error: null });
         try {
           const id = await fs.addDocument('ingredientes', {
@@ -95,7 +95,7 @@ export const IngredientesStore = signalStore(
         }
       },
 
-      async registrarCompraInsumos(gasto: Omit<GastoInsumo, 'id'>) {
+      async registrarCompraInsumos(gasto: GastoInsumoInput) {
         patchState(store, { loading: true, error: null });
         try {
           const gastoId = await fs.addDocument('gastosInsumos', gasto as GastoInsumoInput);

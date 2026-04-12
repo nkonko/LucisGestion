@@ -19,9 +19,9 @@ export const ClientesStore = signalStore(
     return {
       clientes,
 
-      async crearCliente(cliente: Omit<Cliente, 'id'>) {
+      async crearCliente(cliente: ClienteInput) {
         try {
-          return await fs.addDocument('clientes', cliente as ClienteInput);
+          return await fs.addDocument('clientes', cliente);
         } catch (e: any) {
           patchState(store, { error: e.message });
           throw e;

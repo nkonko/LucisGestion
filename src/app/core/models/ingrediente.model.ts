@@ -62,6 +62,7 @@ export type TipoMovimiento = 'compra' | 'venta_deduccion' | 'ajuste' | 'cancelac
 // Input types
 export type IngredienteInput = Omit<Ingrediente, 'id'>;
 export type MovimientoStockInput = Omit<MovimientoStock, 'id'>;
+export type IngredienteInputForm = Omit<Ingrediente, 'id' | 'ultimaCompra' | 'activo'>;
 
 // Display labels
 export const UNIDADES_DISPLAY: Record<UnidadMedida, string> = {

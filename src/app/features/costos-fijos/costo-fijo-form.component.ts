@@ -13,6 +13,7 @@ import {
   CategoriaCosto,
   FRECUENCIA_DISPLAY,
   CATEGORIA_COSTO_DISPLAY,
+  CostoFijoInputForm,
 } from '../../core/models/costo-fijo.model';
 
 @Component({
@@ -35,7 +36,7 @@ export class CostoFijoFormComponent {
 
   isEdit = !!this.data;
 
-  form: Omit<CostoFijo, 'id' | 'activo'> = {
+  form: CostoFijoInputForm = {
     nombre: this.data?.nombre ?? '',
     descripcion: this.data?.descripcion ?? '',
     monto: this.data?.monto ?? 0,

@@ -25,3 +25,4 @@ export const CATEGORIA_COSTO_DISPLAY: Record<CategoriaCosto, string> = {
 };
 
 export type CostoFijoInput = Omit<CostoFijo, 'id'>;
+export type CostoFijoInputForm = Omit<CostoFijo, 'id' | 'activo'>;

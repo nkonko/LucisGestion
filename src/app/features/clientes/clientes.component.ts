@@ -8,10 +8,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ClientesStore } from '../../core/store/clientes.store';
 import { WhatsAppService } from '../../core/services/whatsapp.service';
-import { Cliente } from '../../core/models/cliente.model';
+import { Cliente, ClienteInput } from '../../core/models/cliente.model';
 import { ClienteFormComponent } from './cliente-form.component';
-
-type ClienteInput = Omit<Cliente, 'id'>;
 
 @Component({
   selector: 'app-clientes',
@@ -89,6 +87,9 @@ export class ClientesComponent {
 
   abrirWhatsApp(cliente: Cliente, event: Event) {
     event.stopPropagation();
-    this.whatsApp.enviarMensaje(cliente.telefono, `Hola ${cliente.nombre}! 🧁 Te escribo de Lucis Pastelería.`);
+    this.whatsApp.enviarMensaje(
+      cliente.telefono,
+      `Hola ${cliente.nombre}! 🧁 Te escribo de Lucis Pastelería.`,
+    );
   }
 }

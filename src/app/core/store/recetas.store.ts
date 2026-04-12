@@ -27,7 +27,7 @@ export const RecetasStore = signalStore(
       recetas,
       totalRecetas: computed(() => recetas().length),
 
-      async crearReceta(receta: Omit<Receta, 'id'>) {
+      async crearReceta(receta: RecetaInput) {
         patchState(store, { loading: true, error: null });
         try {
           const costoCalculado = calcularCostoReceta(
