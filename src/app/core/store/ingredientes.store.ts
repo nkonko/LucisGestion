@@ -7,11 +7,12 @@ import {
   IngredienteInput,
   MovimientoStockInput,
 } from '../models/ingrediente.model';
-import { GastoInsumo, GastoInsumoInput } from '../models/gasto-insumo.model';
+import { GastoInsumoInput } from '../models/gasto-insumo.model';
 import { where, orderBy, Timestamp } from '@angular/fire/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
 import { BaseState } from '../interfaces/state';
+import { getStockPriority } from '../utils/stock.utils';
 
 export const IngredientesStore = signalStore(
   { providedIn: 'root' },
@@ -34,11 +35,7 @@ export const IngredientesStore = signalStore(
       stockBajo,
       stockBajoCount: computed(() => stockBajo().length),
       ingredientesOrdenadosPorStock: computed(() =>
-        [...ingredientes()].sort((a, b) => {
-          const scoreA = a.stockActual <= 0 ? 0 : a.stockActual <= a.stockMinimo ? 1 : 2;
-          const scoreB = b.stockActual <= 0 ? 0 : b.stockActual <= b.stockMinimo ? 1 : 2;
-          return scoreA - scoreB;
-        }),
+        [...ingredientes()].sort((a, b) => getStockPriority(a) - getStockPriority(b)),
       ),
 
       async crearIngrediente(ingrediente: IngredienteInput) {

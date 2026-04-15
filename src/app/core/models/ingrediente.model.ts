@@ -1,85 +1,12 @@
-import { Timestamp } from 'firebase/firestore';
-
-export interface Ingrediente {
-  id?: string;
-  nombre: string;
-  unidad: UnidadMedida;
-  precioUnitario: number;
-  stockActual: number;
-  stockMinimo: number;
-  categoria: CategoriaIngrediente;
-  ultimaCompra: Timestamp | null;
-  activo: boolean;
-}
-
-export interface RecetaIngrediente {
-  ingredienteId: string;
-  nombre: string; // denormalized for display
-  cantidad: number;
-  unidad: UnidadMedida;
-  costoLinea: number; // cantidad * precioUnitario
-}
-
-export interface MovimientoStock {
-  id?: string;
-  ingredienteId: string;
-  ingredienteNombre: string;
-  tipo: TipoMovimiento;
-  cantidad: number;
-  fecha: Timestamp;
-  ventaId: string | null;
-}
-
-export interface GastoItem {
-  ingredienteId: string;
-  nombre: string;
-  cantidad: number;
-  precioUnitario: number;
-  precioTotal: number;
-}
-
-export interface HistorialPrecio {
-  id?: string;
-  ingredienteId: string;
-  ingredienteNombre: string;
-  precioAnterior: number;
-  precioNuevo: number;
-  fecha: Timestamp;
-}
-
-// Enums as union types
-export type UnidadMedida = 'kg' | 'g' | 'lt' | 'ml' | 'unidad' | 'docena';
-export type CategoriaIngrediente =
-  | 'secos'
-  | 'lacteos'
-  | 'huevos'
-  | 'grasas'
-  | 'azucares'
-  | 'decoracion'
-  | 'otros';
-export type TipoMovimiento = 'compra' | 'venta_deduccion' | 'ajuste' | 'cancelacion_reposicion';
-
-// Input types
-export type IngredienteInput = Omit<Ingrediente, 'id'>;
-export type MovimientoStockInput = Omit<MovimientoStock, 'id'>;
-export type IngredienteInputForm = Omit<Ingrediente, 'id' | 'ultimaCompra' | 'activo'>;
-
-// Display labels
-export const UNIDADES_DISPLAY: Record<UnidadMedida, string> = {
-  kg: 'Kilogramo',
-  g: 'Gramo',
-  lt: 'Litro',
-  ml: 'Mililitro',
-  unidad: 'Unidad',
-  docena: 'Docena',
-};
-
-export const CATEGORIAS_INGREDIENTE_DISPLAY: Record<CategoriaIngrediente, string> = {
-  secos: 'Secos',
-  lacteos: 'Lácteos',
-  huevos: 'Huevos',
-  grasas: 'Grasas',
-  azucares: 'Azúcares',
-  decoracion: 'Decoración',
-  otros: 'Otros',
-};
+export { CATEGORIAS_INGREDIENTE_DISPLAY } from './categoria-ingrediente.model';
+export type { CategoriaIngrediente } from './categoria-ingrediente.model';
+export type { GastoItem } from './gasto-item.model';
+export type { HistorialPrecio } from './historial-precio.model';
+export type { Ingrediente } from './ingrediente-base.model';
+export type { IngredienteInput, IngredienteInputForm } from './ingrediente-input.model';
+export type { MovimientoStock } from './movimiento-stock.model';
+export type { MovimientoStockInput } from './movimiento-stock-input.model';
+export type { RecetaIngrediente } from './receta-ingrediente.model';
+export type { TipoMovimiento } from './tipo-movimiento.model';
+export { UNIDADES_DISPLAY } from './unidad-medida.model';
+export type { UnidadMedida } from './unidad-medida.model';
