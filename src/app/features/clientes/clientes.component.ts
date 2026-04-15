@@ -61,8 +61,12 @@ export class ClientesComponent {
 
     dialogRef.afterClosed().subscribe(async (result: Cliente | undefined) => {
       if (result) {
-        await this.store.crearCliente(result);
-        this.notify.success('Cliente creado');
+        try {
+          await this.store.crearCliente(result);
+          this.notify.success('Cliente creado');
+        } catch (error) {
+          this.notify.errorFrom(error, 'No se pudo crear el cliente');
+        }
       }
     });
   }
@@ -75,12 +79,16 @@ export class ClientesComponent {
     });
 
     dialogRef.afterClosed().subscribe(async (result: Cliente | 'delete' | undefined) => {
-      if (result === 'delete') {
-        await this.store.deleteCliente(cliente.id!);
-        this.notify.success('Cliente eliminado');
-      } else if (result) {
-        await this.store.actualizarCliente(cliente.id!, result);
-        this.notify.success('Cliente actualizado');
+      try {
+        if (result === 'delete') {
+          await this.store.deleteCliente(cliente.id!);
+          this.notify.success('Cliente eliminado');
+        } else if (result) {
+          await this.store.actualizarCliente(cliente.id!, result);
+          this.notify.success('Cliente actualizado');
+        }
+      } catch (error) {
+        this.notify.errorFrom(error, 'No se pudo guardar el cliente');
       }
     });
   }

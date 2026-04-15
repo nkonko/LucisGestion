@@ -15,4 +15,9 @@ export class NotificationService {
       panelClass: 'snackbar-error',
     });
   }
+
+  errorFrom(error: unknown, fallbackMessage: string, duration = 5000): void {
+    const message = error instanceof Error ? error.message : fallbackMessage;
+    this.error(message, duration);
+  }
 }
