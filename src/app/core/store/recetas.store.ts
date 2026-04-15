@@ -5,7 +5,7 @@ import { Receta, RecetaInput } from '../models/receta.model';
 import { where, orderBy } from '@angular/fire/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IngredientesStore } from './ingredientes.store';
-import { calcularCostoReceta, calcularPrecioSugerido } from './util/precio.utils';
+import { calcularCostoReceta, calcularPrecioSugerido } from '../utils/precio.utils';
 import { BaseState } from '../interfaces/state';
 
 export const RecetasStore = signalStore(
