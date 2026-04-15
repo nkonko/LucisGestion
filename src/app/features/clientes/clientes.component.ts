@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ClientesStore } from '../../core/store/clientes.store';
 import { WhatsAppService } from '../../core/services/whatsapp.service';
-import { Cliente } from '../../core/models/cliente.model';
+import { Cliente } from '../../core/models/cliente';
 import { ClienteFormComponent } from './cliente-form.component';
 
 @Component({

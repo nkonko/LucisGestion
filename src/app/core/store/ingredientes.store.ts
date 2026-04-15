@@ -6,8 +6,8 @@ import {
   HistorialPrecio,
   IngredienteInput,
   MovimientoStockInput,
-} from '../models/ingrediente.model';
-import { GastoInsumoInput } from '../models/gasto-insumo.model';
+} from '../models/ingrediente';
+import { GastoInsumoInput } from '../models/gasto-insumo';
 import { where, orderBy, Timestamp } from '@angular/fire/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';

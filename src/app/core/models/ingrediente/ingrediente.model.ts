@@ -1,6 +1,6 @@
 import { Timestamp } from 'firebase/firestore';
-import { CategoriaIngrediente } from './categoria-ingrediente.model';
-import { UnidadMedida } from './unidad-medida.model';
+import type { UnidadMedida } from './unidad-medida.model';
+import type { CategoriaIngrediente } from './categoria-ingrediente.model';
 
 export interface Ingrediente {
   id?: string;
@@ -13,3 +13,6 @@ export interface Ingrediente {
   ultimaCompra: Timestamp | null;
   activo: boolean;
 }
+
+export type IngredienteInput = Omit<Ingrediente, 'id'>;
+export type IngredienteInputForm = Omit<Ingrediente, 'id' | 'ultimaCompra' | 'activo'>;

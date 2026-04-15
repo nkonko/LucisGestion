@@ -13,7 +13,7 @@ import {
   CategoriaCosto,
   FRECUENCIA_DISPLAY,
   CATEGORIA_COSTO_DISPLAY,
-} from '../../core/models/costo-fijo.model';
+} from '../../core/models/costo-fijo';
 import { CostoFijoFormComponent } from './costo-fijo-form.component';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 

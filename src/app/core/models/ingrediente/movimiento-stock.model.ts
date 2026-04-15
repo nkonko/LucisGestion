@@ -1,5 +1,5 @@
 import { Timestamp } from 'firebase/firestore';
-import { TipoMovimiento } from './tipo-movimiento.model';
+import type { TipoMovimiento } from './tipo-movimiento.model';
 
 export interface MovimientoStock {
   id?: string;
@@ -10,3 +10,5 @@ export interface MovimientoStock {
   fecha: Timestamp;
   ventaId: string | null;
 }
+
+export type MovimientoStockInput = Omit<MovimientoStock, 'id'>;

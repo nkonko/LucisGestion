@@ -1,4 +1,4 @@
-import { Ingrediente, RecetaIngrediente } from '../models/ingrediente.model';
+import { Ingrediente, RecetaIngrediente } from '../models/ingrediente';
 
 export function calcularCostoReceta(
   ingredientesReceta: RecetaIngrediente[],

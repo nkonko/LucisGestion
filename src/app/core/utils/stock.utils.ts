@@ -1,4 +1,4 @@
-import type { Ingrediente } from '../models/ingrediente.model';
+import type { Ingrediente } from '../models/ingrediente';
 
 export function getStockPriority(ingrediente: Ingrediente): number {
   if (ingrediente.stockActual <= 0) {

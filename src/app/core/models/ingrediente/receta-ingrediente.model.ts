@@ -1,4 +1,4 @@
-import { UnidadMedida } from './unidad-medida.model';
+import type { UnidadMedida } from './unidad-medida.model';
 
 export interface RecetaIngrediente {
   ingredienteId: string;

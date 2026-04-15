@@ -1,5 +1,5 @@
 import { Timestamp } from 'firebase/firestore';
-import { GastoItem } from './ingrediente.model';
+import type { GastoItem } from '../ingrediente/gasto-item.model';
 
 export interface GastoInsumo {
   id?: string;

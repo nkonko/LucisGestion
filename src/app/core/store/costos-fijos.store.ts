@@ -1,7 +1,7 @@
 import { computed, inject } from '@angular/core';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
 import { FirestoreService } from '../services/firestore.service';
-import { CostoFijo, CostoFijoInput } from '../models/costo-fijo.model';
+import { CostoFijo, CostoFijoInput } from '../models/costo-fijo';
 import { where, orderBy } from '@angular/fire/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BaseState } from '../interfaces/state';

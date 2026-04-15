@@ -14,7 +14,7 @@ import {
   FRECUENCIA_DISPLAY,
   CATEGORIA_COSTO_DISPLAY,
   CostoFijoInputForm,
-} from '../../core/models/costo-fijo.model';
+} from '../../core/models/costo-fijo';
 
 @Component({
   selector: 'app-costo-fijo-form',

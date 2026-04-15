@@ -16,7 +16,7 @@ import {
   MedioPago,
   MEDIOS_PAGO_DISPLAY,
   VentaInput,
-} from '../../core/models/venta.model';
+} from '../../core/models/venta';
 import { Timestamp } from '@angular/fire/firestore';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 

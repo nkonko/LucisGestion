@@ -59,7 +59,7 @@
           <div class="text-lg font-bold">{{ venta.total | ars }}</div>
           <mat-chip-set>
             <mat-chip [class]="getEstadoClass(venta.estado)" style="font-size: 11px">
-              {{ estadosDisplay[venta.estado] }}
+              {{ getEstadoLabel(venta.estado) }}
             </mat-chip>
           </mat-chip-set>
         </div>

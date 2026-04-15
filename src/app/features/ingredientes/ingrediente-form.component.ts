@@ -13,7 +13,7 @@ import {
   UNIDADES_DISPLAY,
   CATEGORIAS_INGREDIENTE_DISPLAY,
   IngredienteInputForm,
-} from '../../core/models/ingrediente.model';
+} from '../../core/models/ingrediente';
 
 @Component({
   selector: 'app-ingrediente-form',

@@ -10,8 +10,8 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FormsModule } from '@angular/forms';
 import { IngredientesStore } from '../../core/store/ingredientes.store';
 import { calcularCostoReceta, calcularPrecioSugerido } from '../../core/utils/precio.utils';
-import { Receta, CategoriaReceta, CATEGORIAS_RECETA_DISPLAY } from '../../core/models/receta.model';
-import { RecetaIngrediente } from '../../core/models/ingrediente.model';
+import { Receta, CategoriaReceta, CATEGORIAS_RECETA_DISPLAY } from '../../core/models/receta';
+import { RecetaIngrediente } from '../../core/models/ingrediente';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 
 @Component({

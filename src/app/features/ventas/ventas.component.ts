@@ -14,7 +14,9 @@ import { NotificationService } from '../../core/services/notification.service';
 import { VentasStore } from '../../core/store/ventas.store';
 import { ClientesStore } from '../../core/store/clientes.store';
 import { WhatsAppService } from '../../core/services/whatsapp.service';
-import { Venta, ESTADOS_VENTA_DISPLAY } from '../../core/models/venta.model';
+import { ESTADOS_VENTA_CLASS } from '../../core/models/venta/estado-venta.model';
+import type { EstadoVenta } from '../../core/models/venta/estado-venta.model';
+import { Venta, ESTADOS_VENTA_DISPLAY } from '../../core/models/venta';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 import { VentaFormComponent } from './venta-form.component';
 
@@ -45,7 +47,7 @@ export class VentasComponent {
   private dialog = inject(MatDialog);
   private notify = inject(NotificationService);
 
-  estadosDisplay: Record<string, string> = ESTADOS_VENTA_DISPLAY;
+  estadosDisplay: Record<EstadoVenta, string> = ESTADOS_VENTA_DISPLAY;
 
   pendientes = this.store.pedidosPendientes;
 
@@ -70,17 +72,12 @@ export class VentasComponent {
     return items;
   });
 
-  getEstadoClass(estado: string): string {
-    switch (estado) {
-      case 'pendiente':
-        return 'stock-warning';
-      case 'entregado':
-        return 'stock-ok';
-      case 'cancelado':
-        return 'stock-danger';
-      default:
-        return '';
-    }
+  getEstadoClass(estado: EstadoVenta): string {
+    return ESTADOS_VENTA_CLASS[estado];
+  }
+
+  getEstadoLabel(estado: EstadoVenta): string {
+    return ESTADOS_VENTA_DISPLAY[estado];
   }
 
   nuevaVenta() {

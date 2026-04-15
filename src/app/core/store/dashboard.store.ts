@@ -2,9 +2,9 @@ import { computed, inject } from '@angular/core';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
 import { VentasStore } from './ventas.store';
 import { CostosFijosStore } from './costos-fijos.store';
-import { DashboardState } from '../models/dashboard-state.model';
+import { DashboardState } from './state/dashboard.state';
 import { obtenerInicioPeriodo } from '../utils/dashboard.utils';
-import { Periodo } from '../models/periodo.model';
+import { Periodo } from '../models/dashboard';
 
 export const DashboardStore = signalStore(
   { providedIn: 'root' },

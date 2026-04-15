@@ -13,7 +13,7 @@ import {
   QueryConstraint,
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import { StockAdjustmentInput } from '../models/stock-adjustment.model';
+import { StockAdjustmentInput } from '../models/stock';
 export type { StockAdjustmentInput };
 
 @Injectable({ providedIn: 'root' })

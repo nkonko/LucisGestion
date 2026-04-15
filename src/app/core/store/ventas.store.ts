@@ -1,8 +1,8 @@
 import { computed, inject } from '@angular/core';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
 import { FirestoreService } from '../services/firestore.service';
-import { StockAdjustmentInput } from '../models/stock-adjustment.model';
-import { Venta, VentaInput } from '../models/venta.model';
+import { StockAdjustmentInput } from '../models/stock';
+import { Venta, VentaInput } from '../models/venta';
 import { orderBy } from '@angular/fire/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IngredientesStore } from './ingredientes.store';

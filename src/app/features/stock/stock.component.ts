@@ -8,7 +8,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { NotificationService } from '../../core/services/notification.service';
 import { RouterLink } from '@angular/router';
 import { IngredientesStore } from '../../core/store/ingredientes.store';
-import { Ingrediente } from '../../core/models/ingrediente.model';
+import { Ingrediente } from '../../core/models/ingrediente';
 import { getStockPriority } from '../../core/utils/stock.utils';
 import { IngredienteFormComponent } from '../ingredientes/ingrediente-form.component';
 import { AuthService } from '../../core/services/auth.service';

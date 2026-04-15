@@ -7,7 +7,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { NotificationService } from '../../core/services/notification.service';
 import { RecetasStore } from '../../core/store/recetas.store';
-import { Receta } from '../../core/models/receta.model';
+import { Receta } from '../../core/models/receta';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 import { RecetaFormComponent } from './receta-form.component';
 import { CatalogoDialogComponent } from './catalogo-dialog.component';

@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Timestamp } from 'firebase/firestore';
-import type { Ingrediente } from '../models/ingrediente.model';
-import type { Receta } from '../models/receta.model';
-import type { Venta } from '../models/venta.model';
-import type { Cliente } from '../models/cliente.model';
-import type { CostoFijo } from '../models/costo-fijo.model';
-import type { StockAdjustmentInput } from '../models/stock-adjustment.model';
+import type { Ingrediente } from '../models/ingrediente';
+import type { Receta } from '../models/receta';
+import type { Venta } from '../models/venta';
+import type { Cliente } from '../models/cliente';
+import type { CostoFijo } from '../models/costo-fijo';
+import type { StockAdjustmentInput } from '../models/stock';
 
 @Injectable()
 export class MockFirestoreService {

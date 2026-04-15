@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
 import { FirestoreService } from '../services/firestore.service';
-import { Cliente, ClienteInput } from '../models/cliente.model';
+import { Cliente, ClienteInput } from '../models/cliente';
 import { orderBy } from '@angular/fire/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BaseState } from '../interfaces/state';

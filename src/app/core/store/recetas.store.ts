@@ -1,7 +1,7 @@
 import { computed, inject } from '@angular/core';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
 import { FirestoreService } from '../services/firestore.service';
-import { Receta, RecetaInput } from '../models/receta.model';
+import { Receta, RecetaInput } from '../models/receta';
 import { where, orderBy } from '@angular/fire/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IngredientesStore } from './ingredientes.store';

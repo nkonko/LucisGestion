@@ -5,7 +5,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { RouterLink } from '@angular/router';
-import { Periodo } from '../../core/models/periodo.model';
+import { Periodo } from '../../core/models/dashboard';
 import { DashboardStore } from '../../core/store/dashboard.store';
 import { IngredientesStore } from '../../core/store/ingredientes.store';
 import { VentasStore } from '../../core/store/ventas.store';

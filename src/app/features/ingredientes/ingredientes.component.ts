@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { IngredientesStore } from '../../core/store/ingredientes.store';
 import { RecetasStore } from '../../core/store/recetas.store';
-import { Ingrediente } from '../../core/models/ingrediente.model';
+import { Ingrediente } from '../../core/models/ingrediente';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 import { IngredienteFormComponent } from './ingrediente-form.component';
 import { HistorialPreciosComponent } from './historial-precios.component';

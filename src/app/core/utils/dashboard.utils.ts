@@ -1,4 +1,4 @@
-import { Periodo } from '../models/periodo.model';
+import { Periodo } from '../models/dashboard';
 
 export function obtenerInicioPeriodo(_periodo: Periodo): Date {
   const now = new Date();
