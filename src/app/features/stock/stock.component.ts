@@ -9,6 +9,7 @@ import { NotificationService } from '../../core/services/notification.service';
 import { RouterLink } from '@angular/router';
 import { IngredientesStore } from '../../core/store/ingredientes.store';
 import { Ingrediente } from '../../core/models/ingrediente.model';
+import { getStockPriority } from '../../core/utils/stock.utils';
 import { IngredienteFormComponent } from '../ingredientes/ingrediente-form.component';
 import { AuthService } from '../../core/services/auth.service';
 
@@ -36,9 +37,25 @@ export class StockComponent {
   sortedIngredientes = this.store.ingredientesOrdenadosPorStock;
 
   getStockClass(item: Ingrediente): string {
-    if (item.stockActual <= 0) return 'stock-danger';
-    if (item.stockActual <= item.stockMinimo) return 'stock-warning';
-    return 'stock-ok';
+    switch (getStockPriority(item)) {
+      case 0:
+        return 'stock-danger';
+      case 1:
+        return 'stock-warning';
+      default:
+        return 'stock-ok';
+    }
+  }
+
+  getStockLabel(item: Ingrediente): string {
+    switch (getStockPriority(item)) {
+      case 0:
+        return 'SIN STOCK';
+      case 1:
+        return 'REPONER';
+      default:
+        return 'OK';
+    }
   }
 
   getStockPercent(item: Ingrediente): number {
@@ -48,9 +65,14 @@ export class StockComponent {
   }
 
   getStockBarColor(item: Ingrediente): 'primary' | 'accent' | 'warn' {
-    if (item.stockActual <= 0) return 'warn';
-    if (item.stockActual <= item.stockMinimo) return 'accent';
-    return 'primary';
+    switch (getStockPriority(item)) {
+      case 0:
+        return 'warn';
+      case 1:
+        return 'accent';
+      default:
+        return 'primary';
+    }
   }
 
   crear() {
