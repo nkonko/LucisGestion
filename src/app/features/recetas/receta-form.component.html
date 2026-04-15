@@ -52,10 +52,10 @@
     <mat-label>Agregar ingrediente...</mat-label>
     <input
       matInput
-      [(ngModel)]="busquedaIngrediente"
+      [ngModel]="busquedaIngrediente()"
+      (ngModelChange)="busquedaIngrediente.set($event)"
       [matAutocomplete]="auto"
       placeholder="Buscar ingrediente"
-      (input)="filtrarIngredientes()"
     />
     <mat-autocomplete
       #auto="matAutocomplete"

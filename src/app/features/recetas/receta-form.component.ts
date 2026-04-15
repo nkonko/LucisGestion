@@ -47,7 +47,7 @@ export class RecetaFormComponent {
   private ingredientesStore = inject(IngredientesStore);
 
   isEdit = !!this.data;
-  busquedaIngrediente = '';
+  busquedaIngrediente = signal('');
 
   form = {
     nombre: this.data?.nombre ?? '',
@@ -63,7 +63,13 @@ export class RecetaFormComponent {
     this.data?.ingredientes ? [...this.data.ingredientes] : [],
   );
 
-  ingredientesFiltrados = signal(this.ingredientesStore.ingredientes());
+  ingredientesFiltrados = computed(() => {
+    const term = this.busquedaIngrediente().toLowerCase();
+    const yaAgregados = new Set(this.ingredientesReceta().map((ri) => ri.ingredienteId));
+    return this.ingredientesStore
+      .ingredientes()
+      .filter((i) => !yaAgregados.has(i.id!) && i.nombre.toLowerCase().includes(term));
+  });
 
   categorias = Object.entries(CATEGORIAS_RECETA_DISPLAY).map(([key, label]) => ({ key, label }));
 
@@ -74,16 +80,6 @@ export class RecetaFormComponent {
   precioSugerido = computed(() =>
     calcularPrecioSugerido(this.costoCalculado(), this.form.margenGanancia),
   );
-
-  filtrarIngredientes() {
-    const term = this.busquedaIngrediente.toLowerCase();
-    const yaAgregados = new Set(this.ingredientesReceta().map((ri) => ri.ingredienteId));
-    this.ingredientesFiltrados.set(
-      this.ingredientesStore
-        .ingredientes()
-        .filter((i) => !yaAgregados.has(i.id!) && i.nombre.toLowerCase().includes(term)),
-    );
-  }
 
   agregarIngrediente(ing: any) {
     this.ingredientesReceta.update((list) => [
@@ -96,8 +92,7 @@ export class RecetaFormComponent {
         costoLinea: ing.precioUnitario,
       },
     ]);
-    this.busquedaIngrediente = '';
-    this.filtrarIngredientes();
+    this.busquedaIngrediente.set('');
   }
 
   actualizarCantidad(index: number, cantidad: number) {
@@ -117,7 +112,6 @@ export class RecetaFormComponent {
 
   quitarIngrediente(index: number) {
     this.ingredientesReceta.update((list) => list.filter((_, i) => i !== index));
-    this.filtrarIngredientes();
   }
 
   recalcular() {
