@@ -2,17 +2,9 @@ import { computed, inject } from '@angular/core';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
 import { VentasStore } from './ventas.store';
 import { CostosFijosStore } from './costos-fijos.store';
-
-export type Periodo = 'mes';
-
-interface DashboardState {
-  periodoSeleccionado: Periodo;
-}
-
-function obtenerInicioPeriodo(_periodo: Periodo): Date {
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), 1);
-}
+import { DashboardState } from '../models/dashboard-state.model';
+import { obtenerInicioPeriodo } from '../utils/dashboard.utils';
+import { Periodo } from '../models/periodo.model';
 
 export const DashboardStore = signalStore(
   { providedIn: 'root' },
