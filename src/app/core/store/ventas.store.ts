@@ -1,9 +1,9 @@
 import { computed, inject } from '@angular/core';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
 import { FirestoreService } from '../services/firestore.service';
+import { StockAdjustmentInput } from '../models/stock-adjustment.model';
 import { Venta, VentaInput } from '../models/venta.model';
-import { MovimientoStock, MovimientoStockInput } from '../models/ingrediente.model';
-import { orderBy, Timestamp } from '@angular/fire/firestore';
+import { orderBy } from '@angular/fire/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IngredientesStore } from './ingredientes.store';
 import { RecetasStore } from './recetas.store';
@@ -23,6 +23,40 @@ export const VentasStore = signalStore(
 
     const pedidosPendientes = computed(() => ventas().filter((v) => v.estado === 'pendiente'));
 
+    const buildStockAdjustments = (
+      items: Array<{ recetaId: string; cantidad: number }>,
+      factor: -1 | 1,
+    ): StockAdjustmentInput[] => {
+      const adjustmentsByIngrediente = new Map<string, StockAdjustmentInput>();
+
+      for (const item of items) {
+        const receta = recetasStore.recetas().find((r) => r.id === item.recetaId);
+        if (!receta) continue;
+
+        for (const ri of receta.ingredientes) {
+          const delta = ri.cantidad * item.cantidad * factor;
+          if (delta === 0) continue;
+
+          const current = adjustmentsByIngrediente.get(ri.ingredienteId);
+          if (current) {
+            current.delta += delta;
+            continue;
+          }
+
+          const ingredienteNombre =
+            ingredientesStore.ingredientes().find((i) => i.id === ri.ingredienteId)?.nombre ?? ri.nombre;
+
+          adjustmentsByIngrediente.set(ri.ingredienteId, {
+            ingredienteId: ri.ingredienteId,
+            ingredienteNombre,
+            delta,
+          });
+        }
+      }
+
+      return [...adjustmentsByIngrediente.values()];
+    };
+
     return {
       ventas,
       pedidosPendientes,
@@ -34,33 +68,8 @@ export const VentasStore = signalStore(
         try {
           const ventaId = await fs.addDocument<VentaInput>('ventas', venta);
 
-          for (const item of venta.items) {
-            const receta = recetasStore.recetas().find((r) => r.id === item.recetaId);
-            if (!receta) continue;
-
-            for (const ri of receta.ingredientes) {
-              const cantidadDeducir = ri.cantidad * item.cantidad;
-              const ingrediente = ingredientesStore
-                .ingredientes()
-                .find((i) => i.id === ri.ingredienteId);
-              if (!ingrediente) continue;
-
-              const nuevoStock = Math.max(0, ingrediente.stockActual - cantidadDeducir);
-              await fs.updateDocument('ingredientes', ri.ingredienteId, {
-                stockActual: nuevoStock,
-              });
-
-              const movimiento: MovimientoStockInput = {
-                ingredienteId: ri.ingredienteId,
-                ingredienteNombre: ingrediente.nombre,
-                tipo: 'venta_deduccion',
-                cantidad: -cantidadDeducir,
-                fecha: Timestamp.now(),
-                ventaId,
-              };
-              await fs.addDocument<MovimientoStockInput>('movimientosStock', movimiento);
-            }
-          }
+          const adjustments = buildStockAdjustments(venta.items, -1);
+          await fs.applyStockAdjustments(ventaId, 'venta_deduccion', adjustments);
 
           patchState(store, { loading: false });
           return ventaId;
@@ -78,33 +87,8 @@ export const VentasStore = signalStore(
           if (estado === 'cancelado') {
             const venta = ventas().find((v) => v.id === id);
             if (venta) {
-              for (const item of venta.items) {
-                const receta = recetasStore.recetas().find((r) => r.id === item.recetaId);
-                if (!receta) continue;
-
-                for (const ri of receta.ingredientes) {
-                  const cantidadReponer = ri.cantidad * item.cantidad;
-                  const ingrediente = ingredientesStore
-                    .ingredientes()
-                    .find((i) => i.id === ri.ingredienteId);
-                  if (!ingrediente) continue;
-
-                  const nuevoStock = ingrediente.stockActual + cantidadReponer;
-                  await fs.updateDocument('ingredientes', ri.ingredienteId, {
-                    stockActual: nuevoStock,
-                  });
-
-                  const movimiento: MovimientoStockInput = {
-                    ingredienteId: ri.ingredienteId,
-                    ingredienteNombre: ingrediente.nombre,
-                    tipo: 'cancelacion_reposicion',
-                    cantidad: cantidadReponer,
-                    fecha: Timestamp.now(),
-                    ventaId: id,
-                  };
-                  await fs.addDocument<MovimientoStockInput>('movimientosStock', movimiento);
-                }
-              }
+              const adjustments = buildStockAdjustments(venta.items, 1);
+              await fs.applyStockAdjustments(id, 'cancelacion_reposicion', adjustments);
             }
           }
 

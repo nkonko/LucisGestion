@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ClientesStore } from '../../core/store/clientes.store';
 import { WhatsAppService } from '../../core/services/whatsapp.service';
-import { Cliente, ClienteInput } from '../../core/models/cliente.model';
+import { Cliente } from '../../core/models/cliente.model';
 import { ClienteFormComponent } from './cliente-form.component';
 
 @Component({
@@ -76,7 +76,7 @@ export class ClientesComponent {
 
     dialogRef.afterClosed().subscribe(async (result: Cliente | 'delete' | undefined) => {
       if (result === 'delete') {
-        await this.store.actualizarCliente(cliente.id!, { nombre: '[eliminado]' } as ClienteInput);
+        await this.store.deleteCliente(cliente.id!);
         this.notify.success('Cliente eliminado');
       } else if (result) {
         await this.store.actualizarCliente(cliente.id!, result);

@@ -30,7 +30,16 @@ export const ClientesStore = signalStore(
 
       async actualizarCliente(id: string, changes: Partial<Cliente>) {
         try {
-          return await fs.updateDocument('clientes', id, changes as Record<string, any>);
+          return await fs.updateDocument('clientes', id, changes);
+        } catch (e: any) {
+          patchState(store, { error: e.message });
+          throw e;
+        }
+      },
+
+      async deleteCliente(id: string) {
+        try {
+          return await fs.updateDocument('clientes', id, { nombre: '[eliminado]' });
         } catch (e: any) {
           patchState(store, { error: e.message });
           throw e;

@@ -6,6 +6,7 @@ import type { Receta } from '../models/receta.model';
 import type { Venta } from '../models/venta.model';
 import type { Cliente } from '../models/cliente.model';
 import type { CostoFijo } from '../models/costo-fijo.model';
+import type { StockAdjustmentInput } from '../models/stock-adjustment.model';
 
 @Injectable()
 export class MockFirestoreService {
@@ -35,6 +36,49 @@ export class MockFirestoreService {
   async softDelete(path: string, id: string): Promise<void> {
     const col = this.getOrCreate(path);
     col.next(col.value.filter((item: any) => item.id !== id));
+  }
+
+  async applyStockAdjustments(
+    ventaId: string,
+    tipoMovimiento: 'venta_deduccion' | 'cancelacion_reposicion',
+    adjustments: StockAdjustmentInput[],
+  ): Promise<void> {
+    if (adjustments.length === 0) return;
+
+    const ingredientesCol = this.getOrCreate('ingredientes');
+    const movimientosCol = this.getOrCreate('movimientosStock');
+
+    const ingredientes = ingredientesCol.value.map((item) => ({ ...(item as Record<string, unknown>) }));
+    const movimientos = [...movimientosCol.value];
+
+    for (const adjustment of adjustments) {
+      const idx = ingredientes.findIndex((item) => item['id'] === adjustment.ingredienteId);
+      if (idx === -1) continue;
+
+      const stockActual = Number(ingredientes[idx]['stockActual'] ?? 0);
+      const nuevoStock = Math.max(0, stockActual + adjustment.delta);
+      const deltaAplicado = nuevoStock - stockActual;
+
+      ingredientes[idx] = {
+        ...ingredientes[idx],
+        stockActual: nuevoStock,
+      };
+
+      if (deltaAplicado === 0) continue;
+
+      movimientos.push({
+        id: 'mock-' + crypto.randomUUID().slice(0, 8),
+        ingredienteId: adjustment.ingredienteId,
+        ingredienteNombre: adjustment.ingredienteNombre,
+        tipo: tipoMovimiento,
+        cantidad: deltaAplicado,
+        fecha: Timestamp.now(),
+        ventaId,
+      });
+    }
+
+    ingredientesCol.next(ingredientes);
+    movimientosCol.next(movimientos);
   }
 
   private getOrCreate(path: string): BehaviorSubject<unknown[]> {
