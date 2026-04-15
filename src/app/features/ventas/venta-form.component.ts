@@ -36,14 +36,7 @@ import { ArsPipe } from '../../shared/pipes/ars.pipe';
     ArsPipe,
   ],
   templateUrl: './venta-form.component.html',
-  styles: [
-    `
-      .selected-card {
-        outline: 2px solid var(--mat-sys-primary);
-        background: var(--mat-sys-primary-container);
-      }
-    `,
-  ],
+  styleUrl: './venta-form.component.scss',
 })
 export class VentaFormComponent {
   private dialogRef = inject(MatDialogRef<VentaFormComponent>);

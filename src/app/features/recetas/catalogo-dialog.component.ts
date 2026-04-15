@@ -10,19 +10,7 @@ import { ArsPipe } from '../../shared/pipes/ars.pipe';
   standalone: true,
   imports: [MatDialogModule, MatButtonModule, MatIconModule, ArsPipe],
   templateUrl: './catalogo-dialog.component.html',
-  styles: [
-    `
-      .catalogo {
-        min-width: 280px;
-      }
-
-      @media print {
-        .catalogo {
-          padding: 16px;
-        }
-      }
-    `,
-  ],
+  styleUrl: './catalogo-dialog.component.scss',
 })
 export class CatalogoDialogComponent {
   readonly store = inject(RecetasStore);

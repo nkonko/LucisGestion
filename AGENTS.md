@@ -55,3 +55,57 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Design services around a single responsibility
 - Use the `providedIn: 'root'` option for singleton services
 - Use the `inject()` function instead of constructor injection
+
+## Styles Architecture
+
+### Folder structure
+
+```
+src/
+  styles.scss          <- Global entry point. Import order: external deps, tokens, layout, utilities.
+  styles/
+    _tokens.scss       <- All CSS custom properties (design tokens). Single source of truth for raw values.
+    _layout.scss       <- Page-framing utilities: .page-container, .fab-bottom-right.
+    _utilities.scss    <- Shared presentational helpers: .stock-ok/warning/danger, .touch-card.
+  app/
+    feature/
+      component.component.scss   <- Component-scoped styles (one file per component).
+```
+
+### Design tokens (`src/styles/_tokens.scss`)
+
+All raw values MUST be defined as CSS custom properties in `_tokens.scss`. Never use hard-coded values (colours, sizes, z-indices, spacing, transitions) directly in component or global stylesheets — always reference a token.
+
+Token naming convention:
+
+- `--color-*` — Semantic colours (wrapping `--mat-sys-*` or brand/status colours). Examples: `--color-primary`, `--color-status-ok`.
+- `--space-*` — 4-pt spacing scale. `--space-1` = 4px, `--space-2` = 8px, `--space-4` = 16px, `--space-6` = 24px.
+- `--size-*`  — Named dimensions. Examples: `--size-nav-height`, `--size-page-max-width`.
+- `--z-*`     — Z-index scale. `--z-nav` = 1000, `--z-fab` = 100.
+- `--radius-*`— Border radius. `--radius-chip`, `--radius-avatar`.
+- `--transition-*` — Transition durations. `--transition-standard`.
+
+Rules:
+- Prefer `--color-*` tokens over `--mat-sys-*` directly in components. `_tokens.scss` wraps Material tokens so all colour decisions live in one file.
+- When adding a new colour, size, or spacing value add it to `_tokens.scss` first, then reference it everywhere.
+
+### Component styles
+
+- Always use `styleUrl` with a separate `.scss` file. Never use the `styles: [...]` inline array.
+- The `.scss` file must sit next to the `.ts` file with a relative path: `styleUrl: './my.component.scss'`
+- Component stylesheets can reference global tokens directly (CSS custom properties are global by nature, no import needed).
+- Do NOT duplicate styles already in `_utilities.scss` or `_layout.scss`. Apply those global classes in the template instead.
+
+### Global vs. component styles decision guide
+
+- Raw value (colour hex, px size, z-index number) -> `_tokens.scss`
+- Page-level structural helper used in multiple features -> `_layout.scss`
+- Presentational helper used across 2 or more components -> `_utilities.scss`
+- Styles exclusively used by one component -> `component.component.scss`
+
+### Tailwind CSS
+
+- Tailwind utility classes are available globally via `@use 'tailwindcss'` in `styles.scss`.
+- Prefer Tailwind classes for spacing, flex/grid, typography, and colour utilities in templates.
+- When a Tailwind class is not sufficient (e.g. must override Angular Material, needs a CSS variable, or requires a pseudo-selector), use a scoped component `.scss` file.
+- Do NOT redefine Tailwind utility names (like `.w-20`, `.flex`) as custom CSS rules unless overriding Angular Material within a component.

@@ -1,0 +1,23 @@
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--space-6);
+  background: linear-gradient(135deg, var(--color-brand-gradient-from), var(--color-brand-gradient-to));
+}
+
+.login-card {
+  width: 100%;
+  max-width: var(--size-login-card-max-width);
+}
+
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: var(--size-google-btn-height);
+  font-size: 16px;
+}

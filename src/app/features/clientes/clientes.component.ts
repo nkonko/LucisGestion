@@ -23,17 +23,7 @@ import { ClienteFormComponent } from './cliente-form.component';
     MatInputModule,
   ],
   templateUrl: './clientes.component.html',
-  styles: [
-    `
-      .icon-sm {
-        font-size: 14px;
-        width: 14px;
-        height: 14px;
-        vertical-align: middle;
-        margin-right: 4px;
-      }
-    `,
-  ],
+  styleUrl: './clientes.component.scss',
 })
 export class ClientesComponent {
   readonly store = inject(ClientesStore);

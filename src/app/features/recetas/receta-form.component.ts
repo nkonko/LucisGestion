@@ -30,16 +30,7 @@ import { ArsPipe } from '../../shared/pipes/ars.pipe';
     ArsPipe,
   ],
   templateUrl: './receta-form.component.html',
-  styles: [
-    `
-      .w-20 {
-        width: 80px;
-      }
-      .w-16 {
-        width: 64px;
-      }
-    `,
-  ],
+  styleUrl: './receta-form.component.scss',
 })
 export class RecetaFormComponent {
   private dialogRef = inject(MatDialogRef<RecetaFormComponent>);
