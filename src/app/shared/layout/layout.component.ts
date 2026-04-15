@@ -75,27 +75,6 @@ import { AuthService } from '../../core/services/auth.service';
         border-radius: 50%;
         object-fit: cover;
       }
-
-      .global-loading {
-        position: fixed;
-        top: 64px;
-        left: 0;
-        right: 0;
-        height: 3px;
-        z-index: 999;
-        background: linear-gradient(90deg, transparent, var(--mat-sys-primary), transparent);
-        background-size: 200% 100%;
-        animation: loading-slide 1.2s infinite;
-      }
-
-      @keyframes loading-slide {
-        0% {
-          background-position: -200% 0;
-        }
-        100% {
-          background-position: 200% 0;
-        }
-      }
     `,
   ],
 })
