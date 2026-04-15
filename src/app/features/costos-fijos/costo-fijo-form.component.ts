@@ -13,71 +13,22 @@ import {
   CategoriaCosto,
   FRECUENCIA_DISPLAY,
   CATEGORIA_COSTO_DISPLAY,
-} from '../../core/models';
+  CostoFijoInputForm,
+} from '../../core/models/costo-fijo';
 
 @Component({
   selector: 'app-costo-fijo-form',
   imports: [
-    MatDialogModule, MatFormFieldModule, MatInputModule,
-    MatSelectModule, MatButtonModule, MatIconModule, FormsModule, CurrencyPipe,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatIconModule,
+    FormsModule,
+    CurrencyPipe,
   ],
-  template: `
-    <h2 mat-dialog-title>{{ isEdit ? 'Editar' : 'Nuevo' }} Costo Fijo</h2>
-
-    <mat-dialog-content class="flex flex-col gap-3">
-      <mat-form-field appearance="outline">
-        <mat-label>Nombre</mat-label>
-        <input matInput [(ngModel)]="form.nombre" placeholder="Ej: Alquiler local" required>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Descripción (opcional)</mat-label>
-        <input matInput [(ngModel)]="form.descripcion" placeholder="Ej: Pago el 1 de cada mes">
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Categoría</mat-label>
-        <mat-select [(ngModel)]="form.categoria" required>
-          @for (c of categorias; track c.key) {
-            <mat-option [value]="c.key">{{ c.label }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-
-      <div class="grid grid-cols-2 gap-3">
-        <mat-form-field appearance="outline">
-          <mat-label>Monto</mat-label>
-          <input matInput type="number" [(ngModel)]="form.monto" min="0" required>
-          <span matPrefix>$&nbsp;</span>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Frecuencia</mat-label>
-          <mat-select [(ngModel)]="form.frecuencia" required>
-            @for (f of frecuencias; track f.key) {
-              <mat-option [value]="f.key">{{ f.label }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-      <p class="text-xs text-gray-400 -mt-1">
-        Equivale a <strong>{{ montoMensualEquivalente() | currency:'ARS':'symbol':'1.0-0' }}/mes</strong>
-      </p>
-    </mat-dialog-content>
-
-    <mat-dialog-actions align="end">
-      @if (isEdit) {
-        <button mat-button color="warn" (click)="eliminar()">
-          <mat-icon>delete</mat-icon> Eliminar
-        </button>
-      }
-      <button mat-button mat-dialog-close>Cancelar</button>
-      <button mat-flat-button color="primary" (click)="guardar()" [disabled]="!isValid()">
-        {{ isEdit ? 'Guardar' : 'Crear' }}
-      </button>
-    </mat-dialog-actions>
-  `,
+  templateUrl: './costo-fijo-form.component.html',
 })
 export class CostoFijoFormComponent {
   private dialogRef = inject(MatDialogRef<CostoFijoFormComponent>);
@@ -85,7 +36,7 @@ export class CostoFijoFormComponent {
 
   isEdit = !!this.data;
 
-  form: Omit<CostoFijo, 'id' | 'activo'> = {
+  form: CostoFijoInputForm = {
     nombre: this.data?.nombre ?? '',
     descripcion: this.data?.descripcion ?? '',
     monto: this.data?.monto ?? 0,
@@ -112,7 +63,12 @@ export class CostoFijoFormComponent {
   }
 
   isValid(): boolean {
-    return !!(this.form.nombre && this.form.monto >= 0 && this.form.frecuencia && this.form.categoria);
+    return !!(
+      this.form.nombre &&
+      this.form.monto >= 0 &&
+      this.form.frecuencia &&
+      this.form.categoria
+    );
   }
 
   guardar() {

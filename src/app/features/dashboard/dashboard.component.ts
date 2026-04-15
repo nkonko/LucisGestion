@@ -5,173 +5,37 @@ import { MatListModule } from '@angular/material/list';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { RouterLink } from '@angular/router';
-import { PasteleriaStore, Periodo } from '../../core/store';
+import { Periodo } from '../../core/models/dashboard';
+import { DashboardStore } from '../../core/store/dashboard.store';
+import { IngredientesStore } from '../../core/store/ingredientes.store';
+import { VentasStore } from '../../core/store/ventas.store';
+import { RecetasStore } from '../../core/store/recetas.store';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    MatCardModule, MatIconModule, MatListModule, MatChipsModule,
-    MatButtonToggleModule, RouterLink, ArsPipe,
+    MatCardModule,
+    MatIconModule,
+    MatListModule,
+    MatChipsModule,
+    MatButtonToggleModule,
+    RouterLink,
+    ArsPipe,
   ],
-  template: `
-    <h2 class="text-xl font-semibold mb-4">Hola! 👋</h2>
-
-    <!-- Period Selector -->
-    <mat-button-toggle-group
-      class="mb-4 w-full"
-      [value]="store.periodoSeleccionado()"
-      (change)="store.setPeriodo($event.value)">
-      <mat-button-toggle value="mes" class="flex-1">Mes</mat-button-toggle>
-    </mat-button-toggle-group>
-
-    <!-- KPI Cards -->
-    <div class="grid grid-cols-2 gap-3 mb-6">
-      <mat-card class="touch-card">
-        <mat-card-content class="text-center py-3">
-          <mat-icon class="text-green-600">trending_up</mat-icon>
-          <div class="text-2xl font-bold">{{ ventasMes() | ars }}</div>
-          <div class="text-xs text-gray-500">Ingresos</div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="touch-card">
-        <mat-card-content class="text-center py-3">
-          <mat-icon class="text-blue-600">savings</mat-icon>
-          <div class="text-2xl font-bold" [class]="gananciaNeta() >= 0 ? 'text-blue-700' : 'text-red-600'">
-            {{ gananciaNeta() | ars }}
-          </div>
-          <div class="text-xs text-gray-500">Ganancia neta</div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="touch-card" routerLink="/recetas">
-        <mat-card-content class="text-center py-3">
-          <mat-icon class="text-purple-600">menu_book</mat-icon>
-          <div class="text-2xl font-bold">{{ totalRecetas() }}</div>
-          <div class="text-xs text-gray-500">Recetas activas</div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="touch-card" routerLink="/ventas">
-        <mat-card-content class="text-center py-3">
-          <mat-icon class="text-orange-600">pending_actions</mat-icon>
-          <div class="text-2xl font-bold">{{ pedidosPendientes() }}</div>
-          <div class="text-xs text-gray-500">Pedidos pendientes</div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-
-    <!-- Producto más vendido -->
-    @if (store.productoMasVendido(); as top) {
-      <mat-card class="mb-4 touch-card">
-        <mat-card-content class="flex items-center gap-3 py-2">
-          <mat-icon class="text-amber-500" style="font-size: 32px; width: 32px; height: 32px">emoji_events</mat-icon>
-          <div>
-            <div class="text-xs text-gray-500">Más vendido</div>
-            <div class="font-bold">{{ top.nombre }}</div>
-            <div class="text-sm text-gray-400">{{ top.cantidad }} unidades</div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    }
-
-    <!-- Ingresos vs Gastos Bar -->
-    <h3 class="text-base font-medium mb-2">Ingresos vs Gastos</h3>
-    <mat-card class="mb-4">
-      <mat-card-content class="py-3 flex flex-col">
-        <div class="flex items-center gap-2 py-2">
-          <span class="text-xs w-20 text-gray-500 shrink-0">Ingresos</span>
-          <div class="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
-            <div class="bg-green-500 h-6 rounded-full transition-all"
-                 [style.width.%]="ingresosBarWidth()"></div>
-          </div>
-          <span class="text-xs w-24 text-right font-medium shrink-0">{{ ventasMes() | ars }}</span>
-        </div>
-        <div class="border-t border-dashed border-gray-200"></div>
-        <div class="flex items-center gap-2 py-2">
-          <span class="text-xs w-20 text-gray-500 shrink-0">Ingredientes</span>
-          <div class="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
-            <div class="bg-orange-400 h-6 rounded-full transition-all"
-                 [style.width.%]="ingredientesBarWidth()"></div>
-          </div>
-          <span class="text-xs w-24 text-right font-medium shrink-0">{{ gastosMes() | ars }}</span>
-        </div>
-        <div class="flex items-center gap-2 pb-2">
-          <span class="text-xs w-20 text-gray-500 shrink-0">C. fijos</span>
-          <div class="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
-            <div class="bg-red-400 h-6 rounded-full transition-all"
-                 [style.width.%]="costosFijosBarWidth()"></div>
-          </div>
-          <span class="text-xs w-24 text-right font-medium shrink-0">{{ costosFijosPeriodo() | ars }}</span>
-        </div>
-        <div class="border-t pt-3 flex items-center justify-between">
-          <span class="text-xs text-gray-500">Gastos totales</span>
-          <span class="text-sm font-semibold text-red-700">{{ gastosTotalesPeriodo() | ars }}</span>
-        </div>
-        <div class="pt-1 flex items-center justify-between">
-          <span class="text-xs text-gray-500">Ganancia neta</span>
-          <span class="text-sm font-bold"
-                [class]="gananciaNeta() >= 0 ? 'text-green-700' : 'text-red-700'">
-            {{ gananciaNeta() | ars }}
-          </span>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Stock Alerts -->
-    @if (stockBajo().length > 0) {
-      <h3 class="text-base font-medium mb-2">
-        <mat-icon class="text-red-500 align-middle" style="font-size: 20px">warning</mat-icon>
-        Stock bajo
-      </h3>
-      <mat-card class="mb-4">
-        <mat-list>
-          @for (item of stockBajo(); track item.id) {
-            <mat-list-item>
-              <mat-icon matListItemIcon class="stock-danger">error</mat-icon>
-              <span matListItemTitle>{{ item.nombre }}</span>
-              <span matListItemLine>
-                Quedan {{ item.stockActual }} {{ item.unidad }} (mín: {{ item.stockMinimo }})
-              </span>
-            </mat-list-item>
-          }
-        </mat-list>
-      </mat-card>
-    }
-
-    <!-- Recent Sales -->
-    @if (ventasRecientes().length > 0) {
-      <h3 class="text-base font-medium mb-2">Últimas ventas</h3>
-      <mat-card>
-        <mat-list>
-          @for (venta of ventasRecientes(); track venta.id) {
-            <mat-list-item>
-              <mat-icon matListItemIcon>receipt</mat-icon>
-              <span matListItemTitle>{{ venta.clienteNombre || 'Sin cliente' }} — {{ venta.total | ars }}</span>
-              <span matListItemLine>
-                <mat-chip-set>
-                  <mat-chip [class]="venta.estado === 'pendiente' ? 'stock-warning' : 'stock-ok'"
-                            style="font-size: 11px">
-                    {{ venta.estado }}
-                  </mat-chip>
-                </mat-chip-set>
-              </span>
-            </mat-list-item>
-          }
-        </mat-list>
-      </mat-card>
-    }
-  `,
+  templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent {
-  readonly store = inject(PasteleriaStore);
+  readonly store = inject(DashboardStore);
+  private ingredientesStore = inject(IngredientesStore);
+  private ventasStore = inject(VentasStore);
+  private recetasStore = inject(RecetasStore);
 
-  stockBajo = this.store.stockBajo;
-  totalRecetas = this.store.totalRecetas;
-  ventasRecientes = this.store.ventasRecientes;
-  pedidosPendientes = this.store.pedidosPendientesCount;
+  stockBajo = this.ingredientesStore.stockBajo;
+  totalRecetas = this.recetasStore.totalRecetas;
+  ventasRecientes = this.ventasStore.ventasRecientes;
+  pedidosPendientes = this.ventasStore.pedidosPendientesCount;
   ventasMes = this.store.ventasMes;
   gastosMes = this.store.gastosMes;
   gananciaMes = this.store.gananciaMes;
