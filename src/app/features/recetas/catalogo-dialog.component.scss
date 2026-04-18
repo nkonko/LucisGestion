@@ -1,5 +1,5 @@
 .catalogo {
-  min-width: 280px;
+  min-width: var(--dialog-min-width, 17.5rem);
 }
 
 @media print {
