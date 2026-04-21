@@ -1,4 +1,3 @@
-
 You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
 
 ## TypeScript Best Practices
@@ -68,7 +67,7 @@ src/
     _layout.scss       <- Page-framing utilities: .page-container, .fab-bottom-right.
     _utilities.scss    <- Shared presentational helpers: .stock-ok/warning/danger, .touch-card.
   app/
-    feature/
+    features/
       component.component.scss   <- Component-scoped styles (one file per component).
 ```
 
@@ -80,12 +79,13 @@ Token naming convention:
 
 - `--color-*` — Semantic colours (wrapping `--mat-sys-*` or brand/status colours). Examples: `--color-primary`, `--color-status-ok`.
 - `--space-*` — 4-pt spacing scale. `--space-1` = 4px, `--space-2` = 8px, `--space-4` = 16px, `--space-6` = 24px.
-- `--size-*`  — Named dimensions. Examples: `--size-nav-height`, `--size-page-max-width`.
-- `--z-*`     — Z-index scale. `--z-nav` = 1000, `--z-fab` = 100.
+- `--size-*` — Named dimensions. Examples: `--size-nav-height`, `--size-page-max-width`.
+- `--z-*` — Z-index scale. `--z-nav` = 1000, `--z-fab` = 100.
 - `--radius-*`— Border radius. `--radius-chip`, `--radius-avatar`.
 - `--transition-*` — Transition durations. `--transition-standard`.
 
 Rules:
+
 - Prefer `--color-*` tokens over `--mat-sys-*` directly in components. `_tokens.scss` wraps Material tokens so all colour decisions live in one file.
 - When adding a new colour, size, or spacing value add it to `_tokens.scss` first, then reference it everywhere.
 
