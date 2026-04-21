@@ -1,0 +1,22 @@
+// =============================================================================
+// Shared Utilities — Lucis Gestión
+// =============================================================================
+// Reusable presentational helpers that are applied across multiple components.
+// =============================================================================
+
+// ── Stock semaphore ─────────────────────────────────────────────────────────
+// Applied to stock-level indicators to communicate quantity status at a glance.
+.stock-ok      { color: var(--color-status-ok); }
+.stock-warning { color: var(--color-status-warning); }
+.stock-danger  { color: var(--color-status-danger); }
+
+// ── Touch-friendly interactive card ─────────────────────────────────────────
+// Adds tap feedback for clickable cards on touch devices.
+.touch-card {
+  cursor: pointer;
+  transition: box-shadow var(--transition-standard);
+
+  &:active {
+    box-shadow: var(--shadow-pressed);
+  }
+}
