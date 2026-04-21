@@ -22,61 +22,7 @@ import { AuthService } from '../../core/services/auth.service';
     MatMenuModule,
   ],
   templateUrl: './layout.component.html',
-  styles: [
-    `
-      .top-toolbar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 1000;
-      }
-
-      main {
-        margin-top: 64px;
-      }
-
-      .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        height: 64px;
-        background: var(--mat-sys-surface-container);
-        border-top: 1px solid var(--mat-sys-outline-variant);
-        z-index: 1000;
-      }
-
-      .nav-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        color: var(--mat-sys-on-surface-variant);
-        font-size: 11px;
-        padding: 4px 16px;
-        border-radius: 16px;
-        transition: all 0.2s;
-        gap: 2px;
-
-        &.active {
-          color: var(--mat-sys-primary);
-          font-weight: 500;
-        }
-      }
-
-      .avatar {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        object-fit: cover;
-      }
-    `,
-  ],
+  styleUrl: './layout.component.scss',
 })
 export class LayoutComponent {
   private ingredientesStore = inject(IngredientesStore);

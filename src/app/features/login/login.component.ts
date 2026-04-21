@@ -11,33 +11,7 @@ import { AuthService } from '../../core/services/auth.service';
   standalone: true,
   imports: [MatButtonModule, MatIconModule, MatCardModule, MatProgressSpinnerModule],
   templateUrl: './login.component.html',
-  styles: [
-    `
-      .login-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        padding: 24px;
-        background: linear-gradient(135deg, #fff1f2, #fff7ed);
-      }
-
-      .login-card {
-        width: 100%;
-        max-width: 360px;
-      }
-
-      .google-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        height: 48px;
-        font-size: 16px;
-      }
-    `,
-  ],
+  styleUrl: './login.component.scss',
 })
 export class LoginComponent {
   private auth = inject(AuthService);
