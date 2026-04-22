@@ -1,6 +1,6 @@
 <h2 mat-dialog-title>{{ isEdit ? 'Editar' : 'Nueva' }} Receta</h2>
 
-<mat-dialog-content class="flex flex-col gap-3">
+<mat-dialog-content class="flex flex-col gap-3 pt-1">
   <mat-form-field appearance="outline">
     <mat-label>Nombre</mat-label>
     <input matInput [(ngModel)]="form.nombre" placeholder="Ej: Torta de chocolate" required />
@@ -23,13 +23,14 @@
   </div>
 
   <!-- Ingredientes de la receta -->
-  <mat-divider></mat-divider>
-  <h3 class="text-sm font-medium pt-1">Ingredientes</h3>
+  <mat-divider class="py-1"></mat-divider>
+
+  <h3 class="text-sm font-medium">Ingredientes</h3>
 
   @for (ri of ingredientesReceta(); track ri.ingredienteId; let i = $index) {
-    <div class="flex items-center gap-2">
-      <span class="flex-1 text-sm">{{ ri.nombre }}</span>
-      <mat-form-field appearance="outline" class="w-20" subscriptSizing="dynamic">
+    <div class="grid grid-cols-12 gap-2 items-center">
+      <span class="col-span-5 text-sm">{{ ri.nombre }}</span>
+      <mat-form-field appearance="outline" class="col-span-3" subscriptSizing="dynamic">
         <input
           matInput
           type="number"
@@ -39,16 +40,16 @@
           step="0.1"
         />
       </mat-form-field>
-      <span class="text-xs text-gray-500">{{ ri.unidad }}</span>
-      <span class="text-xs font-medium w-16 text-right">{{ ri.costoLinea | ars }}</span>
-      <button mat-icon-button (click)="quitarIngrediente(i)" color="warn">
+      <span class="col-span-1 text-xs text-gray-500">{{ ri.unidad }}</span>
+      <span class="col-span-2 text-xs font-medium text-right">{{ ri.costoLinea | ars }}</span>
+      <button mat-icon-button class="col-span-1" (click)="quitarIngrediente(i)" color="warn">
         <mat-icon style="font-size: 18px">close</mat-icon>
       </button>
     </div>
   }
 
   <!-- Agregar ingrediente -->
-  <mat-form-field appearance="outline">
+  <mat-form-field appearance="outline" class="pt-1">
     <mat-label>Agregar ingrediente...</mat-label>
     <input
       matInput
@@ -69,10 +70,10 @@
     </mat-autocomplete>
   </mat-form-field>
 
-  <mat-divider></mat-divider>
+  <mat-divider class="py-1"></mat-divider>
 
   <!-- Cost calculation -->
-  <div class="grid grid-cols-3 gap-3 text-center pt-1">
+  <div class="grid grid-cols-2 gap-2 text-center">
     <div>
       <div class="text-xs text-gray-500">Costo total</div>
       <div class="text-lg font-bold text-red-600">{{ costoCalculado() | ars }}</div>
@@ -90,14 +91,13 @@
         />
       </mat-form-field>
     </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-2 text-center pt-1">
     <div>
       <div class="text-xs text-gray-500">Precio sugerido</div>
       <div class="text-lg font-bold text-green-600">{{ precioSugerido() | ars }}</div>
     </div>
-  </div>
-
-  <div class="grid grid-cols-3 gap-3 text-center pt-1">
-    <div></div>
     <div class="flex justify-center">
       <mat-form-field appearance="outline" class="precio-venta-field">
         <mat-label>Precio de venta final</mat-label>
@@ -107,10 +107,9 @@
       </mat-form-field>
     </div>
   </div>
-  <div></div>
-  <mat-divider></mat-divider>
+  <mat-divider class="py-1"></mat-divider>
 
-  <h3 class="text-sm font-medium pt-1">Notas / Instrucciones</h3>
+  <h3 class="text-sm font-medium">Notas / Instrucciones</h3>
   <mat-form-field appearance="outline" class="w-full">
     <textarea
       matInput
@@ -119,16 +118,17 @@
       placeholder="Escribi cualquier nota o instrucción importante"
     ></textarea>
   </mat-form-field>
-</mat-dialog-content>
+  <mat-divider class="py-1"></mat-divider>
 
-<mat-dialog-actions align="end">
-  @if (isEdit) {
-    <button mat-button color="warn" (click)="eliminar()">
-      <mat-icon>delete</mat-icon> Eliminar
+  <mat-dialog-actions align="end">
+    @if (isEdit) {
+      <button mat-button color="warn" (click)="eliminar()">
+        <mat-icon>delete</mat-icon> Eliminar
+      </button>
+    }
+    <button mat-button mat-dialog-close>Cancelar</button>
+    <button mat-flat-button color="primary" (click)="guardar()" [disabled]="!isValid()">
+      {{ isEdit ? 'Guardar' : 'Crear' }}
     </button>
-  }
-  <button mat-button mat-dialog-close>Cancelar</button>
-  <button mat-flat-button color="primary" (click)="guardar()" [disabled]="!isValid()">
-    {{ isEdit ? 'Guardar' : 'Crear' }}
-  </button>
-</mat-dialog-actions>
+  </mat-dialog-actions>
+</mat-dialog-content>

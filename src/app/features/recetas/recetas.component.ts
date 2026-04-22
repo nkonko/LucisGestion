@@ -38,6 +38,7 @@ export class RecetasComponent {
       width: '100%',
       maxWidth: '560px',
       maxHeight: '90vh',
+      panelClass: 'receta-dialog',
       data: null,
     });
 
@@ -54,6 +55,7 @@ export class RecetasComponent {
       width: '100%',
       maxWidth: '560px',
       maxHeight: '90vh',
+      panelClass: 'receta-dialog',
       data: receta,
     });
 
