@@ -1,0 +1,22 @@
+// =============================================================================
+// Layout Utilities — Lucis Gestión
+// =============================================================================
+// Page-framing helpers: constrained containers, FAB positioning, nav clearance.
+// =============================================================================
+
+// Centred page container with bottom clearance for the fixed navigation bar.
+.page-container {
+  padding: var(--space-4);
+  max-width: var(--size-page-max-width);
+  margin: 0 auto;
+  // Clears the fixed bottom nav (nav height + extra breathing room).
+  padding-bottom: calc(var(--size-nav-height) + var(--space-4));
+}
+
+// Floating action button anchored above the bottom navigation bar.
+.fab-bottom-right {
+  position: fixed !important;
+  bottom: calc(var(--size-nav-height) + var(--space-4));
+  right: var(--space-4);
+  z-index: var(--z-fab);
+}

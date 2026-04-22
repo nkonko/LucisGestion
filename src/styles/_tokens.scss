@@ -1,0 +1,61 @@
+// =============================================================================
+// Design Tokens — Lucis Gestión
+// =============================================================================
+// CSS custom properties that centralise every raw value used across the app.
+// Components MUST reference these variables instead of hard-coded values.
+// Material Design system tokens (--mat-sys-*) are wrapped here so that all
+// semantic colour decisions live in one place.
+// =============================================================================
+
+:root {
+  // ── Semantic colours (wrapping Angular Material system tokens) ──────────────
+  // Prefer these over --mat-sys-* in component stylesheets.
+  --color-primary:            var(--mat-sys-primary);
+  --color-primary-container:  var(--mat-sys-primary-container);
+  --color-surface:            var(--mat-sys-surface);
+  --color-surface-container:  var(--mat-sys-surface-container);
+  --color-on-surface:         var(--mat-sys-on-surface);
+  --color-on-surface-variant: var(--mat-sys-on-surface-variant);
+  --color-outline-variant:    var(--mat-sys-outline-variant);
+
+  // ── Status colours (stock semaphore) ────────────────────────────────────────
+  --color-status-ok:      #4caf50;
+  --color-status-warning: #ff9800;
+  --color-status-danger:  #f44336;
+
+  // ── Brand / decorative colours ───────────────────────────────────────────────
+  // Used in the login page gradient — maps to Tailwind rose-50 / orange-50.
+  --color-brand-gradient-from: #fff1f2;
+  --color-brand-gradient-to:   #fff7ed;
+
+  // ── Spacing scale (4-pt grid) ────────────────────────────────────────────────
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  // ── Layout sizing ────────────────────────────────────────────────────────────
+  --size-nav-height:          64px;    // Height of each navigation bar (top toolbar and bottom nav)
+  --size-page-max-width:      600px;   // Max width for page content containers
+  --size-login-card-max-width: 360px;  // Max width for the login card
+  --size-avatar:              32px;    // User avatar diameter
+  --size-icon-sm:             14px;    // Small inline icon size
+  --size-font-md:             16px;    // Base medium font size
+  --size-google-btn-height:   48px;    // Google sign-in button height
+
+  // ── Z-index scale ────────────────────────────────────────────────────────────
+  --z-nav: 1000;   // Fixed navigation bars (top + bottom)
+  --z-fab: 100;    // Floating action buttons
+
+  // ── Border radius ────────────────────────────────────────────────────────────
+  --radius-chip:   16px;  // Pill / chip shape (e.g. active nav item)
+  --radius-avatar: 50%;   // Circular avatar
+
+  // ── Transitions ──────────────────────────────────────────────────────────────
+  --transition-standard: 0.2s;
+
+  // ── Shadows / elevations ────────────────────────────────────────────────────
+  --shadow-pressed: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
