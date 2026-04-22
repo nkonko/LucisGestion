@@ -1,11 +1,9 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { NotificationService } from '../../core/services/notification.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { NotificationService } from '../../core/services/notification.service';
 import { IngredientesStore } from '../../core/store/ingredientes.store';
 import { RecetasStore } from '../../core/store/recetas.store';
 import { Ingrediente } from '../../core/models/ingrediente';
@@ -16,10 +14,8 @@ import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-ingredientes',
-  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    MatCardModule,
-    MatIconModule,
     MatButtonModule,
     MatDialogModule,
     ArsPipe,
@@ -27,6 +23,7 @@ import { AuthService } from '../../core/services/auth.service';
     MatInputModule,
   ],
   templateUrl: './ingredientes.component.html',
+  styleUrl: './ingredientes.component.scss',
 })
 export class IngredientesComponent {
   readonly store = inject(IngredientesStore);

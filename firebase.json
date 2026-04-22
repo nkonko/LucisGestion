@@ -11,6 +11,15 @@
     ],
     "headers": [
       {
+        "source": "/**",
+        "headers": [
+          {
+            "key": "Cross-Origin-Opener-Policy",
+            "value": "same-origin-allow-popups"
+          }
+        ]
+      },
+      {
         "source": "/**/*.@(js|css|svg|png|jpg|jpeg|gif|webp|ico|woff2)",
         "headers": [
           {

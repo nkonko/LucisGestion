@@ -7,6 +7,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { IngredientesStore } from '../../core/store/ingredientes.store';
 import { AuthService } from '../../core/services/auth.service';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-layout',
@@ -27,6 +28,7 @@ import { AuthService } from '../../core/services/auth.service';
 export class LayoutComponent {
   private ingredientesStore = inject(IngredientesStore);
   readonly auth = inject(AuthService);
+  readonly theme = inject(ThemeService);
   private router = inject(Router);
 
   stockBajoCount = this.ingredientesStore.stockBajoCount;

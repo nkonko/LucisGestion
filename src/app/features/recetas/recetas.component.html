@@ -1,66 +1,82 @@
-<div class="flex items-center justify-between mb-4">
-  <h2 class="text-xl font-semibold">Recetas</h2>
-  <button mat-stroked-button (click)="verCatalogo()"><mat-icon>share</mat-icon> Catálogo</button>
+<!-- Header -->
+<div class="flex items-center justify-between mb-6">
+  <h2 class="text-3xl font-bold text-on-surface tracking-tight">Recetas</h2>
+  <button mat-stroked-button (click)="verCatalogo()">
+    <span class="material-symbols-outlined">share</span>
+    Catálogo
+  </button>
 </div>
 
+<!-- Empty state -->
 @if (store.recetas().length === 0) {
-  <div class="text-center py-8 text-gray-400">
-    <mat-icon style="font-size: 48px; width: 48px; height: 48px">menu_book</mat-icon>
-    <p>No hay recetas cargadas aún</p>
+  <div class="flex flex-col items-center justify-center py-16 gap-3 text-on-surface-variant">
+    <span class="material-symbols-outlined" style="font-size: 56px">menu_book</span>
+    <p class="font-semibold text-on-surface">No hay recetas cargadas aún</p>
     <p class="text-sm">Tocá el botón + para crear la primera</p>
   </div>
 }
 
+<!-- Receta cards -->
 @for (receta of store.recetas(); track receta.id) {
-  <mat-card class="touch-card mb-3" (click)="auth.isOwner() ? editar(receta) : null">
-    <mat-card-content class="py-2">
-      <div class="flex items-center justify-between mb-1">
-        <div class="font-medium text-base">{{ receta.nombre }}</div>
-        <div class="flex items-center gap-1">
-          <mat-chip-set>
-            <mat-chip class="text-xs">{{ receta.categoria }}</mat-chip>
-          </mat-chip-set>
-          @if (auth.isOwner()) {
-            <button
-              mat-icon-button
-              [matMenuTriggerFor]="recetaMenu"
-              (click)="$event.stopPropagation()"
-            >
-              <mat-icon>more_vert</mat-icon>
+  <div
+    class="receta-card touch-card mb-3"
+    [class.cursor-pointer]="auth.isOwner()"
+    (click)="auth.isOwner() ? editar(receta) : null"
+    role="button"
+    [attr.tabindex]="auth.isOwner() ? 0 : null"
+    [attr.aria-label]="'Editar receta ' + receta.nombre"
+    (keydown.enter)="auth.isOwner() ? editar(receta) : null"
+  >
+    <!-- Top row: name + category + menu -->
+    <div class="flex items-start justify-between gap-2 mb-3">
+      <div class="flex-1 min-w-0">
+        <p class="font-semibold text-on-surface text-base leading-tight">{{ receta.nombre }}</p>
+        <p class="text-xs text-on-surface-variant mt-0.5">
+          {{ receta.ingredientes.length }} ingredientes · rinde {{ receta.rendimiento }} u.
+        </p>
+      </div>
+      <div class="flex items-center gap-1 shrink-0">
+        <span class="category-chip">{{ receta.categoria }}</span>
+        @if (auth.isOwner()) {
+          <button
+            mat-icon-button
+            [matMenuTriggerFor]="recetaMenu"
+            (click)="$event.stopPropagation()"
+            aria-label="Opciones de receta"
+          >
+            <span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+          </button>
+          <mat-menu #recetaMenu="matMenu">
+            <button mat-menu-item (click)="duplicar(receta)">
+              <span class="material-symbols-outlined">content_copy</span>
+              Duplicar
             </button>
-            <mat-menu #recetaMenu="matMenu">
-              <button mat-menu-item (click)="duplicar(receta)">
-                <mat-icon>content_copy</mat-icon> Duplicar
-              </button>
-            </mat-menu>
-          }
-        </div>
+          </mat-menu>
+        }
       </div>
+    </div>
 
-      <div class="grid grid-cols-3 gap-2 text-center mt-2">
-        <div>
-          <div class="text-xs text-gray-500">Costo</div>
-          <div class="font-semibold text-red-600">{{ receta.costoCalculado | ars }}</div>
-        </div>
-        <div>
-          <div class="text-xs text-gray-500">Margen</div>
-          <div class="font-semibold">{{ receta.margenGanancia }}%</div>
-        </div>
-        <div>
-          <div class="text-xs text-gray-500">Precio</div>
-          <div class="font-semibold text-green-600">{{ receta.precioVenta | ars }}</div>
-        </div>
+    <!-- Stats row -->
+    <div class="grid grid-cols-3 gap-2 text-center">
+      <div class="stat-cell">
+        <p class="stat-label">Costo</p>
+        <p class="stat-value text-[color:var(--mat-sys-error)]">{{ receta.costoCalculado | ars }}</p>
       </div>
-
-      <div class="text-xs text-gray-400 mt-1">
-        {{ receta.ingredientes.length }} ingredientes · rinde {{ receta.rendimiento }} u.
+      <div class="stat-cell">
+        <p class="stat-label">Margen</p>
+        <p class="stat-value">{{ receta.margenGanancia }}%</p>
       </div>
-    </mat-card-content>
-  </mat-card>
+      <div class="stat-cell">
+        <p class="stat-label">Precio</p>
+        <p class="stat-value text-[color:var(--color-status-ok)]">{{ receta.precioVenta | ars }}</p>
+      </div>
+    </div>
+  </div>
 }
 
 @if (auth.isOwner()) {
-  <button mat-fab class="fab-bottom-right" color="primary" (click)="crear()">
-    <mat-icon>add</mat-icon>
+  <button mat-fab class="fab-bottom-right" color="primary" (click)="crear()" aria-label="Crear receta">
+    <span class="material-symbols-outlined">add</span>
   </button>
 }
+

@@ -1,12 +1,9 @@
-import { Component, inject } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatListModule } from '@angular/material/list';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { NotificationService } from '../../core/services/notification.service';
 import { RouterLink } from '@angular/router';
+import { NotificationService } from '../../core/services/notification.service';
 import { IngredientesStore } from '../../core/store/ingredientes.store';
 import { Ingrediente } from '../../core/models/ingrediente';
 import { getStockPriority } from '../../core/utils/stock.utils';
@@ -15,17 +12,15 @@ import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-stock',
-  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    MatCardModule,
-    MatIconModule,
     MatButtonModule,
     MatProgressBarModule,
-    MatListModule,
     MatDialogModule,
     RouterLink,
   ],
   templateUrl: './stock.component.html',
+  styleUrl: './stock.component.scss',
 })
 export class StockComponent {
   readonly store = inject(IngredientesStore);

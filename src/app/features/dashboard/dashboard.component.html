@@ -1,167 +1,151 @@
-<h2 class="text-xl font-semibold mb-4">Hola! 👋</h2>
+﻿<!-- Welcome Section -->
+<section class="mb-2">
+  <h2 class="text-3xl font-bold text-on-surface tracking-tight">Hola! 👋</h2>
+  <p class="text-on-surface-variant mt-1">Lucis Gestión Dashboard</p>
+</section>
 
-<!-- Period Selector -->
-<mat-button-toggle-group
-  class="mb-4 w-full"
-  [value]="store.periodoSeleccionado()"
-  (change)="store.setPeriodo($event.value)"
->
-  <mat-button-toggle value="mes" class="flex-1">Mes</mat-button-toggle>
-</mat-button-toggle-group>
+<!-- Metrics Bento Grid -->
+<section class="grid grid-cols-2 gap-4 mb-6" aria-label="Métricas principales">
+  <!-- Ingresos -->
+  <div class="app-card metric-card">
+    <span class="material-symbols-outlined text-[color:var(--mat-sys-primary)]">trending_up</span>
+    <p class="metric-label">Ingresos</p>
+    <p class="metric-value">{{ ventasMes() | ars }}</p>
+  </div>
 
-<!-- KPI Cards -->
-<div class="grid grid-cols-2 gap-3 mb-6">
-  <mat-card class="touch-card">
-    <mat-card-content class="text-center py-3">
-      <mat-icon class="text-green-600">trending_up</mat-icon>
-      <div class="text-2xl font-bold">{{ ventasMes() | ars }}</div>
-      <div class="text-xs text-gray-500">Ingresos</div>
-    </mat-card-content>
-  </mat-card>
+  <!-- Ganancia Neta -->
+  <div class="app-card metric-card">
+    <span class="material-symbols-outlined text-[color:var(--mat-sys-primary)]">savings</span>
+    <p class="metric-label">Ganancia neta</p>
+    <p
+      class="metric-value"
+      [class.text-green-700]="gananciaNeta() >= 0"
+      [class.text-red-600]="gananciaNeta() < 0"
+    >{{ gananciaNeta() | ars }}</p>
+  </div>
 
-  <mat-card class="touch-card">
-    <mat-card-content class="text-center py-3">
-      <mat-icon class="text-blue-600">savings</mat-icon>
-      <div
-        class="text-2xl font-bold"
-        [class]="gananciaNeta() >= 0 ? 'text-blue-700' : 'text-red-600'"
-      >
-        {{ gananciaNeta() | ars }}
+  <!-- Recetas activas -->
+  <a routerLink="/recetas" class="app-card metric-card">
+    <span class="material-symbols-outlined text-[color:var(--mat-sys-primary)]">menu_book</span>
+    <p class="metric-label">Recetas activas</p>
+    <p class="metric-value">{{ totalRecetas() }}</p>
+  </a>
+
+  <!-- Pedidos pendientes -->
+  <a routerLink="/ventas" class="app-card metric-card">
+    <span class="material-symbols-outlined text-[color:var(--mat-sys-primary)]">assignment</span>
+    <p class="metric-label">Pedidos pendientes</p>
+    <p class="metric-value">{{ pedidosPendientes() }}</p>
+  </a>
+</section>
+
+<!-- Visual Banner -->
+<section class="banner-hero mb-6" aria-hidden="true">
+  <div class="banner-overlay">
+    <p class="text-white text-lg font-semibold">Calidad artesanal en cada lote.</p>
+  </div>
+</section>
+
+<!-- Stock Alert Cards -->
+@if (stockBajo().length > 0) {
+  <section class="mb-6 space-y-3" aria-label="Alertas de stock">
+    @for (item of stockBajo(); track item.id) {
+      <div class="stock-alert-card">
+        <div class="w-12 h-12 rounded-full bg-[color:var(--mat-sys-error)] flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-white">warning</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-bold uppercase tracking-wide text-[color:var(--color-on-error-container)]">Alerta de Stock</p>
+          <p class="text-sm text-[color:var(--color-on-error-container)] truncate">
+            Stock bajo: <strong>{{ item.nombre }} ({{ item.stockActual }} {{ item.unidad }})</strong>
+          </p>
+        </div>
+        <a routerLink="/stock" class="text-sm font-semibold text-[color:var(--mat-sys-error)] shrink-0">Reponer</a>
       </div>
-      <div class="text-xs text-gray-500">Ganancia neta</div>
-    </mat-card-content>
-  </mat-card>
-
-  <mat-card class="touch-card" routerLink="/recetas">
-    <mat-card-content class="text-center py-3">
-      <mat-icon class="text-purple-600">menu_book</mat-icon>
-      <div class="text-2xl font-bold">{{ totalRecetas() }}</div>
-      <div class="text-xs text-gray-500">Recetas activas</div>
-    </mat-card-content>
-  </mat-card>
-
-  <mat-card class="touch-card" routerLink="/ventas">
-    <mat-card-content class="text-center py-3">
-      <mat-icon class="text-orange-600">pending_actions</mat-icon>
-      <div class="text-2xl font-bold">{{ pedidosPendientes() }}</div>
-      <div class="text-xs text-gray-500">Pedidos pendientes</div>
-    </mat-card-content>
-  </mat-card>
-</div>
-
-<!-- Producto más vendido -->
-@if (store.productoMasVendido(); as top) {
-  <mat-card class="mb-4 touch-card">
-    <mat-card-content class="flex items-center gap-3 py-2">
-      <mat-icon class="text-amber-500" style="font-size: 32px; width: 32px; height: 32px"
-        >emoji_events</mat-icon
-      >
-      <div>
-        <div class="text-xs text-gray-500">Más vendido</div>
-        <div class="font-bold">{{ top.nombre }}</div>
-        <div class="text-sm text-gray-400">{{ top.cantidad }} unidades</div>
-      </div>
-    </mat-card-content>
-  </mat-card>
+    }
+  </section>
 }
 
-<!-- Ingresos vs Gastos Bar -->
-<h3 class="text-base font-medium mb-2">Ingresos vs Gastos</h3>
-<mat-card class="mb-4">
-  <mat-card-content class="py-3 flex flex-col">
-    <div class="flex items-center gap-2 py-2">
-      <span class="text-xs w-20 text-gray-500 shrink-0">Ingresos</span>
-      <div class="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
-        <div
-          class="bg-green-500 h-6 rounded-full transition-all"
-          [style.width.%]="ingresosBarWidth()"
-        ></div>
+<!-- Producto mas vendido -->
+@if (store.productoMasVendido(); as top) {
+  <section class="mb-6">
+    <div class="app-card metric-card flex-row gap-4 items-center">
+      <span class="material-symbols-outlined text-amber-500 shrink-0" style="font-size: 36px">emoji_events</span>
+      <div>
+        <p class="metric-label">Mas vendido</p>
+        <p class="font-bold text-on-surface">{{ top.nombre }}</p>
+        <p class="text-sm text-on-surface-variant">{{ top.cantidad }} unidades</p>
       </div>
-      <span class="text-xs w-24 text-right font-medium shrink-0">{{ ventasMes() | ars }}</span>
     </div>
-    <div class="border-t border-dashed border-gray-200"></div>
-    <div class="flex items-center gap-2 py-2">
-      <span class="text-xs w-20 text-gray-500 shrink-0">Ingredientes</span>
-      <div class="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
-        <div
-          class="bg-orange-400 h-6 rounded-full transition-all"
-          [style.width.%]="ingredientesBarWidth()"
-        ></div>
+  </section>
+}
+
+<!-- Bar Chart - Ingresos vs Gastos -->
+<section class="app-card chart-card mb-6" aria-label="Ingresos vs Gastos">
+  <div class="flex justify-between items-center mb-5">
+    <h3 class="text-base font-bold text-on-surface">Ingresos vs Gastos</h3>
+    <span class="material-symbols-outlined text-on-surface-variant">bar_chart</span>
+  </div>
+  <div class="space-y-4">
+    <div>
+      <div class="flex justify-between text-xs font-medium mb-1">
+        <span class="text-on-surface-variant">Ingresos</span>
+        <span>{{ ventasMes() | ars }}</span>
       </div>
-      <span class="text-xs w-24 text-right font-medium shrink-0">{{ gastosMes() | ars }}</span>
-    </div>
-    <div class="flex items-center gap-2 pb-2">
-      <span class="text-xs w-20 text-gray-500 shrink-0">C. fijos</span>
-      <div class="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
-        <div
-          class="bg-red-400 h-6 rounded-full transition-all"
-          [style.width.%]="costosFijosBarWidth()"
-        ></div>
+      <div class="chart-track">
+        <div class="bg-emerald-500 h-full rounded-full transition-all" [style.width.%]="ingresosBarWidth()"></div>
       </div>
-      <span class="text-xs w-24 text-right font-medium shrink-0">{{
-        costosFijosPeriodo() | ars
-      }}</span>
     </div>
-    <div class="border-t pt-3 flex items-center justify-between">
-      <span class="text-xs text-gray-500">Gastos totales</span>
+    <div>
+      <div class="flex justify-between text-xs font-medium mb-1">
+        <span class="text-on-surface-variant">Ingredientes</span>
+        <span>{{ gastosMes() | ars }}</span>
+      </div>
+      <div class="chart-track">
+        <div class="bg-orange-400 h-full rounded-full transition-all" [style.width.%]="ingredientesBarWidth()"></div>
+      </div>
+    </div>
+    <div>
+      <div class="flex justify-between text-xs font-medium mb-1">
+        <span class="text-on-surface-variant">C. fijos</span>
+        <span>{{ costosFijosPeriodo() | ars }}</span>
+      </div>
+      <div class="chart-track">
+        <div class="bg-[color:var(--mat-sys-primary)] h-full rounded-full transition-all" [style.width.%]="costosFijosBarWidth()"></div>
+      </div>
+    </div>
+    <div class="border-t border-dashed border-outline-variant pt-3 flex justify-between items-center">
+      <span class="text-xs text-on-surface-variant">Gastos totales</span>
       <span class="text-sm font-semibold text-red-700">{{ gastosTotalesPeriodo() | ars }}</span>
     </div>
-    <div class="pt-1 flex items-center justify-between">
-      <span class="text-xs text-gray-500">Ganancia neta</span>
+    <div class="flex justify-between items-center">
+      <span class="text-xs text-on-surface-variant">Ganancia neta</span>
       <span
         class="text-sm font-bold"
-        [class]="gananciaNeta() >= 0 ? 'text-green-700' : 'text-red-700'"
-      >
-        {{ gananciaNeta() | ars }}
-      </span>
+        [class.text-green-700]="gananciaNeta() >= 0"
+        [class.text-red-700]="gananciaNeta() < 0"
+      >{{ gananciaNeta() | ars }}</span>
     </div>
-  </mat-card-content>
-</mat-card>
+  </div>
+</section>
 
-<!-- Stock Alerts -->
-@if (stockBajo().length > 0) {
-  <h3 class="text-base font-medium mb-2">
-    <mat-icon class="text-red-500 align-middle" style="font-size: 20px">warning</mat-icon>
-    Stock bajo
-  </h3>
-  <mat-card class="mb-4">
-    <mat-list>
-      @for (item of stockBajo(); track item.id) {
-        <mat-list-item>
-          <mat-icon matListItemIcon class="stock-danger">error</mat-icon>
-          <span matListItemTitle>{{ item.nombre }}</span>
-          <span matListItemLine>
-            Quedan {{ item.stockActual }} {{ item.unidad }} (mín: {{ item.stockMinimo }})
-          </span>
-        </mat-list-item>
-      }
-    </mat-list>
-  </mat-card>
-}
-
-<!-- Recent Sales -->
+<!-- Recent Activity -->
 @if (ventasRecientes().length > 0) {
-  <h3 class="text-base font-medium mb-2">Últimas ventas</h3>
-  <mat-card>
-    <mat-list>
-      @for (venta of ventasRecientes(); track venta.id) {
-        <mat-list-item>
-          <mat-icon matListItemIcon>receipt</mat-icon>
-          <span matListItemTitle
-            >{{ venta.clienteNombre || 'Sin cliente' }} — {{ venta.total | ars }}</span
-          >
-          <span matListItemLine>
-            <mat-chip-set>
-              <mat-chip
-                [class]="venta.estado === 'pendiente' ? 'stock-warning' : 'stock-ok'"
-                style="font-size: 11px"
-              >
-                {{ venta.estado }}
-              </mat-chip>
-            </mat-chip-set>
-          </span>
-        </mat-list-item>
-      }
-    </mat-list>
-  </mat-card>
+  <section class="space-y-3" aria-label="Actividad reciente">
+    <h3 class="text-base font-bold px-1">Actividad Reciente</h3>
+    @for (venta of ventasRecientes(); track venta.id) {
+      <div class="app-card activity-card">
+        <div class="w-12 h-12 rounded-lg bg-[color:var(--mat-sys-primary-container)] flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-[color:var(--mat-sys-on-primary-container)]">receipt_long</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-semibold text-on-surface">{{ venta.clienteNombre || 'Sin cliente' }}</p>
+          <p class="text-sm text-on-surface-variant capitalize">{{ venta.estado }}</p>
+        </div>
+        <div class="text-right shrink-0">
+          <p class="font-bold text-[color:var(--mat-sys-primary)]">{{ venta.total | ars }}</p>
+        </div>
+      </div>
+    }
+  </section>
 }

@@ -1,8 +1,5 @@
-import { Component, inject } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { NotificationService } from '../../core/services/notification.service';
@@ -15,17 +12,15 @@ import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-recetas',
-  standalone: true,
   imports: [
-    MatCardModule,
-    MatIconModule,
     MatButtonModule,
-    MatChipsModule,
     MatMenuModule,
     MatDialogModule,
     ArsPipe,
   ],
   templateUrl: './recetas.component.html',
+  styleUrl: './recetas.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RecetasComponent {
   readonly store = inject(RecetasStore);

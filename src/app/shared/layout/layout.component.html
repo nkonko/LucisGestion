@@ -1,6 +1,10 @@
 <mat-toolbar color="primary" class="top-toolbar">
   <span class="text-lg font-medium flex-1">🧁 Lucis Gestión</span>
 
+  <button mat-icon-button (click)="theme.toggle()" [attr.aria-label]="theme.dark() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'">
+    <mat-icon>{{ theme.dark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  </button>
+
   <button mat-icon-button [matMenuTriggerFor]="userMenu">
     @if (auth.appUser()?.photoURL) {
       <img

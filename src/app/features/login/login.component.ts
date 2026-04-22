@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,14 +20,22 @@ export class LoginComponent {
   loading = false;
   error = '';
 
+  constructor() {
+    effect(() => {
+      if (this.auth.ready() && this.auth.isLoggedIn()) {
+        void this.router.navigate(['/dashboard']);
+      }
+    });
+  }
+
   async loginGoogle() {
     this.loading = true;
     this.error = '';
     try {
       await this.auth.loginWithGoogle();
-      this.router.navigate(['/dashboard']);
-    } catch (e: any) {
-      this.error = e?.message ?? 'Error al iniciar sesión';
+      void this.router.navigate(['/dashboard']);
+    } catch (error: unknown) {
+      this.error = error instanceof Error ? error.message : 'Error al iniciar sesión';
       this.loading = false;
     }
   }

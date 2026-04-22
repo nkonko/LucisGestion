@@ -10,6 +10,20 @@
 .stock-warning { color: var(--color-status-warning); }
 .stock-danger  { color: var(--color-status-danger); }
 
+// ── Base card ────────────────────────────────────────────────────────────────
+// Token-aware surface card. Use this instead of mat-card or hardcoded white
+// backgrounds so dark mode is handled automatically via --mat-sys-* tokens.
+.app-card {
+  background: var(--color-card-surface, var(--mat-sys-surface-container-lowest));
+  border: 1px solid var(--color-card-border, var(--mat-sys-outline-variant));
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-4);
+  color: var(--mat-sys-on-surface);
+  text-decoration: none;
+  display: block;
+}
+
 // ── Touch-friendly interactive card ─────────────────────────────────────────
 // Adds tap feedback for clickable cards on touch devices.
 .touch-card {

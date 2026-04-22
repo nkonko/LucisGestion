@@ -42,9 +42,13 @@ export class AuthService {
   constructor() {
     onAuthStateChanged(this.auth, async (user) => {
       this._user.set(user);
-      if (user) {
-        await this.loadOrCreateProfile(user);
-      } else {
+      try {
+        if (user) {
+          await this.loadOrCreateProfile(user);
+        } else {
+          this._appUser.set(null);
+        }
+      } catch {
         this._appUser.set(null);
       }
       this._ready.set(true);

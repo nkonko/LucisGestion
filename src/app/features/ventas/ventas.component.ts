@@ -1,9 +1,6 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed, signal } from '@angular/core';
 import { NgTemplateOutlet, DatePipe } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -22,14 +19,11 @@ import { VentaFormComponent } from './venta-form.component';
 
 @Component({
   selector: 'app-ventas',
-  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     NgTemplateOutlet,
     DatePipe,
-    MatCardModule,
-    MatIconModule,
     MatButtonModule,
-    MatChipsModule,
     MatTabsModule,
     MatDialogModule,
     ArsPipe,
@@ -39,6 +33,7 @@ import { VentaFormComponent } from './venta-form.component';
     MatNativeDateModule,
   ],
   templateUrl: './ventas.component.html',
+  styleUrl: './ventas.component.scss',
 })
 export class VentasComponent {
   readonly store = inject(VentasStore);

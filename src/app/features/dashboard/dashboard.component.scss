@@ -1,0 +1,95 @@
+// Dashboard component styles
+// Uses CSS custom properties from _tokens.scss
+// Base card appearance comes from the global .app-card utility in _utilities.scss
+
+.metric-card {
+  background: var(--color-card-surface, var(--mat-sys-surface-container-lowest));
+  border: 1px solid var(--color-card-border, var(--mat-sys-outline-variant));
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 150ms ease;
+
+  &:is(a):hover {
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .metric-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  .metric-value {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--mat-sys-on-surface);
+  }
+}
+
+.banner-hero {
+  position: relative;
+  height: 11rem;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--mat-sys-primary-container) 0%, var(--mat-sys-tertiary-container, #b05700) 100%);
+
+  .banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent);
+    display: flex;
+    align-items: flex-end;
+    padding: var(--space-5);
+  }
+}
+
+.stock-alert-card {
+  background: color-mix(in srgb, var(--mat-sys-error-container) 40%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mat-sys-error) 20%, transparent);
+  padding: var(--space-4);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+// Token alias for on-error-container — adapt to theme via mat-sys
+:host {
+  --color-on-error-container: var(--mat-sys-on-error-container, #93000a);
+}
+
+.chart-card {
+  background: var(--color-card-surface, var(--mat-sys-surface-container-lowest));
+  border: 1px solid var(--color-card-border, var(--mat-sys-outline-variant));
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-5);
+}
+
+.chart-track {
+  width: 100%;
+  background: var(--mat-sys-surface-container);
+  height: 10px;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.activity-card {
+  background: var(--color-card-surface, var(--mat-sys-surface-container-lowest));
+  border: 1px solid var(--color-card-border, var(--mat-sys-outline-variant));
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}

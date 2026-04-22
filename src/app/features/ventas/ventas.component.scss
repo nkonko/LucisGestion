@@ -1,0 +1,28 @@
+@mixin feature-card {
+  background: var(--color-card-surface, var(--mat-sys-surface-container-lowest));
+  border: 1px solid var(--color-card-border, var(--mat-sys-outline-variant));
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-4);
+}
+
+.venta-card {
+  @include feature-card;
+}
+
+.estado-chip {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+
+  // State-specific overrides using existing utility classes logic
+  &.stock-ok     { background: color-mix(in srgb, var(--color-status-ok) 20%, transparent); color: var(--color-status-ok); }
+  &.stock-warning { background: color-mix(in srgb, var(--color-status-warning) 20%, transparent); color: var(--color-status-warning); }
+  &.stock-danger  { background: color-mix(in srgb, var(--color-status-danger) 20%, transparent); color: var(--color-status-danger); }
+}

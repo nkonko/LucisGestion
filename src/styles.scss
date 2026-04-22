@@ -20,19 +20,93 @@
 @use 'styles/layout';
 @use 'styles/utilities';
 
-// ── Angular Material theme ───────────────────────────────────────────────────
+// ── Angular Material theme (Artisan Red Management) ──────────────────────────
 html {
   height: 100%;
   @include mat.theme(
     (
       color: (
-        primary: mat.$rose-palette,
+        primary: mat.$red-palette,
         tertiary: mat.$orange-palette,
       ),
-      typography: Roboto,
+      typography: (Epilogue, Work Sans),
       density: -1,
     )
   );
+
+  // Artisan Red Light overrides — applied after mat.theme() so they win the cascade.
+  --mat-sys-primary:                  #af101a;
+  --mat-sys-on-primary:               #ffffff;
+  --mat-sys-primary-container:        #d32f2f;
+  --mat-sys-on-primary-container:     #fff2f0;
+  --mat-sys-secondary:                #77574d;
+  --mat-sys-on-secondary:             #ffffff;
+  --mat-sys-secondary-container:      #fed3c7;
+  --mat-sys-on-secondary-container:   #795950;
+  --mat-sys-tertiary:                 #8b4400;
+  --mat-sys-on-tertiary:              #ffffff;
+  --mat-sys-tertiary-container:       #b05700;
+  --mat-sys-on-tertiary-container:    #fff2eb;
+  --mat-sys-surface:                  #fbf9f9;
+  --mat-sys-surface-dim:              #dbdad9;
+  --mat-sys-surface-bright:           #fbf9f9;
+  --mat-sys-surface-container:        #efeded;
+  --mat-sys-surface-container-low:    #f5f3f3;
+  --mat-sys-surface-container-high:   #e9e8e7;
+  --mat-sys-surface-container-highest:#e3e2e2;
+  --mat-sys-on-surface:               #1b1c1c;
+  --mat-sys-on-surface-variant:       #5b403d;
+  --mat-sys-outline:                  #8f6f6c;
+  --mat-sys-outline-variant:          #e4beba;
+  --mat-sys-inverse-surface:          #303031;
+  --mat-sys-inverse-on-surface:       #f2f0f0;
+  --mat-sys-inverse-primary:          #ffb3ac;
+}
+
+// ── Dark mode ────────────────────────────────────────────────────────────────
+html.dark {
+  color-scheme: dark;
+  @include mat.theme(
+    (
+      color: (
+        theme-type: dark,
+        primary: mat.$red-palette,
+        tertiary: mat.$orange-palette,
+      ),
+      typography: (Epilogue, Work Sans),
+      density: -1,
+    )
+  );
+
+  // Artisan Red Dark overrides — applied after mat.theme() so they win the cascade.
+  --mat-sys-primary:                  #ffb3ac;
+  --mat-sys-on-primary:               #680008;
+  --mat-sys-primary-container:        #d32f2f;
+  --mat-sys-on-primary-container:     #fff2f0;
+  --mat-sys-secondary:                #c8c6c5;
+  --mat-sys-on-secondary:             #313030;
+  --mat-sys-secondary-container:      #474746;
+  --mat-sys-on-secondary-container:   #b7b5b4;
+  --mat-sys-tertiary:                 #c8c6c5;
+  --mat-sys-on-tertiary:              #303030;
+  --mat-sys-tertiary-container:       #706f6f;
+  --mat-sys-on-tertiary-container:    #f6f3f3;
+  --mat-sys-surface:                  #131313;
+  --mat-sys-surface-dim:              #131313;
+  --mat-sys-surface-bright:           #393939;
+  --mat-sys-surface-container:        #201f1f;
+  --mat-sys-surface-container-low:    #1c1b1b;
+  --mat-sys-surface-container-high:   #2a2a2a;
+  --mat-sys-surface-container-highest:#353534;
+  --mat-sys-on-surface:               #e5e2e1;
+  --mat-sys-on-surface-variant:       #e4beba;
+  --mat-sys-outline:                  #ab8985;
+  --mat-sys-outline-variant:          #5b403d;
+  --mat-sys-inverse-surface:          #e5e2e1;
+  // Card border in dark mode needs more contrast than outline-variant (#5b403d)
+  --color-card-border: rgba(229, 226, 225, 0.18);
+  --mat-sys-inverse-on-surface:       #313030;
+  --mat-sys-inverse-primary:          #ba1a20;
 }
 
 // ── Base reset ───────────────────────────────────────────────────────────────
@@ -43,4 +117,14 @@ body {
   font: var(--mat-sys-body-medium);
   margin: 0;
   height: 100%;
+}
+
+html.dark body {
+  color-scheme: dark;
+}
+
+// Keep Angular CDK overlays above fixed app chrome (toolbar/bottom nav).
+.cdk-overlay-container,
+.cdk-global-overlay-wrapper {
+  z-index: 2000;
 }

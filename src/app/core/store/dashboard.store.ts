@@ -1,21 +1,18 @@
 import { computed, inject } from '@angular/core';
-import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
+import { signalStore, withMethods } from '@ngrx/signals';
 import { VentasStore } from './ventas.store';
 import { CostosFijosStore } from './costos-fijos.store';
-import { DashboardState } from './state/dashboard.state';
-import { obtenerInicioPeriodo } from '../utils/dashboard.utils';
-import { Periodo } from '../models/dashboard';
 
 export const DashboardStore = signalStore(
   { providedIn: 'root' },
-  withState<DashboardState>({ periodoSeleccionado: 'mes' }),
 
-  withMethods((store) => {
+  withMethods(() => {
     const ventasStore = inject(VentasStore);
     const costosFijosStore = inject(CostosFijosStore);
 
     const ventasPeriodo = computed(() => {
-      const inicio = obtenerInicioPeriodo(store.periodoSeleccionado());
+      const now = new Date();
+      const inicio = new Date(now.getFullYear(), now.getMonth(), 1);
       return ventasStore.ventas().filter((v) => v.fecha?.toDate() >= inicio);
     });
 
@@ -54,10 +51,6 @@ export const DashboardStore = signalStore(
       gastosTotalesPeriodo,
       gananciaNeta,
       productoMasVendido,
-
-      setPeriodo(periodo: Periodo) {
-        patchState(store, { periodoSeleccionado: periodo });
-      },
     };
   }),
 );

@@ -1,8 +1,5 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { NotificationService } from '../../core/services/notification.service';
 import { CostosFijosStore } from '../../core/store/costos-fijos.store';
@@ -21,14 +18,12 @@ import { ArsPipe } from '../../shared/pipes/ars.pipe';
   selector: 'app-costos-fijos',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    MatCardModule,
-    MatIconModule,
     MatButtonModule,
-    MatChipsModule,
     MatDialogModule,
     ArsPipe,
   ],
   templateUrl: './costos-fijos.component.html',
+  styleUrl: './costos-fijos.component.scss',
 })
 export class CostosFijosComponent {
   readonly store = inject(CostosFijosStore);

@@ -1,11 +1,9 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { NotificationService } from '../../core/services/notification.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { NotificationService } from '../../core/services/notification.service';
 import { ClientesStore } from '../../core/store/clientes.store';
 import { WhatsAppService } from '../../core/services/whatsapp.service';
 import { Cliente } from '../../core/models/cliente';
@@ -13,10 +11,8 @@ import { ClienteFormComponent } from './cliente-form.component';
 
 @Component({
   selector: 'app-clientes',
-  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    MatCardModule,
-    MatIconModule,
     MatButtonModule,
     MatDialogModule,
     MatFormFieldModule,
