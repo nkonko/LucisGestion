@@ -6,7 +6,7 @@ export const routes: Routes = [
   {
     path: 'login',
     loadComponent: () =>
-      import('./features/login/login.component').then(m => m.LoginComponent),
+      import('./features/login/login.component').then((m) => m.LoginComponent),
   },
   {
     path: '',
@@ -16,37 +16,43 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         loadComponent: () =>
-          import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
+          import('./features/dashboard/dashboard.component').then(
+            (m) => m.DashboardComponent,
+          ),
       },
       {
         path: 'ingredientes',
         loadComponent: () =>
-          import('./features/ingredientes/ingredientes.component').then(m => m.IngredientesComponent),
+          import('./features/ingredients/ingredients.component').then(
+            (m) => m.IngredientsComponent,
+          ),
       },
       {
         path: 'recetas',
         loadComponent: () =>
-          import('./features/recetas/recetas.component').then(m => m.RecetasComponent),
+          import('./features/recipes/recipes.component').then((m) => m.RecipesComponent),
       },
       {
         path: 'ventas',
         loadComponent: () =>
-          import('./features/ventas/ventas.component').then(m => m.VentasComponent),
+          import('./features/sales/sales.component').then((m) => m.SalesComponent),
       },
       {
         path: 'stock',
         loadComponent: () =>
-          import('./features/stock/stock.component').then(m => m.StockComponent),
+          import('./features/stock/stock.component').then((m) => m.StockComponent),
       },
       {
         path: 'clientes',
         loadComponent: () =>
-          import('./features/clientes/clientes.component').then(m => m.ClientesComponent),
+          import('./features/customers/customers.component').then((m) => m.CustomersComponent),
       },
       {
         path: 'costos',
         loadComponent: () =>
-          import('./features/costos-fijos/costos-fijos.component').then(m => m.CostosFijosComponent),
+          import('./features/fixed-costs/fixed-costs.component').then(
+            (m) => m.FixedCostsComponent,
+          ),
       },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],

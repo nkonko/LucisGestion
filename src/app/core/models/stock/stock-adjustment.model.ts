@@ -1,5 +1,5 @@
 export interface StockAdjustmentInput {
-  ingredienteId: string;
-  ingredienteNombre: string;
+  ingredientId: string;
+  ingredientName: string;
   delta: number;
 }

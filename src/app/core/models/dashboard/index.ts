@@ -1,1 +1,1 @@
-export type { Periodo } from './periodo.model';
+export type { Period } from './period.model';

@@ -18,7 +18,7 @@ export class MockAuthService {
   readonly ready = this._ready.asReadonly();
   readonly isLoggedIn = computed(() => !!this._appUser());
   readonly isOwner = computed(() => this._appUser()?.role === 'owner');
-  readonly isAyudante = computed(() => this._appUser()?.role === 'ayudante');
+  readonly isAssistant = computed(() => this._appUser()?.role === 'assistant');
 
   async loginWithGoogle(): Promise<void> {
     this._appUser.set({
