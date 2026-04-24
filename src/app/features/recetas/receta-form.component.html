@@ -120,15 +120,16 @@
   </mat-form-field>
   <mat-divider class="py-1"></mat-divider>
 
-  <mat-dialog-actions align="end">
-    @if (isEdit) {
-      <button mat-button color="warn" (click)="eliminar()">
-        <mat-icon>delete</mat-icon> Eliminar
-      </button>
-    }
-    <button mat-button mat-dialog-close>Cancelar</button>
-    <button mat-flat-button color="primary" (click)="guardar()" [disabled]="!isValid()">
-      {{ isEdit ? 'Guardar' : 'Crear' }}
-    </button>
-  </mat-dialog-actions>
 </mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  @if (isEdit) {
+    <button mat-button color="warn" (click)="eliminar()">
+      <mat-icon>delete</mat-icon> Eliminar
+    </button>
+  }
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-flat-button color="primary" (click)="guardar()" [disabled]="!isValid()">
+    {{ isEdit ? 'Guardar' : 'Crear' }}
+  </button>
+</mat-dialog-actions>
