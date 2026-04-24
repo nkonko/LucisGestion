@@ -1,5 +1,5 @@
-import type { Periodo } from '../../models/dashboard/periodo.model';
+import type { Period } from '../../models/dashboard/period.model';
 
 export interface DashboardState {
-  periodoSeleccionado: Periodo;
+  selectedPeriod: Period;
 }

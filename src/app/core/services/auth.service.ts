@@ -10,7 +10,7 @@ import {
 import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
 import { environment } from '../../../environments/environment';
 
-export type UserRole = 'owner' | 'ayudante';
+export type UserRole = 'owner' | 'assistant';
 
 export interface AppUser {
   uid: string;
@@ -37,7 +37,7 @@ export class AuthService {
   readonly ready = this._ready.asReadonly();
   readonly isLoggedIn = computed(() => !!this._appUser());
   readonly isOwner = computed(() => this._appUser()?.role === 'owner');
-  readonly isAyudante = computed(() => this._appUser()?.role === 'ayudante');
+  readonly isAssistant = computed(() => this._appUser()?.role === 'assistant');
 
   constructor() {
     onAuthStateChanged(this.auth, async (user) => {
@@ -69,7 +69,7 @@ export class AuthService {
 
   /**
    * Load user profile from Firestore, or create a new one.
-   * First user ever gets 'owner' role, subsequent users get 'ayudante'.
+   * First user ever gets 'owner' role, subsequent users get 'assistant'.
    */
   private async loadOrCreateProfile(user: User): Promise<void> {
     // Double-check whitelist on auth state restore (e.g. page reload)
@@ -92,7 +92,7 @@ export class AuthService {
       const usersRef = collection(this.firestore, 'users');
       const q = query(usersRef, limit(1));
       const existing = await getDocs(q);
-      const role: UserRole = existing.empty ? 'owner' : 'ayudante';
+      const role: UserRole = existing.empty ? 'owner' : 'assistant';
 
       const profile: AppUser = {
         uid: user.uid,

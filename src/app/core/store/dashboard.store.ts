@@ -1,62 +1,62 @@
 import { computed, inject } from '@angular/core';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
-import { VentasStore } from './ventas.store';
-import { CostosFijosStore } from './costos-fijos.store';
+import { SalesStore } from './sales.store';
+import { FixedCostsStore } from './fixed-costs.store';
 import { DashboardState } from './state/dashboard.state';
-import { obtenerInicioPeriodo } from '../utils/dashboard.utils';
-import { Periodo } from '../models/dashboard';
+import { getPeriodStart } from '../utils/dashboard.utils';
+import { Period } from '../models/dashboard';
 
 export const DashboardStore = signalStore(
   { providedIn: 'root' },
-  withState<DashboardState>({ periodoSeleccionado: 'mes' }),
+  withState<DashboardState>({ selectedPeriod: 'month' }),
 
   withMethods((store) => {
-    const ventasStore = inject(VentasStore);
-    const costosFijosStore = inject(CostosFijosStore);
+    const salesStore = inject(SalesStore);
+    const fixedCostsStore = inject(FixedCostsStore);
 
-    const ventasPeriodo = computed(() => {
-      const inicio = obtenerInicioPeriodo(store.periodoSeleccionado());
-      return ventasStore.ventas().filter((v) => v.fecha?.toDate() >= inicio);
+    const periodSales = computed(() => {
+      const start = getPeriodStart(store.selectedPeriod());
+      return salesStore.sales().filter((v) => v.date?.toDate() >= start);
     });
 
-    const ventasMes = computed(() => ventasPeriodo().reduce((sum, v) => sum + v.total, 0));
+    const monthlySales = computed(() => periodSales().reduce((sum, v) => sum + v.total, 0));
 
-    const gastosMes = computed(() => ventasPeriodo().reduce((sum, v) => sum + v.costoTotal, 0));
+    const monthlyExpenses = computed(() => periodSales().reduce((sum, v) => sum + v.totalCost, 0));
 
-    const gananciaMes = computed(() => ventasPeriodo().reduce((sum, v) => sum + v.ganancia, 0));
+    const monthlyProfit = computed(() => periodSales().reduce((sum, v) => sum + v.profit, 0));
 
-    const costosFijosPeriodo = computed(() => costosFijosStore.totalCostosFijosMensuales());
+    const periodFixedCosts = computed(() => fixedCostsStore.totalMonthlyFixedCosts());
 
-    const gastosTotalesPeriodo = computed(() => gastosMes() + costosFijosPeriodo());
+    const totalPeriodExpenses = computed(() => monthlyExpenses() + periodFixedCosts());
 
-    const gananciaNeta = computed(() => gananciaMes() - costosFijosPeriodo());
+    const netProfit = computed(() => monthlyProfit() - periodFixedCosts());
 
-    const productoMasVendido = computed(() => {
-      const vp = ventasPeriodo();
+    const topSellingProduct = computed(() => {
+      const vp = periodSales();
       if (!vp.length) return null;
-      const conteo: Record<string, { nombre: string; cantidad: number }> = {};
+      const count: Record<string, { name: string; quantity: number }> = {};
       for (const v of vp) {
         for (const item of v.items) {
-          if (!conteo[item.recetaId]) {
-            conteo[item.recetaId] = { nombre: item.nombre, cantidad: 0 };
+          if (!count[item.recipeId]) {
+            count[item.recipeId] = { name: item.name, quantity: 0 };
           }
-          conteo[item.recetaId].cantidad += item.cantidad;
+          count[item.recipeId].quantity += item.quantity;
         }
       }
-      return Object.values(conteo).sort((a, b) => b.cantidad - a.cantidad)[0] ?? null;
+      return Object.values(count).sort((a, b) => b.quantity - a.quantity)[0] ?? null;
     });
 
     return {
-      ventasMes,
-      gastosMes,
-      gananciaMes,
-      costosFijosPeriodo,
-      gastosTotalesPeriodo,
-      gananciaNeta,
-      productoMasVendido,
+      monthlySales,
+      monthlyExpenses,
+      monthlyProfit,
+      periodFixedCosts,
+      totalPeriodExpenses,
+      netProfit,
+      topSellingProduct,
 
-      setPeriodo(periodo: Periodo) {
-        patchState(store, { periodoSeleccionado: periodo });
+      setPeriod(period: Period) {
+        patchState(store, { selectedPeriod: period });
       },
     };
   }),

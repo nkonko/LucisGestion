@@ -7,15 +7,14 @@ import { MatListModule } from '@angular/material/list';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { NotificationService } from '../../core/services/notification.service';
 import { RouterLink } from '@angular/router';
-import { IngredientesStore } from '../../core/store/ingredientes.store';
-import { Ingrediente } from '../../core/models/ingrediente';
+import { IngredientsStore } from '../../core/store/ingredients.store';
+import { Ingredient } from '../../core/models/ingredient';
 import { getStockPriority } from '../../core/utils/stock.utils';
-import { IngredienteFormComponent } from '../ingredientes/ingrediente-form.component';
+import { IngredientFormComponent } from '../ingredients/ingredient-form.component';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-stock',
-  standalone: true,
   imports: [
     MatCardModule,
     MatIconModule,
@@ -28,15 +27,14 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './stock.component.html',
 })
 export class StockComponent {
-  readonly store = inject(IngredientesStore);
+  readonly store = inject(IngredientsStore);
   readonly auth = inject(AuthService);
   private dialog = inject(MatDialog);
   private notify = inject(NotificationService);
 
-  // Sort: danger first, then warning, then ok
-  sortedIngredientes = this.store.ingredientesOrdenadosPorStock;
+  sortedIngredients = this.store.ingredientsSortedByStock;
 
-  getStockClass(item: Ingrediente): string {
+  getStockClass(item: Ingredient): string {
     switch (getStockPriority(item)) {
       case 0:
         return 'stock-danger';
@@ -47,7 +45,7 @@ export class StockComponent {
     }
   }
 
-  getStockLabel(item: Ingrediente): string {
+  getStockLabel(item: Ingredient): string {
     switch (getStockPriority(item)) {
       case 0:
         return 'SIN STOCK';
@@ -58,13 +56,13 @@ export class StockComponent {
     }
   }
 
-  getStockPercent(item: Ingrediente): number {
-    if (item.stockMinimo <= 0) return 100;
-    const percent = (item.stockActual / (item.stockMinimo * 3)) * 100;
+  getStockPercent(item: Ingredient): number {
+    if (item.minimumStock <= 0) return 100;
+    const percent = (item.currentStock / (item.minimumStock * 3)) * 100;
     return Math.min(percent, 100);
   }
 
-  getStockBarColor(item: Ingrediente): 'primary' | 'accent' | 'warn' {
+  getStockBarColor(item: Ingredient): 'primary' | 'accent' | 'warn' {
     switch (getStockPriority(item)) {
       case 0:
         return 'warn';
@@ -75,34 +73,34 @@ export class StockComponent {
     }
   }
 
-  crear() {
-    const dialogRef = this.dialog.open(IngredienteFormComponent, {
+  create() {
+    const dialogRef = this.dialog.open(IngredientFormComponent, {
       width: '100%',
       maxWidth: '500px',
       data: null,
     });
 
-    dialogRef.afterClosed().subscribe(async (result: Ingrediente | undefined) => {
+    dialogRef.afterClosed().subscribe(async (result: Ingredient | undefined) => {
       if (result) {
-        await this.store.crearIngrediente(result);
+        await this.store.createIngredient(result);
         this.notify.success('Ingrediente creado');
       }
     });
   }
 
-  editar(ingrediente: Ingrediente) {
-    const dialogRef = this.dialog.open(IngredienteFormComponent, {
+  edit(ingredient: Ingredient) {
+    const dialogRef = this.dialog.open(IngredientFormComponent, {
       width: '100%',
       maxWidth: '500px',
-      data: ingrediente,
+      data: ingredient,
     });
 
-    dialogRef.afterClosed().subscribe(async (result: Ingrediente | 'delete' | undefined) => {
+    dialogRef.afterClosed().subscribe(async (result: Ingredient | 'delete' | undefined) => {
       if (result === 'delete') {
-        await this.store.eliminarIngrediente(ingrediente.id!);
+        await this.store.deleteIngredient(ingredient.id!);
         this.notify.success('Ingrediente eliminado');
       } else if (result) {
-        await this.store.actualizarIngrediente(ingrediente.id!, result);
+        await this.store.updateIngredient(ingredient.id!, result);
         this.notify.success('Ingrediente actualizado');
       }
     });
