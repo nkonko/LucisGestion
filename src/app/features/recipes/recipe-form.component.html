@@ -1,6 +1,6 @@
 <h2 mat-dialog-title>{{ isEdit ? 'Editar' : 'Nueva' }} Receta</h2>
 
-<mat-dialog-content class="flex flex-col gap-3">
+<mat-dialog-content class="flex flex-col gap-3 pt-1">
   <mat-form-field appearance="outline">
     <mat-label>Nombre</mat-label>
     <input matInput [(ngModel)]="form.name" placeholder="Ej: Torta de chocolate" required />
@@ -48,7 +48,7 @@
   }
 
   <!-- Add ingredient -->
-  <mat-form-field appearance="outline">
+  <mat-form-field appearance="outline" class="pt-1">
     <mat-label>Agregar ingrediente...</mat-label>
     <input
       matInput
@@ -69,10 +69,10 @@
     </mat-autocomplete>
   </mat-form-field>
 
-  <mat-divider></mat-divider>
+  <mat-divider class="py-1"></mat-divider>
 
   <!-- Cost calculation -->
-  <div class="grid grid-cols-3 gap-3 text-center py-2">
+  <div class="grid grid-cols-2 gap-2 text-center">
     <div>
       <div class="text-xs text-gray-500">Costo total</div>
       <div class="text-lg font-bold text-red-600">{{ calculatedCost() | ars }}</div>
@@ -90,18 +90,30 @@
         />
       </mat-form-field>
     </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-2 text-center pt-1">
     <div>
       <div class="text-xs text-gray-500">Precio sugerido</div>
       <div class="text-lg font-bold text-green-600">{{ suggestedPrice() | ars }}</div>
     </div>
+    <div class="flex justify-center">
+      <mat-form-field appearance="outline" class="precio-venta-field">
+        <mat-label>Precio de venta final</mat-label>
+        <input matInput type="number" [(ngModel)]="form.salePrice" min="0" />
+        <span matPrefix>$&nbsp;</span>
+        <mat-hint align="start">No completar para usar el sugerido</mat-hint>
+      </mat-form-field>
+    </div>
   </div>
-
-  <mat-form-field appearance="outline">
+  <mat-divider class="py-1"></mat-divider>
+  <mat-form-field appearance="outline" class="w-full">
     <mat-label>Precio de venta final</mat-label>
     <input matInput type="number" [(ngModel)]="form.salePrice" min="0" />
     <span matPrefix>$&nbsp;</span>
     <mat-hint>Dejalo en blanco para usar el sugerido</mat-hint>
   </mat-form-field>
+  <mat-divider class="py-1"></mat-divider>
 
   <mat-form-field appearance="outline">
     <mat-label>Notas / Instrucciones</mat-label>
