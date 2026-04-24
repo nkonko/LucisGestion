@@ -45,12 +45,12 @@ body {
   height: 100%;
 }
 
-// Scoped dialog overlay tweaks for receta form.
-.receta-dialog .mat-mdc-dialog-container {
+// Scoped dialog overlay tweaks for recipe form.
+.recipe-dialog .mat-mdc-dialog-container {
   padding: 0 !important;
 }
 
-.receta-dialog mat-dialog-content {
+.recipe-dialog mat-dialog-content {
   max-height: 80vh;
   padding: var(--space-4);
 }

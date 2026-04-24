@@ -14,7 +14,7 @@ export const FixedCostsStore = signalStore(
     const fs = inject(FirestoreService);
 
     const fixedCosts$ = fs.getCollection<FixedCost>(
-      'costosFijos',
+      'fixedCosts',
       where('active', '==', true),
       orderBy('name', 'asc'),
     );
@@ -34,7 +34,7 @@ export const FixedCostsStore = signalStore(
       async createFixedCost(fixedCost: FixedCostInput) {
         patchState(store, { loading: true, error: null });
         try {
-          const id = await fs.addDocument<FixedCostInput>('costosFijos', {
+          const id = await fs.addDocument<FixedCostInput>('fixedCosts', {
             ...fixedCost,
             active: true,
           });
@@ -49,7 +49,7 @@ export const FixedCostsStore = signalStore(
       async updateFixedCost(id: string, changes: Partial<FixedCost>) {
         patchState(store, { loading: true, error: null });
         try {
-          await fs.updateDocument('costosFijos', id, changes as Record<string, any>);
+          await fs.updateDocument('fixedCosts', id, changes as Record<string, any>);
           patchState(store, { loading: false });
         } catch (e: any) {
           patchState(store, { loading: false, error: e.message });
@@ -59,7 +59,7 @@ export const FixedCostsStore = signalStore(
 
       async deleteFixedCost(id: string) {
         try {
-          return await fs.softDelete('costosFijos', id);
+          return await fs.softDelete('fixedCosts', id);
         } catch (e: any) {
           patchState(store, { error: e.message });
           throw e;

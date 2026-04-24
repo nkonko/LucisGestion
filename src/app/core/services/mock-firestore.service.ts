@@ -45,8 +45,8 @@ export class MockFirestoreService {
   ): Promise<void> {
     if (adjustments.length === 0) return;
 
-    const ingredientsCol = this.getOrCreate('ingredientes');
-    const movementsCol = this.getOrCreate('movimientosStock');
+    const ingredientsCol = this.getOrCreate('ingredients');
+    const movementsCol = this.getOrCreate('stockMovements');
 
     const ingredients = ingredientsCol.value.map((item) => ({ ...(item as Record<string, unknown>) }));
     const movements = [...movementsCol.value];
@@ -419,13 +419,13 @@ export class MockFirestoreService {
       },
     ];
 
-    this.getOrCreate('ingredientes').next(ingredients);
-    this.getOrCreate('recetas').next(recipes);
-    this.getOrCreate('clientes').next(customers);
-    this.getOrCreate('ventas').next(sales);
-    this.getOrCreate('historialPrecios').next([]);
-    this.getOrCreate('movimientosStock').next([]);
-    this.getOrCreate('gastosInsumos').next([]);
+    this.getOrCreate('ingredients').next(ingredients);
+    this.getOrCreate('recipes').next(recipes);
+    this.getOrCreate('customers').next(customers);
+    this.getOrCreate('sales').next(sales);
+    this.getOrCreate('priceHistory').next([]);
+    this.getOrCreate('stockMovements').next([]);
+    this.getOrCreate('supplyExpenses').next([]);
 
     // --- Fixed Costs ---------------------------------------------------------
     const fixedCosts: FixedCost[] = [
@@ -484,6 +484,6 @@ export class MockFirestoreService {
         active: true,
       },
     ];
-    this.getOrCreate('costosFijos').next(fixedCosts);
+    this.getOrCreate('fixedCosts').next(fixedCosts);
   }
 }

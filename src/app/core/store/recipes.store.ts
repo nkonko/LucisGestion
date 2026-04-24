@@ -17,7 +17,7 @@ export const RecipesStore = signalStore(
     const ingredientsStore = inject(IngredientsStore);
 
     const recipes$ = fs.getCollection<Recipe>(
-      'recetas',
+      'recipes',
       where('active', '==', true),
       orderBy('name', 'asc'),
     );
@@ -36,7 +36,7 @@ export const RecipesStore = signalStore(
           );
           const suggestedPrice = calculateSuggestedPrice(calculatedCost, recipe.profitMargin);
 
-          const id = await fs.addDocument('recetas', {
+          const id = await fs.addDocument('recipes', {
             ...recipe,
             calculatedCost,
             suggestedPrice,
@@ -62,7 +62,7 @@ export const RecipesStore = signalStore(
             changes.calculatedCost = calculateRecipeCost(ings, ingredientsStore.ingredients());
             changes.suggestedPrice = calculateSuggestedPrice(changes.calculatedCost, margin);
           }
-          await fs.updateDocument('recetas', id, changes as Record<string, any>);
+          await fs.updateDocument('recipes', id, changes as Record<string, any>);
           patchState(store, { loading: false });
         } catch (e: any) {
           patchState(store, { loading: false, error: e.message });
@@ -73,7 +73,7 @@ export const RecipesStore = signalStore(
       async duplicateRecipe(recipe: Recipe) {
         try {
           const { id, ...data } = recipe;
-          return await fs.addDocument('recetas', {
+          return await fs.addDocument('recipes', {
             ...data,
             name: `${data.name} (copia)`,
             active: true,
@@ -86,7 +86,7 @@ export const RecipesStore = signalStore(
 
       async deleteRecipe(id: string) {
         try {
-          return await fs.softDelete('recetas', id);
+          return await fs.softDelete('recipes', id);
         } catch (e: any) {
           patchState(store, { error: e.message });
           throw e;
@@ -104,7 +104,7 @@ export const RecipesStore = signalStore(
             ingredientsStore.ingredients(),
           );
           const suggestedPrice = calculateSuggestedPrice(calculatedCost, recipe.profitMargin);
-          await fs.updateDocument('recetas', recipe.id!, { calculatedCost, suggestedPrice });
+          await fs.updateDocument('recipes', recipe.id!, { calculatedCost, suggestedPrice });
         }
       },
     };

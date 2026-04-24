@@ -18,7 +18,7 @@ export const SalesStore = signalStore(
     const ingredientsStore = inject(IngredientsStore);
     const recipesStore = inject(RecipesStore);
 
-    const sales$ = fs.getCollection<Sale>('ventas', orderBy('date', 'desc'));
+    const sales$ = fs.getCollection<Sale>('sales', orderBy('date', 'desc'));
     const sales = toSignal(sales$, { initialValue: [] as Sale[] });
 
     const pendingOrders = computed(() => sales().filter((v) => v.status === 'pending'));
@@ -66,7 +66,7 @@ export const SalesStore = signalStore(
       async registerSale(sale: SaleInput) {
         patchState(store, { loading: true, error: null });
         try {
-          const saleId = await fs.addDocument<SaleInput>('ventas', sale);
+          const saleId = await fs.addDocument<SaleInput>('sales', sale);
 
           const adjustments = buildStockAdjustments(sale.items, -1);
           await fs.applyStockAdjustments(saleId, 'sale_deduction', adjustments);
@@ -82,7 +82,7 @@ export const SalesStore = signalStore(
       async updateSaleStatus(id: string, status: Sale['status']) {
         patchState(store, { loading: true, error: null });
         try {
-          await fs.updateDocument('ventas', id, { status });
+          await fs.updateDocument('sales', id, { status });
 
           if (status === 'cancelled') {
             const sale = sales().find((v) => v.id === id);

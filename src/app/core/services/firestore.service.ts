@@ -54,7 +54,7 @@ export class FirestoreService {
       const now = Timestamp.now();
 
       for (const adjustment of adjustments) {
-        const ingredientRef = doc(this.firestore, 'ingredientes', adjustment.ingredientId);
+        const ingredientRef = doc(this.firestore, 'ingredients', adjustment.ingredientId);
         const ingredientSnap = await transaction.get(ingredientRef);
         if (!ingredientSnap.exists()) continue;
 
@@ -66,7 +66,7 @@ export class FirestoreService {
 
         if (appliedDelta === 0) continue;
 
-        const movementRef = doc(collection(this.firestore, 'movimientosStock'));
+        const movementRef = doc(collection(this.firestore, 'stockMovements'));
         transaction.set(movementRef, {
           ingredientId: adjustment.ingredientId,
           ingredientName: adjustment.ingredientName,

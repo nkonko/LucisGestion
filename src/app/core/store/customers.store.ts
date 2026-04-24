@@ -13,7 +13,7 @@ export const CustomersStore = signalStore(
   withMethods((store) => {
     const fs = inject(FirestoreService);
 
-    const customers$ = fs.getCollection<Customer>('clientes', orderBy('name', 'asc'));
+    const customers$ = fs.getCollection<Customer>('customers', orderBy('name', 'asc'));
     const customers = toSignal(customers$, { initialValue: [] as Customer[] });
 
     return {
@@ -21,7 +21,7 @@ export const CustomersStore = signalStore(
 
       async createCustomer(customer: CustomerInput) {
         try {
-          return await fs.addDocument('clientes', customer);
+          return await fs.addDocument('customers', customer);
         } catch (e: any) {
           patchState(store, { error: e.message });
           throw e;
@@ -30,7 +30,7 @@ export const CustomersStore = signalStore(
 
       async updateCustomer(id: string, changes: Partial<Customer>) {
         try {
-          return await fs.updateDocument('clientes', id, changes);
+          return await fs.updateDocument('customers', id, changes);
         } catch (e: any) {
           patchState(store, { error: e.message });
           throw e;
@@ -39,7 +39,7 @@ export const CustomersStore = signalStore(
 
       async deleteCustomer(id: string) {
         try {
-          return await fs.updateDocument('clientes', id, { name: '[eliminado]' });
+          return await fs.updateDocument('customers', id, { name: '[eliminado]' });
         } catch (e: any) {
           patchState(store, { error: e.message });
           throw e;

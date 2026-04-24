@@ -22,7 +22,7 @@ export const IngredientsStore = signalStore(
     const fs = inject(FirestoreService);
 
     const ingredients$ = fs.getCollection<Ingredient>(
-      'ingredientes',
+      'ingredients',
       where('active', '==', true),
       orderBy('name', 'asc'),
     );
@@ -41,7 +41,7 @@ export const IngredientsStore = signalStore(
       async createIngredient(ingredient: IngredientInput) {
         patchState(store, { loading: true, error: null });
         try {
-          const id = await fs.addDocument('ingredientes', {
+          const id = await fs.addDocument('ingredients', {
             ...ingredient,
             active: true,
           } as IngredientInput);
@@ -56,13 +56,13 @@ export const IngredientsStore = signalStore(
       async updateIngredient(id: string, changes: Partial<Ingredient>) {
         patchState(store, { loading: true, error: null });
         try {
-          await fs.updateDocument('ingredientes', id, changes as Record<string, any>);
+          await fs.updateDocument('ingredients', id, changes as Record<string, any>);
 
           // Record price history if price changed
           if (changes.unitPrice !== undefined) {
             const current = ingredients().find((i) => i.id === id);
             if (current && current.unitPrice !== changes.unitPrice) {
-              await fs.addDocument('historialPrecios', {
+              await fs.addDocument('priceHistory', {
                 ingredientId: id,
                 ingredientName: current.name,
                 previousPrice: current.unitPrice,
@@ -71,7 +71,7 @@ export const IngredientsStore = signalStore(
               } as PriceHistory);
             }
 
-            await fs.updateDocument('ingredientes', id, {
+            await fs.updateDocument('ingredients', id, {
               lastPurchase: Timestamp.now(),
             });
           }
@@ -85,7 +85,7 @@ export const IngredientsStore = signalStore(
 
       async deleteIngredient(id: string) {
         try {
-          return await fs.softDelete('ingredientes', id);
+          return await fs.softDelete('ingredients', id);
         } catch (e: any) {
           patchState(store, { error: e.message });
           throw e;
@@ -95,20 +95,20 @@ export const IngredientsStore = signalStore(
       async registerSupplyPurchase(expense: SupplyExpenseInput) {
         patchState(store, { loading: true, error: null });
         try {
-          const expenseId = await fs.addDocument('gastosInsumos', expense as SupplyExpenseInput);
+          const expenseId = await fs.addDocument('supplyExpenses', expense as SupplyExpenseInput);
 
           for (const item of expense.items) {
             const ingredient = ingredients().find((i) => i.id === item.ingredientId);
             if (!ingredient) continue;
 
             const newStock = ingredient.currentStock + item.quantity;
-            await fs.updateDocument('ingredientes', item.ingredientId, {
+            await fs.updateDocument('ingredients', item.ingredientId, {
               currentStock: newStock,
               unitPrice: item.unitPrice,
               lastPurchase: Timestamp.now(),
             });
 
-            await fs.addDocument<StockMovementInput>('movimientosStock', {
+            await fs.addDocument<StockMovementInput>('stockMovements', {
               ingredientId: item.ingredientId,
               ingredientName: ingredient.name,
               type: 'purchase',
@@ -128,7 +128,7 @@ export const IngredientsStore = signalStore(
 
       getPriceHistory(ingredientId: string): Observable<PriceHistory[]> {
         return fs.getCollection<PriceHistory>(
-          'historialPrecios',
+          'priceHistory',
           where('ingredientId', '==', ingredientId),
           orderBy('date', 'desc'),
         );
