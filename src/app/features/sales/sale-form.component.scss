@@ -1,4 +1,4 @@
 .selected-card {
-  outline: 2px solid var(--color-primary);
+  outline: var(--border-width-medium) solid var(--color-primary);
   background: var(--color-primary-container);
 }

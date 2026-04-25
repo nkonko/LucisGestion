@@ -2,12 +2,8 @@ mat-form-field {
   width: 100%;
 }
 
-.flex.justify-center {
-  margin: var(--space-2) 0;
-}
-
 .precio-venta-field {
-  width: 280px !important;
+  width: var(--size-price-field-width) !important;
   max-width: 100%;
 }
 

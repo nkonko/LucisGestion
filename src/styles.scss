@@ -40,7 +40,7 @@ body {
   color-scheme: light;
   background-color: var(--color-surface);
   color: var(--color-on-surface);
-  font: var(--mat-sys-body-medium);
+  font: var(--font-body);
   margin: 0;
   height: 100%;
 }
@@ -51,6 +51,11 @@ body {
 }
 
 .recipe-dialog mat-dialog-content {
-  max-height: 80vh;
+  max-height: var(--size-dialog-content-max-height);
   padding: var(--space-4);
 }
+
+// Cleanup note:
+// - Removed direct dependency on --mat-sys-body-medium from body typography.
+// - Legacy spacing selector `.flex.justify-center` was deleted from recipe-form styles
+//   and replaced with Tailwind utility class `my-2` in template.

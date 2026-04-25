@@ -97,7 +97,7 @@
       <div class="text-xs text-gray-500">Precio sugerido</div>
       <div class="text-lg font-bold text-green-600">{{ suggestedPrice() | ars }}</div>
     </div>
-    <div class="flex justify-center">
+    <div class="flex justify-center my-2">
       <mat-form-field appearance="outline" class="precio-venta-field">
         <mat-label>Precio de venta final</mat-label>
         <input matInput type="number" [(ngModel)]="form.salePrice" min="0" />

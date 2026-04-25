@@ -8,15 +8,16 @@
 // =============================================================================
 
 :root {
-  // ── Semantic colours (wrapping Angular Material system tokens) ──────────────
-  // Prefer these over --mat-sys-* in component stylesheets.
-  --color-primary:            var(--mat-sys-primary);
-  --color-primary-container:  var(--mat-sys-primary-container);
-  --color-surface:            var(--mat-sys-surface);
-  --color-surface-container:  var(--mat-sys-surface-container);
-  --color-on-surface:         var(--mat-sys-on-surface);
-  --color-on-surface-variant: var(--mat-sys-on-surface-variant);
-  --color-outline-variant:    var(--mat-sys-outline-variant);
+  // ── Semantic colours (Material-independent defaults) ─────────────────────────
+  // These are now the source of truth and are mirrored into --mat-sys-* below.
+  // This allows progressively removing Material theming without breaking app UI.
+  --color-primary:            #8e2450;
+  --color-primary-container:  #ffd8e4;
+  --color-surface:            #fffbff;
+  --color-surface-container:  #f5edf1;
+  --color-on-surface:         #1f1b1d;
+  --color-on-surface-variant: #4f4449;
+  --color-outline-variant:    #d2c2c9;
 
   // ── Status colours (stock semaphore) ────────────────────────────────────────
   --color-status-ok:      #4caf50;
@@ -44,6 +45,11 @@
   --size-icon-sm:             14px;    // Small inline icon size
   --size-font-md:             16px;    // Base medium font size
   --size-google-btn-height:   48px;    // Google sign-in button height
+  --size-price-field-width:   280px;   // Sales price field width in recipe form
+  --size-catalog-min-width:   17.5rem; // Printable catalog minimum width
+  --size-font-2xs:            12px;    // Compact nav/support text size
+  --size-dialog-content-max-height: 80vh; // Recipe dialog max content height
+  --size-viewport-height:     100vh;   // Full viewport-height sections
 
   // ── Z-index scale ────────────────────────────────────────────────────────────
   --z-nav: 1000;   // Fixed navigation bars (top + bottom)
@@ -58,4 +64,21 @@
 
   // ── Shadows / elevations ────────────────────────────────────────────────────
   --shadow-pressed: 0 1px 3px rgba(0, 0, 0, 0.2);
+
+  // ── Border sizes ─────────────────────────────────────────────────────────────
+  --border-width-thin: 1px;
+  --border-width-medium: 2px;
+
+  // ── Typography ───────────────────────────────────────────────────────────────
+  --font-body: 400 0.875rem/1.25rem Roboto, sans-serif;
+
+  // ── Material bridge variables ────────────────────────────────────────────────
+  // NOTE: Added to support progressively removing Angular Material theme mixins.
+  --mat-sys-primary:            var(--color-primary);
+  --mat-sys-primary-container:  var(--color-primary-container);
+  --mat-sys-surface:            var(--color-surface);
+  --mat-sys-surface-container:  var(--color-surface-container);
+  --mat-sys-on-surface:         var(--color-on-surface);
+  --mat-sys-on-surface-variant: var(--color-on-surface-variant);
+  --mat-sys-outline-variant:    var(--color-outline-variant);
 }
