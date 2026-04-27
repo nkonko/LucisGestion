@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -36,6 +36,7 @@ import { ArsPipe } from '../../shared/pipes/ars.pipe';
   ],
   templateUrl: './sale-form.component.html',
   styleUrl: './sale-form.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SaleFormComponent {
   private dialogRef = inject(MatDialogRef<SaleFormComponent>);

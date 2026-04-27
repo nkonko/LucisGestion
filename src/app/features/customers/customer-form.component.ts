@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -18,6 +18,7 @@ import { Customer } from '../../core/models/customer';
     MatIconModule,
   ],
   templateUrl: './customer-form.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomerFormComponent {
   private fb = inject(FormBuilder);

@@ -1,4 +1,4 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed, signal } from '@angular/core';
 import { NgTemplateOutlet, DatePipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -38,6 +38,7 @@ import { SaleFormComponent } from './sale-form.component';
     MatNativeDateModule,
   ],
   templateUrl: './sales.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SalesComponent {
   readonly store = inject(SalesStore);

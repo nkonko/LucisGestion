@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,6 +12,7 @@ import { ArsPipe } from '../../shared/pipes/ars.pipe';
   selector: 'app-price-history',
   imports: [MatDialogModule, MatListModule, MatIconModule, MatButtonModule, DatePipe, ArsPipe],
   templateUrl: './price-history.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PriceHistoryComponent {
   private store = inject(IngredientsStore);
