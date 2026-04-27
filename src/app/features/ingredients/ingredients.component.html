@@ -9,7 +9,7 @@
 
 @if (filteredIngredients().length === 0) {
   <div class="text-center py-8 text-gray-400">
-    <mat-icon style="font-size: 48px; width: 48px; height: 48px">egg</mat-icon>
+    <span class="material-icons" style="font-size: 48px; width: 48px; height: 48px">egg</span>
     @if (searchTerm()) {
       <p>No se encontraron ingredientes</p>
     } @else {
@@ -20,8 +20,8 @@
 }
 
 @for (ingredient of filteredIngredients(); track ingredient.id) {
-  <mat-card class="touch-card mb-3" (click)="auth.isOwner() ? edit(ingredient) : null">
-    <mat-card-content class="flex items-center justify-between py-2">
+  <section class="touch-card mb-3 p-3" (click)="auth.isOwner() ? edit(ingredient) : null">
+    <div class="flex items-center justify-between py-2">
       <div>
         <div class="font-medium">{{ ingredient.name }}</div>
         <div class="text-sm text-gray-500">{{ ingredient.unitPrice | ars }} / {{ ingredient.unit }}</div>
@@ -33,21 +33,16 @@
           </div>
           <div class="text-xs text-gray-400">mín: {{ ingredient.minimumStock }}</div>
         </div>
-        <button
-          mat-icon-button
-          (click)="viewHistory(ingredient, $event)"
-          aria-label="Historial de precios"
-          class="text-gray-400"
-        >
-          <mat-icon style="font-size: 18px">history</mat-icon>
+        <button class="ui-btn" type="button" (click)="viewHistory(ingredient, $event)" aria-label="Historial de precios">
+          <span class="material-icons" style="font-size: 18px">history</span>
         </button>
       </div>
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </section>
 }
 
 @if (auth.isOwner()) {
-  <button mat-fab class="fab-bottom-right" color="primary" (click)="create()">
-    <mat-icon>add</mat-icon>
+  <button class="fab-bottom-right ui-btn ui-btn-primary" type="button" (click)="create()" aria-label="Agregar ingrediente">
+    <span class="material-icons">add</span>
   </button>
 }

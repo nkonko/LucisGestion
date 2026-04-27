@@ -2,38 +2,35 @@
   <h2 class="text-xl font-semibold">Costos Fijos</h2>
 </div>
 
-<!-- Resumen mensual -->
-<mat-card class="mb-4 bg-orange-50">
-  <mat-card-content class="py-3">
+<section class="mb-4 bg-orange-50 rounded-lg p-4">
+  <div class="py-3">
     <div class="flex items-center gap-2 mb-1">
-      <mat-icon class="text-orange-500">calculate</mat-icon>
+      <span class="material-icons text-orange-500">calculate</span>
       <span class="font-medium text-orange-800">Total mensual estimado</span>
     </div>
     <div class="text-2xl font-bold text-orange-700">
       {{ store.totalMonthlyFixedCosts() | ars }}
     </div>
     <div class="text-xs text-orange-600 mt-1">Suma de todos los costos convertidos a mensual</div>
-  </mat-card-content>
-</mat-card>
+  </div>
+</section>
 
-<!-- Lista vacía -->
 @if (store.fixedCosts().length === 0) {
   <div class="text-center py-8 text-gray-400">
-    <mat-icon style="font-size: 48px; width: 48px; height: 48px">receipt_long</mat-icon>
+    <span class="material-icons" style="font-size: 48px; width: 48px; height: 48px">receipt_long</span>
     <p>No hay costos fijos cargados</p>
     <p class="text-sm">Tocá el botón + para agregar luz, gas, alquiler, etc.</p>
   </div>
 }
 
-<!-- Agrupado por categoría -->
 @for (group of groupsByCategory(); track group.category) {
   <div class="mb-2">
     <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide px-1 mb-1">
       {{ categoryLabel(group.category) }}
     </div>
     @for (cost of group.items; track cost.id) {
-      <mat-card class="touch-card mb-2" (click)="auth.isOwner() ? edit(cost) : null">
-        <mat-card-content class="py-2">
+      <section class="touch-card mb-2 p-3" (click)="auth.isOwner() ? edit(cost) : null">
+        <div class="py-2">
           <div class="flex items-center justify-between">
             <div class="flex-1 min-w-0">
               <div class="font-medium truncate">{{ cost.name }}</div>
@@ -43,28 +40,20 @@
             </div>
             <div class="text-right ml-3 shrink-0">
               <div class="font-semibold text-orange-700">{{ cost.amount | ars }}</div>
-              <mat-chip-set>
-                <mat-chip class="text-xs">{{ frequencyLabel(cost.frequency) }}</mat-chip>
-              </mat-chip-set>
+              <span class="ui-btn text-xs" aria-hidden="true">{{ frequencyLabel(cost.frequency) }}</span>
             </div>
           </div>
           @if (cost.frequency !== 'monthly') {
             <div class="text-xs text-gray-400 mt-1">≈ {{ monthlyAmount(cost) | ars }}/mes</div>
           }
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </section>
     }
   </div>
 }
 
 @if (auth.isOwner()) {
-  <button
-    mat-fab
-    class="fab-bottom-right"
-    color="primary"
-    (click)="create()"
-    aria-label="Agregar costo fijo"
-  >
-    <mat-icon>add</mat-icon>
+  <button class="fab-bottom-right ui-btn ui-btn-primary" type="button" (click)="create()" aria-label="Agregar costo fijo">
+    <span class="material-icons">add</span>
   </button>
 }

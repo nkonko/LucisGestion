@@ -1,38 +1,30 @@
 <div class="flex items-center justify-between mb-4">
   <h2 class="text-xl font-semibold">Recetas</h2>
-  <button mat-stroked-button (click)="viewCatalog()"><mat-icon>share</mat-icon> Catálogo</button>
+  <button class="ui-btn" type="button" (click)="viewCatalog()">
+    <span class="material-icons">share</span>
+    Catálogo
+  </button>
 </div>
 
 @if (store.recipes().length === 0) {
   <div class="text-center py-8 text-gray-400">
-    <mat-icon style="font-size: 48px; width: 48px; height: 48px">menu_book</mat-icon>
+    <span class="material-icons" style="font-size: 48px; width: 48px; height: 48px">menu_book</span>
     <p>No hay recetas cargadas aún</p>
     <p class="text-sm">Tocá el botón + para crear la primera</p>
   </div>
 }
 
 @for (recipe of store.recipes(); track recipe.id) {
-  <mat-card class="touch-card mb-3" (click)="auth.isOwner() ? edit(recipe) : null">
-    <mat-card-content class="py-2">
+  <section class="touch-card mb-3 p-3" (click)="auth.isOwner() ? edit(recipe) : null">
+    <div class="py-2">
       <div class="flex items-center justify-between mb-1">
         <div class="font-medium text-base">{{ recipe.name }}</div>
-        <div class="flex items-center gap-1">
-          <mat-chip-set>
-            <mat-chip class="text-xs">{{ recipe.category }}</mat-chip>
-          </mat-chip-set>
+        <div class="flex items-center gap-2">
+          <span class="ui-btn text-xs" aria-hidden="true">{{ recipe.category }}</span>
           @if (auth.isOwner()) {
-            <button
-              mat-icon-button
-              [matMenuTriggerFor]="recipeMenu"
-              (click)="$event.stopPropagation()"
-            >
-              <mat-icon>more_vert</mat-icon>
+            <button class="ui-btn" type="button" (click)="$event.stopPropagation(); duplicate(recipe)" aria-label="Duplicar receta">
+              <span class="material-icons">content_copy</span>
             </button>
-            <mat-menu #recipeMenu="matMenu">
-              <button mat-menu-item (click)="duplicate(recipe)">
-                <mat-icon>content_copy</mat-icon> Duplicar
-              </button>
-            </mat-menu>
           }
         </div>
       </div>
@@ -55,12 +47,12 @@
       <div class="text-xs text-gray-400 mt-1">
         {{ recipe.ingredients.length }} ingredientes · rinde {{ recipe.yield }} u.
       </div>
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </section>
 }
 
 @if (auth.isOwner()) {
-  <button mat-fab class="fab-bottom-right" color="primary" (click)="create()">
-    <mat-icon>add</mat-icon>
+  <button class="fab-bottom-right ui-btn ui-btn-primary" type="button" (click)="create()" aria-label="Agregar receta">
+    <span class="material-icons">add</span>
   </button>
 }

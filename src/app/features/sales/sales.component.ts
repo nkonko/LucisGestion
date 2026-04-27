@@ -1,10 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, computed, signal } from '@angular/core';
 import { NgTemplateOutlet, DatePipe } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatTabsModule } from '@angular/material/tabs';
 import { NotificationService } from '../../core/services/notification.service';
 import { SalesStore } from '../../core/store/sales.store';
 import { CustomersStore } from '../../core/store/customers.store';
@@ -18,7 +13,7 @@ import { DialogService } from '../../core/services/dialog.service';
 
 @Component({
   selector: 'app-sales',
-  imports: [NgTemplateOutlet, DatePipe, MatCardModule, MatIconModule, MatButtonModule, MatChipsModule, MatTabsModule, ArsPipe],
+  imports: [NgTemplateOutlet, DatePipe, ArsPipe],
   templateUrl: './sales.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -32,6 +27,8 @@ export class SalesComponent {
   statusDisplay: Record<SaleStatus, string> = SALE_STATUS_DISPLAY;
 
   pending = this.store.pendingOrders;
+
+  readonly activeTab = signal<'pending' | 'history'>('pending');
 
   searchTerm = signal('');
   dateFrom = signal<Date | null>(null);

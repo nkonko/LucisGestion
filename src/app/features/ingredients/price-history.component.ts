@@ -1,6 +1,4 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
 import { DatePipe } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IngredientsStore } from '../../core/store/ingredients.store';
@@ -15,7 +13,7 @@ interface PriceHistoryDialogData {
 
 @Component({
   selector: 'app-price-history',
-  imports: [MatIconModule, MatButtonModule, DatePipe, ArsPipe],
+  imports: [DatePipe, ArsPipe],
   templateUrl: './price-history.component.html',
   styleUrl: './price-history.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

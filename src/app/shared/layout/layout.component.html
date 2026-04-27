@@ -1,7 +1,7 @@
-<mat-toolbar color="primary" class="top-toolbar">
+<header class="top-toolbar">
   <span class="text-lg font-medium flex-1">🧁 Lucis Gestión</span>
 
-  <button mat-icon-button [matMenuTriggerFor]="userMenu">
+  <button class="icon-button" type="button" (click)="toggleMenu()" aria-label="Abrir menú de usuario">
     @if (auth.appUser()?.photoURL) {
       <img
         [src]="auth.appUser()!.photoURL"
@@ -10,62 +10,62 @@
         referrerpolicy="no-referrer"
       />
     } @else {
-      <mat-icon>account_circle</mat-icon>
+      <span class="material-icons">account_circle</span>
     }
   </button>
-  <mat-menu #userMenu="matMenu">
-    <div class="px-4 py-2 border-b">
-      <div class="font-medium">{{ auth.appUser()?.displayName }}</div>
-      <div class="text-xs text-gray-500">{{ auth.appUser()?.email }}</div>
-      <div class="text-xs mt-1">
-        <span
-          class="inline-block px-2 py-0.5 rounded-full text-white"
-          [class]="auth.isOwner() ? 'bg-rose-500' : 'bg-blue-500'"
-        >
-          {{ auth.isOwner() ? 'Dueña' : 'Ayudante' }}
-        </span>
-      </div>
-    </div>
-    <button mat-menu-item (click)="logout()">
-      <mat-icon>logout</mat-icon>
-      <span>Cerrar sesión</span>
-    </button>
-  </mat-menu>
-</mat-toolbar>
 
-<main class="page-container">
+  @if (menuOpen()) {
+    <div class="user-menu" role="menu">
+      <div class="px-4 py-2 border-b">
+        <div class="font-medium">{{ auth.appUser()?.displayName }}</div>
+        <div class="text-xs text-gray-500">{{ auth.appUser()?.email }}</div>
+        <div class="text-xs mt-1">
+          <span
+            class="inline-block px-2 py-0.5 rounded-full text-white"
+            [class]="auth.isOwner() ? 'bg-rose-500' : 'bg-blue-500'"
+          >
+            {{ auth.isOwner() ? 'Dueña' : 'Ayudante' }}
+          </span>
+        </div>
+      </div>
+      <button class="menu-item" type="button" (click)="logout()">
+        <span class="material-icons">logout</span>
+        <span>Cerrar sesión</span>
+      </button>
+    </div>
+  }
+</header>
+
+<main class="page-container" (click)="closeMenu()">
   <router-outlet />
 </main>
 
 <nav class="bottom-nav">
   <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
-    <mat-icon>home</mat-icon>
+    <span class="material-icons">home</span>
     <span>Inicio</span>
   </a>
   <a routerLink="/recetas" routerLinkActive="active" class="nav-item">
-    <mat-icon>menu_book</mat-icon>
+    <span class="material-icons">menu_book</span>
     <span>Recetas</span>
   </a>
   <a routerLink="/costos" routerLinkActive="active" class="nav-item">
-    <mat-icon>receipt_long</mat-icon>
+    <span class="material-icons">receipt_long</span>
     <span>Costos</span>
   </a>
   <a routerLink="/ventas" routerLinkActive="active" class="nav-item">
-    <mat-icon>point_of_sale</mat-icon>
+    <span class="material-icons">point_of_sale</span>
     <span>Ventas</span>
   </a>
-  <a routerLink="/stock" routerLinkActive="active" class="nav-item">
-    <mat-icon
-      [matBadge]="lowStockCount() > 0 ? lowStockCount() : null"
-      matBadgeColor="warn"
-      matBadgeSize="small"
-    >
-      inventory_2
-    </mat-icon>
+  <a routerLink="/stock" routerLinkActive="active" class="nav-item nav-item--badge">
+    <span class="material-icons">inventory_2</span>
+    @if (lowStockCount() > 0) {
+      <span class="badge">{{ lowStockCount() }}</span>
+    }
     <span>Stock</span>
   </a>
   <a routerLink="/clientes" routerLinkActive="active" class="nav-item">
-    <mat-icon>people</mat-icon>
+    <span class="material-icons">people</span>
     <span>Clientes</span>
   </a>
 </nav>

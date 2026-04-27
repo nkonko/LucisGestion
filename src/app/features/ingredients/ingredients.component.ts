@@ -1,7 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
 import { NotificationService } from '../../core/services/notification.service';
 import { IngredientsStore } from '../../core/store/ingredients.store';
 import { RecipesStore } from '../../core/store/recipes.store';
@@ -14,7 +11,7 @@ import { DialogService } from '../../core/services/dialog.service';
 
 @Component({
   selector: 'app-ingredients',
-  imports: [MatCardModule, MatIconModule, MatButtonModule, ArsPipe],
+  imports: [ArsPipe],
   templateUrl: './ingredients.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

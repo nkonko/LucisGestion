@@ -1,61 +1,23 @@
-// =============================================================================
-// Global Entry Point — Lucis Gestión
-// =============================================================================
-// Import order:
-//   1. External dependencies (Material, Tailwind)
-//   2. Design tokens (CSS custom properties — must come before anything that
-//      uses them so the cascade resolves correctly)
-//   3. Layout utilities
-//   4. Shared utilities
-// =============================================================================
-
-// ── External dependencies ────────────────────────────────────────────────────
-@use '@angular/material' as mat;
 @use 'tailwindcss';
-
-// ── Design tokens ────────────────────────────────────────────────────────────
 @use 'styles/tokens';
-
-// ── Layout & shared utilities ────────────────────────────────────────────────
 @use 'styles/layout';
 @use 'styles/utilities';
 
-// ── Angular Material theme ───────────────────────────────────────────────────
-html {
+html,
+body {
   height: 100%;
-  @include mat.theme(
-    (
-      color: (
-        primary: mat.$rose-palette,
-        tertiary: mat.$orange-palette,
-      ),
-      typography: Roboto,
-      density: -1,
-    )
-  );
 }
 
-// ── Base reset ───────────────────────────────────────────────────────────────
 body {
   color-scheme: light;
   background-color: var(--color-surface);
   color: var(--color-on-surface);
   font: var(--font-body);
   margin: 0;
-  height: 100%;
 }
 
-// Scoped dialog overlay tweaks for recipe form.
-.recipe-dialog .mat-mdc-dialog-container {
-  padding: 0 !important;
+.material-icons {
+  font-size: 20px;
+  line-height: 1;
+  vertical-align: middle;
 }
-
-.recipe-dialog mat-dialog-content {
-  max-height: var(--size-dialog-content-max-height);
-  padding: var(--space-4);
-}
-
-// Cleanup note:
-// - Removed direct dependency on --mat-sys-body-medium from body typography.
-// - Legacy spacing selector `.flex.justify-center` was deleted from recipe-form styles
-//   and replaced with Tailwind utility class `my-2` in template.

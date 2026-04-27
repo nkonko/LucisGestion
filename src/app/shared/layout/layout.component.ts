@@ -1,25 +1,11 @@
-import { Component, inject } from '@angular/core';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatBadgeModule } from '@angular/material/badge';
-import { MatMenuModule } from '@angular/material/menu';
-import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { IngredientsStore } from '../../core/store/ingredients.store';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-layout',
-  imports: [
-    RouterOutlet,
-    RouterLink,
-    RouterLinkActive,
-    MatToolbarModule,
-    MatIconModule,
-    MatButtonModule,
-    MatBadgeModule,
-    MatMenuModule,
-  ],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss',
 })
@@ -28,9 +14,19 @@ export class LayoutComponent {
   readonly auth = inject(AuthService);
   private router = inject(Router);
 
+  readonly menuOpen = signal(false);
   lowStockCount = this.ingredientsStore.lowStockCount;
 
-  async logout() {
+  toggleMenu(): void {
+    this.menuOpen.update((open) => !open);
+  }
+
+  closeMenu(): void {
+    this.menuOpen.set(false);
+  }
+
+  async logout(): Promise<void> {
+    this.closeMenu();
     await this.auth.logout();
     this.router.navigate(['/login']);
   }

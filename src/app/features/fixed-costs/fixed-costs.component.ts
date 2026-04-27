@@ -1,8 +1,4 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatChipsModule } from '@angular/material/chips';
 import { NotificationService } from '../../core/services/notification.service';
 import { FixedCostsStore } from '../../core/store/fixed-costs.store';
 import { AuthService } from '../../core/services/auth.service';
@@ -19,7 +15,7 @@ import { DialogService } from '../../core/services/dialog.service';
 @Component({
   selector: 'app-fixed-costs',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MatCardModule, MatIconModule, MatButtonModule, MatChipsModule, ArsPipe],
+  imports: [ArsPipe],
   templateUrl: './fixed-costs.component.html',
 })
 export class FixedCostsComponent {

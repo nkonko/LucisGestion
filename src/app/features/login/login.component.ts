@@ -1,14 +1,10 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
-  imports: [MatButtonModule, MatIconModule, MatCardModule, MatProgressSpinnerModule],
+  imports: [],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })

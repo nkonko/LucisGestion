@@ -1,6 +1,4 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { RecipesStore } from '../../core/store/recipes.store';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 import { DIALOG_REF } from '../../core/models/dialog/dialog-tokens.model';
@@ -8,7 +6,7 @@ import { DialogRef } from '../../core/models/dialog/dialog-ref.model';
 
 @Component({
   selector: 'app-catalog-dialog',
-  imports: [MatButtonModule, MatIconModule, ArsPipe],
+  imports: [ArsPipe],
   templateUrl: './catalog-dialog.component.html',
   styleUrl: './catalog-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -4,6 +4,12 @@
   left: 0;
   right: 0;
   z-index: var(--z-nav);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-primary);
+  color: var(--color-surface);
 }
 
 main {
@@ -36,6 +42,7 @@ main {
   border-radius: var(--radius-chip);
   transition: all var(--transition-standard);
   gap: var(--space-1);
+  position: relative;
 
   &.active {
     color: var(--color-primary);
@@ -48,4 +55,51 @@ main {
   height: var(--size-avatar);
   border-radius: var(--radius-avatar);
   object-fit: cover;
+}
+
+.icon-button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-menu {
+  position: absolute;
+  right: var(--space-4);
+  top: calc(var(--size-nav-height) - var(--space-2));
+  background: var(--color-surface);
+  color: var(--color-on-surface);
+  border: var(--border-width-thin) solid var(--color-outline-variant);
+  border-radius: var(--radius-chip);
+  min-width: 220px;
+  z-index: var(--z-nav);
+}
+
+.menu-item {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+}
+
+.badge {
+  position: absolute;
+  top: 2px;
+  right: 8px;
+  border-radius: 999px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: var(--color-status-danger);
+  color: var(--color-surface);
+  font-size: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }

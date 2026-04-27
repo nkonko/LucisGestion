@@ -1,20 +1,23 @@
 <div class="flex items-center justify-between mb-4">
   <h2 class="text-xl font-semibold">Stock de Ingredientes</h2>
-  <a mat-stroked-button routerLink="/ingredientes"> <mat-icon>list</mat-icon> Ver todos </a>
+  <a class="ui-btn" routerLink="/ingredientes">
+    <span class="material-icons">list</span>
+    Ver todos
+  </a>
 </div>
 
 @if (store.lowStock().length > 0) {
   <div class="mb-4 p-3 bg-red-50 rounded-lg">
     <div class="text-sm font-medium text-red-700 mb-1">
-      <mat-icon class="align-middle" style="font-size: 18px">warning</mat-icon>
+      <span class="material-icons align-middle" style="font-size: 18px">warning</span>
       {{ store.lowStock().length }} ingrediente(s) con stock bajo
     </div>
   </div>
 }
 
 @for (item of sortedIngredients(); track item.id) {
-  <mat-card class="touch-card mb-3" (click)="auth.isOwner() ? edit(item) : null">
-    <mat-card-content class="py-2">
+  <section class="touch-card mb-3 p-3" (click)="auth.isOwner() ? edit(item) : null">
+    <div class="py-2">
       <div class="flex items-center justify-between mb-1">
         <div>
           <div class="font-medium">{{ item.name }}</div>
@@ -28,31 +31,28 @@
         </div>
       </div>
 
-      <mat-progress-bar
-        [mode]="'determinate'"
-        [value]="getStockPercent(item)"
-        [color]="getStockBarColor(item)"
-      >
-      </mat-progress-bar>
+      <div class="h-2 rounded-full bg-gray-200 overflow-hidden">
+        <div class="h-2 rounded-full" [class]="getStockClass(item)" [style.width.%]="getStockPercent(item)"></div>
+      </div>
 
       <div class="flex justify-between text-xs text-gray-400 mt-1">
         <span>Mínimo: {{ item.minimumStock }} {{ item.unit }}</span>
         <span [class]="getStockClass(item)">{{ getStockLabel(item) }}</span>
       </div>
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </section>
 }
 
 @if (sortedIngredients().length === 0) {
   <div class="text-center py-8 text-gray-400">
-    <mat-icon style="font-size: 48px; width: 48px; height: 48px">inventory_2</mat-icon>
+    <span class="material-icons" style="font-size: 48px; width: 48px; height: 48px">inventory_2</span>
     <p>No hay ingredientes cargados aún</p>
     <p class="text-sm">Tocá el botón + para agregar el primero</p>
   </div>
 }
 
 @if (auth.isOwner()) {
-  <button mat-fab class="fab-bottom-right" color="primary" (click)="create()">
-    <mat-icon>add</mat-icon>
+  <button class="fab-bottom-right ui-btn ui-btn-primary" type="button" (click)="create()" aria-label="Agregar ingrediente">
+    <span class="material-icons">add</span>
   </button>
 }

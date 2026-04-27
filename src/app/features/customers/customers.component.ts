@@ -1,7 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
 import { NotificationService } from '../../core/services/notification.service';
 import { CustomersStore } from '../../core/store/customers.store';
 import { WhatsAppService } from '../../core/services/whatsapp.service';
@@ -11,7 +8,7 @@ import { DialogService } from '../../core/services/dialog.service';
 
 @Component({
   selector: 'app-customers',
-  imports: [MatCardModule, MatIconModule, MatButtonModule],
+  imports: [],
   templateUrl: './customers.component.html',
   styleUrl: './customers.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

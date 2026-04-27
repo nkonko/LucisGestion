@@ -1,45 +1,50 @@
 <h2 class="text-xl font-semibold mb-4">Ventas</h2>
 
-<mat-tab-group>
-  <mat-tab label="Pendientes ({{ pending().length }})">
-    @if (pending().length === 0) {
-      <div class="text-center py-8 text-gray-400">
-        <mat-icon style="font-size: 48px; width: 48px; height: 48px">check_circle</mat-icon>
-        <p>No hay pedidos pendientes</p>
-      </div>
-    }
-    @for (sale of pending(); track sale.id) {
-      <ng-container *ngTemplateOutlet="saleCard; context: { $implicit: sale }"></ng-container>
-    }
-  </mat-tab>
+<div class="flex gap-2 mb-4">
+  <button class="ui-btn" type="button" [class.ui-btn-primary]="activeTab() === 'pending'" (click)="activeTab.set('pending')">
+    Pendientes ({{ pending().length }})
+  </button>
+  <button class="ui-btn" type="button" [class.ui-btn-primary]="activeTab() === 'history'" (click)="activeTab.set('history')">
+    Historial
+  </button>
+</div>
 
-  <mat-tab label="Historial">
-    <div class="flex gap-2 mt-3 mb-2 flex-wrap">
-      <label class="ui-field flex-1 min-w-[180px]">
-        <span>Buscar cliente / producto</span>
-        <input class="ui-input" (input)="onSearchInput($event)" [value]="searchTerm()" />
-      </label>
-      <label class="ui-field w-[200px]">
-        <span>Desde</span>
-        <input class="ui-input" type="date" (change)="onDateFromInput($event)" />
-      </label>
+@if (activeTab() === 'pending') {
+  @if (pending().length === 0) {
+    <div class="text-center py-8 text-gray-400">
+      <span class="material-icons" style="font-size: 48px; width: 48px; height: 48px">check_circle</span>
+      <p>No hay pedidos pendientes</p>
     </div>
+  }
+  @for (sale of pending(); track sale.id) {
+    <ng-container *ngTemplateOutlet="saleCard; context: { $implicit: sale }"></ng-container>
+  }
+} @else {
+  <div class="flex gap-2 mt-3 mb-2 flex-wrap">
+    <label class="ui-field flex-1 min-w-[180px]">
+      <span>Buscar cliente / producto</span>
+      <input class="ui-input" (input)="onSearchInput($event)" [value]="searchTerm()" />
+    </label>
+    <label class="ui-field w-[200px]">
+      <span>Desde</span>
+      <input class="ui-input" type="date" (change)="onDateFromInput($event)" />
+    </label>
+  </div>
 
-    @if (filteredHistory().length === 0) {
-      <div class="text-center py-6 text-gray-400">
-        <p>No se encontraron ventas</p>
-      </div>
-    }
+  @if (filteredHistory().length === 0) {
+    <div class="text-center py-6 text-gray-400">
+      <p>No se encontraron ventas</p>
+    </div>
+  }
 
-    @for (sale of filteredHistory(); track sale.id) {
-      <ng-container *ngTemplateOutlet="saleCard; context: { $implicit: sale }"></ng-container>
-    }
-  </mat-tab>
-</mat-tab-group>
+  @for (sale of filteredHistory(); track sale.id) {
+    <ng-container *ngTemplateOutlet="saleCard; context: { $implicit: sale }"></ng-container>
+  }
+}
 
 <ng-template #saleCard let-sale>
-  <mat-card class="touch-card mb-3 mt-3">
-    <mat-card-content class="py-2">
+  <section class="touch-card mb-3 mt-3 p-3">
+    <div class="py-2">
       <div class="flex items-center justify-between mb-1">
         <div>
           <div class="font-medium">{{ sale.customerName || 'Sin cliente' }}</div>
@@ -47,11 +52,7 @@
         </div>
         <div class="text-right">
           <div class="text-lg font-bold">{{ sale.total | ars }}</div>
-          <mat-chip-set>
-            <mat-chip [class]="getStatusClass(sale.status)" style="font-size: 11px">
-              {{ getStatusLabel(sale.status) }}
-            </mat-chip>
-          </mat-chip-set>
+          <span [class]="getStatusClass(sale.status)" class="ui-btn text-xs">{{ getStatusLabel(sale.status) }}</span>
         </div>
       </div>
 
@@ -64,23 +65,18 @@
       @if (sale.status === 'pending') {
         <div class="flex justify-end gap-2 mt-2">
           @if (sale.customerName) {
-            <button
-              mat-icon-button
-              color="primary"
-              (click)="sendWhatsApp(sale)"
-              aria-label="Enviar por WhatsApp"
-            >
-              <mat-icon>chat</mat-icon>
+            <button class="ui-btn" type="button" (click)="sendWhatsApp(sale)" aria-label="Enviar por WhatsApp">
+              <span class="material-icons">chat</span>
             </button>
           }
-          <button mat-stroked-button color="warn" (click)="changeStatus(sale, 'cancelled')">Cancelar</button>
-          <button mat-flat-button color="primary" (click)="changeStatus(sale, 'delivered')">Entregar ✓</button>
+          <button class="ui-btn ui-btn-danger" type="button" (click)="changeStatus(sale, 'cancelled')">Cancelar</button>
+          <button class="ui-btn ui-btn-primary" type="button" (click)="changeStatus(sale, 'delivered')">Entregar ✓</button>
         </div>
       }
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </section>
 </ng-template>
 
-<button mat-fab class="fab-bottom-right" color="primary" (click)="newSale()">
-  <mat-icon>add</mat-icon>
+<button class="fab-bottom-right ui-btn ui-btn-primary" type="button" (click)="newSale()" aria-label="Nueva venta">
+  <span class="material-icons">add</span>
 </button>
