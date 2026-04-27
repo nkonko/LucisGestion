@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -27,6 +27,7 @@ import {
     FormsModule,
   ],
   templateUrl: './ingredient-form.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IngredientFormComponent {
   private dialogRef = inject(MatDialogRef<IngredientFormComponent>);

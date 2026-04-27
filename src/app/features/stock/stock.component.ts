@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,6 +25,7 @@ import { AuthService } from '../../core/services/auth.service';
     RouterLink,
   ],
   templateUrl: './stock.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockComponent {
   readonly store = inject(IngredientsStore);

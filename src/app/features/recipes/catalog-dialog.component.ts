@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,6 +10,7 @@ import { ArsPipe } from '../../shared/pipes/ars.pipe';
   imports: [MatDialogModule, MatButtonModule, MatIconModule, ArsPipe],
   templateUrl: './catalog-dialog.component.html',
   styleUrl: './catalog-dialog.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogDialogComponent {
   readonly store = inject(RecipesStore);
