@@ -1,15 +1,8 @@
-mat-form-field {
-  width: 100%;
+:host {
+  display: block;
 }
 
 .precio-venta-field {
-  width: var(--size-price-field-width) !important;
+  width: var(--size-price-field-width);
   max-width: 100%;
-}
-
-.precio-venta-field .mat-mdc-form-field-hint-wrapper {
-  display: flex;
-  justify-content: center;
-  white-space: nowrap;
-  text-align: center;
 }

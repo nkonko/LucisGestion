@@ -1,10 +1,11 @@
 <h2 class="text-xl font-semibold mb-4">Ingredientes</h2>
 
-<mat-form-field class="w-full mb-2" appearance="outline">
-  <mat-icon matPrefix>search</mat-icon>
-  <mat-label>Buscar ingrediente</mat-label>
-  <input matInput (input)="searchTerm.set($any($event.target).value)" [value]="searchTerm()" />
-</mat-form-field>
+<div class="w-full mb-2">
+  <label class="ui-field">
+    <span>Buscar ingrediente</span>
+    <input class="ui-input" (input)="onSearchInput($event)" [value]="searchTerm()" />
+  </label>
+</div>
 
 @if (filteredIngredients().length === 0) {
   <div class="text-center py-8 text-gray-400">
@@ -23,9 +24,7 @@
     <mat-card-content class="flex items-center justify-between py-2">
       <div>
         <div class="font-medium">{{ ingredient.name }}</div>
-        <div class="text-sm text-gray-500">
-          {{ ingredient.unitPrice | ars }} / {{ ingredient.unit }}
-        </div>
+        <div class="text-sm text-gray-500">{{ ingredient.unitPrice | ars }} / {{ ingredient.unit }}</div>
       </div>
       <div class="text-right flex items-center gap-1">
         <div>

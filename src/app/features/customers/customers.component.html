@@ -1,10 +1,11 @@
 <h2 class="text-xl font-semibold mb-4">Clientes</h2>
 
-<mat-form-field class="w-full mb-2" appearance="outline">
-  <mat-icon matPrefix>search</mat-icon>
-  <mat-label>Buscar cliente</mat-label>
-  <input matInput (input)="searchTerm.set($any($event.target).value)" [value]="searchTerm()" />
-</mat-form-field>
+<div class="w-full mb-2">
+  <label class="ui-field">
+    <span>Buscar cliente</span>
+    <input class="ui-input" (input)="onSearchInput($event)" [value]="searchTerm()" />
+  </label>
+</div>
 
 @if (filteredCustomers().length === 0) {
   <div class="text-center py-8 text-gray-400">

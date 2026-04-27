@@ -2,25 +2,16 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { NotificationService } from '../../core/services/notification.service';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { CustomersStore } from '../../core/store/customers.store';
 import { WhatsAppService } from '../../core/services/whatsapp.service';
 import { Customer } from '../../core/models/customer';
 import { CustomerFormComponent } from './customer-form.component';
+import { DialogService } from '../../core/services/dialog.service';
 
 @Component({
   selector: 'app-customers',
-  imports: [
-    MatCardModule,
-    MatIconModule,
-    MatButtonModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-  ],
+  imports: [MatCardModule, MatIconModule, MatButtonModule],
   templateUrl: './customers.component.html',
   styleUrl: './customers.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,7 +19,7 @@ import { CustomerFormComponent } from './customer-form.component';
 export class CustomersComponent {
   readonly store = inject(CustomersStore);
   private whatsApp = inject(WhatsAppService);
-  private dialog = inject(MatDialog);
+  private dialog = inject(DialogService);
   private notify = inject(NotificationService);
 
   searchTerm = signal('');
@@ -42,14 +33,18 @@ export class CustomersComponent {
     );
   });
 
-  create() {
-    const dialogRef = this.dialog.open(CustomerFormComponent, {
-      width: '100%',
+  onSearchInput(event: Event): void {
+    const target = event.target as HTMLInputElement | null;
+    this.searchTerm.set(target?.value ?? '');
+  }
+
+  create(): void {
+    const dialogRef = this.dialog.open<null, Customer>(CustomerFormComponent, {
       maxWidth: '500px',
       data: null,
     });
 
-    dialogRef.afterClosed().subscribe(async (result: Customer | undefined) => {
+    dialogRef.afterClosed.subscribe(async (result) => {
       if (result) {
         try {
           await this.store.createCustomer(result);
@@ -61,14 +56,13 @@ export class CustomersComponent {
     });
   }
 
-  edit(customer: Customer) {
-    const dialogRef = this.dialog.open(CustomerFormComponent, {
-      width: '100%',
+  edit(customer: Customer): void {
+    const dialogRef = this.dialog.open<Customer, Customer | 'delete'>(CustomerFormComponent, {
       maxWidth: '500px',
       data: customer,
     });
 
-    dialogRef.afterClosed().subscribe(async (result: Customer | 'delete' | undefined) => {
+    dialogRef.afterClosed.subscribe(async (result) => {
       try {
         if (result === 'delete') {
           await this.store.deleteCustomer(customer.id!);
@@ -83,7 +77,7 @@ export class CustomersComponent {
     });
   }
 
-  openWhatsApp(customer: Customer, event: Event) {
+  openWhatsApp(customer: Customer, event: Event): void {
     event.stopPropagation();
     this.whatsApp.sendMessage(
       customer.phone,

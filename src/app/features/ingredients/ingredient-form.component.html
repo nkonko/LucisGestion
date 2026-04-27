@@ -1,58 +1,18 @@
-<h2 mat-dialog-title>{{ isEdit ? 'Editar' : 'Nuevo' }} Ingrediente</h2>
-
-<mat-dialog-content class="flex flex-col gap-3">
-  <mat-form-field appearance="outline">
-    <mat-label>Nombre</mat-label>
-    <input matInput [(ngModel)]="form.name" placeholder="Ej: Harina 000" required />
-  </mat-form-field>
-
+<h2 class="text-xl font-semibold mb-3">{{ isEdit ? 'Editar' : 'Nuevo' }} Ingrediente</h2>
+<div class="flex flex-col gap-3">
+  <label class="ui-field"><span>Nombre</span><input data-initial-focus class="ui-input" [(ngModel)]="form.name" required /></label>
   <div class="grid grid-cols-2 gap-3">
-    <mat-form-field appearance="outline">
-      <mat-label>Unidad</mat-label>
-      <mat-select [(ngModel)]="form.unit" required>
-        @for (u of units; track u.key) {
-          <mat-option [value]="u.key">{{ u.label }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Categoría</mat-label>
-      <mat-select [(ngModel)]="form.category" required>
-        @for (c of categories; track c.key) {
-          <mat-option [value]="c.key">{{ c.label }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+    <label class="ui-field"><span>Unidad</span><select class="ui-select" [(ngModel)]="form.unit" required>@for (u of units; track u.key) {<option [value]="u.key">{{ u.label }}</option>}</select></label>
+    <label class="ui-field"><span>Categoría</span><select class="ui-select" [(ngModel)]="form.category" required>@for (c of categories; track c.key) {<option [value]="c.key">{{ c.label }}</option>}</select></label>
   </div>
-
-  <mat-form-field appearance="outline">
-    <mat-label>Precio por {{ form.unit || 'unidad' }}</mat-label>
-    <input matInput type="number" [(ngModel)]="form.unitPrice" min="0" required />
-    <span matPrefix>$&nbsp;</span>
-  </mat-form-field>
-
+  <label class="ui-field"><span>Precio por {{ form.unit || 'unidad' }}</span><input class="ui-input" type="number" [(ngModel)]="form.unitPrice" min="0" required /></label>
   <div class="grid grid-cols-2 gap-3">
-    <mat-form-field appearance="outline">
-      <mat-label>Stock actual</mat-label>
-      <input matInput type="number" [(ngModel)]="form.currentStock" min="0" required />
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Stock mínimo</mat-label>
-      <input matInput type="number" [(ngModel)]="form.minimumStock" min="0" required />
-    </mat-form-field>
+    <label class="ui-field"><span>Stock actual</span><input class="ui-input" type="number" [(ngModel)]="form.currentStock" min="0" required /></label>
+    <label class="ui-field"><span>Stock mínimo</span><input class="ui-input" type="number" [(ngModel)]="form.minimumStock" min="0" required /></label>
   </div>
-</mat-dialog-content>
-
-<mat-dialog-actions align="end">
-  @if (isEdit) {
-    <button mat-button color="warn" (click)="remove()">
-      <mat-icon>delete</mat-icon> Eliminar
-    </button>
-  }
-  <button mat-button mat-dialog-close>Cancelar</button>
-  <button mat-flat-button color="primary" (click)="save()" [disabled]="!isValid()">
-    {{ isEdit ? 'Guardar' : 'Crear' }}
-  </button>
-</mat-dialog-actions>
+</div>
+<div class="flex justify-end gap-2 mt-4">
+  @if (isEdit) { <button class="ui-btn ui-btn-danger" type="button" (click)="remove()">Eliminar</button> }
+  <button class="ui-btn" type="button" (click)="cancel()">Cancelar</button>
+  <button class="ui-btn ui-btn-primary" type="button" (click)="save()" [disabled]="!isValid()">{{ isEdit ? 'Guardar' : 'Crear' }}</button>
+</div>

@@ -1,35 +1,21 @@
-<h2 mat-dialog-title>{{ data ? 'Editar' : 'Nuevo' }} Cliente</h2>
-<mat-dialog-content>
-  <form [formGroup]="form" class="flex flex-col gap-2">
-    <mat-form-field appearance="outline">
-      <mat-label>Nombre</mat-label>
-      <input matInput formControlName="name" />
-    </mat-form-field>
+<div class="flex items-center justify-between mb-3">
+  <h2 class="text-xl font-semibold">{{ data ? 'Editar' : 'Nuevo' }} Cliente</h2>
+</div>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Teléfono</mat-label>
-      <input matInput formControlName="phone" type="tel" />
-    </mat-form-field>
+<form [formGroup]="form" class="flex flex-col gap-3">
+  <label class="ui-field">
+    <span>Nombre</span>
+    <input data-initial-focus class="ui-input" formControlName="name" />
+  </label>
+  <label class="ui-field"><span>Teléfono</span><input class="ui-input" formControlName="phone" type="tel" /></label>
+  <label class="ui-field"><span>Dirección</span><input class="ui-input" formControlName="address" /></label>
+  <label class="ui-field"><span>Notas</span><textarea class="ui-textarea" formControlName="notes" rows="3"></textarea></label>
+</form>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Dirección</mat-label>
-      <input matInput formControlName="address" />
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Notas</mat-label>
-      <textarea matInput formControlName="notes" rows="3"></textarea>
-    </mat-form-field>
-  </form>
-</mat-dialog-content>
-<mat-dialog-actions align="end">
+<div class="flex justify-end gap-2 mt-4">
   @if (data) {
-    <button mat-button color="warn" (click)="remove()">
-      <mat-icon>delete</mat-icon> Eliminar
-    </button>
+    <button class="ui-btn ui-btn-danger" type="button" (click)="remove()">Eliminar</button>
   }
-  <button mat-button mat-dialog-close>Cancelar</button>
-  <button mat-flat-button color="primary" [disabled]="form.invalid" (click)="save()">
-    Guardar
-  </button>
-</mat-dialog-actions>
+  <button class="ui-btn" type="button" (click)="cancel()">Cancelar</button>
+  <button class="ui-btn ui-btn-primary" type="button" [disabled]="form.invalid" (click)="save()">Guardar</button>
+</div>

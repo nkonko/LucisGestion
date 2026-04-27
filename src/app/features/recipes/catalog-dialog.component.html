@@ -1,39 +1,35 @@
 <div class="flex items-center justify-between mb-2">
-  <h2 mat-dialog-title class="!mb-0">Catálogo de Precios</h2>
+  <h2 class="text-xl font-semibold !mb-0">Catálogo de Precios</h2>
   <div class="flex gap-1">
-    <button mat-icon-button (click)="share()" aria-label="Compartir">
+    <button mat-icon-button type="button" (click)="share()" aria-label="Compartir">
       <mat-icon>share</mat-icon>
     </button>
-    <button mat-icon-button (click)="print()" aria-label="Imprimir">
+    <button mat-icon-button type="button" (click)="print()" aria-label="Imprimir">
       <mat-icon>print</mat-icon>
     </button>
   </div>
 </div>
 
-<mat-dialog-content>
-  <div id="catalog-content" class="catalog">
-    <div class="text-center mb-4">
-      <div class="text-3xl">🧁</div>
-      <h3 class="text-lg font-bold">Lucis Pastelería</h3>
-      <p class="text-xs text-gray-500">Catálogo de productos</p>
-    </div>
-
-    @for (recipe of store.recipes(); track recipe.id) {
-      <div class="catalog-item">
-        <div class="flex justify-between items-center py-2 border-b">
-          <div>
-            <div class="font-medium">{{ recipe.name }}</div>
-            <div class="text-xs text-gray-400">{{ recipe.category }}</div>
-          </div>
-          <div class="text-lg font-bold text-rose-600">
-            {{ recipe.salePrice | ars }}
-          </div>
-        </div>
-      </div>
-    }
+<div id="catalog-content" class="catalog">
+  <div class="text-center mb-4">
+    <div class="text-3xl">🧁</div>
+    <h3 class="text-lg font-bold">Lucis Pastelería</h3>
+    <p class="text-xs text-gray-500">Catálogo de productos</p>
   </div>
-</mat-dialog-content>
 
-<mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cerrar</button>
-</mat-dialog-actions>
+  @for (recipe of store.recipes(); track recipe.id) {
+    <div class="catalog-item">
+      <div class="flex justify-between items-center py-2 border-b">
+        <div>
+          <div class="font-medium">{{ recipe.name }}</div>
+          <div class="text-xs text-gray-400">{{ recipe.category }}</div>
+        </div>
+        <div class="text-lg font-bold text-rose-600">{{ recipe.salePrice | ars }}</div>
+      </div>
+    </div>
+  }
+</div>
+
+<div class="flex justify-end mt-4">
+  <button mat-button type="button" (click)="close()">Cerrar</button>
+</div>

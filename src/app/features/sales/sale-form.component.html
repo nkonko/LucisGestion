@@ -1,78 +1,20 @@
-<h2 mat-dialog-title>Nueva Venta</h2>
-
-<mat-dialog-content class="flex flex-col gap-3">
-  <!-- Product selection as cards -->
+<h2 class="text-xl font-semibold mb-3">Nueva Venta</h2>
+<div class="flex flex-col gap-3">
   <h3 class="text-sm font-medium">Seleccionar productos</h3>
   <div class="grid grid-cols-2 gap-2">
     @for (recipe of recipesStore.recipes(); track recipe.id) {
-      <mat-card
-        class="touch-card text-center py-2 cursor-pointer"
-        [class.selected-card]="getItemQuantity(recipe.id!) > 0"
-        (click)="addItem(recipe)"
-      >
-        <div class="font-medium text-sm">{{ recipe.name }}</div>
-        <div class="text-sm font-bold">{{ recipe.salePrice | ars }}</div>
+      <div class="touch-card text-center py-2 px-2 border rounded-md" [class.selected-card]="getItemQuantity(recipe.id!) > 0" (click)="addItem(recipe)">
+        <div class="font-medium text-sm">{{ recipe.name }}</div><div class="text-sm font-bold">{{ recipe.salePrice | ars }}</div>
         @if (getItemQuantity(recipe.id!) > 0) {
-          <div class="flex items-center justify-center gap-2 mt-1">
-            <button mat-icon-button (click)="decrementItem(recipe.id!); $event.stopPropagation()">
-              <mat-icon style="font-size: 18px">remove</mat-icon>
-            </button>
-            <span class="font-bold">{{ getItemQuantity(recipe.id!) }}</span>
-            <button mat-icon-button (click)="addItem(recipe); $event.stopPropagation()">
-              <mat-icon style="font-size: 18px">add</mat-icon>
-            </button>
-          </div>
+          <div class="flex items-center justify-center gap-2 mt-1"><button class="ui-btn" type="button" (click)="decrementItem(recipe.id!); $event.stopPropagation()">-</button><span class="font-bold">{{ getItemQuantity(recipe.id!) }}</span><button class="ui-btn" type="button" (click)="addItem(recipe); $event.stopPropagation()">+</button></div>
         }
-      </mat-card>
+      </div>
     }
   </div>
-
-  <!-- Client -->
-  <mat-form-field appearance="outline">
-    <mat-label>Cliente (opcional)</mat-label>
-    <input
-      matInput
-      [(ngModel)]="customerSearch"
-      [matAutocomplete]="autoCustomer"
-      placeholder="Buscar cliente..."
-    />
-    <mat-autocomplete
-      #autoCustomer="matAutocomplete"
-      (optionSelected)="selectCustomer($event.option.value)"
-      [displayWith]="displayCustomer"
-    >
-      @for (c of filteredCustomers(); track c.id) {
-        <mat-option [value]="c">{{ c.name }} — {{ c.phone }}</mat-option>
-      }
-    </mat-autocomplete>
-  </mat-form-field>
-
-  <!-- Payment -->
-  <mat-form-field appearance="outline">
-    <mat-label>Medio de pago</mat-label>
-    <mat-select [(ngModel)]="paymentMethod">
-      @for (mp of paymentMethods; track mp.key) {
-        <mat-option [value]="mp.key">{{ mp.label }}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
-
-  <mat-form-field appearance="outline">
-    <mat-label>Notas</mat-label>
-    <input matInput [(ngModel)]="notes" placeholder="Observaciones del pedido" />
-  </mat-form-field>
-
-  <!-- Total -->
-  <div class="text-center py-2 bg-green-50 rounded-lg">
-    <div class="text-sm text-gray-500">Total</div>
-    <div class="text-3xl font-bold text-green-700">{{ total() | ars }}</div>
-    <div class="text-xs text-gray-400">Ganancia estimada: {{ profit() | ars }}</div>
-  </div>
-</mat-dialog-content>
-
-<mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cancelar</button>
-  <button mat-flat-button color="primary" (click)="confirm()" [disabled]="items().length === 0">
-    Confirmar venta
-  </button>
-</mat-dialog-actions>
+  <label class="ui-field"><span>Cliente (opcional)</span><input class="ui-input" [(ngModel)]="customerSearch" (ngModelChange)="selectCustomerByName($event)" list="customer-options" data-initial-focus /></label>
+  <datalist id="customer-options">@for (c of filteredCustomers(); track c.id) { <option [value]="c.name">{{ c.phone }}</option> }</datalist>
+  <label class="ui-field"><span>Medio de pago</span><select class="ui-select" [(ngModel)]="paymentMethod">@for (mp of paymentMethods; track mp.key) {<option [value]="mp.key">{{ mp.label }}</option>}</select></label>
+  <label class="ui-field"><span>Notas</span><input class="ui-input" [(ngModel)]="notes" /></label>
+  <div class="text-center py-2 bg-green-50 rounded-lg"><div class="text-sm text-gray-500">Total</div><div class="text-3xl font-bold text-green-700">{{ total() | ars }}</div><div class="text-xs text-gray-400">Ganancia estimada: {{ profit() | ars }}</div></div>
+</div>
+<div class="flex justify-end gap-2 mt-4"><button class="ui-btn" type="button" (click)="cancel()">Cancelar</button><button class="ui-btn ui-btn-primary" type="button" (click)="confirm()" [disabled]="items().length === 0">Confirmar venta</button></div>

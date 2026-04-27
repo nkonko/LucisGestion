@@ -1,134 +1,20 @@
-<h2 mat-dialog-title>{{ isEdit ? 'Editar' : 'Nueva' }} Receta</h2>
-
-<mat-dialog-content class="flex flex-col gap-3 pt-1">
-  <mat-form-field appearance="outline">
-    <mat-label>Nombre</mat-label>
-    <input matInput [(ngModel)]="form.name" placeholder="Ej: Torta de chocolate" required />
-  </mat-form-field>
-
+<h2 class="text-xl font-semibold mb-3">{{ isEdit ? 'Editar' : 'Nueva' }} Receta</h2>
+<div class="flex flex-col gap-3 pt-1">
+  <label class="ui-field"><span>Nombre</span><input data-initial-focus class="ui-input" [(ngModel)]="form.name" required /></label>
   <div class="grid grid-cols-2 gap-3">
-    <mat-form-field appearance="outline">
-      <mat-label>Categoría</mat-label>
-      <mat-select [(ngModel)]="form.category" required>
-        @for (c of categories; track c.key) {
-          <mat-option [value]="c.key">{{ c.label }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Rendimiento (unid.)</mat-label>
-      <input matInput type="number" [(ngModel)]="form.yield" min="1" required />
-    </mat-form-field>
+    <label class="ui-field"><span>Categoría</span><select class="ui-select" [(ngModel)]="form.category" required>@for (c of categories; track c.key) {<option [value]="c.key">{{ c.label }}</option>}</select></label>
+    <label class="ui-field"><span>Rendimiento (unid.)</span><input class="ui-input" type="number" [(ngModel)]="form.yield" min="1" required /></label>
   </div>
-
-  <!-- Recipe ingredients -->
-  <mat-divider></mat-divider>
-  <h3 class="text-sm font-medium">Ingredientes</h3>
-
+  <hr class="border-gray-200" /><h3 class="text-sm font-medium">Ingredientes</h3>
   @for (ri of recipeIngredients(); track ri.ingredientId; let i = $index) {
-    <div class="flex items-center gap-2">
-      <span class="flex-1 text-sm">{{ ri.name }}</span>
-      <mat-form-field appearance="outline" class="w-20" subscriptSizing="dynamic">
-        <input
-          matInput
-          type="number"
-          [ngModel]="ri.quantity"
-          (ngModelChange)="updateQuantity(i, $event)"
-          min="0"
-          step="0.1"
-        />
-      </mat-form-field>
-      <span class="text-xs text-gray-500">{{ ri.unit }}</span>
-      <span class="text-xs font-medium w-16 text-right">{{ ri.lineCost | ars }}</span>
-      <button mat-icon-button (click)="removeIngredient(i)" color="warn">
-        <mat-icon style="font-size: 18px">close</mat-icon>
-      </button>
-    </div>
+    <div class="flex items-center gap-2"><span class="flex-1 text-sm">{{ ri.name }}</span><input class="ui-input w-20" type="number" [ngModel]="ri.quantity" (ngModelChange)="updateQuantity(i, $event)" min="0" step="0.1" /><span class="text-xs text-gray-500">{{ ri.unit }}</span><span class="text-xs font-medium w-16 text-right">{{ ri.lineCost | ars }}</span><button class="ui-btn ui-btn-danger" type="button" (click)="removeIngredient(i)">Quitar</button></div>
   }
-
-  <!-- Add ingredient -->
-  <mat-form-field appearance="outline" class="pt-1">
-    <mat-label>Agregar ingrediente...</mat-label>
-    <input
-      matInput
-      [ngModel]="ingredientSearch()"
-      (ngModelChange)="ingredientSearch.set($event)"
-      [matAutocomplete]="auto"
-      placeholder="Buscar ingrediente"
-    />
-    <mat-autocomplete
-      #auto="matAutocomplete"
-      (optionSelected)="addIngredient($event.option.value)"
-    >
-      @for (ing of filteredIngredients(); track ing.id) {
-        <mat-option [value]="ing"
-          >{{ ing.name }} ({{ ing.unitPrice | ars }}/{{ ing.unit }})</mat-option
-        >
-      }
-    </mat-autocomplete>
-  </mat-form-field>
-
-  <mat-divider class="py-1"></mat-divider>
-
-  <!-- Cost calculation -->
-  <div class="grid grid-cols-2 gap-2 text-center">
-    <div>
-      <div class="text-xs text-gray-500">Costo total</div>
-      <div class="text-lg font-bold text-red-600">{{ calculatedCost() | ars }}</div>
-    </div>
-    <div>
-      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full">
-        <mat-label>Margen %</mat-label>
-        <input
-          matInput
-          type="number"
-          [(ngModel)]="form.profitMargin"
-          min="0"
-          max="1000"
-          (ngModelChange)="recalculate()"
-        />
-      </mat-form-field>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-2 gap-2 text-center pt-1">
-    <div>
-      <div class="text-xs text-gray-500">Precio sugerido</div>
-      <div class="text-lg font-bold text-green-600">{{ suggestedPrice() | ars }}</div>
-    </div>
-    <div class="flex justify-center my-2">
-      <mat-form-field appearance="outline" class="precio-venta-field">
-        <mat-label>Precio de venta final</mat-label>
-        <input matInput type="number" [(ngModel)]="form.salePrice" min="0" />
-        <span matPrefix>$&nbsp;</span>
-        <mat-hint align="start">No completar para usar el sugerido</mat-hint>
-      </mat-form-field>
-    </div>
-  </div>
-  <mat-divider class="py-1"></mat-divider>
-  <mat-form-field appearance="outline" class="w-full">
-    <mat-label>Precio de venta final</mat-label>
-    <input matInput type="number" [(ngModel)]="form.salePrice" min="0" />
-    <span matPrefix>$&nbsp;</span>
-    <mat-hint>Dejalo en blanco para usar el sugerido</mat-hint>
-  </mat-form-field>
-  <mat-divider class="py-1"></mat-divider>
-
-  <mat-form-field appearance="outline">
-    <mat-label>Notas / Instrucciones</mat-label>
-    <textarea matInput [(ngModel)]="form.notes" rows="2"></textarea>
-  </mat-form-field>
-</mat-dialog-content>
-
-<mat-dialog-actions align="end">
-  @if (isEdit) {
-    <button mat-button color="warn" (click)="remove()">
-      <mat-icon>delete</mat-icon> Eliminar
-    </button>
-  }
-  <button mat-button mat-dialog-close>Cancelar</button>
-  <button mat-flat-button color="primary" (click)="save()" [disabled]="!isValid()">
-    {{ isEdit ? 'Guardar' : 'Crear' }}
-  </button>
-</mat-dialog-actions>
+  <label class="ui-field pt-1"><span>Agregar ingrediente...</span><input class="ui-input" [ngModel]="ingredientSearch()" (ngModelChange)="ingredientSearch.set($event); addIngredientByName($event)" list="ingredients-options" /></label>
+  <datalist id="ingredients-options">@for (ing of filteredIngredients(); track ing.id) { <option [value]="ing.name">{{ ing.unitPrice | ars }}/{{ ing.unit }}</option> }</datalist>
+  <hr class="border-gray-200" />
+  <div class="grid grid-cols-2 gap-2 text-center"><div><div class="text-xs text-gray-500">Costo total</div><div class="text-lg font-bold text-red-600">{{ calculatedCost() | ars }}</div></div><div><label class="ui-field"><span>Margen %</span><input class="ui-input" type="number" [(ngModel)]="form.profitMargin" min="0" max="1000" /></label></div></div>
+  <div class="grid grid-cols-2 gap-2 text-center pt-1"><div><div class="text-xs text-gray-500">Precio sugerido</div><div class="text-lg font-bold text-green-600">{{ suggestedPrice() | ars }}</div></div><div class="flex justify-center my-2"><label class="ui-field precio-venta-field"><span>Precio de venta final</span><input class="ui-input" type="number" [(ngModel)]="form.salePrice" min="0" /><small class="text-xs text-gray-500 text-center">No completar para usar el sugerido</small></label></div></div>
+  <hr class="border-gray-200" />
+  <label class="ui-field"><span>Notas / Instrucciones</span><textarea class="ui-textarea" [(ngModel)]="form.notes" rows="2"></textarea></label>
+</div>
+<div class="flex justify-end gap-2 mt-4">@if (isEdit) { <button class="ui-btn ui-btn-danger" type="button" (click)="remove()">Eliminar</button> }<button class="ui-btn" type="button" (click)="cancel()">Cancelar</button><button class="ui-btn ui-btn-primary" type="button" (click)="save()" [disabled]="!isValid()">{{ isEdit ? 'Guardar' : 'Crear' }}</button></div>

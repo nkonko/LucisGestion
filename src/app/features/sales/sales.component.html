@@ -14,23 +14,15 @@
   </mat-tab>
 
   <mat-tab label="Historial">
-    <!-- Search & Filters -->
     <div class="flex gap-2 mt-3 mb-2 flex-wrap">
-      <mat-form-field appearance="outline" class="flex-1 min-w-[180px]">
-        <mat-icon matPrefix>search</mat-icon>
-        <mat-label>Buscar cliente / producto</mat-label>
-        <input
-          matInput
-          (input)="searchTerm.set($any($event.target).value)"
-          [value]="searchTerm()"
-        />
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="w-[140px]">
-        <mat-label>Desde</mat-label>
-        <input matInput [matDatepicker]="pickerFrom" (dateChange)="dateFrom.set($event.value)" />
-        <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
-        <mat-datepicker #pickerFrom></mat-datepicker>
-      </mat-form-field>
+      <label class="ui-field flex-1 min-w-[180px]">
+        <span>Buscar cliente / producto</span>
+        <input class="ui-input" (input)="onSearchInput($event)" [value]="searchTerm()" />
+      </label>
+      <label class="ui-field w-[200px]">
+        <span>Desde</span>
+        <input class="ui-input" type="date" (change)="onDateFromInput($event)" />
+      </label>
     </div>
 
     @if (filteredHistory().length === 0) {
@@ -51,9 +43,7 @@
       <div class="flex items-center justify-between mb-1">
         <div>
           <div class="font-medium">{{ sale.customerName || 'Sin cliente' }}</div>
-          <div class="text-xs text-gray-400">
-            {{ sale.date?.toDate() | date: 'dd/MM HH:mm' }}
-          </div>
+          <div class="text-xs text-gray-400">{{ sale.date?.toDate() | date: 'dd/MM HH:mm' }}</div>
         </div>
         <div class="text-right">
           <div class="text-lg font-bold">{{ sale.total | ars }}</div>
@@ -83,12 +73,8 @@
               <mat-icon>chat</mat-icon>
             </button>
           }
-          <button mat-stroked-button color="warn" (click)="changeStatus(sale, 'cancelled')">
-            Cancelar
-          </button>
-          <button mat-flat-button color="primary" (click)="changeStatus(sale, 'delivered')">
-            Entregar ✓
-          </button>
+          <button mat-stroked-button color="warn" (click)="changeStatus(sale, 'cancelled')">Cancelar</button>
+          <button mat-flat-button color="primary" (click)="changeStatus(sale, 'delivered')">Entregar ✓</button>
         </div>
       }
     </mat-card-content>

@@ -1,10 +1,4 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import {
   Ingredient,
@@ -14,24 +8,19 @@ import {
   INGREDIENT_CATEGORY_DISPLAY,
   IngredientInputForm,
 } from '../../core/models/ingredient';
+import { DIALOG_DATA, DIALOG_REF } from '../../core/models/dialog/dialog-tokens.model';
+import { DialogRef } from '../../core/models/dialog/dialog-ref.model';
 
 @Component({
   selector: 'app-ingredient-form',
-  imports: [
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatIconModule,
-    FormsModule,
-  ],
+  imports: [FormsModule],
   templateUrl: './ingredient-form.component.html',
+  styleUrl: './ingredient-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IngredientFormComponent {
-  private dialogRef = inject(MatDialogRef<IngredientFormComponent>);
-  private data: Ingredient | null = inject(MAT_DIALOG_DATA);
+  private dialogRef = inject(DIALOG_REF) as DialogRef<Ingredient | 'delete'>;
+  private data = inject(DIALOG_DATA) as Ingredient | null;
 
   isEdit = !!this.data;
 
@@ -44,9 +33,13 @@ export class IngredientFormComponent {
     category: this.data?.category ?? 'other',
   };
 
-  units = Object.entries(UNIT_DISPLAY).map(([key, label]) => ({ key, label }));
+  units = Object.entries(UNIT_DISPLAY).map(([key, label]) => ({
+    key: key as MeasurementUnit,
+    label,
+  }));
+
   categories = Object.entries(INGREDIENT_CATEGORY_DISPLAY).map(([key, label]) => ({
-    key,
+    key: key as IngredientCategory,
     label,
   }));
 
@@ -54,7 +47,7 @@ export class IngredientFormComponent {
     return !!(this.form.name && this.form.unit && this.form.unitPrice >= 0);
   }
 
-  save() {
+  save(): void {
     if (this.isValid()) {
       this.dialogRef.close({
         ...this.form,
@@ -64,7 +57,11 @@ export class IngredientFormComponent {
     }
   }
 
-  remove() {
+  cancel(): void {
+    this.dialogRef.close(undefined);
+  }
+
+  remove(): void {
     this.dialogRef.close('delete');
   }
 }
