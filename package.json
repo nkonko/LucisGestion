@@ -6,8 +6,13 @@
     "start": "ng serve",
     "start:mock": "ng serve --configuration mock",
     "build": "ng build",
+    "build:mock": "ng build --configuration mock",
+    "build:ci": "ng build --configuration mock",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:mock": "node scripts/test-mock.mjs",
+    "test:ci": "node scripts/test-mock.mjs",
+    "screenshot:mock": "node scripts/capture-mock.mjs"
   },
   "private": true,
   "packageManager": "npm@11.11.1",
@@ -35,6 +40,7 @@
     "@tailwindcss/postcss": "^4.2.2",
     "firebase-tools": "^14.27.0",
     "jsdom": "^28.0.0",
+    "playwright": "^1.55.0",
     "postcss": "^8.5.8",
     "prettier": "^3.8.1",
     "tailwindcss": "^4.2.2",
