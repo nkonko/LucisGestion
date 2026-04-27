@@ -11,8 +11,8 @@
       </div>
     }
   </div>
-  <label class="ui-field"><span>Cliente (opcional)</span><input class="ui-input" [(ngModel)]="customerSearch" (ngModelChange)="selectCustomerByName($event)" list="customer-options" data-initial-focus /></label>
-  <datalist id="customer-options">@for (c of filteredCustomers(); track c.id) { <option [value]="c.name">{{ c.phone }}</option> }</datalist>
+  <label class="ui-field"><span>Cliente (opcional)</span><input class="ui-input" [ngModel]="customerSearch" (ngModelChange)="handleCustomerSearchChange($event)" data-initial-focus /></label>
+  <label class="ui-field"><span>Seleccionar cliente existente</span><select class="ui-select" [ngModel]="selectedCustomerId" (ngModelChange)="selectCustomerById($event)"><option value="">Sin cliente registrado</option>@for (c of customers(); track c.id ?? c.phone) {<option [value]="c.id ?? ''">{{ c.name }} · {{ c.phone }}</option>}</select></label>
   <label class="ui-field"><span>Medio de pago</span><select class="ui-select" [(ngModel)]="paymentMethod">@for (mp of paymentMethods; track mp.key) {<option [value]="mp.key">{{ mp.label }}</option>}</select></label>
   <label class="ui-field"><span>Notas</span><input class="ui-input" [(ngModel)]="notes" /></label>
   <div class="text-center py-2 bg-green-50 rounded-lg"><div class="text-sm text-gray-500">Total</div><div class="text-3xl font-bold text-green-700">{{ total() | ars }}</div><div class="text-xs text-gray-400">Ganancia estimada: {{ profit() | ars }}</div></div>

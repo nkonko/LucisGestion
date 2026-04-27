@@ -30,6 +30,7 @@ export class SaleFormComponent {
 
   items = signal<SaleItem[]>([]);
   customerSearch = '';
+  selectedCustomerId = '';
   selectedCustomer: Customer | null = null;
   paymentMethod: PaymentMethod = 'cash';
   notes = '';
@@ -39,12 +40,7 @@ export class SaleFormComponent {
     label,
   }));
 
-  filteredCustomers = computed(() => {
-    const term = this.customerSearch.toLowerCase();
-    return this.customersStore
-      .customers()
-      .filter((c) => c.name.toLowerCase().includes(term) || c.phone.includes(term));
-  });
+  customers = computed(() => this.customersStore.customers());
 
   total = computed(() => this.items().reduce((sum, i) => sum + i.quantity * i.unitPrice, 0));
   totalCost = computed(() => this.items().reduce((sum, i) => sum + i.quantity * i.unitCost, 0));
@@ -82,11 +78,21 @@ export class SaleFormComponent {
     });
   }
 
-  selectCustomerByName(name: string): void {
-    const customer = this.filteredCustomers().find((c) => c.name.toLowerCase() === name.toLowerCase());
-    if (customer) {
-      this.selectedCustomer = customer;
-      this.customerSearch = customer.name;
+  selectCustomerById(customerId: string): void {
+    this.selectedCustomerId = customerId;
+    this.selectedCustomer = this.customers().find((customer) => customer.id === customerId) ?? null;
+
+    if (this.selectedCustomer) {
+      this.customerSearch = this.selectedCustomer.name;
+    }
+  }
+
+  handleCustomerSearchChange(name: string): void {
+    this.customerSearch = name;
+
+    if (!name || name !== this.selectedCustomer?.name) {
+      this.selectedCustomer = null;
+      this.selectedCustomerId = '';
     }
   }
 
