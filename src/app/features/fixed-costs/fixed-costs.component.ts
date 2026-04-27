@@ -3,7 +3,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { NotificationService } from '../../core/services/notification.service';
 import { FixedCostsStore } from '../../core/store/fixed-costs.store';
 import { AuthService } from '../../core/services/auth.service';
@@ -15,24 +14,18 @@ import {
 } from '../../core/models/fixed-cost';
 import { FixedCostFormComponent } from './fixed-cost-form.component';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
+import { DialogService } from '../../core/services/dialog.service';
 
 @Component({
   selector: 'app-fixed-costs',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    MatCardModule,
-    MatIconModule,
-    MatButtonModule,
-    MatChipsModule,
-    MatDialogModule,
-    ArsPipe,
-  ],
+  imports: [MatCardModule, MatIconModule, MatButtonModule, MatChipsModule, ArsPipe],
   templateUrl: './fixed-costs.component.html',
 })
 export class FixedCostsComponent {
   readonly store = inject(FixedCostsStore);
   readonly auth = inject(AuthService);
-  private dialog = inject(MatDialog);
+  private dialog = inject(DialogService);
   private notify = inject(NotificationService);
 
   groupsByCategory() {
@@ -59,13 +52,12 @@ export class FixedCostsComponent {
     return c.amount;
   }
 
-  create() {
-    const ref = this.dialog.open(FixedCostFormComponent, {
-      width: '100%',
+  create(): void {
+    const ref = this.dialog.open<null, FixedCost>(FixedCostFormComponent, {
       maxWidth: '480px',
       data: null,
     });
-    ref.afterClosed().subscribe(async (result: FixedCost | undefined) => {
+    ref.afterClosed.subscribe(async (result) => {
       if (result) {
         await this.store.createFixedCost(result);
         this.notify.success('Costo fijo agregado');
@@ -73,13 +65,12 @@ export class FixedCostsComponent {
     });
   }
 
-  edit(cost: FixedCost) {
-    const ref = this.dialog.open(FixedCostFormComponent, {
-      width: '100%',
+  edit(cost: FixedCost): void {
+    const ref = this.dialog.open<FixedCost, FixedCost | 'delete'>(FixedCostFormComponent, {
       maxWidth: '480px',
       data: cost,
     });
-    ref.afterClosed().subscribe(async (result: FixedCost | 'delete' | undefined) => {
+    ref.afterClosed.subscribe(async (result) => {
       if (result === 'delete') {
         await this.store.deleteFixedCost(cost.id!);
         this.notify.success('Costo fijo eliminado');

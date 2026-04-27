@@ -1,21 +1,27 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { RecipesStore } from '../../core/store/recipes.store';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
+import { DIALOG_REF } from '../../core/models/dialog/dialog-tokens.model';
+import { DialogRef } from '../../core/models/dialog/dialog-ref.model';
 
 @Component({
   selector: 'app-catalog-dialog',
-  imports: [MatDialogModule, MatButtonModule, MatIconModule, ArsPipe],
+  imports: [MatButtonModule, MatIconModule, ArsPipe],
   templateUrl: './catalog-dialog.component.html',
   styleUrl: './catalog-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogDialogComponent {
   readonly store = inject(RecipesStore);
+  private dialogRef = inject(DIALOG_REF) as DialogRef<undefined>;
 
-  print() {
+  close(): void {
+    this.dialogRef.close(undefined);
+  }
+
+  print(): void {
     const content = document.getElementById('catalog-content');
     if (!content) return;
 
@@ -40,7 +46,7 @@ export class CatalogDialogComponent {
     win.print();
   }
 
-  async share() {
+  async share(): Promise<void> {
     const recipes = this.store.recipes();
     const text =
       `🧁 Lucis Pastelería — Catálogo\n\n` +

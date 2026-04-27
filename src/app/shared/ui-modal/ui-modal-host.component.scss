@@ -1,0 +1,24 @@
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-nav) + 1);
+}
+
+.ui-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background: color-mix(in srgb, var(--color-on-surface) 35%, transparent);
+}
+
+.ui-modal-panel {
+  background: var(--color-surface);
+  color: var(--color-on-surface);
+  border-radius: var(--space-2);
+  padding: var(--space-4);
+  overflow: auto;
+  box-shadow: var(--shadow-modal);
+}
