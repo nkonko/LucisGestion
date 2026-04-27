@@ -1,0 +1,13 @@
+<label class="ui-select__label" [attr.for]="id()">{{ label() }}</label>
+<select
+  class="ui-select"
+  [disabled]="disabled()"
+  [id]="id()"
+  [required]="required()"
+  [value]="value()"
+  (change)="onSelection($event)"
+>
+  @for (option of options(); track option.value) {
+    <option [disabled]="option.disabled" [value]="option.value">{{ option.label }}</option>
+  }
+</select>
