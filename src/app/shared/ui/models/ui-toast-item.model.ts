@@ -6,4 +6,5 @@ export interface UiToastItem {
   kind: UiToastKind;
   duration: number;
   icon?: string;
+  dismissing?: boolean;
 }
