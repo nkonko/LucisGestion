@@ -3,7 +3,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  min-height: var(--size-viewport-height);
   padding: var(--space-6);
   background: linear-gradient(135deg, var(--color-brand-gradient-from), var(--color-brand-gradient-to));
 }

@@ -12,48 +12,48 @@ service cloud.firestore {
       return isSignedIn() && request.auth.token.role == 'owner';
     }
 
-    function isAyudante() {
-      return isSignedIn() && request.auth.token.role == 'ayudante';
+    function isAssistant() {
+      return isSignedIn() && request.auth.token.role == 'assistant';
     }
 
     function isTeamMember() {
-      return isOwner() || isAyudante();
+      return isOwner() || isAssistant();
     }
 
-    // Ingredientes: owner can CRUD, ayudante can read
-    match /ingredientes/{docId} {
+    // Ingredients: owner can CRUD, assistant can read
+    match /ingredients/{docId} {
       allow read: if isTeamMember();
       allow write: if isOwner();
     }
 
-    // Recetas: owner can CRUD, ayudante can read
-    match /recetas/{docId} {
+    // Recipes: owner can CRUD, assistant can read
+    match /recipes/{docId} {
       allow read: if isTeamMember();
       allow write: if isOwner();
     }
 
-    // Ventas: both can read and create, only owner can update/delete
-    match /ventas/{docId} {
+    // Sales: both can read and create, only owner can update/delete
+    match /sales/{docId} {
       allow read: if isTeamMember();
       allow create: if isTeamMember();
       allow update, delete: if isOwner();
     }
 
-    // Clientes: both can read and create, only owner can update/delete
-    match /clientes/{docId} {
+    // Customers: both can read and create, only owner can update/delete
+    match /customers/{docId} {
       allow read: if isTeamMember();
       allow create: if isTeamMember();
       allow update, delete: if isOwner();
     }
 
     // Stock movements: both can read, created by system via sales
-    match /movimientosStock/{docId} {
+    match /stockMovements/{docId} {
       allow read: if isTeamMember();
       allow create: if isTeamMember();
     }
 
-    // Gastos: owner only
-    match /gastosInsumos/{docId} {
+    // Supply expenses: owner only
+    match /supplyExpenses/{docId} {
       allow read: if isTeamMember();
       allow write: if isOwner();
     }
@@ -65,10 +65,16 @@ service cloud.firestore {
       allow update: if isOwner();
     }
 
-    // Historial de precios: read for team, created by system on price changes
-    match /historialPrecios/{docId} {
+    // Price history: read for team, created by system on price changes
+    match /priceHistory/{docId} {
       allow read: if isTeamMember();
       allow create: if isTeamMember();
+    }
+
+    // Fixed costs: owner only
+    match /fixedCosts/{docId} {
+      allow read: if isTeamMember();
+      allow write: if isOwner();
     }
   }
 }

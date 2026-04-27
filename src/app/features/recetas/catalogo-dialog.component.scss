@@ -1,9 +1,0 @@
-.catalogo {
-  min-width: var(--dialog-min-width, 17.5rem);
-}
-
-@media print {
-  .catalogo {
-    padding: var(--space-4);
-  }
-}

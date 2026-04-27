@@ -1,0 +1,9 @@
+.catalog {
+  min-width: var(--size-catalog-min-width);
+}
+
+@media print {
+  .catalog {
+    padding: var(--space-4);
+  }
+}

@@ -40,12 +40,12 @@ export class FirestoreService {
   }
 
   async softDelete(path: string, id: string): Promise<void> {
-    await this.updateDocument(path, id, { activo: false });
+    await this.updateDocument(path, id, { active: false });
   }
 
   async applyStockAdjustments(
-    ventaId: string,
-    tipoMovimiento: 'venta_deduccion' | 'cancelacion_reposicion',
+    saleId: string,
+    movementType: 'sale_deduction' | 'cancellation_restock',
     adjustments: StockAdjustmentInput[],
   ): Promise<void> {
     if (adjustments.length === 0) return;
@@ -54,26 +54,26 @@ export class FirestoreService {
       const now = Timestamp.now();
 
       for (const adjustment of adjustments) {
-        const ingredienteRef = doc(this.firestore, 'ingredientes', adjustment.ingredienteId);
-        const ingredienteSnap = await transaction.get(ingredienteRef);
-        if (!ingredienteSnap.exists()) continue;
+        const ingredientRef = doc(this.firestore, 'ingredients', adjustment.ingredientId);
+        const ingredientSnap = await transaction.get(ingredientRef);
+        if (!ingredientSnap.exists()) continue;
 
-        const stockActual = Number(ingredienteSnap.data()['stockActual'] ?? 0);
-        const nuevoStock = Math.max(0, stockActual + adjustment.delta);
-        const deltaAplicado = nuevoStock - stockActual;
+        const currentStock = Number(ingredientSnap.data()['currentStock'] ?? 0);
+        const newStock = Math.max(0, currentStock + adjustment.delta);
+        const appliedDelta = newStock - currentStock;
 
-        transaction.update(ingredienteRef, { stockActual: nuevoStock });
+        transaction.update(ingredientRef, { currentStock: newStock });
 
-        if (deltaAplicado === 0) continue;
+        if (appliedDelta === 0) continue;
 
-        const movimientoRef = doc(collection(this.firestore, 'movimientosStock'));
-        transaction.set(movimientoRef, {
-          ingredienteId: adjustment.ingredienteId,
-          ingredienteNombre: adjustment.ingredienteNombre,
-          tipo: tipoMovimiento,
-          cantidad: deltaAplicado,
-          fecha: now,
-          ventaId,
+        const movementRef = doc(collection(this.firestore, 'stockMovements'));
+        transaction.set(movementRef, {
+          ingredientId: adjustment.ingredientId,
+          ingredientName: adjustment.ingredientName,
+          type: movementType,
+          quantity: appliedDelta,
+          date: now,
+          saleId,
         });
       }
     });

@@ -56,7 +56,7 @@
   </a>
   <a routerLink="/stock" routerLinkActive="active" class="nav-item">
     <mat-icon
-      [matBadge]="stockBajoCount() > 0 ? stockBajoCount() : null"
+      [matBadge]="lowStockCount() > 0 ? lowStockCount() : null"
       matBadgeColor="warn"
       matBadgeSize="small"
     >

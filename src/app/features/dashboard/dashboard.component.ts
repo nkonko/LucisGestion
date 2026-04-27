@@ -5,16 +5,14 @@ import { MatListModule } from '@angular/material/list';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { RouterLink } from '@angular/router';
-import { Periodo } from '../../core/models/dashboard';
 import { DashboardStore } from '../../core/store/dashboard.store';
-import { IngredientesStore } from '../../core/store/ingredientes.store';
-import { VentasStore } from '../../core/store/ventas.store';
-import { RecetasStore } from '../../core/store/recetas.store';
+import { IngredientsStore } from '../../core/store/ingredients.store';
+import { SalesStore } from '../../core/store/sales.store';
+import { RecipesStore } from '../../core/store/recipes.store';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 
 @Component({
   selector: 'app-dashboard',
-  standalone: true,
   imports: [
     MatCardModule,
     MatIconModule,
@@ -28,38 +26,38 @@ import { ArsPipe } from '../../shared/pipes/ars.pipe';
 })
 export class DashboardComponent {
   readonly store = inject(DashboardStore);
-  private ingredientesStore = inject(IngredientesStore);
-  private ventasStore = inject(VentasStore);
-  private recetasStore = inject(RecetasStore);
+  private ingredientsStore = inject(IngredientsStore);
+  private salesStore = inject(SalesStore);
+  private recipesStore = inject(RecipesStore);
 
-  stockBajo = this.ingredientesStore.stockBajo;
-  totalRecetas = this.recetasStore.totalRecetas;
-  ventasRecientes = this.ventasStore.ventasRecientes;
-  pedidosPendientes = this.ventasStore.pedidosPendientesCount;
-  ventasMes = this.store.ventasMes;
-  gastosMes = this.store.gastosMes;
-  gananciaMes = this.store.gananciaMes;
-  costosFijosPeriodo = this.store.costosFijosPeriodo;
-  gastosTotalesPeriodo = this.store.gastosTotalesPeriodo;
-  gananciaNeta = this.store.gananciaNeta;
+  lowStock = this.ingredientsStore.lowStock;
+  totalRecipes = this.recipesStore.totalRecipes;
+  recentSales = this.salesStore.recentSales;
+  pendingOrders = this.salesStore.pendingOrdersCount;
+  monthlySales = this.store.monthlySales;
+  monthlyExpenses = this.store.monthlyExpenses;
+  monthlyProfit = this.store.monthlyProfit;
+  periodFixedCosts = this.store.periodFixedCosts;
+  totalPeriodExpenses = this.store.totalPeriodExpenses;
+  netProfit = this.store.netProfit;
 
-  ingresosBarWidth = computed(() => {
-    const max = Math.max(this.ventasMes(), this.gastosTotalesPeriodo(), 1);
-    return (this.ventasMes() / max) * 100;
+  incomeBarWidth = computed(() => {
+    const max = Math.max(this.monthlySales(), this.totalPeriodExpenses(), 1);
+    return (this.monthlySales() / max) * 100;
   });
 
-  ingredientesBarWidth = computed(() => {
-    const max = Math.max(this.ventasMes(), this.gastosTotalesPeriodo(), 1);
-    return (this.gastosMes() / max) * 100;
+  ingredientsBarWidth = computed(() => {
+    const max = Math.max(this.monthlySales(), this.totalPeriodExpenses(), 1);
+    return (this.monthlyExpenses() / max) * 100;
   });
 
-  costosFijosBarWidth = computed(() => {
-    const max = Math.max(this.ventasMes(), this.gastosTotalesPeriodo(), 1);
-    return (this.costosFijosPeriodo() / max) * 100;
+  fixedCostsBarWidth = computed(() => {
+    const max = Math.max(this.monthlySales(), this.totalPeriodExpenses(), 1);
+    return (this.periodFixedCosts() / max) * 100;
   });
 
-  gastosBarWidth = computed(() => {
-    const max = Math.max(this.ventasMes(), this.gastosTotalesPeriodo(), 1);
-    return (this.gastosTotalesPeriodo() / max) * 100;
+  expensesBarWidth = computed(() => {
+    const max = Math.max(this.monthlySales(), this.totalPeriodExpenses(), 1);
+    return (this.totalPeriodExpenses() / max) * 100;
   });
 }
