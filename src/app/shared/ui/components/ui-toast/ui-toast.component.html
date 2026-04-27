@@ -1,0 +1,15 @@
+<section aria-atomic="true" aria-live="polite" class="ui-toast" role="status">
+  @for (toast of toastService.toasts(); track toast.id) {
+    <article class="ui-toast__item" [class.ui-toast__item--error]="toast.kind === 'error'">
+      <p class="ui-toast__message">{{ toast.message }}</p>
+      <button
+        aria-label="Cerrar notificación"
+        class="ui-toast__close"
+        type="button"
+        (click)="toastService.dismiss(toast.id)"
+      >
+        ×
+      </button>
+    </article>
+  }
+</section>

@@ -1,0 +1,8 @@
+<section class="ui-card" [attr.aria-label]="title()">
+  @if (title()) {
+    <h2 class="ui-card__title">{{ title() }}</h2>
+  }
+  <div class="ui-card__content">
+    <ng-content />
+  </div>
+</section>

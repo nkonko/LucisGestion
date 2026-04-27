@@ -1,0 +1,13 @@
+<label class="ui-input__label" [attr.for]="id()">{{ label() }}</label>
+<input
+  class="ui-input"
+  [attr.aria-describedby]="describedBy()"
+  [disabled]="disabled()"
+  [id]="id()"
+  [placeholder]="placeholder()"
+  [required]="required()"
+  [type]="type()"
+  [value]="value()"
+  (blur)="onBlur()"
+  (input)="onInput($event)"
+/>
