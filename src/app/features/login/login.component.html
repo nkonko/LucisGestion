@@ -5,15 +5,15 @@
     <p class="text-gray-500 mt-2">Gestión de pastelería</p>
   </div>
 
-  <mat-card class="login-card">
-    <mat-card-content class="py-6 text-center">
+  <section class="login-card ui-card-surface">
+    <div class="py-6 text-center">
       @if (loading) {
-        <mat-spinner diameter="40" class="mx-auto mb-4"></mat-spinner>
+        <div class="ui-spinner mx-auto mb-4" aria-label="Cargando"></div>
         <p class="text-gray-500">Iniciando sesión...</p>
       } @else {
         <p class="text-gray-600 mb-6">Iniciá sesión para continuar</p>
 
-        <button mat-flat-button class="google-btn w-full" (click)="loginGoogle()">
+        <button class="ui-btn ui-btn-primary google-btn w-full" (click)="loginGoogle()" type="button">
           <img
             src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
             alt=""
@@ -28,6 +28,6 @@
           <p class="text-red-500 text-sm mt-4">{{ error }}</p>
         }
       }
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </section>
 </div>

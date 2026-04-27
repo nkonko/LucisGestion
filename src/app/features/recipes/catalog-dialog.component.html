@@ -1,11 +1,11 @@
 <div class="flex items-center justify-between mb-2">
   <h2 class="text-xl font-semibold !mb-0">Catálogo de Precios</h2>
   <div class="flex gap-1">
-    <button mat-icon-button type="button" (click)="share()" aria-label="Compartir">
-      <mat-icon>share</mat-icon>
+    <button class="ui-icon-btn" type="button" (click)="share()" aria-label="Compartir">
+      <ui-icon name="share" [decorative]="true" />
     </button>
-    <button mat-icon-button type="button" (click)="print()" aria-label="Imprimir">
-      <mat-icon>print</mat-icon>
+    <button class="ui-icon-btn" type="button" (click)="print()" aria-label="Imprimir">
+      <ui-icon name="print" [decorative]="true" />
     </button>
   </div>
 </div>
@@ -31,5 +31,5 @@
 </div>
 
 <div class="flex justify-end mt-4">
-  <button mat-button type="button" (click)="close()">Cerrar</button>
+  <button class="ui-btn" type="button" (click)="close()">Cerrar</button>
 </div>

@@ -1,10 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject, computed, signal } from '@angular/core';
-import { NgTemplateOutlet, DatePipe } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatTabsModule } from '@angular/material/tabs';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { NotificationService } from '../../core/services/notification.service';
 import { SalesStore } from '../../core/store/sales.store';
 import { CustomersStore } from '../../core/store/customers.store';
@@ -15,11 +10,13 @@ import { Sale, SALE_STATUS_DISPLAY } from '../../core/models/sale';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 import { SaleFormComponent } from './sale-form.component';
 import { DialogService } from '../../core/services/dialog.service';
+import { UiIconComponent } from '../../shared/ui/components';
 
 @Component({
   selector: 'app-sales',
-  imports: [NgTemplateOutlet, DatePipe, MatCardModule, MatIconModule, MatButtonModule, MatChipsModule, MatTabsModule, ArsPipe],
+  imports: [NgTemplateOutlet, DatePipe, ArsPipe, UiIconComponent],
   templateUrl: './sales.component.html',
+  styleUrl: './sales.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SalesComponent {
@@ -29,8 +26,8 @@ export class SalesComponent {
   private dialog = inject(DialogService);
   private notify = inject(NotificationService);
 
+  readonly selectedTab = signal<'pending' | 'history'>('pending');
   statusDisplay: Record<SaleStatus, string> = SALE_STATUS_DISPLAY;
-
   pending = this.store.pendingOrders;
 
   searchTerm = signal('');
