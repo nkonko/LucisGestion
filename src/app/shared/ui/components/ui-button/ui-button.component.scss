@@ -1,0 +1,37 @@
+.ui-button {
+  border: var(--border-width-thin) solid transparent;
+  border-radius: var(--radius-chip);
+  background-color: var(--color-primary);
+  color: var(--color-surface);
+  cursor: pointer;
+  font: inherit;
+  min-height: calc(var(--space-8) + var(--space-4));
+  padding: var(--space-2) var(--space-4);
+  transition: background-color var(--transition-standard), border-color var(--transition-standard), color var(--transition-standard);
+}
+
+.ui-button:hover {
+  filter: brightness(0.95);
+}
+
+.ui-button:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--space-1);
+}
+
+.ui-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.ui-button--secondary {
+  background-color: var(--color-surface-container);
+  border-color: var(--color-outline-variant);
+  color: var(--color-on-surface);
+}
+
+.ui-button--ghost {
+  background-color: transparent;
+  border-color: var(--color-outline-variant);
+  color: var(--color-on-surface);
+}

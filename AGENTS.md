@@ -5,6 +5,7 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Use strict type checking
 - Prefer type inference when the type is obvious
 - Avoid the `any` type; use `unknown` when type is uncertain
+- Do NOT add comments to code you write unless the logic is genuinely non-obvious. Never add comments that just restate what the code does.
 
 ## Angular Best Practices
 

@@ -52,8 +52,9 @@
   --size-viewport-height:     100vh;   // Full viewport-height sections
 
   // ── Z-index scale ────────────────────────────────────────────────────────────
-  --z-nav: 1000;   // Fixed navigation bars (top + bottom)
-  --z-fab: 100;    // Floating action buttons
+  --z-toast: 9999;  // Toast notifications (must be above dialogs)
+  --z-nav:  1000;   // Fixed navigation bars (top + bottom)
+  --z-fab:  100;    // Floating action buttons
 
   // ── Border radius ────────────────────────────────────────────────────────────
   --radius-chip:   16px;  // Pill / chip shape (e.g. active nav item)
