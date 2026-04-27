@@ -1,7 +1,7 @@
-import { Observable, Subject } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
 
 export class DialogRef<TResult> {
-  private readonly closeSubject = new Subject<TResult | undefined>();
+  private readonly closeSubject = new ReplaySubject<TResult | undefined>(1);
 
   readonly afterClosed: Observable<TResult | undefined> = this.closeSubject.asObservable();
 
