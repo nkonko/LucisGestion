@@ -1,6 +1,13 @@
 <section aria-atomic="true" aria-live="polite" class="ui-toast" role="status">
   @for (toast of toastService.toasts(); track toast.id) {
-    <article class="ui-toast__item" [class.ui-toast__item--error]="toast.kind === 'error'">
+    <article
+      class="ui-toast__item"
+      [class.ui-toast__item--error]="toast.kind === 'error'"
+      [class.ui-toast__item--dismissing]="toast.dismissing"
+    >
+      @if (toast.icon) {
+        <span aria-hidden="true" class="ui-toast__icon">{{ toast.icon }}</span>
+      }
       <p class="ui-toast__message">{{ toast.message }}</p>
       <button
         aria-label="Cerrar notificación"

@@ -7,11 +7,11 @@ export class NotificationService {
   private readonly toast = inject(UiToastService);
 
   success(message: string, duration = 2000): void {
-    this.toast.show(message, 'success', duration);
+    this.toast.show(message, 'success', duration, '✓');
   }
 
   error(message: string, duration = 5000): void {
-    this.toast.show(`Error: ${message}`, 'error', duration);
+    this.toast.show(`Error: ${message}`, 'error', duration, '✕');
   }
 
   errorFrom(error: unknown, fallbackMessage: string, duration = 5000): void {

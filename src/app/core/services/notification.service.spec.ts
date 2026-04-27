@@ -27,27 +27,27 @@ describe('NotificationService', () => {
     service.success('Guardado correctamente', 2500);
 
     expect(toastServiceMock.show).toHaveBeenCalledTimes(1);
-    expect(toastServiceMock.show).toHaveBeenCalledWith('Guardado correctamente', 'success', 2500);
+    expect(toastServiceMock.show).toHaveBeenCalledWith('Guardado correctamente', 'success', 2500, '✓');
   });
 
   it('delegates error notifications prefixing the message', () => {
     service.error('Falló', 3200);
 
     expect(toastServiceMock.show).toHaveBeenCalledTimes(1);
-    expect(toastServiceMock.show).toHaveBeenCalledWith('Error: Falló', 'error', 3200);
+    expect(toastServiceMock.show).toHaveBeenCalledWith('Error: Falló', 'error', 3200, '✕');
   });
 
   it('uses Error.message in errorFrom when the source is an Error', () => {
     service.errorFrom(new Error('Sin conexión'), 'Mensaje fallback', 4100);
 
     expect(toastServiceMock.show).toHaveBeenCalledTimes(1);
-    expect(toastServiceMock.show).toHaveBeenCalledWith('Error: Sin conexión', 'error', 4100);
+    expect(toastServiceMock.show).toHaveBeenCalledWith('Error: Sin conexión', 'error', 4100, '✕');
   });
 
   it('uses fallback message in errorFrom when the source is not an Error', () => {
     service.errorFrom({ reason: 'failure' }, 'No se pudo procesar', 4100);
 
     expect(toastServiceMock.show).toHaveBeenCalledTimes(1);
-    expect(toastServiceMock.show).toHaveBeenCalledWith('Error: No se pudo procesar', 'error', 4100);
+    expect(toastServiceMock.show).toHaveBeenCalledWith('Error: No se pudo procesar', 'error', 4100, '✕');
   });
 });

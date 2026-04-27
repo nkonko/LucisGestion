@@ -5,4 +5,5 @@ export interface UiToastItem {
   message: string;
   kind: UiToastKind;
   duration: number;
+  icon?: string;
 }
