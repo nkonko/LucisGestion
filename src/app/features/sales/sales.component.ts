@@ -30,8 +30,6 @@ export class SalesComponent {
   statusDisplay: Record<SaleStatus, string> = SALE_STATUS_DISPLAY;
   pending = this.store.pendingOrders;
 
-  readonly activeTab = signal<'pending' | 'history'>('pending');
-
   searchTerm = signal('');
   dateFrom = signal<Date | null>(null);
 

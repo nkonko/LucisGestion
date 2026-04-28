@@ -9,10 +9,13 @@
   @for (ri of recipeIngredients(); track ri.ingredientId; let i = $index) {
     <div class="flex items-center gap-2"><span class="flex-1 text-sm">{{ ri.name }}</span><input class="ui-input w-20" type="number" [ngModel]="ri.quantity" (ngModelChange)="updateQuantity(i, $event)" min="0" step="0.1" /><span class="text-xs text-gray-500">{{ ri.unit }}</span><span class="text-xs font-medium w-16 text-right">{{ ri.lineCost | ars }}</span><button class="ui-btn ui-btn-danger" type="button" (click)="removeIngredient(i)">Quitar</button></div>
   }
-  <label class="ui-field pt-1"><span>Agregar ingrediente...</span><input class="ui-input" [ngModel]="ingredientSearch()" (ngModelChange)="ingredientSearch.set($event); addIngredientByName($event)" list="ingredients-options" /></label>
+  <div class="grid grid-cols-[1fr_auto] gap-2 pt-1 items-end">
+    <label class="ui-field"><span>Agregar ingrediente...</span><input class="ui-input" [ngModel]="ingredientSearch()" (ngModelChange)="ingredientSearch.set($event)" list="ingredients-options" /></label>
+    <button class="ui-btn ui-btn-primary" type="button" (click)="addSelectedIngredient()" [disabled]="!selectedIngredient()">Agregar</button>
+  </div>
   <datalist id="ingredients-options">@for (ing of filteredIngredients(); track ing.id) { <option [value]="ing.name">{{ ing.unitPrice | ars }}/{{ ing.unit }}</option> }</datalist>
   <hr class="border-gray-200" />
-  <div class="grid grid-cols-2 gap-2 text-center"><div><div class="text-xs text-gray-500">Costo total</div><div class="text-lg font-bold text-red-600">{{ calculatedCost() | ars }}</div></div><div><label class="ui-field"><span>Margen %</span><input class="ui-input" type="number" [(ngModel)]="form.profitMargin" min="0" max="1000" /></label></div></div>
+  <div class="grid grid-cols-2 gap-2 text-center"><div><div class="text-xs text-gray-500">Costo total</div><div class="text-lg font-bold text-red-600">{{ calculatedCost() | ars }}</div></div><div><label class="ui-field"><span>Margen %</span><input class="ui-input" type="number" [ngModel]="profitMargin()" (ngModelChange)="onProfitMarginChange($event)" min="0" max="1000" /></label></div></div>
   <div class="grid grid-cols-2 gap-2 text-center pt-1"><div><div class="text-xs text-gray-500">Precio sugerido</div><div class="text-lg font-bold text-green-600">{{ suggestedPrice() | ars }}</div></div><div class="flex justify-center my-2"><label class="ui-field precio-venta-field"><span>Precio de venta final</span><input class="ui-input" type="number" [(ngModel)]="form.salePrice" min="0" /><small class="text-xs text-gray-500 text-center">No completar para usar el sugerido</small></label></div></div>
   <hr class="border-gray-200" />
   <label class="ui-field"><span>Notas / Instrucciones</span><textarea class="ui-textarea" [(ngModel)]="form.notes" rows="2"></textarea></label>

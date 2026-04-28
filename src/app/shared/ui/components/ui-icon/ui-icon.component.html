@@ -12,5 +12,5 @@
   [attr.aria-label]="label()"
   [attr.role]="decorative() ? 'presentation' : 'img'"
 >
-  <use [attr.href]="'/icons.svg#' + name()"></use>
+  <use [attr.href]="spriteHrefPrefix + name()"></use>
 </svg>

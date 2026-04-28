@@ -27,21 +27,23 @@ export class CatalogDialogComponent {
     const win = window.open('', '_blank');
     if (!win) return;
 
-    win.document.write(`
-      <html><head><title>Catálogo Lucis</title>
-      <style>
-        body { font-family: sans-serif; max-width: 400px; margin: 0 auto; padding: 24px; }
-        .item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
-        .name { font-weight: 500; }
-        .cat { font-size: 12px; color: #888; }
-        .price { font-size: 18px; font-weight: bold; color: #e11d48; }
-        .header { text-align: center; margin-bottom: 24px; }
-        .header h3 { margin: 4px 0; font-size: 20px; }
-      </style></head><body>
-      ${content.innerHTML}
-      </body></html>
-    `);
-    win.document.close();
+    const { document: printDocument } = win;
+    printDocument.title = 'Catálogo Lucis';
+
+    const style = printDocument.createElement('style');
+    style.textContent = `
+      body { font-family: sans-serif; max-width: 400px; margin: 0 auto; padding: 24px; }
+      .item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
+      .name { font-weight: 500; }
+      .cat { font-size: 12px; color: #888; }
+      .price { font-size: 18px; font-weight: bold; color: #e11d48; }
+      .header { text-align: center; margin-bottom: 24px; }
+      .header h3 { margin: 4px 0; font-size: 20px; }
+    `;
+
+    printDocument.head.appendChild(style);
+    printDocument.body.innerHTML = '';
+    printDocument.body.appendChild(content.cloneNode(true));
     win.print();
   }
 

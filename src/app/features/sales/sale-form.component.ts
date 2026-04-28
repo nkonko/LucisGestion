@@ -31,7 +31,6 @@ export class SaleFormComponent {
   items = signal<SaleItem[]>([]);
   customerSearch = '';
   selectedCustomerId = '';
-  selectedCustomer: Customer | null = null;
   paymentMethod: PaymentMethod = 'cash';
   notes = '';
 
@@ -45,6 +44,10 @@ export class SaleFormComponent {
   total = computed(() => this.items().reduce((sum, i) => sum + i.quantity * i.unitPrice, 0));
   totalCost = computed(() => this.items().reduce((sum, i) => sum + i.quantity * i.unitCost, 0));
   profit = computed(() => this.total() - this.totalCost());
+
+  private getSelectedCustomer(): Customer | null {
+    return this.customers().find((customer) => customer.id === this.selectedCustomerId) ?? null;
+  }
 
   getItemQuantity(recipeId: string): number {
     return this.items().find((i) => i.recipeId === recipeId)?.quantity ?? 0;
@@ -79,19 +82,25 @@ export class SaleFormComponent {
   }
 
   selectCustomerById(customerId: string): void {
+    const previousSelectedCustomer = this.getSelectedCustomer();
     this.selectedCustomerId = customerId;
-    this.selectedCustomer = this.customers().find((customer) => customer.id === customerId) ?? null;
+    const selectedCustomer = this.getSelectedCustomer();
 
-    if (this.selectedCustomer) {
-      this.customerSearch = this.selectedCustomer.name;
+    if (selectedCustomer) {
+      this.customerSearch = selectedCustomer.name;
+      return;
+    }
+
+    if (previousSelectedCustomer && this.customerSearch === previousSelectedCustomer.name) {
+      this.customerSearch = '';
     }
   }
 
   handleCustomerSearchChange(name: string): void {
     this.customerSearch = name;
+    const selectedCustomer = this.getSelectedCustomer();
 
-    if (!name || name !== this.selectedCustomer?.name) {
-      this.selectedCustomer = null;
+    if (!name || name !== selectedCustomer?.name) {
       this.selectedCustomerId = '';
     }
   }
@@ -103,10 +112,12 @@ export class SaleFormComponent {
   confirm(): void {
     if (this.items().length === 0) return;
 
+    const selectedCustomer = this.getSelectedCustomer();
+
     const sale: SaleInput = {
       date: Timestamp.now(),
-      customerId: this.selectedCustomer?.id ?? null,
-      customerName: this.selectedCustomer?.name ?? this.customerSearch ?? '',
+      customerId: selectedCustomer?.id ?? null,
+      customerName: selectedCustomer?.name ?? this.customerSearch ?? '',
       items: this.items(),
       total: this.total(),
       totalCost: this.totalCost(),

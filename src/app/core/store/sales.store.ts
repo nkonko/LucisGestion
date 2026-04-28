@@ -57,6 +57,12 @@ export const SalesStore = signalStore(
       return [...adjustmentsByIngredient.values()];
     };
 
+    const handleStoreError = (e: unknown): never => {
+      const error = e instanceof Error ? e : new Error(String(e));
+      patchState(store, { loading: false, error: error.message });
+      throw error;
+    };
+
     return {
       sales,
       pendingOrders,
@@ -74,9 +80,7 @@ export const SalesStore = signalStore(
           patchState(store, { loading: false });
           return saleId;
         } catch (e: unknown) {
-          const error = e instanceof Error ? e : new Error(String(e));
-          patchState(store, { loading: false, error: error.message });
-          throw error;
+          return handleStoreError(e);
         }
       },
 
@@ -95,9 +99,7 @@ export const SalesStore = signalStore(
 
           patchState(store, { loading: false });
         } catch (e: unknown) {
-          const error = e instanceof Error ? e : new Error(String(e));
-          patchState(store, { loading: false, error: error.message });
-          throw error;
+          return handleStoreError(e);
         }
       },
     };

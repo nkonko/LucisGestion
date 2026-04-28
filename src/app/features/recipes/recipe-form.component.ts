@@ -22,12 +22,12 @@ export class RecipeFormComponent {
 
   isEdit = !!this.data;
   ingredientSearch = signal('');
+  profitMargin = signal(this.data?.profitMargin ?? 60);
 
   form = {
     name: this.data?.name ?? '',
     category: (this.data?.category ?? 'cakes') as RecipeCategory,
     yield: this.data?.yield ?? 1,
-    profitMargin: this.data?.profitMargin ?? 60,
     salePrice: this.data?.salePrice ?? 0,
     notes: this.data?.notes ?? '',
     imageUrl: this.data?.imageUrl ?? '',
@@ -43,6 +43,12 @@ export class RecipeFormComponent {
       .filter((i) => !alreadyAdded.has(i.id!) && i.name.toLowerCase().includes(term));
   });
 
+  selectedIngredient = computed(() => {
+    const name = this.ingredientSearch().trim().toLowerCase();
+    if (!name) return null;
+    return this.filteredIngredients().find((item) => item.name.toLowerCase() === name) ?? null;
+  });
+
   categories = Object.entries(RECIPE_CATEGORY_DISPLAY).map(([key, label]) => ({
     key: key as RecipeCategory,
     label,
@@ -50,13 +56,19 @@ export class RecipeFormComponent {
 
   calculatedCost = computed(() => calculateRecipeCost(this.recipeIngredients(), this.ingredientsStore.ingredients()));
 
-  suggestedPrice = computed(() => calculateSuggestedPrice(this.calculatedCost(), this.form.profitMargin));
+  suggestedPrice = computed(() => calculateSuggestedPrice(this.calculatedCost(), this.profitMargin()));
+
+  onProfitMarginChange(value: number | null): void {
+    const nextValue = Number(value ?? 0);
+    const normalized = Number.isFinite(nextValue) ? nextValue : 0;
+    this.profitMargin.set(normalized);
+  }
 
   addIngredient(ingredient: Ingredient): void {
     this.recipeIngredients.update((list) => [
       ...list,
       {
-        ingredientId: ingredient.id!,
+        ingredientId: ingredient.id ?? '',
         name: ingredient.name,
         quantity: 1,
         unit: ingredient.unit,
@@ -66,8 +78,8 @@ export class RecipeFormComponent {
     this.ingredientSearch.set('');
   }
 
-  addIngredientByName(name: string): void {
-    const ingredient = this.filteredIngredients().find((item) => item.name.toLowerCase() === name.toLowerCase());
+  addSelectedIngredient(): void {
+    const ingredient = this.selectedIngredient();
     if (ingredient) {
       this.addIngredient(ingredient);
     }
@@ -102,6 +114,7 @@ export class RecipeFormComponent {
 
     this.dialogRef.close({
       ...this.form,
+      profitMargin: this.profitMargin(),
       ingredients: this.recipeIngredients(),
       calculatedCost: cost,
       suggestedPrice: suggested,

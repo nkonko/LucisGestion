@@ -83,4 +83,7 @@ async function run() {
   }
 }
 
-void run();
+run().catch((error) => {
+  process.stderr.write(`\nUnhandled error: ${error instanceof Error ? error.message : String(error)}\n`);
+  process.exitCode = 1;
+});
