@@ -2,6 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { spawn } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 
 const HOST = '127.0.0.1';
 const PORT = 4300;
@@ -10,7 +11,7 @@ const SCREENSHOT_PATH = resolve('__screenshots__/mock-home.png');
 const FALLBACK_PNG_BASE64 =
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO8l3XQAAAAASUVORK5CYII=';
 
-function getSafeBaseUrl() {
+export function getSafeBaseUrl() {
   const url = new URL(BASE_URL);
   if (url.protocol !== 'http:' || url.hostname !== HOST || url.port !== String(PORT)) {
     throw new Error('BASE_URL invalida para captura mock');
@@ -18,27 +19,30 @@ function getSafeBaseUrl() {
   return url;
 }
 
-async function sleep(ms) {
+export async function sleep(ms) {
   return new Promise((resolveSleep) => setTimeout(resolveSleep, ms));
 }
 
-async function waitForServer(timeoutMs = 90_000) {
+export async function waitForServer(timeoutMs = 90_000, deps = {}) {
+  const fetchImpl = deps.fetchImpl ?? fetch;
+  const sleepImpl = deps.sleepImpl ?? sleep;
+  const now = deps.now ?? Date.now;
   const safeUrl = getSafeBaseUrl().toString();
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
+  const start = now();
+  while (now() - start < timeoutMs) {
     try {
-      const response = await fetch(safeUrl, { method: 'GET' });
+      const response = await fetchImpl(safeUrl, { method: 'GET' });
       if (response.ok) {
         return;
       }
     } catch {
     }
-    await sleep(1000);
+    await sleepImpl(1000);
   }
   throw new Error(`Timeout esperando el servidor en ${safeUrl}`);
 }
 
-async function ensurePlaywright() {
+export async function ensurePlaywright() {
   try {
     return await import('playwright');
   } catch {
@@ -46,13 +50,13 @@ async function ensurePlaywright() {
   }
 }
 
-async function writeFallbackScreenshot() {
+export async function writeFallbackScreenshot() {
   await mkdir(dirname(SCREENSHOT_PATH), { recursive: true });
   await writeFile(SCREENSHOT_PATH, Buffer.from(FALLBACK_PNG_BASE64, 'base64'));
   process.stdout.write(`\nScreenshot fallback generado: ${SCREENSHOT_PATH}\n`);
 }
 
-async function run() {
+export async function run() {
   const ngCliPath = resolve('node_modules/@angular/cli/bin/ng.js');
   const ngArgs = ['serve', '--configuration', 'mock', '--host', HOST, '--port', String(PORT), '--no-open'];
 
@@ -93,7 +97,13 @@ async function run() {
   }
 }
 
-run().catch((error) => {
-  process.stderr.write(`\nUnhandled error: ${error instanceof Error ? error.message : String(error)}\n`);
-  process.exitCode = 1;
-});
+const isMainModule = process.argv[1]
+  ? import.meta.url === pathToFileURL(process.argv[1]).href
+  : false;
+
+if (isMainModule) {
+  run().catch((error) => {
+    process.stderr.write(`\nUnhandled error: ${error instanceof Error ? error.message : String(error)}\n`);
+    process.exitCode = 1;
+  });
+}
