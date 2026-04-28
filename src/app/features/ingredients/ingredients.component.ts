@@ -85,7 +85,7 @@ export class IngredientsComponent {
     event.stopPropagation();
     this.dialog.open<{ id: string; name: string }, never>(PriceHistoryComponent, {
       maxWidth: '450px',
-      data: { id: ingredient.id!, name: ingredient.name },
+      data: { id: ingredient.id ?? '', name: ingredient.name },
     });
   }
 }
