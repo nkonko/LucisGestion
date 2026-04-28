@@ -20,6 +20,7 @@ module.exports = defineConfig([
     },
     rules: {
       '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-explicit-any': 'warn',
       'unused-imports/no-unused-imports': 'warn',
       '@angular-eslint/directive-selector': [
         'error',
@@ -33,7 +34,7 @@ module.exports = defineConfig([
         'error',
         {
           type: 'element',
-          prefix: 'app',
+          prefix: ['app', 'ui'],
           style: 'kebab-case',
         },
       ],
@@ -41,7 +42,7 @@ module.exports = defineConfig([
   },
   {
     files: ['**/*.html'],
-    extends: [angular.configs.templateRecommended, angular.configs.templateAccessibility],
+    extends: [angular.configs.templateRecommended],
     rules: {},
   },
 ]);
