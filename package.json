@@ -12,7 +12,8 @@
     "test": "ng test",
     "test:mock": "node scripts/test-mock.mjs",
     "test:ci": "node scripts/test-mock.mjs",
-    "screenshot:mock": "node scripts/capture-mock.mjs"
+    "screenshot:mock": "node scripts/capture-mock.mjs",
+    "lint": "ng lint"
   },
   "private": true,
   "packageManager": "npm@11.11.1",
@@ -34,7 +35,11 @@
     "@angular/build": "^21.2.3",
     "@angular/cli": "^21.2.3",
     "@angular/compiler-cli": "^21.2.0",
+    "@eslint/js": "^10.0.1",
     "@tailwindcss/postcss": "^4.2.2",
+    "angular-eslint": "21.3.1",
+    "eslint": "^10.0.3",
+    "eslint-plugin-unused-imports": "^4.4.1",
     "firebase-tools": "^14.27.0",
     "jsdom": "^28.0.0",
     "playwright": "^1.55.0",
@@ -42,6 +47,7 @@
     "prettier": "^3.8.1",
     "tailwindcss": "^4.2.2",
     "typescript": "~5.9.2",
+    "typescript-eslint": "8.56.1",
     "vitest": "^4.0.8"
   }
 }

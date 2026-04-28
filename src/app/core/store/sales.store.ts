@@ -24,7 +24,7 @@ export const SalesStore = signalStore(
     const pendingOrders = computed(() => sales().filter((v) => v.status === 'pending'));
 
     const buildStockAdjustments = (
-      items: Array<{ recipeId: string; quantity: number }>,
+      items: { recipeId: string; quantity: number }[],
       factor: -1 | 1,
     ): StockAdjustmentInput[] => {
       const adjustmentsByIngredient = new Map<string, StockAdjustmentInput>();
@@ -73,9 +73,10 @@ export const SalesStore = signalStore(
 
           patchState(store, { loading: false });
           return saleId;
-        } catch (e: any) {
-          patchState(store, { loading: false, error: e.message });
-          throw e;
+        } catch (e: unknown) {
+          const error = e instanceof Error ? e : new Error(String(e));
+          patchState(store, { loading: false, error: error.message });
+          throw error;
         }
       },
 
@@ -93,9 +94,10 @@ export const SalesStore = signalStore(
           }
 
           patchState(store, { loading: false });
-        } catch (e: any) {
-          patchState(store, { loading: false, error: e.message });
-          throw e;
+        } catch (e: unknown) {
+          const error = e instanceof Error ? e : new Error(String(e));
+          patchState(store, { loading: false, error: error.message });
+          throw error;
         }
       },
     };
