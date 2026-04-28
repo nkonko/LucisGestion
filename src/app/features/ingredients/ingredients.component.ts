@@ -1,11 +1,5 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { NotificationService } from '../../core/services/notification.service';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { IngredientsStore } from '../../core/store/ingredients.store';
 import { RecipesStore } from '../../core/store/recipes.store';
 import { Ingredient } from '../../core/models/ingredient';
@@ -13,25 +7,21 @@ import { ArsPipe } from '../../shared/pipes/ars.pipe';
 import { IngredientFormComponent } from './ingredient-form.component';
 import { PriceHistoryComponent } from './price-history.component';
 import { AuthService } from '../../core/services/auth.service';
+import { DialogService } from '../../core/services/dialog.service';
+import { UiIconComponent } from '../../shared/ui/components';
 
 @Component({
   selector: 'app-ingredients',
-  imports: [
-    MatCardModule,
-    MatIconModule,
-    MatButtonModule,
-    MatDialogModule,
-    ArsPipe,
-    MatFormFieldModule,
-    MatInputModule,
-  ],
+  imports: [ArsPipe, UiIconComponent],
   templateUrl: './ingredients.component.html',
+  styleUrl: './ingredients.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IngredientsComponent {
   readonly store = inject(IngredientsStore);
   private recipesStore = inject(RecipesStore);
   readonly auth = inject(AuthService);
-  private dialog = inject(MatDialog);
+  private dialog = inject(DialogService);
   private notify = inject(NotificationService);
 
   searchTerm = signal('');
@@ -43,20 +33,24 @@ export class IngredientsComponent {
     return items.filter((i) => i.name.toLowerCase().includes(term));
   });
 
+  onSearchInput(event: Event): void {
+    const htmlTarget = event.target as HTMLInputElement | null;
+    this.searchTerm.set(htmlTarget?.value ?? '');
+  }
+
   getStockClass(i: Ingredient): string {
     if (i.currentStock <= 0) return 'stock-danger';
     if (i.currentStock <= i.minimumStock) return 'stock-warning';
     return 'stock-ok';
   }
 
-  create() {
-    const dialogRef = this.dialog.open(IngredientFormComponent, {
-      width: '100%',
+  create(): void {
+    const dialogRef = this.dialog.open<null, Ingredient>(IngredientFormComponent, {
       maxWidth: '500px',
       data: null,
     });
 
-    dialogRef.afterClosed().subscribe(async (result: Ingredient | undefined) => {
+    dialogRef.afterClosed.subscribe(async (result) => {
       if (result) {
         await this.store.createIngredient(result);
         this.notify.success('Ingrediente creado');
@@ -64,14 +58,13 @@ export class IngredientsComponent {
     });
   }
 
-  edit(ingredient: Ingredient) {
-    const dialogRef = this.dialog.open(IngredientFormComponent, {
-      width: '100%',
+  edit(ingredient: Ingredient): void {
+    const dialogRef = this.dialog.open<Ingredient, Ingredient | 'delete'>(IngredientFormComponent, {
       maxWidth: '500px',
       data: ingredient,
     });
 
-    dialogRef.afterClosed().subscribe(async (result: Ingredient | 'delete' | undefined) => {
+    dialogRef.afterClosed.subscribe(async (result) => {
       if (result === 'delete') {
         await this.store.deleteIngredient(ingredient.id!);
         this.notify.success('Ingrediente eliminado');
@@ -88,12 +81,11 @@ export class IngredientsComponent {
     });
   }
 
-  viewHistory(ingredient: Ingredient, event: Event) {
+  viewHistory(ingredient: Ingredient, event: Event): void {
     event.stopPropagation();
-    this.dialog.open(PriceHistoryComponent, {
-      width: '100%',
+    this.dialog.open<{ id: string; name: string }, never>(PriceHistoryComponent, {
       maxWidth: '450px',
-      data: { id: ingredient.id, name: ingredient.name },
+      data: { id: ingredient.id ?? '', name: ingredient.name },
     });
   }
 }

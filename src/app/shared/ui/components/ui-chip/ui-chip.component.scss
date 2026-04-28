@@ -1,0 +1,20 @@
+.ui-chip {
+  background-color: var(--color-surface-container);
+  border: var(--border-width-thin) solid var(--color-outline-variant);
+  border-radius: var(--radius-chip);
+  color: var(--color-on-surface);
+  cursor: pointer;
+  font: inherit;
+  min-height: var(--space-8);
+  padding: var(--space-1) var(--space-3);
+}
+
+.ui-chip:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-primary);
+  outline-offset: var(--space-1);
+}
+
+.ui-chip--selected {
+  background-color: var(--color-primary-container);
+  border-color: var(--color-primary);
+}

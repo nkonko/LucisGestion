@@ -1,0 +1,16 @@
+<svg
+  class="ui-icon"
+  [attr.width]="size()"
+  [attr.height]="size()"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  [attr.aria-hidden]="decorative()"
+  [attr.aria-label]="label()"
+  [attr.role]="decorative() ? 'presentation' : 'img'"
+>
+  <use [attr.href]="spriteHrefPrefix + name()"></use>
+</svg>

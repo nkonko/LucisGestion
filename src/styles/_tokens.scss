@@ -3,14 +3,10 @@
 // =============================================================================
 // CSS custom properties that centralise every raw value used across the app.
 // Components MUST reference these variables instead of hard-coded values.
-// Material Design system tokens (--mat-sys-*) are wrapped here so that all
-// semantic colour decisions live in one place.
 // =============================================================================
 
 :root {
-  // ── Semantic colours (Material-independent defaults) ─────────────────────────
-  // These are now the source of truth and are mirrored into --mat-sys-* below.
-  // This allows progressively removing Material theming without breaking app UI.
+  // ── Semantic colours ───────────────────────────────────────────────────────────
   --color-primary:            #8e2450;
   --color-primary-container:  #ffd8e4;
   --color-surface:            #fffbff;
@@ -50,10 +46,16 @@
   --size-font-2xs:            12px;    // Compact nav/support text size
   --size-dialog-content-max-height: 80vh; // Recipe dialog max content height
   --size-viewport-height:     100vh;   // Full viewport-height sections
+  --size-icon-button:         var(--space-8);
+  --size-fab:                 calc(var(--space-8) + var(--space-6));
+  --size-spinner:             calc(var(--space-8) + var(--space-2));
+  --size-progress-height:     var(--space-2);
+
 
   // ── Z-index scale ────────────────────────────────────────────────────────────
-  --z-nav: 1000;   // Fixed navigation bars (top + bottom)
-  --z-fab: 100;    // Floating action buttons
+  --z-toast: 9999;  // Toast notifications (must be above dialogs)
+  --z-nav:  1000;   // Fixed navigation bars (top + bottom)
+  --z-fab:  100;    // Floating action buttons
 
   // ── Border radius ────────────────────────────────────────────────────────────
   --radius-chip:   16px;  // Pill / chip shape (e.g. active nav item)
@@ -64,21 +66,14 @@
 
   // ── Shadows / elevations ────────────────────────────────────────────────────
   --shadow-pressed: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-modal: 0 10px 30px rgba(0, 0, 0, 0.2);
 
   // ── Border sizes ─────────────────────────────────────────────────────────────
   --border-width-thin: 1px;
   --border-width-medium: 2px;
+  --border-width-thick:  3px;
 
   // ── Typography ───────────────────────────────────────────────────────────────
   --font-body: 400 0.875rem/1.25rem Roboto, sans-serif;
 
-  // ── Material bridge variables ────────────────────────────────────────────────
-  // NOTE: Added to support progressively removing Angular Material theme mixins.
-  --mat-sys-primary:            var(--color-primary);
-  --mat-sys-primary-container:  var(--color-primary-container);
-  --mat-sys-surface:            var(--color-surface);
-  --mat-sys-surface-container:  var(--color-surface-container);
-  --mat-sys-on-surface:         var(--color-on-surface);
-  --mat-sys-on-surface-variant: var(--color-on-surface-variant);
-  --mat-sys-outline-variant:    var(--color-outline-variant);
 }

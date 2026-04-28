@@ -1,0 +1,21 @@
+@if (open()) {
+  <div class="ui-modal__backdrop" (click)="onBackdropClick()">
+    <section
+      class="ui-modal"
+      aria-modal="true"
+      role="dialog"
+      [attr.aria-label]="title()"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="ui-modal__header">
+        <h2 class="ui-modal__title">{{ title() }}</h2>
+        <button aria-label="Cerrar" class="ui-modal__close" type="button" (click)="closed.emit()">
+          ×
+        </button>
+      </header>
+      <div class="ui-modal__content">
+        <ng-content />
+      </div>
+    </section>
+  </div>
+}

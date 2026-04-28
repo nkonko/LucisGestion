@@ -1,71 +1,70 @@
-<mat-toolbar color="primary" class="top-toolbar">
+<header class="top-toolbar">
   <span class="text-lg font-medium flex-1">🧁 Lucis Gestión</span>
 
-  <button mat-icon-button [matMenuTriggerFor]="userMenu">
-    @if (auth.appUser()?.photoURL) {
-      <img
-        [src]="auth.appUser()!.photoURL"
-        [alt]="auth.appUser()!.displayName"
-        class="avatar"
-        referrerpolicy="no-referrer"
-      />
-    } @else {
-      <mat-icon>account_circle</mat-icon>
-    }
-  </button>
-  <mat-menu #userMenu="matMenu">
-    <div class="px-4 py-2 border-b">
-      <div class="font-medium">{{ auth.appUser()?.displayName }}</div>
-      <div class="text-xs text-gray-500">{{ auth.appUser()?.email }}</div>
-      <div class="text-xs mt-1">
-        <span
-          class="inline-block px-2 py-0.5 rounded-full text-white"
-          [class]="auth.isOwner() ? 'bg-rose-500' : 'bg-blue-500'"
-        >
-          {{ auth.isOwner() ? 'Dueña' : 'Ayudante' }}
-        </span>
-      </div>
-    </div>
-    <button mat-menu-item (click)="logout()">
-      <mat-icon>logout</mat-icon>
-      <span>Cerrar sesión</span>
+  <div class="relative" (click)="onMenuClick($event)">
+    <button class="ui-icon-btn" type="button" aria-haspopup="menu" [attr.aria-expanded]="menuOpen()" (click)="toggleMenu($event)">
+      @if (auth.appUser()?.photoURL) {
+        <img
+          [src]="auth.appUser()!.photoURL"
+          [alt]="auth.appUser()!.displayName"
+          class="avatar"
+          referrerpolicy="no-referrer"
+        />
+      } @else {
+        <ui-icon name="account_circle" [decorative]="true" />
+      }
     </button>
-  </mat-menu>
-</mat-toolbar>
 
-<main class="page-container">
+    @if (menuOpen()) {
+      <div class="ui-menu" role="menu">
+        <div class="px-4 py-2 border-b">
+          <div class="font-medium">{{ auth.appUser()?.displayName }}</div>
+          <div class="text-xs text-gray-500">{{ auth.appUser()?.email }}</div>
+          <div class="text-xs mt-1">
+            <span class="inline-block px-2 py-0.5 rounded-full text-white" [class]="auth.isOwner() ? 'bg-rose-500' : 'bg-blue-500'">
+              {{ auth.isOwner() ? 'Dueña' : 'Ayudante' }}
+            </span>
+          </div>
+        </div>
+        <button class="ui-menu-item" type="button" role="menuitem" (click)="logout()">
+          <ui-icon name="logout" [decorative]="true" [size]="18" />
+          <span>Cerrar sesión</span>
+        </button>
+      </div>
+    }
+  </div>
+</header>
+
+<main class="page-container" (click)="closeMenu()">
   <router-outlet />
 </main>
 
 <nav class="bottom-nav">
-  <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
-    <mat-icon>home</mat-icon>
+  <a routerLink="/dashboard" routerLinkActive="active" class="nav-item ui-nav-item">
+    <ui-icon name="home" [decorative]="true" [size]="20" />
     <span>Inicio</span>
   </a>
-  <a routerLink="/recetas" routerLinkActive="active" class="nav-item">
-    <mat-icon>menu_book</mat-icon>
+  <a routerLink="/recetas" routerLinkActive="active" class="nav-item ui-nav-item">
+    <ui-icon name="menu_book" [decorative]="true" [size]="20" />
     <span>Recetas</span>
   </a>
-  <a routerLink="/costos" routerLinkActive="active" class="nav-item">
-    <mat-icon>receipt_long</mat-icon>
+  <a routerLink="/costos" routerLinkActive="active" class="nav-item ui-nav-item">
+    <ui-icon name="receipt_long" [decorative]="true" [size]="20" />
     <span>Costos</span>
   </a>
-  <a routerLink="/ventas" routerLinkActive="active" class="nav-item">
-    <mat-icon>point_of_sale</mat-icon>
+  <a routerLink="/ventas" routerLinkActive="active" class="nav-item ui-nav-item">
+    <ui-icon name="point_of_sale" [decorative]="true" [size]="20" />
     <span>Ventas</span>
   </a>
-  <a routerLink="/stock" routerLinkActive="active" class="nav-item">
-    <mat-icon
-      [matBadge]="lowStockCount() > 0 ? lowStockCount() : null"
-      matBadgeColor="warn"
-      matBadgeSize="small"
-    >
-      inventory_2
-    </mat-icon>
+  <a routerLink="/stock" routerLinkActive="active" class="nav-item ui-nav-item nav-item--badge">
+    <ui-icon name="inventory_2" [decorative]="true" [size]="20" />
+    @if (lowStockCount() > 0) {
+      <span class="badge" aria-label="{{ lowStockCount() }} ingredientes con stock bajo">{{ lowStockCount() }}</span>
+    }
     <span>Stock</span>
   </a>
-  <a routerLink="/clientes" routerLinkActive="active" class="nav-item">
-    <mat-icon>people</mat-icon>
+  <a routerLink="/clientes" routerLinkActive="active" class="nav-item ui-nav-item">
+    <ui-icon name="people" [decorative]="true" [size]="20" />
     <span>Clientes</span>
   </a>
 </nav>

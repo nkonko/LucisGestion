@@ -22,9 +22,11 @@ export const SalesStore = signalStore(
     const sales = toSignal(sales$, { initialValue: [] as Sale[] });
 
     const pendingOrders = computed(() => sales().filter((v) => v.status === 'pending'));
+    const pendingOrdersCount = computed(() => pendingOrders().length);
+    const recentSales = computed(() => sales().slice(0, 5));
 
     const buildStockAdjustments = (
-      items: Array<{ recipeId: string; quantity: number }>,
+      items: { recipeId: string; quantity: number }[],
       factor: -1 | 1,
     ): StockAdjustmentInput[] => {
       const adjustmentsByIngredient = new Map<string, StockAdjustmentInput>();
@@ -57,11 +59,17 @@ export const SalesStore = signalStore(
       return [...adjustmentsByIngredient.values()];
     };
 
+    const handleStoreError = (e: unknown): never => {
+      const error = e instanceof Error ? e : new Error(String(e));
+      patchState(store, { loading: false, error: error.message });
+      throw error;
+    };
+
     return {
       sales,
       pendingOrders,
-      pendingOrdersCount: computed(() => pendingOrders().length),
-      recentSales: computed(() => sales().slice(0, 5)),
+      pendingOrdersCount,
+      recentSales,
 
       async registerSale(sale: SaleInput) {
         patchState(store, { loading: true, error: null });
@@ -73,9 +81,8 @@ export const SalesStore = signalStore(
 
           patchState(store, { loading: false });
           return saleId;
-        } catch (e: any) {
-          patchState(store, { loading: false, error: e.message });
-          throw e;
+        } catch (e: unknown) {
+          return handleStoreError(e);
         }
       },
 
@@ -93,9 +100,8 @@ export const SalesStore = signalStore(
           }
 
           patchState(store, { loading: false });
-        } catch (e: any) {
-          patchState(store, { loading: false, error: e.message });
-          throw e;
+        } catch (e: unknown) {
+          return handleStoreError(e);
         }
       },
     };

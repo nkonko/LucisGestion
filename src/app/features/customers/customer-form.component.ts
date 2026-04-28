@@ -1,28 +1,20 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { Customer } from '../../core/models/customer';
+import { DIALOG_DATA, DIALOG_REF } from '../../core/models/dialog/dialog-tokens.model';
+import { DialogRef } from '../../core/models/dialog/dialog-ref.model';
 
 @Component({
   selector: 'app-customer-form',
-  imports: [
-    ReactiveFormsModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-  ],
+  imports: [ReactiveFormsModule],
   templateUrl: './customer-form.component.html',
+  styleUrl: './customer-form.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomerFormComponent {
   private fb = inject(FormBuilder);
-  private dialogRef = inject(MatDialogRef<CustomerFormComponent>);
-  data = inject<Customer | null>(MAT_DIALOG_DATA);
+  private dialogRef = inject(DIALOG_REF) as DialogRef<Customer | 'delete'>;
+  data = inject(DIALOG_DATA) as Customer | null;
 
   form = this.fb.nonNullable.group({
     name: [this.data?.name ?? '', Validators.required],
@@ -31,7 +23,7 @@ export class CustomerFormComponent {
     notes: [this.data?.notes ?? ''],
   });
 
-  save() {
+  save(): void {
     if (this.form.invalid) return;
     this.dialogRef.close({
       ...this.form.getRawValue(),
@@ -40,7 +32,11 @@ export class CustomerFormComponent {
     });
   }
 
-  remove() {
+  cancel(): void {
+    this.dialogRef.close(undefined);
+  }
+
+  remove(): void {
     this.dialogRef.close('delete');
   }
 }

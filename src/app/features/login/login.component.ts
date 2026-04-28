@@ -1,16 +1,13 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
-  imports: [MatButtonModule, MatIconModule, MatCardModule, MatProgressSpinnerModule],
+  imports: [],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
   private auth = inject(AuthService);
@@ -19,14 +16,14 @@ export class LoginComponent {
   loading = false;
   error = '';
 
-  async loginGoogle() {
+  async loginGoogle(): Promise<void> {
     this.loading = true;
     this.error = '';
     try {
       await this.auth.loginWithGoogle();
       this.router.navigate(['/dashboard']);
-    } catch (e: any) {
-      this.error = e?.message ?? 'Error al iniciar sesión';
+    } catch (error: unknown) {
+      this.error = error instanceof Error ? error.message : 'Error al iniciar sesión';
       this.loading = false;
     }
   }

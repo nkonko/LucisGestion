@@ -1,28 +1,18 @@
-import { Component, computed, inject } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DashboardStore } from '../../core/store/dashboard.store';
 import { IngredientsStore } from '../../core/store/ingredients.store';
 import { SalesStore } from '../../core/store/sales.store';
 import { RecipesStore } from '../../core/store/recipes.store';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
+import { UiIconComponent } from '../../shared/ui/components';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [
-    MatCardModule,
-    MatIconModule,
-    MatListModule,
-    MatChipsModule,
-    MatButtonToggleModule,
-    RouterLink,
-    ArsPipe,
-  ],
+  imports: [RouterLink, ArsPipe, UiIconComponent],
   templateUrl: './dashboard.component.html',
+  styleUrl: './dashboard.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent {
   readonly store = inject(DashboardStore);
@@ -36,7 +26,6 @@ export class DashboardComponent {
   pendingOrders = this.salesStore.pendingOrdersCount;
   monthlySales = this.store.monthlySales;
   monthlyExpenses = this.store.monthlyExpenses;
-  monthlyProfit = this.store.monthlyProfit;
   periodFixedCosts = this.store.periodFixedCosts;
   totalPeriodExpenses = this.store.totalPeriodExpenses;
   netProfit = this.store.netProfit;
