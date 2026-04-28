@@ -1,31 +1,21 @@
-<h2 mat-dialog-title>Historial de precios — {{ data.name }}</h2>
-<mat-dialog-content>
-  @if (history().length === 0) {
-    <div class="text-center py-6 text-gray-400">
-      <mat-icon style="font-size: 40px; width: 40px; height: 40px">history</mat-icon>
-      <p>No hay cambios de precio registrados</p>
-    </div>
-  } @else {
-    <mat-list>
-      @for (item of history(); track item.id) {
-        <mat-list-item>
-          <mat-icon
-            matListItemIcon
-            [class]="item.newPrice > item.previousPrice ? 'text-red-500' : 'text-green-500'"
-          >
-            {{ item.newPrice > item.previousPrice ? 'trending_up' : 'trending_down' }}
-          </mat-icon>
-          <span matListItemTitle>
-            {{ item.previousPrice | ars }} → {{ item.newPrice | ars }}
-          </span>
-          <span matListItemLine class="text-xs text-gray-400">
-            {{ item.date.toDate() | date: 'dd/MM/yyyy HH:mm' }}
-          </span>
-        </mat-list-item>
-      }
-    </mat-list>
-  }
-</mat-dialog-content>
-<mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cerrar</button>
-</mat-dialog-actions>
+<h2 class="text-lg font-semibold mb-3">Historial de precios — {{ data.name }}</h2>
+
+@if (history().length === 0) {
+  <div class="text-center py-6 text-gray-400">
+    <ui-icon name="history" [size]="40" [decorative]="true" />
+    <p>No hay cambios de precio registrados</p>
+  </div>
+} @else {
+  <ul class="space-y-2">
+    @for (item of history(); track item.id) {
+      <li class="border border-gray-200 rounded-md p-2">
+        <div class="font-medium">{{ item.previousPrice | ars }} → {{ item.newPrice | ars }}</div>
+        <div class="text-xs text-gray-400">{{ item.date.toDate() | date: 'dd/MM/yyyy HH:mm' }}</div>
+      </li>
+    }
+  </ul>
+}
+
+<div class="flex justify-end mt-4">
+  <button class="ui-btn" type="button" (click)="close()">Cerrar</button>
+</div>

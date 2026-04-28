@@ -1,22 +1,32 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
-import { MatListModule } from '@angular/material/list';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
 import { DatePipe } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IngredientsStore } from '../../core/store/ingredients.store';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
+import { DIALOG_DATA, DIALOG_REF } from '../../core/models/dialog/dialog-tokens.model';
+import { DialogRef } from '../../core/models/dialog/dialog-ref.model';
+import { UiIconComponent } from '../../shared/ui/components';
+
+interface PriceHistoryDialogData {
+  id: string;
+  name: string;
+}
 
 @Component({
   selector: 'app-price-history',
-  imports: [MatDialogModule, MatListModule, MatIconModule, MatButtonModule, DatePipe, ArsPipe],
+  imports: [DatePipe, ArsPipe, UiIconComponent],
   templateUrl: './price-history.component.html',
+  styleUrl: './price-history.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PriceHistoryComponent {
   private store = inject(IngredientsStore);
-  data = inject<{ id: string; name: string }>(MAT_DIALOG_DATA);
+  private dialogRef = inject(DIALOG_REF) as DialogRef<undefined>;
+  data = inject(DIALOG_DATA) as PriceHistoryDialogData;
 
   history = toSignal(this.store.getPriceHistory(this.data.id), { initialValue: [] });
+
+  close(): void {
+    this.dialogRef.close(undefined);
+  }
 }

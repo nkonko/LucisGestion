@@ -1,0 +1,10 @@
+<button
+  class="ui-button"
+  [class.ui-button--secondary]="variant() === 'secondary'"
+  [class.ui-button--ghost]="variant() === 'ghost'"
+  [attr.aria-label]="ariaLabel()"
+  [disabled]="disabled()"
+  [type]="type()"
+>
+  <ng-content />
+</button>

@@ -1,15 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject, computed, signal } from '@angular/core';
-import { NgTemplateOutlet, DatePipe } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { NotificationService } from '../../core/services/notification.service';
 import { SalesStore } from '../../core/store/sales.store';
 import { CustomersStore } from '../../core/store/customers.store';
@@ -19,36 +9,25 @@ import type { SaleStatus } from '../../core/models/sale/sale-status.model';
 import { Sale, SALE_STATUS_DISPLAY } from '../../core/models/sale';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 import { SaleFormComponent } from './sale-form.component';
+import { DialogService } from '../../core/services/dialog.service';
+import { UiIconComponent } from '../../shared/ui/components';
 
 @Component({
   selector: 'app-sales',
-  imports: [
-    NgTemplateOutlet,
-    DatePipe,
-    MatCardModule,
-    MatIconModule,
-    MatButtonModule,
-    MatChipsModule,
-    MatTabsModule,
-    MatDialogModule,
-    ArsPipe,
-    MatFormFieldModule,
-    MatInputModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-  ],
+  imports: [NgTemplateOutlet, DatePipe, ArsPipe, UiIconComponent],
   templateUrl: './sales.component.html',
+  styleUrl: './sales.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SalesComponent {
   readonly store = inject(SalesStore);
   private customersStore = inject(CustomersStore);
   private whatsApp = inject(WhatsAppService);
-  private dialog = inject(MatDialog);
+  private dialog = inject(DialogService);
   private notify = inject(NotificationService);
 
+  readonly selectedTab = signal<'pending' | 'history'>('pending');
   statusDisplay: Record<SaleStatus, string> = SALE_STATUS_DISPLAY;
-
   pending = this.store.pendingOrders;
 
   searchTerm = signal('');
@@ -72,6 +51,17 @@ export class SalesComponent {
     return items;
   });
 
+  onSearchInput(event: Event): void {
+    const htmlTarget = event.target as HTMLInputElement | null;
+    this.searchTerm.set(htmlTarget?.value ?? '');
+  }
+
+  onDateFromInput(event: Event): void {
+    const htmlTarget = event.target as HTMLInputElement | null;
+    const value = htmlTarget?.value ?? '';
+    this.dateFrom.set(value ? new Date(`${value}T00:00:00`) : null);
+  }
+
   getStatusClass(status: SaleStatus): string {
     return SALE_STATUS_CLASS[status];
   }
@@ -80,15 +70,14 @@ export class SalesComponent {
     return SALE_STATUS_DISPLAY[status];
   }
 
-  newSale() {
-    const dialogRef = this.dialog.open(SaleFormComponent, {
-      width: '100%',
+  newSale(): void {
+    const dialogRef = this.dialog.open<null, Sale>(SaleFormComponent, {
       maxWidth: '560px',
       maxHeight: '90vh',
       data: null,
     });
 
-    dialogRef.afterClosed().subscribe(async (result: Sale | undefined) => {
+    dialogRef.afterClosed.subscribe(async (result) => {
       if (result) {
         await this.store.registerSale(result);
         this.notify.success('Venta registrada. Stock actualizado.', 3000);
@@ -96,12 +85,12 @@ export class SalesComponent {
     });
   }
 
-  async changeStatus(sale: Sale, newStatus: Sale['status']) {
+  async changeStatus(sale: Sale, newStatus: Sale['status']): Promise<void> {
     await this.store.updateSaleStatus(sale.id!, newStatus);
     this.notify.success(`Pedido marcado como ${this.getStatusLabel(newStatus).toLowerCase()}`);
   }
 
-  sendWhatsApp(sale: Sale) {
+  sendWhatsApp(sale: Sale): void {
     const customer = this.customersStore.customers().find((c) => c.id === sale.customerId);
     const items = sale.items.map((i) => `${i.quantity}x ${i.name}`).join('\n');
     const msg = `Hola ${sale.customerName}! 🧁\n\nTu pedido de Lucis Pastelería:\n${items}\n\nTotal: $${sale.total}\n\n¡Gracias!`;

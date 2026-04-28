@@ -1,36 +1,25 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatListModule } from '@angular/material/list';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { NotificationService } from '../../core/services/notification.service';
 import { RouterLink } from '@angular/router';
+import { NotificationService } from '../../core/services/notification.service';
 import { IngredientsStore } from '../../core/store/ingredients.store';
 import { Ingredient } from '../../core/models/ingredient';
 import { getStockPriority } from '../../core/utils/stock.utils';
 import { IngredientFormComponent } from '../ingredients/ingredient-form.component';
 import { AuthService } from '../../core/services/auth.service';
+import { DialogService } from '../../core/services/dialog.service';
+import { UiIconComponent } from '../../shared/ui/components';
 
 @Component({
   selector: 'app-stock',
-  imports: [
-    MatCardModule,
-    MatIconModule,
-    MatButtonModule,
-    MatProgressBarModule,
-    MatListModule,
-    MatDialogModule,
-    RouterLink,
-  ],
+  imports: [RouterLink, UiIconComponent],
   templateUrl: './stock.component.html',
+  styleUrl: './stock.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockComponent {
   readonly store = inject(IngredientsStore);
   readonly auth = inject(AuthService);
-  private dialog = inject(MatDialog);
+  private dialog = inject(DialogService);
   private notify = inject(NotificationService);
 
   sortedIngredients = this.store.ingredientsSortedByStock;
@@ -63,25 +52,24 @@ export class StockComponent {
     return Math.min(percent, 100);
   }
 
-  getStockBarColor(item: Ingredient): 'primary' | 'accent' | 'warn' {
+  getStockBarClass(item: Ingredient): string {
     switch (getStockPriority(item)) {
       case 0:
-        return 'warn';
+        return 'bg-red-500';
       case 1:
-        return 'accent';
+        return 'bg-orange-400';
       default:
-        return 'primary';
+        return 'bg-green-500';
     }
   }
 
-  create() {
-    const dialogRef = this.dialog.open(IngredientFormComponent, {
-      width: '100%',
+  create(): void {
+    const dialogRef = this.dialog.open<null, Ingredient>(IngredientFormComponent, {
       maxWidth: '500px',
       data: null,
     });
 
-    dialogRef.afterClosed().subscribe(async (result: Ingredient | undefined) => {
+    dialogRef.afterClosed.subscribe(async (result) => {
       if (result) {
         await this.store.createIngredient(result);
         this.notify.success('Ingrediente creado');
@@ -89,14 +77,13 @@ export class StockComponent {
     });
   }
 
-  edit(ingredient: Ingredient) {
-    const dialogRef = this.dialog.open(IngredientFormComponent, {
-      width: '100%',
+  edit(ingredient: Ingredient): void {
+    const dialogRef = this.dialog.open<Ingredient, Ingredient | 'delete'>(IngredientFormComponent, {
       maxWidth: '500px',
       data: ingredient,
     });
 
-    dialogRef.afterClosed().subscribe(async (result: Ingredient | 'delete' | undefined) => {
+    dialogRef.afterClosed.subscribe(async (result) => {
       if (result === 'delete') {
         await this.store.deleteIngredient(ingredient.id!);
         this.notify.success('Ingrediente eliminado');

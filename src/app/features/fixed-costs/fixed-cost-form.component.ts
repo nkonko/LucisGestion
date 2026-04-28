@@ -1,10 +1,4 @@
 import { Component, inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { CurrencyPipe } from '@angular/common';
 import {
@@ -15,24 +9,18 @@ import {
   COST_CATEGORY_DISPLAY,
   FixedCostInputForm,
 } from '../../core/models/fixed-cost';
+import { DIALOG_DATA, DIALOG_REF } from '../../core/models/dialog/dialog-tokens.model';
+import { DialogRef } from '../../core/models/dialog/dialog-ref.model';
 
 @Component({
   selector: 'app-fixed-cost-form',
-  imports: [
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatIconModule,
-    FormsModule,
-    CurrencyPipe,
-  ],
+  imports: [FormsModule, CurrencyPipe],
   templateUrl: './fixed-cost-form.component.html',
+  styleUrl: './fixed-cost-form.component.scss',
 })
 export class FixedCostFormComponent {
-  private dialogRef = inject(MatDialogRef<FixedCostFormComponent>);
-  private data: FixedCost | null = inject(MAT_DIALOG_DATA);
+  private dialogRef = inject(DIALOG_REF) as DialogRef<FixedCost | 'delete'>;
+  private data = inject(DIALOG_DATA) as FixedCost | null;
 
   isEdit = !!this.data;
 
@@ -62,21 +50,20 @@ export class FixedCostFormComponent {
   }
 
   isValid(): boolean {
-    return !!(
-      this.form.name &&
-      this.form.amount >= 0 &&
-      this.form.frequency &&
-      this.form.category
-    );
+    return !!this.form.name && this.form.amount >= 0;
   }
 
-  save() {
+  save(): void {
     if (this.isValid()) {
       this.dialogRef.close({ ...this.form, active: true });
     }
   }
 
-  remove() {
+  cancel(): void {
+    this.dialogRef.close(undefined);
+  }
+
+  remove(): void {
     this.dialogRef.close('delete');
   }
 }
