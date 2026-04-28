@@ -31,7 +31,7 @@ export class UiModalHostComponent implements AfterViewInit {
   readonly panelClass = input<string | null>(null);
   readonly closeOnBackdropClick = input(true);
 
-  readonly closeRequested = output<void>();
+  readonly closeRequested = output<undefined>();
 
   private readonly panel = viewChild.required<ElementRef<HTMLElement>>('panel');
 
@@ -47,7 +47,7 @@ export class UiModalHostComponent implements AfterViewInit {
   }
 
   requestClose(): void {
-    this.closeRequested.emit();
+    this.closeRequested.emit(undefined);
   }
 
   onBackdropClick(event: MouseEvent): void {
@@ -91,15 +91,15 @@ export class UiModalHostComponent implements AfterViewInit {
 
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
-    const active = document.activeElement as HTMLElement | null;
+    const htmlActiveElement = document.activeElement as HTMLElement | null;
 
-    if (event.shiftKey && active === first) {
+    if (event.shiftKey && htmlActiveElement === first) {
       event.preventDefault();
       last.focus();
       return;
     }
 
-    if (!event.shiftKey && active === last) {
+    if (!event.shiftKey && htmlActiveElement === last) {
       event.preventDefault();
       first.focus();
     }

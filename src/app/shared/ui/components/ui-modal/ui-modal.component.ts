@@ -14,17 +14,17 @@ export class UiModalComponent {
   readonly title = input.required<string>();
   readonly closeOnBackdrop = input(true);
 
-  readonly closed = output<void>();
+  readonly closed = output<undefined>();
 
   onBackdropClick(): void {
     if (this.closeOnBackdrop()) {
-      this.closed.emit();
+      this.closed.emit(undefined);
     }
   }
 
   onEscape(): void {
     if (this.open()) {
-      this.closed.emit();
+      this.closed.emit(undefined);
     }
   }
 }

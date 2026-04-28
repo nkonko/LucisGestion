@@ -19,7 +19,7 @@ export class UiSelectComponent {
   readonly valueChange = output<string>();
 
   onSelection(event: Event): void {
-    const element = event.target as HTMLSelectElement;
-    this.valueChange.emit(element.value);
+    const htmlSelectElement = event.target as HTMLSelectElement;
+    this.valueChange.emit(htmlSelectElement.value);
   }
 }

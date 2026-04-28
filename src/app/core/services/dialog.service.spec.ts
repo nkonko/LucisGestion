@@ -8,7 +8,7 @@ import { DialogRef } from '../models/dialog/dialog-ref.model';
 
 @Component({
   selector: 'app-test-dialog-content',
-  template: '<button type="button" data-initial-focus>Cerrar</button>',
+  templateUrl: './dialog.service.spec-content.component.html',
 })
 class TestDialogContentComponent {
   static lastInstance: TestDialogContentComponent | null = null;
@@ -36,7 +36,9 @@ describe('DialogService', () => {
   });
 
   afterEach(() => {
-    document.querySelectorAll('app-ui-modal-host').forEach((node) => node.remove());
+    document.querySelectorAll('app-ui-modal-host').forEach((node) => {
+      node.remove();
+    });
   });
 
   it('injects DIALOG_DATA and DIALOG_REF into dynamic content components', () => {
@@ -64,10 +66,10 @@ describe('DialogService', () => {
     const dialogRef = service.open<null, string>(TestDialogContentComponent, { data: null });
     dialogRef.afterClosed.subscribe(afterClosed);
 
-    const backdrop = document.querySelector('.ui-modal-backdrop') as HTMLElement;
-    expect(backdrop).toBeTruthy();
+    const htmlBackdrop = document.querySelector('.ui-modal-backdrop') as HTMLElement;
+    expect(htmlBackdrop).toBeTruthy();
 
-    backdrop.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    htmlBackdrop.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
     expect(afterClosed).toHaveBeenCalledTimes(1);
     expect(afterClosed).toHaveBeenCalledWith(undefined);

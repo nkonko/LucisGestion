@@ -117,7 +117,7 @@ export class SaleFormComponent {
     const sale: SaleInput = {
       date: Timestamp.now(),
       customerId: selectedCustomer?.id ?? null,
-      customerName: selectedCustomer?.name ?? this.customerSearch ?? '',
+      customerName: selectedCustomer?.name ?? this.customerSearch,
       items: this.items(),
       total: this.total(),
       totalCost: this.totalCost(),

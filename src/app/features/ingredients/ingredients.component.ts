@@ -34,8 +34,8 @@ export class IngredientsComponent {
   });
 
   onSearchInput(event: Event): void {
-    const target = event.target as HTMLInputElement | null;
-    this.searchTerm.set(target?.value ?? '');
+    const htmlTarget = event.target as HTMLInputElement | null;
+    this.searchTerm.set(htmlTarget?.value ?? '');
   }
 
   getStockClass(i: Ingredient): string {

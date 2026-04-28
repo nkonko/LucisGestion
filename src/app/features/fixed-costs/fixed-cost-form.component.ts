@@ -50,7 +50,7 @@ export class FixedCostFormComponent {
   }
 
   isValid(): boolean {
-    return !!(this.form.name && this.form.amount >= 0 && this.form.frequency && this.form.category);
+    return !!this.form.name && this.form.amount >= 0;
   }
 
   save(): void {

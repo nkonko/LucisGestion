@@ -2,31 +2,18 @@ import { readdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { spawn } from 'node:child_process';
 
-async function collectTestFiles(dir) {
-  const entries = await readdir(dir, { withFileTypes: true });
-  const results = [];
-
-  for (const entry of entries) {
-    const fullPath = resolve(dir, entry.name);
-    if (entry.isDirectory()) {
-      const nested = await collectTestFiles(fullPath);
-      results.push(...nested);
-      continue;
-    }
-
-    if (entry.isFile() && (entry.name.endsWith('.spec.ts') || entry.name.endsWith('.test.ts'))) {
-      results.push(fullPath);
-    }
-  }
-
-  return results;
+async function hasTestFiles() {
+  const entries = await readdir('src', { withFileTypes: true, recursive: true });
+  return entries.some(
+    (entry) =>
+      entry.isFile() && (entry.name.endsWith('.spec.ts') || entry.name.endsWith('.test.ts')),
+  );
 }
 
 async function run() {
-  const srcPath = resolve('src');
-  const testFiles = await collectTestFiles(srcPath);
+  const testFilesAvailable = await hasTestFiles();
 
-  if (testFiles.length === 0) {
+  if (!testFilesAvailable) {
     process.stdout.write('No hay archivos de test (*.spec.ts/*.test.ts). Se considera OK en modo mock.\n');
     process.exit(0);
     return;

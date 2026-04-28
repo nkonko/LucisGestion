@@ -17,14 +17,14 @@ export class UiInputComponent {
   readonly describedBy = input<string | null>(null);
 
   readonly valueChange = output<string>();
-  readonly blurred = output<void>();
+  readonly blurred = output<undefined>();
 
   onInput(event: Event): void {
-    const element = event.target as HTMLInputElement;
-    this.valueChange.emit(element.value);
+    const htmlInputElement = event.target as HTMLInputElement;
+    this.valueChange.emit(htmlInputElement.value);
   }
 
   onBlur(): void {
-    this.blurred.emit();
+    this.blurred.emit(undefined);
   }
 }

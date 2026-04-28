@@ -29,24 +29,30 @@ export async function waitForServer(timeoutMs = 90_000, deps = {}) {
   const now = deps.now ?? Date.now;
   const safeUrl = getSafeBaseUrl().toString();
   const start = now();
+  let lastError;
   while (now() - start < timeoutMs) {
     try {
       const response = await fetchImpl(safeUrl, { method: 'GET' });
       if (response.ok) {
         return;
       }
-    } catch {
+      lastError = new Error(`Servidor respondio con estado ${response.status}`);
+    } catch (error) {
+      lastError = error;
     }
     await sleepImpl(1000);
   }
-  throw new Error(`Timeout esperando el servidor en ${safeUrl}`);
+  const reason = lastError instanceof Error ? ` Causa: ${lastError.message}` : '';
+  throw new Error(`Timeout esperando el servidor en ${safeUrl}.${reason}`);
 }
 
 export async function ensurePlaywright() {
   try {
     return await import('playwright');
-  } catch {
-    throw new Error('No se encontro playwright. Ejecuta: npm install ; npx playwright install chromium');
+  } catch (error) {
+    throw new Error('No se encontro playwright. Ejecuta: npm install ; npx playwright install chromium', {
+      cause: error,
+    });
   }
 }
 

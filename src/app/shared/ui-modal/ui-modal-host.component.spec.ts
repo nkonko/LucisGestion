@@ -28,26 +28,26 @@ describe('UiModalHostComponent', () => {
   });
 
   it('traps focus from last to first on Tab', () => {
-    const hostElement = fixture.nativeElement as HTMLElement;
-    const first = hostElement.querySelector('#first') as HTMLButtonElement;
-    const last = hostElement.querySelector('#last') as HTMLButtonElement;
+    const htmlHostElement = fixture.nativeElement as HTMLElement;
+    const htmlFirstButton = htmlHostElement.querySelector('#first') as HTMLButtonElement;
+    const htmlLastButton = htmlHostElement.querySelector('#last') as HTMLButtonElement;
 
-    last.focus();
-    hostElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+    htmlLastButton.focus();
+    htmlHostElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
 
-    expect(document.activeElement).toBe(first);
+    expect(document.activeElement).toBe(htmlFirstButton);
   });
 
   it('traps focus from first to last on Shift+Tab', () => {
-    const hostElement = fixture.nativeElement as HTMLElement;
-    const first = hostElement.querySelector('#first') as HTMLButtonElement;
-    const last = hostElement.querySelector('#last') as HTMLButtonElement;
+    const htmlHostElement = fixture.nativeElement as HTMLElement;
+    const htmlFirstButton = htmlHostElement.querySelector('#first') as HTMLButtonElement;
+    const htmlLastButton = htmlHostElement.querySelector('#last') as HTMLButtonElement;
 
-    first.focus();
-    hostElement.dispatchEvent(
+    htmlFirstButton.focus();
+    htmlHostElement.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true }),
     );
 
-    expect(document.activeElement).toBe(last);
+    expect(document.activeElement).toBe(htmlLastButton);
   });
 });

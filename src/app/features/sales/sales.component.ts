@@ -52,13 +52,13 @@ export class SalesComponent {
   });
 
   onSearchInput(event: Event): void {
-    const target = event.target as HTMLInputElement | null;
-    this.searchTerm.set(target?.value ?? '');
+    const htmlTarget = event.target as HTMLInputElement | null;
+    this.searchTerm.set(htmlTarget?.value ?? '');
   }
 
   onDateFromInput(event: Event): void {
-    const target = event.target as HTMLInputElement | null;
-    const value = target?.value ?? '';
+    const htmlTarget = event.target as HTMLInputElement | null;
+    const value = htmlTarget?.value ?? '';
     this.dateFrom.set(value ? new Date(`${value}T00:00:00`) : null);
   }
 

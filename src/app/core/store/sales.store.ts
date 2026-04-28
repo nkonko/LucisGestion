@@ -22,6 +22,8 @@ export const SalesStore = signalStore(
     const sales = toSignal(sales$, { initialValue: [] as Sale[] });
 
     const pendingOrders = computed(() => sales().filter((v) => v.status === 'pending'));
+    const pendingOrdersCount = computed(() => pendingOrders().length);
+    const recentSales = computed(() => sales().slice(0, 5));
 
     const buildStockAdjustments = (
       items: { recipeId: string; quantity: number }[],
@@ -66,8 +68,8 @@ export const SalesStore = signalStore(
     return {
       sales,
       pendingOrders,
-      pendingOrdersCount: computed(() => pendingOrders().length),
-      recentSales: computed(() => sales().slice(0, 5)),
+      pendingOrdersCount,
+      recentSales,
 
       async registerSale(sale: SaleInput) {
         patchState(store, { loading: true, error: null });

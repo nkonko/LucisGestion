@@ -87,14 +87,21 @@ export class RecipeFormComponent {
 
   updateQuantity(index: number, quantity: number): void {
     this.recipeIngredients.update((list) => {
-      const updated = [...list];
-      const ingredient = this.ingredientsStore.ingredients().find((i) => i.id === updated[index].ingredientId);
-      updated[index] = {
-        ...updated[index],
-        quantity,
-        lineCost: Math.round(quantity * (ingredient?.unitPrice ?? 0) * 100) / 100,
-      };
-      return updated;
+      return list.map((item, itemIndex) => {
+        if (itemIndex !== index) {
+          return item;
+        }
+
+        const ingredient = this.ingredientsStore
+          .ingredients()
+          .find((i) => i.id === item.ingredientId);
+
+        return {
+          ...item,
+          quantity,
+          lineCost: Math.round(quantity * (ingredient?.unitPrice ?? 0) * 100) / 100,
+        };
+      });
     });
   }
 
