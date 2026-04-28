@@ -10,15 +10,24 @@ const SCREENSHOT_PATH = resolve('__screenshots__/mock-home.png');
 const FALLBACK_PNG_BASE64 =
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO8l3XQAAAAASUVORK5CYII=';
 
+function getSafeBaseUrl() {
+  const url = new URL(BASE_URL);
+  if (url.protocol !== 'http:' || url.hostname !== HOST || url.port !== String(PORT)) {
+    throw new Error('BASE_URL invalida para captura mock');
+  }
+  return url;
+}
+
 async function sleep(ms) {
   return new Promise((resolveSleep) => setTimeout(resolveSleep, ms));
 }
 
-async function waitForServer(url, timeoutMs = 90_000) {
+async function waitForServer(timeoutMs = 90_000) {
+  const safeUrl = getSafeBaseUrl().toString();
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
     try {
-      const response = await fetch(url, { method: 'GET' });
+      const response = await fetch(safeUrl, { method: 'GET' });
       if (response.ok) {
         return;
       }
@@ -26,7 +35,7 @@ async function waitForServer(url, timeoutMs = 90_000) {
     }
     await sleep(1000);
   }
-  throw new Error(`Timeout esperando el servidor en ${url}`);
+  throw new Error(`Timeout esperando el servidor en ${safeUrl}`);
 }
 
 async function ensurePlaywright() {
@@ -63,11 +72,12 @@ async function run() {
 
   let exitCode = 0;
   try {
-    await waitForServer(BASE_URL);
+    const safeBaseUrl = getSafeBaseUrl().toString();
+    await waitForServer();
     const { chromium } = await ensurePlaywright();
     const browser = await chromium.launch();
     const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-    await page.goto(BASE_URL, { waitUntil: 'networkidle' });
+    await page.goto(safeBaseUrl, { waitUntil: 'networkidle' });
     await mkdir(dirname(SCREENSHOT_PATH), { recursive: true });
     await page.screenshot({ path: SCREENSHOT_PATH, fullPage: true });
     await browser.close();
