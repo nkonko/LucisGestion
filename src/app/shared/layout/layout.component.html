@@ -35,27 +35,6 @@
   </div>
 </header>
 
-  @if (menuOpen()) {
-    <div class="user-menu" role="menu">
-      <div class="px-4 py-2 border-b">
-        <div class="font-medium">{{ auth.appUser()?.displayName }}</div>
-        <div class="text-xs text-gray-500">{{ auth.appUser()?.email }}</div>
-        <div class="text-xs mt-1">
-          <span
-            class="inline-block px-2 py-0.5 rounded-full text-white"
-            [class]="auth.isOwner() ? 'bg-rose-500' : 'bg-blue-500'"
-          >
-            {{ auth.isOwner() ? 'Dueña' : 'Ayudante' }}
-          </span>
-        </div>
-      </div>
-      <button class="menu-item" type="button" (click)="logout()">
-        <span class="material-icons">logout</span>
-        <span>Cerrar sesión</span>
-      </button>
-    </div>
-  }
-
 <main class="page-container" (click)="closeMenu()">
   <router-outlet />
 </main>
