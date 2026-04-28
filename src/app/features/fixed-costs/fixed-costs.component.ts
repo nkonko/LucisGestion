@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { NotificationService } from '../../core/services/notification.service';
 import { FixedCostsStore } from '../../core/store/fixed-costs.store';
 import { AuthService } from '../../core/services/auth.service';
@@ -11,12 +11,14 @@ import {
 import { FixedCostFormComponent } from './fixed-cost-form.component';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 import { DialogService } from '../../core/services/dialog.service';
+import { UiIconComponent } from '../../shared/ui/components';
 
 @Component({
   selector: 'app-fixed-costs',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ArsPipe],
+  imports: [ArsPipe, UiIconComponent],
   templateUrl: './fixed-costs.component.html',
+  styleUrl: './fixed-costs.component.scss',
 })
 export class FixedCostsComponent {
   readonly store = inject(FixedCostsStore);

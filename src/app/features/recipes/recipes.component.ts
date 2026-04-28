@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { NotificationService } from '../../core/services/notification.service';
 import { RecipesStore } from '../../core/store/recipes.store';
 import { Recipe } from '../../core/models/recipe';
@@ -7,18 +7,25 @@ import { RecipeFormComponent } from './recipe-form.component';
 import { CatalogDialogComponent } from './catalog-dialog.component';
 import { AuthService } from '../../core/services/auth.service';
 import { DialogService } from '../../core/services/dialog.service';
+import { UiIconComponent } from '../../shared/ui/components';
 
 @Component({
   selector: 'app-recipes',
-  imports: [ArsPipe],
+  imports: [ArsPipe, UiIconComponent],
   templateUrl: './recipes.component.html',
+  styleUrl: './recipes.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '(document:click)': 'openMenuRecipeId.set(null)',
+  },
 })
 export class RecipesComponent {
   readonly store = inject(RecipesStore);
   readonly auth = inject(AuthService);
   private dialog = inject(DialogService);
   private notify = inject(NotificationService);
+
+  readonly openMenuRecipeId = signal<string | null>(null);
 
   create(): void {
     const dialogRef = this.dialog.open<null, Recipe>(RecipeFormComponent, {
@@ -66,5 +73,14 @@ export class RecipesComponent {
       maxHeight: '90vh',
       data: null,
     });
+  }
+
+  toggleMenu(recipeId: string, event: Event): void {
+    event.stopPropagation();
+    this.openMenuRecipeId.update((current) => (current === recipeId ? null : recipeId));
+  }
+
+  onMenuClick(event: Event): void {
+    event.stopPropagation();
   }
 }

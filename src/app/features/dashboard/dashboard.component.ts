@@ -5,11 +5,13 @@ import { IngredientsStore } from '../../core/store/ingredients.store';
 import { SalesStore } from '../../core/store/sales.store';
 import { RecipesStore } from '../../core/store/recipes.store';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
+import { UiIconComponent } from '../../shared/ui/components';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, ArsPipe],
+  imports: [RouterLink, ArsPipe, UiIconComponent],
   templateUrl: './dashboard.component.html',
+  styleUrl: './dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent {
@@ -24,7 +26,6 @@ export class DashboardComponent {
   pendingOrders = this.salesStore.pendingOrdersCount;
   monthlySales = this.store.monthlySales;
   monthlyExpenses = this.store.monthlyExpenses;
-  monthlyProfit = this.store.monthlyProfit;
   periodFixedCosts = this.store.periodFixedCosts;
   totalPeriodExpenses = this.store.totalPeriodExpenses;
   netProfit = this.store.netProfit;

@@ -8,11 +8,13 @@ import { IngredientFormComponent } from './ingredient-form.component';
 import { PriceHistoryComponent } from './price-history.component';
 import { AuthService } from '../../core/services/auth.service';
 import { DialogService } from '../../core/services/dialog.service';
+import { UiIconComponent } from '../../shared/ui/components';
 
 @Component({
   selector: 'app-ingredients',
-  imports: [ArsPipe],
+  imports: [ArsPipe, UiIconComponent],
   templateUrl: './ingredients.component.html',
+  styleUrl: './ingredients.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IngredientsComponent {

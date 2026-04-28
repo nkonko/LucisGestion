@@ -1,17 +1,19 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { NotificationService } from '../../core/services/notification.service';
 import { RouterLink } from '@angular/router';
+import { NotificationService } from '../../core/services/notification.service';
 import { IngredientsStore } from '../../core/store/ingredients.store';
 import { Ingredient } from '../../core/models/ingredient';
 import { getStockPriority } from '../../core/utils/stock.utils';
 import { IngredientFormComponent } from '../ingredients/ingredient-form.component';
 import { AuthService } from '../../core/services/auth.service';
 import { DialogService } from '../../core/services/dialog.service';
+import { UiIconComponent } from '../../shared/ui/components';
 
 @Component({
   selector: 'app-stock',
-  imports: [RouterLink],
+  imports: [RouterLink, UiIconComponent],
   templateUrl: './stock.component.html',
+  styleUrl: './stock.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockComponent {
@@ -50,15 +52,24 @@ export class StockComponent {
     return Math.min(percent, 100);
   }
 
+  getStockBarClass(item: Ingredient): string {
+    switch (getStockPriority(item)) {
+      case 0:
+        return 'bg-red-500';
+      case 1:
+        return 'bg-orange-400';
+      default:
+        return 'bg-green-500';
+    }
+  }
 
-  create() {
+  create(): void {
     const dialogRef = this.dialog.open<null, Ingredient>(IngredientFormComponent, {
-      width: '100%',
       maxWidth: '500px',
       data: null,
     });
 
-    dialogRef.afterClosed.subscribe(async (result: Ingredient | undefined) => {
+    dialogRef.afterClosed.subscribe(async (result) => {
       if (result) {
         await this.store.createIngredient(result);
         this.notify.success('Ingrediente creado');
@@ -66,14 +77,13 @@ export class StockComponent {
     });
   }
 
-  edit(ingredient: Ingredient) {
+  edit(ingredient: Ingredient): void {
     const dialogRef = this.dialog.open<Ingredient, Ingredient | 'delete'>(IngredientFormComponent, {
-      width: '100%',
       maxWidth: '500px',
       data: ingredient,
     });
 
-    dialogRef.afterClosed.subscribe(async (result: Ingredient | 'delete' | undefined) => {
+    dialogRef.afterClosed.subscribe(async (result) => {
       if (result === 'delete') {
         await this.store.deleteIngredient(ingredient.id!);
         this.notify.success('Ingrediente eliminado');

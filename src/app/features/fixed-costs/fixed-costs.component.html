@@ -2,22 +2,20 @@
   <h2 class="text-xl font-semibold">Costos Fijos</h2>
 </div>
 
-<section class="mb-4 bg-orange-50 rounded-lg p-4">
+<section class="ui-card-surface mb-4 bg-orange-50">
   <div class="py-3">
     <div class="flex items-center gap-2 mb-1">
-      <span class="material-icons text-orange-500">calculate</span>
+      <ui-icon name="calculate" class="text-orange-500" [decorative]="true" />
       <span class="font-medium text-orange-800">Total mensual estimado</span>
     </div>
-    <div class="text-2xl font-bold text-orange-700">
-      {{ store.totalMonthlyFixedCosts() | ars }}
-    </div>
+    <div class="text-2xl font-bold text-orange-700">{{ store.totalMonthlyFixedCosts() | ars }}</div>
     <div class="text-xs text-orange-600 mt-1">Suma de todos los costos convertidos a mensual</div>
   </div>
 </section>
 
 @if (store.fixedCosts().length === 0) {
   <div class="text-center py-8 text-gray-400">
-    <span class="material-icons" style="font-size: 48px; width: 48px; height: 48px">receipt_long</span>
+    <ui-icon name="receipt_long" [size]="48" [decorative]="true" />
     <p>No hay costos fijos cargados</p>
     <p class="text-sm">Tocá el botón + para agregar luz, gas, alquiler, etc.</p>
   </div>
@@ -25,11 +23,9 @@
 
 @for (group of groupsByCategory(); track group.category) {
   <div class="mb-2">
-    <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide px-1 mb-1">
-      {{ categoryLabel(group.category) }}
-    </div>
+    <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide px-1 mb-1">{{ categoryLabel(group.category) }}</div>
     @for (cost of group.items; track cost.id) {
-      <section class="touch-card mb-2 p-3" (click)="auth.isOwner() ? edit(cost) : null">
+      <article class="ui-card-surface touch-card mb-2" (click)="auth.isOwner() ? edit(cost) : null">
         <div class="py-2">
           <div class="flex items-center justify-between">
             <div class="flex-1 min-w-0">
@@ -40,20 +36,20 @@
             </div>
             <div class="text-right ml-3 shrink-0">
               <div class="font-semibold text-orange-700">{{ cost.amount | ars }}</div>
-              <span class="ui-btn text-xs" aria-hidden="true">{{ frequencyLabel(cost.frequency) }}</span>
+              <span class="ui-chip-static">{{ frequencyLabel(cost.frequency) }}</span>
             </div>
           </div>
           @if (cost.frequency !== 'monthly') {
             <div class="text-xs text-gray-400 mt-1">≈ {{ monthlyAmount(cost) | ars }}/mes</div>
           }
         </div>
-      </section>
+      </article>
     }
   </div>
 }
 
 @if (auth.isOwner()) {
-  <button class="fab-bottom-right ui-btn ui-btn-primary" type="button" (click)="create()" aria-label="Agregar costo fijo">
-    <span class="material-icons">add</span>
+  <button class="fab-bottom-right ui-fab" (click)="create()" aria-label="Agregar costo fijo" type="button">
+    <ui-icon name="add" [decorative]="true" />
   </button>
 }

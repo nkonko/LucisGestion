@@ -46,6 +46,11 @@
   --size-font-2xs:            12px;    // Compact nav/support text size
   --size-dialog-content-max-height: 80vh; // Recipe dialog max content height
   --size-viewport-height:     100vh;   // Full viewport-height sections
+  --size-icon-button:         var(--space-8);
+  --size-fab:                 calc(var(--space-8) + var(--space-6));
+  --size-spinner:             calc(var(--space-8) + var(--space-2));
+  --size-progress-height:     var(--space-2);
+
 
   // ── Z-index scale ────────────────────────────────────────────────────────────
   --z-toast: 9999;  // Toast notifications (must be above dialogs)
@@ -66,6 +71,7 @@
   // ── Border sizes ─────────────────────────────────────────────────────────────
   --border-width-thin: 1px;
   --border-width-medium: 2px;
+  --border-width-thick:  3px;
 
   // ── Typography ───────────────────────────────────────────────────────────────
   --font-body: 400 0.875rem/1.25rem Roboto, sans-serif;

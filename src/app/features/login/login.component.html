@@ -5,15 +5,15 @@
     <p class="text-gray-500 mt-2">Gestión de pastelería</p>
   </div>
 
-  <section class="login-card">
+  <section class="login-card ui-card-surface">
     <div class="py-6 text-center">
       @if (loading) {
-        <div class="loader mx-auto mb-4" aria-label="Cargando"></div>
+        <div class="ui-spinner mx-auto mb-4" aria-label="Cargando"></div>
         <p class="text-gray-500">Iniciando sesión...</p>
       } @else {
         <p class="text-gray-600 mb-6">Iniciá sesión para continuar</p>
 
-        <button class="ui-btn ui-btn-primary google-btn w-full" type="button" (click)="loginGoogle()">
+        <button class="ui-btn ui-btn-primary google-btn w-full" (click)="loginGoogle()" type="button">
           <img
             src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
             alt=""

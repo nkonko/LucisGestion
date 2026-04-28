@@ -3,10 +3,11 @@ import { RecipesStore } from '../../core/store/recipes.store';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 import { DIALOG_REF } from '../../core/models/dialog/dialog-tokens.model';
 import { DialogRef } from '../../core/models/dialog/dialog-ref.model';
+import { UiIconComponent } from '../../shared/ui/components';
 
 @Component({
   selector: 'app-catalog-dialog',
-  imports: [ArsPipe],
+  imports: [ArsPipe, UiIconComponent],
   templateUrl: './catalog-dialog.component.html',
   styleUrl: './catalog-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

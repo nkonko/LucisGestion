@@ -5,6 +5,7 @@ import { IngredientsStore } from '../../core/store/ingredients.store';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 import { DIALOG_DATA, DIALOG_REF } from '../../core/models/dialog/dialog-tokens.model';
 import { DialogRef } from '../../core/models/dialog/dialog-ref.model';
+import { UiIconComponent } from '../../shared/ui/components';
 
 interface PriceHistoryDialogData {
   id: string;
@@ -13,7 +14,7 @@ interface PriceHistoryDialogData {
 
 @Component({
   selector: 'app-price-history',
-  imports: [DatePipe, ArsPipe],
+  imports: [DatePipe, ArsPipe, UiIconComponent],
   templateUrl: './price-history.component.html',
   styleUrl: './price-history.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

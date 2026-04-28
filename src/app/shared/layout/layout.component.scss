@@ -4,12 +4,12 @@
   left: 0;
   right: 0;
   z-index: var(--z-nav);
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
+  height: var(--size-nav-height);
   background: var(--color-primary);
   color: var(--color-surface);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-4);
 }
 
 main {
@@ -48,6 +48,26 @@ main {
     color: var(--color-primary);
     font-weight: 500;
   }
+}
+
+.nav-item--badge {
+  position: relative;
+}
+
+.badge {
+  position: absolute;
+  top: 0;
+  right: var(--space-1);
+  min-width: var(--space-4);
+  height: var(--space-4);
+  border-radius: var(--radius-chip);
+  background: var(--color-status-danger);
+  color: var(--color-surface);
+  font-size: var(--size-font-2xs);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-1);
 }
 
 .avatar {

@@ -1,30 +1,40 @@
 <div class="flex items-center justify-between mb-4">
   <h2 class="text-xl font-semibold">Recetas</h2>
   <button class="ui-btn" type="button" (click)="viewCatalog()">
-    <span class="material-icons">share</span>
+    <ui-icon name="share" [size]="18" [decorative]="true" />
     Catálogo
   </button>
 </div>
 
 @if (store.recipes().length === 0) {
   <div class="text-center py-8 text-gray-400">
-    <span class="material-icons" style="font-size: 48px; width: 48px; height: 48px">menu_book</span>
+    <ui-icon name="menu_book" [size]="48" [decorative]="true" />
     <p>No hay recetas cargadas aún</p>
     <p class="text-sm">Tocá el botón + para crear la primera</p>
   </div>
 }
 
 @for (recipe of store.recipes(); track recipe.id) {
-  <section class="touch-card mb-3 p-3" (click)="auth.isOwner() ? edit(recipe) : null">
+  <article class="ui-card-surface touch-card mb-3" (click)="auth.isOwner() ? edit(recipe) : null">
     <div class="py-2">
       <div class="flex items-center justify-between mb-1">
         <div class="font-medium text-base">{{ recipe.name }}</div>
-        <div class="flex items-center gap-2">
-          <span class="ui-btn text-xs" aria-hidden="true">{{ recipe.category }}</span>
+        <div class="flex items-center gap-1">
+          <span class="ui-chip-static">{{ recipe.category }}</span>
           @if (auth.isOwner()) {
-            <button class="ui-btn" type="button" (click)="$event.stopPropagation(); duplicate(recipe)" aria-label="Duplicar receta">
-              <span class="material-icons">content_copy</span>
-            </button>
+            <div class="relative" (click)="onMenuClick($event)">
+              <button class="ui-icon-btn" type="button" aria-label="Abrir opciones" (click)="toggleMenu(recipe.id ?? '', $event)">
+                <ui-icon name="more_vert" [decorative]="true" />
+              </button>
+              @if (openMenuRecipeId() === (recipe.id ?? '')) {
+                <div class="ui-menu" role="menu">
+                  <button class="ui-menu-item" type="button" role="menuitem" (click)="duplicate(recipe)">
+                    <ui-icon name="content_copy" [size]="16" [decorative]="true" />
+                    Duplicar
+                  </button>
+                </div>
+              }
+            </div>
           }
         </div>
       </div>
@@ -44,15 +54,13 @@
         </div>
       </div>
 
-      <div class="text-xs text-gray-400 mt-1">
-        {{ recipe.ingredients.length }} ingredientes · rinde {{ recipe.yield }} u.
-      </div>
+      <div class="text-xs text-gray-400 mt-1">{{ recipe.ingredients.length }} ingredientes · rinde {{ recipe.yield }} u.</div>
     </div>
-  </section>
+  </article>
 }
 
 @if (auth.isOwner()) {
-  <button class="fab-bottom-right ui-btn ui-btn-primary" type="button" (click)="create()" aria-label="Agregar receta">
-    <span class="material-icons">add</span>
+  <button class="fab-bottom-right ui-fab" (click)="create()" type="button" aria-label="Crear receta">
+    <ui-icon name="add" [decorative]="true" />
   </button>
 }
