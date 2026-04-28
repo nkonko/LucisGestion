@@ -42,12 +42,17 @@ export class AuthService {
   constructor() {
     onAuthStateChanged(this.auth, async (user) => {
       this._user.set(user);
-      if (user) {
-        await this.loadOrCreateProfile(user);
-      } else {
+      try {
+        if (user) {
+          await this.loadOrCreateProfile(user);
+        } else {
+          this._appUser.set(null);
+        }
+      } catch {
         this._appUser.set(null);
+      } finally {
+        this._ready.set(true);
       }
-      this._ready.set(true);
     });
   }
 
@@ -60,6 +65,8 @@ export class AuthService {
       this._appUser.set(null);
       throw new Error('Tu cuenta no tiene acceso a esta app.');
     }
+
+    await this.loadOrCreateProfile(result.user);
   }
 
   async logout(): Promise<void> {

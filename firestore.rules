@@ -8,12 +8,22 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function userDocPath() {
+      return /databases/$(database)/documents/users/$(request.auth.uid);
+    }
+
+    function userRole() {
+      return isSignedIn() && exists(userDocPath())
+        ? get(userDocPath()).data.role
+        : null;
+    }
+
     function isOwner() {
-      return isSignedIn() && request.auth.token.role == 'owner';
+      return userRole() == 'owner';
     }
 
     function isAssistant() {
-      return isSignedIn() && request.auth.token.role == 'assistant';
+      return userRole() == 'assistant';
     }
 
     function isTeamMember() {

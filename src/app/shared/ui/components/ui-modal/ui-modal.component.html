@@ -9,7 +9,7 @@
     >
       <header class="ui-modal__header">
         <h2 class="ui-modal__title">{{ title() }}</h2>
-        <button aria-label="Cerrar" class="ui-modal__close" type="button" (click)="closed.emit()">
+        <button aria-label="Cerrar" class="ui-modal__close" type="button" (click)="closed.emit(undefined)">
           ×
         </button>
       </header>
