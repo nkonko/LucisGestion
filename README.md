@@ -5,7 +5,7 @@ Sistema de gestión para pastelería artesanal. Permite administrar ingredientes
 ## Tech Stack
 
 - **Angular 21** (standalone components, signals, OnPush)
-- **Angular Material 21** + Tailwind CSS 4
+- **UI propia Tailwind CSS 4
 - **NgRx Signals** (store reactivo)
 - **Firebase** (Auth, Firestore, Hosting)
 - **PWA** (Service Worker, offline support)
@@ -69,9 +69,13 @@ src/app/
 │   ├── stock/          # Vista semáforo de stock
 │   └── ventas/         # Registro de ventas + historial
 └── shared/
-    ├── layout/         # Shell con sidenav y toolbar
+    ├── layout/         # Shell con top toolbar y bottom nav
     └── pipes/          # Pipe ARS (formato moneda)
 ```
+
+## Nota de UI
+
+La UI se basa en componentes/primitivas propias y set SVG local.
 
 ## Documentación adicional
 
