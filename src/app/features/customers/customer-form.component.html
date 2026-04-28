@@ -5,11 +5,11 @@
 <form [formGroup]="form" class="flex flex-col gap-3">
   <label class="ui-field">
     <span>Nombre</span>
-    <input data-initial-focus class="ui-input" formControlName="name" />
+    <input id="customer-name" name="name" data-initial-focus class="ui-input" formControlName="name" />
   </label>
-  <label class="ui-field"><span>Teléfono</span><input class="ui-input" formControlName="phone" type="tel" /></label>
-  <label class="ui-field"><span>Dirección</span><input class="ui-input" formControlName="address" /></label>
-  <label class="ui-field"><span>Notas</span><textarea class="ui-textarea" formControlName="notes" rows="3"></textarea></label>
+  <label class="ui-field"><span>Teléfono</span><input id="customer-phone" name="phone" class="ui-input" formControlName="phone" type="tel" /></label>
+  <label class="ui-field"><span>Dirección</span><input id="customer-address" name="address" class="ui-input" formControlName="address" /></label>
+  <label class="ui-field"><span>Notas</span><textarea id="customer-notes" name="notes" class="ui-textarea" formControlName="notes" rows="3"></textarea></label>
 </form>
 
 <div class="flex justify-end gap-2 mt-4">

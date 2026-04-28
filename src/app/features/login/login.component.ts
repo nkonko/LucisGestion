@@ -21,7 +21,13 @@ export class LoginComponent {
     this.error = '';
     try {
       await this.auth.loginWithGoogle();
-      this.router.navigate(['/dashboard']);
+      if (this.auth.isLoggedIn()) {
+        await this.router.navigate(['/dashboard']);
+        return;
+      }
+
+      this.error = 'No se pudo completar la sesión. Reintentá.';
+      this.loading = false;
     } catch (error: unknown) {
       this.error = error instanceof Error ? error.message : 'Error al iniciar sesión';
       this.loading = false;
