@@ -17,6 +17,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
   text-decoration: none;
   color: var(--color-on-surface-variant);
   font-size: var(--size-font-2xs);
@@ -34,6 +35,16 @@
 
 .nav-item--badge {
   position: relative;
+}
+
+.nav-menu {
+  position: relative;
+
+  .ui-menu {
+    top: auto;
+    bottom: calc(100% + var(--space-1));
+    right: 0;
+  }
 }
 
 .badge {

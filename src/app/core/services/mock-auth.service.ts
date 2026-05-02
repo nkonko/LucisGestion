@@ -1,37 +1,37 @@
-import { Injectable, signal, computed } from '@angular/core';
-import { type UserRole, type AppUser } from './auth.service';
+import { Injectable, inject } from '@angular/core';
+import { UserRole } from '../models/user/user-role.model';
+import { AppUser } from '../models/user/app-user.model';
+import { AuthStore } from '../store/auth.store';
 
 @Injectable()
 export class MockAuthService {
-  private readonly _appUser = signal<AppUser | null>({
+  private authStore = inject(AuthStore);
+
+  private readonly mockAppUser: AppUser = {
     uid: 'mock-owner-uid',
     email: 'demo@lucis.com',
     displayName: 'Demo (modo prueba)',
     photoURL: '',
     role: 'owner',
-  });
+  };
 
-  private readonly _ready = signal(true);
+  readonly user = this.authStore.user;
+  readonly appUser = this.authStore.appUser;
+  readonly ready = this.authStore.ready;
+  readonly isLoggedIn = this.authStore.isLoggedIn;
+  readonly isOwner = this.authStore.isOwner;
+  readonly isAssistant = this.authStore.isAssistant;
 
-  readonly user = signal(null).asReadonly();
-  readonly appUser = this._appUser.asReadonly();
-  readonly ready = this._ready.asReadonly();
-  readonly isLoggedIn = computed(() => !!this._appUser());
-  readonly isOwner = computed(() => this._appUser()?.role === 'owner');
-  readonly isAssistant = computed(() => this._appUser()?.role === 'assistant');
+  constructor() {
+    this.authStore.setAuthState(null, this.mockAppUser, true);
+  }
 
   async loginWithGoogle(): Promise<void> {
-    this._appUser.set({
-      uid: 'mock-owner-uid',
-      email: 'demo@lucis.com',
-      displayName: 'Demo (modo prueba)',
-      photoURL: '',
-      role: 'owner',
-    });
+    this.authStore.setAuthState(null, this.mockAppUser, true);
   }
 
   async logout(): Promise<void> {
-    this._appUser.set(null);
+    this.authStore.setAuthState(null, null, true);
   }
 
   async setUserRole(_uid: string, _role: UserRole): Promise<void> {
