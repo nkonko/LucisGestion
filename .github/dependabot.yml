@@ -1,0 +1,49 @@
+version: 2
+updates:
+  # Monitor npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "nkonko"
+    assignees:
+      - "nkonko"
+    labels:
+      - "dependencies"
+      - "npm"
+    commit-message:
+      prefix: "chore(deps):"
+      include: "scope"
+    pull-request-branch-name:
+      separator: "/"
+    rebase-strategy: "auto"
+    allow:
+      - dependency-type: "all"
+    ignore:
+      # Add packages here if you want to ignore updates (example):
+      # - dependency-name: "package-name"
+    # Security updates
+    security-updates-only: false
+    # Version requirements
+    versioning-strategy: "auto"
+
+  # Monitor GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+    reviewers:
+      - "nkonko"
+    assignees:
+      - "nkonko"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci(deps):"
