@@ -1,0 +1,20 @@
+<section class="net-profit-card" aria-label="Resumen financiero mensual">
+  <header class="net-profit-card__header">
+    <p class="net-profit-card__period">{{ periodLabel() }}</p>
+    <p class="net-profit-card__title">Ganancia neta</p>
+  </header>
+
+  <p class="net-profit-card__net-value">{{ netProfit() | ars }}</p>
+
+  <div class="net-profit-card__metrics">
+    <article class="net-profit-card__metric">
+      <p class="net-profit-card__metric-label">Ingresos</p>
+      <p class="net-profit-card__metric-value">{{ income() | ars }}</p>
+    </article>
+
+    <article class="net-profit-card__metric">
+      <p class="net-profit-card__metric-label">Gastos + fijos</p>
+      <p class="net-profit-card__metric-value">{{ totalCosts() | ars }}</p>
+    </article>
+  </div>
+</section>

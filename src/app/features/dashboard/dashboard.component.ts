@@ -6,10 +6,11 @@ import { SalesStore } from '../../core/store/sales.store';
 import { RecipesStore } from '../../core/store/recipes.store';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 import { UiIconComponent } from '../../shared/ui/components';
+import { NetProfitCardComponent } from './net-profit-card/net-profit-card.component';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, ArsPipe, UiIconComponent],
+  imports: [RouterLink, ArsPipe, UiIconComponent, NetProfitCardComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,24 +30,25 @@ export class DashboardComponent {
   periodFixedCosts = this.store.periodFixedCosts;
   totalPeriodExpenses = this.store.totalPeriodExpenses;
   netProfit = this.store.netProfit;
+  max = computed(() => Math.max(this.monthlySales(), this.totalPeriodExpenses(), 1));
 
   incomeBarWidth = computed(() => {
-    const max = Math.max(this.monthlySales(), this.totalPeriodExpenses(), 1);
-    return (this.monthlySales() / max) * 100;
+    return this.calculate((this.monthlySales()));
   });
 
   ingredientsBarWidth = computed(() => {
-    const max = Math.max(this.monthlySales(), this.totalPeriodExpenses(), 1);
-    return (this.monthlyExpenses() / max) * 100;
+    return this.calculate((this.monthlyExpenses()));
   });
 
   fixedCostsBarWidth = computed(() => {
-    const max = Math.max(this.monthlySales(), this.totalPeriodExpenses(), 1);
-    return (this.periodFixedCosts() / max) * 100;
+    return this.calculate((this.periodFixedCosts()));
   });
 
   expensesBarWidth = computed(() => {
-    const max = Math.max(this.monthlySales(), this.totalPeriodExpenses(), 1);
-    return (this.totalPeriodExpenses() / max) * 100;
+    return this.calculate(this.totalPeriodExpenses());
   });
+
+  calculate(value: number) {
+    return (value / this.max()) * 100;
+  }
 }

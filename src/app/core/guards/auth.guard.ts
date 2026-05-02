@@ -7,9 +7,11 @@ import { AuthStore } from '../store/auth.store';
 export const authGuard: CanActivateFn = async () => {
   const authStore = inject(AuthStore);
   const router = inject(Router);
+  const ready$ = toObservable(authStore.ready);
+  const isLoggedIn$ = toObservable(authStore.isLoggedIn);
 
-  await firstValueFrom(toObservable(authStore.ready).pipe(filter((ready) => ready)));
-  const isLoggedIn = await firstValueFrom(toObservable(authStore.isLoggedIn));
+  await firstValueFrom(ready$.pipe(filter((ready) => ready)));
+  const isLoggedIn = await firstValueFrom(isLoggedIn$);
 
   if (isLoggedIn) {
     return true;

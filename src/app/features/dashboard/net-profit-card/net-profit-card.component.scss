@@ -1,0 +1,70 @@
+:host {
+  display: block;
+}
+
+.net-profit-card {
+  border-radius: var(--space-8);
+  padding: var(--space-6);
+  border: var(--border-width-thin) solid color-mix(in srgb, var(--color-surface) 24%, transparent);
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--color-status-warning) 30%, transparent) 0%, transparent 60%),
+    linear-gradient(
+      120deg,
+      color-mix(in srgb, var(--color-primary) 75%, var(--color-on-surface) 25%) 0%,
+      color-mix(in srgb, var(--color-primary) 52%, var(--color-status-warning) 48%) 100%
+    );
+  color: var(--color-surface);
+}
+
+.net-profit-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3);
+}
+
+.net-profit-card__period {
+  font-size: var(--size-font-md);
+  text-transform: uppercase;
+  letter-spacing: calc(var(--space-1) / 2);
+  opacity: 0.92;
+}
+
+.net-profit-card__title {
+  font-size: var(--size-font-2xs);
+  opacity: 0.9;
+}
+
+.net-profit-card__net-value {
+  font-size: calc(var(--size-font-md) * 2.5);
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: var(--space-6);
+}
+
+.net-profit-card__metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.net-profit-card__metric {
+  border-radius: var(--space-4);
+  border: var(--border-width-thin) solid color-mix(in srgb, var(--color-surface) 20%, transparent);
+  padding: var(--space-4);
+  background: color-mix(in srgb, var(--color-on-surface) 20%, transparent);
+}
+
+.net-profit-card__metric-label {
+  font-size: var(--size-font-2xs);
+  opacity: 0.86;
+  margin-bottom: var(--space-2);
+  text-transform: uppercase;
+  letter-spacing: calc(var(--space-1) / 4);
+}
+
+.net-profit-card__metric-value {
+  font-size: calc(var(--size-font-md) * 1.75);
+  font-weight: 700;
+  line-height: 1.1;
+}
