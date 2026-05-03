@@ -33,15 +33,15 @@ export class DashboardComponent {
   max = computed(() => Math.max(this.monthlySales(), this.totalPeriodExpenses(), 1));
 
   incomeBarWidth = computed(() => {
-    return this.calculate((this.monthlySales()));
+    return this.calculate(this.monthlySales());
   });
 
   ingredientsBarWidth = computed(() => {
-    return this.calculate((this.monthlyExpenses()));
+    return this.calculate(this.monthlyExpenses());
   });
 
   fixedCostsBarWidth = computed(() => {
-    return this.calculate((this.periodFixedCosts()));
+    return this.calculate(this.periodFixedCosts());
   });
 
   expensesBarWidth = computed(() => {

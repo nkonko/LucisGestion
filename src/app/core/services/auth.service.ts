@@ -9,6 +9,8 @@ import {
 } from '@angular/fire/auth';
 import { Firestore, collection, doc, getDoc, getDocs, limit, query, setDoc } from '@angular/fire/firestore';
 import {
+  catchError,
+  combineLatest,
   filter,
   firstValueFrom,
   from,
@@ -18,6 +20,7 @@ import {
   shareReplay,
   startWith,
   switchMap,
+  take,
 } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AppUser } from '../models/user/app-user.model';
@@ -36,20 +39,18 @@ export class AuthService {
   ).pipe(shareReplay({ bufferSize: 1, refCount: true }));
 
   private readonly appUserState$ = this.authState$.pipe(
-    switchMap((user) => (user ? from(this.loadOrCreateProfile(user)) : of(null))),
+    switchMap((user) =>
+      user
+        ? from(this.loadOrCreateProfile(user)).pipe(catchError(() => of(null)))
+        : of(null),
+    ),
     shareReplay({ bufferSize: 1, refCount: true }),
   );
 
   constructor() {
-    this.authState$
+    combineLatest([this.authState$, this.appUserState$])
       .pipe(
-        switchMap((user) =>
-          user
-            ? from(this.loadOrCreateProfile(user)).pipe(
-                map((appUser) => ({ user, appUser, ready: true })),
-              )
-            : of({ user: null, appUser: null, ready: true }),
-        ),
+        map(([user, appUser]) => ({ user, appUser, ready: true })),
         startWith({ user: null, appUser: null, ready: false }),
       )
       .subscribe(({ user, appUser, ready }) => {
@@ -67,8 +68,21 @@ export class AuthService {
     }
 
     await firstValueFrom(
-      this.appUserState$.pipe(
-        filter((appUser): appUser is AppUser => !!appUser && appUser.uid === result.user.uid),
+      this.authState$.pipe(
+        filter((user): user is User => !!user && user.uid === result.user.uid),
+        take(1),
+        switchMap(() =>
+          this.appUserState$.pipe(
+            filter((appUser) => appUser === null || appUser.uid === result.user.uid),
+            take(1),
+            map((appUser) => {
+              if (!appUser) {
+                throw new Error('Tu cuenta no tiene acceso a esta app.');
+              }
+              return appUser;
+            }),
+          ),
+        ),
       ),
     );
   }

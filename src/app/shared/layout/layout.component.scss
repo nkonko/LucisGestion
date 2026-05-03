@@ -1,4 +1,13 @@
-Imain {
-  margin-top: var(--size-nav-height);
+:host {
+  display: block;
+}
+
+.layout-content {
+  padding-top: var(--size-layout-header-height);
+  transition: padding-top var(--transition-layout-brand-collapse) ease;
+}
+
+.layout-content--compact {
+  padding-top: var(--size-layout-header-height-compact);
 }
 

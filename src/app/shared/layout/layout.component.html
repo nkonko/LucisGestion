@@ -1,5 +1,7 @@
 
-<main class="page-container">
+<app-brand-header (compactChanged)="onBrandCompactChanged($event)"></app-brand-header>
+
+<main class="page-container layout-content" [class.layout-content--compact]="isBrandCompact()">
   <router-outlet />
 </main>
 
