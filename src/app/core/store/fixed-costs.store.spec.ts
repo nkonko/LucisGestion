@@ -26,7 +26,7 @@ describe('FixedCostsStore', () => {
   describe('deactivateFixedCost', () => {
     it('should set active to false and populate endDate', async () => {
       const costId = 'test-id-123';
-      
+
       await store.deactivateFixedCost(costId);
 
       expect(firestoreSpy.updateDocument).toHaveBeenCalledWith(
