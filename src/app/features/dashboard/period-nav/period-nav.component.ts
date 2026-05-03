@@ -34,7 +34,8 @@ export class PeriodNavComponent {
   }
 
   onMonthChange(event: Event): void {
-    const selectedDate = fromMonthInputValue((event.target as HTMLInputElement).value);
+    const input = event.target as HTMLInputElement;
+    const selectedDate = fromMonthInputValue(input.value);
     if (selectedDate) {
       this.monthChange.emit(selectedDate);
     }
