@@ -58,7 +58,7 @@ export const DashboardStore = signalStore(
       return fixedCostsStore.allFixedCosts().reduce((sum, cost) => {
         const startDate = cost.startDate?.toDate() ?? new Date(1970, 0, 1);
         const endDate = cost.endDate?.toDate() ?? null;
-        const isActiveInPeriod = cost.active && startDate < periodEnd && (endDate === null || endDate >= periodStart);
+        const isActiveInPeriod = startDate < periodEnd && (endDate === null || endDate >= periodStart);
 
         if (!isActiveInPeriod) return sum;
         if (cost.frequency === 'monthly') return sum + cost.amount;
@@ -66,7 +66,7 @@ export const DashboardStore = signalStore(
       }, 0);
     });
 
-    const totalPeriodExpenses = computed(() => periodVariableExpenses() + periodFixedCosts());
+      const totalPeriodExpenses = computed(() => periodVariableExpenses() + periodFixedCosts() + periodSupplyExpenses());
 
     const netProfit = computed(() => monthlySales() - totalPeriodExpenses());
 

@@ -40,7 +40,7 @@ export class MockFirestoreService {
 
   async softDelete(path: string, id: string): Promise<void> {
     const col = this.getOrCreate(path);
-    col.next(col.value.filter((item: any) => item.id !== id));
+    col.next(col.value.map((item: any) => (item.id === id ? { ...item, active: false, endDate: Timestamp.now() } : item)));
   }
 
   async applyStockAdjustments(
