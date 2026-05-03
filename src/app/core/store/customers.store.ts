@@ -12,6 +12,8 @@ export const CustomersStore = signalStore(
 
   withMethods((store) => {
     const fs = inject(FirestoreService);
+    const getErrorMessage = (error: unknown): string =>
+      error instanceof Error ? error.message : String(error);
 
     const customers$ = fs.getCollection<Customer>('customers', orderBy('name', 'asc'));
     const customers = toSignal(customers$, { initialValue: [] as Customer[] });
@@ -22,8 +24,8 @@ export const CustomersStore = signalStore(
       async createCustomer(customer: CustomerInput) {
         try {
           return await fs.addDocument('customers', customer);
-        } catch (e: any) {
-          patchState(store, { error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { error: getErrorMessage(e) });
           throw e;
         }
       },
@@ -31,8 +33,8 @@ export const CustomersStore = signalStore(
       async updateCustomer(id: string, changes: Partial<Customer>) {
         try {
           return await fs.updateDocument('customers', id, changes);
-        } catch (e: any) {
-          patchState(store, { error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { error: getErrorMessage(e) });
           throw e;
         }
       },
@@ -40,8 +42,8 @@ export const CustomersStore = signalStore(
       async deleteCustomer(id: string) {
         try {
           return await fs.updateDocument('customers', id, { name: '[eliminado]' });
-        } catch (e: any) {
-          patchState(store, { error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { error: getErrorMessage(e) });
           throw e;
         }
       },

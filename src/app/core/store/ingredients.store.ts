@@ -20,6 +20,8 @@ export const IngredientsStore = signalStore(
 
   withMethods((store) => {
     const fs = inject(FirestoreService);
+    const getErrorMessage = (error: unknown): string =>
+      error instanceof Error ? error.message : String(error);
 
     const ingredients$ = fs.getCollection<Ingredient>(
       'ingredients',
@@ -50,8 +52,8 @@ export const IngredientsStore = signalStore(
           } as IngredientInput);
           patchState(store, { loading: false });
           return id;
-        } catch (e: any) {
-          patchState(store, { loading: false, error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { loading: false, error: getErrorMessage(e) });
           throw e;
         }
       },
@@ -59,7 +61,7 @@ export const IngredientsStore = signalStore(
       async updateIngredient(id: string, changes: Partial<Ingredient>) {
         patchState(store, { loading: true, error: null });
         try {
-          await fs.updateDocument('ingredients', id, changes as Record<string, any>);
+          await fs.updateDocument('ingredients', id, changes as Record<string, unknown>);
 
           // Record price history if price changed
           if (changes.unitPrice !== undefined) {
@@ -80,8 +82,8 @@ export const IngredientsStore = signalStore(
           }
 
           patchState(store, { loading: false });
-        } catch (e: any) {
-          patchState(store, { loading: false, error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { loading: false, error: getErrorMessage(e) });
           throw e;
         }
       },
@@ -89,8 +91,8 @@ export const IngredientsStore = signalStore(
       async deleteIngredient(id: string) {
         try {
           return await fs.softDelete('ingredients', id);
-        } catch (e: any) {
-          patchState(store, { error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { error: getErrorMessage(e) });
           throw e;
         }
       },
@@ -123,8 +125,8 @@ export const IngredientsStore = signalStore(
 
           patchState(store, { loading: false });
           return expenseId;
-        } catch (e: any) {
-          patchState(store, { loading: false, error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { loading: false, error: getErrorMessage(e) });
           throw e;
         }
       },

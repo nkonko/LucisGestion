@@ -5,7 +5,6 @@ import { DashboardStore } from './dashboard.store';
 import { SalesStore } from './sales.store';
 import { FixedCostsStore } from './fixed-costs.store';
 import { IngredientsStore } from './ingredients.store';
-import { SelectedDate } from '../models/dashboard';
 import { Sale } from '../models/sale';
 import { FixedCost } from '../models/fixed-cost';
 import { SupplyExpense } from '../models/supply-expense';
@@ -33,40 +32,46 @@ describe('DashboardStore', () => {
     store = TestBed.inject(DashboardStore);
   });
 
-  const buildSale = (overrides: Partial<Sale>): Sale => ({
-    date: Timestamp.fromDate(new Date(2024, 4, 15)),
-    customerId: null,
-    customerName: 'Consumidor final',
-    items: [],
-    total: 0,
-    totalCost: 0,
-    profit: 0,
-    paymentMethod: 'cash',
-    status: 'delivered',
-    notes: '',
-    ...overrides,
-  });
+  function buildSale(overrides: Partial<Sale>): Sale {
+    return {
+      date: Timestamp.fromDate(new Date(2024, 4, 15)),
+      customerId: null,
+      customerName: 'Consumidor final',
+      items: [],
+      total: 0,
+      totalCost: 0,
+      profit: 0,
+      paymentMethod: 'cash',
+      status: 'delivered',
+      notes: '',
+      ...overrides,
+    };
+  }
 
-  const buildFixedCost = (overrides: Partial<FixedCost>): FixedCost => ({
-    name: 'Costo fijo',
-    description: '',
-    amount: 0,
-    frequency: 'monthly',
-    category: 'utilities',
-    active: true,
-    startDate: Timestamp.fromDate(new Date(2024, 0, 1)),
-    endDate: null,
-    ...overrides,
-  });
+  function buildFixedCost(overrides: Partial<FixedCost>): FixedCost {
+    return {
+      name: 'Costo fijo',
+      description: '',
+      amount: 0,
+      frequency: 'monthly',
+      category: 'utilities',
+      active: true,
+      startDate: Timestamp.fromDate(new Date(2024, 0, 1)),
+      endDate: null,
+      ...overrides,
+    };
+  }
 
-  const buildSupplyExpense = (overrides: Partial<SupplyExpense>): SupplyExpense => ({
-    date: Timestamp.fromDate(new Date(2024, 4, 10)),
-    description: 'Compra',
-    items: [],
-    total: 0,
-    supplier: 'Proveedor',
-    ...overrides,
-  });
+  function buildSupplyExpense(overrides: Partial<SupplyExpense>): SupplyExpense {
+    return {
+      date: Timestamp.fromDate(new Date(2024, 4, 10)),
+      description: 'Compra',
+      items: [],
+      total: 0,
+      supplier: 'Proveedor',
+      ...overrides,
+    };
+  }
 
   describe('Month Navigation', () => {
     it('should update selectedDate when going to previous month', () => {

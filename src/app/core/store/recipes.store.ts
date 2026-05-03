@@ -15,6 +15,8 @@ export const RecipesStore = signalStore(
   withMethods((store) => {
     const fs = inject(FirestoreService);
     const ingredientsStore = inject(IngredientsStore);
+    const getErrorMessage = (error: unknown): string =>
+      error instanceof Error ? error.message : String(error);
 
     const recipes$ = fs.getCollection<Recipe>(
       'recipes',
@@ -45,8 +47,8 @@ export const RecipesStore = signalStore(
           } as RecipeInput);
           patchState(store, { loading: false });
           return id;
-        } catch (e: any) {
-          patchState(store, { loading: false, error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { loading: false, error: getErrorMessage(e) });
           throw e;
         }
       },
@@ -62,10 +64,10 @@ export const RecipesStore = signalStore(
             changes.calculatedCost = calculateRecipeCost(ings, ingredientsStore.ingredients());
             changes.suggestedPrice = calculateSuggestedPrice(changes.calculatedCost, margin);
           }
-          await fs.updateDocument('recipes', id, changes as Record<string, any>);
+          await fs.updateDocument('recipes', id, changes as Record<string, unknown>);
           patchState(store, { loading: false });
-        } catch (e: any) {
-          patchState(store, { loading: false, error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { loading: false, error: getErrorMessage(e) });
           throw e;
         }
       },
@@ -78,8 +80,8 @@ export const RecipesStore = signalStore(
             name: `${data.name} (copia)`,
             active: true,
           } as RecipeInput);
-        } catch (e: any) {
-          patchState(store, { error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { error: getErrorMessage(e) });
           throw e;
         }
       },
@@ -87,8 +89,8 @@ export const RecipesStore = signalStore(
       async deleteRecipe(id: string) {
         try {
           return await fs.softDelete('recipes', id);
-        } catch (e: any) {
-          patchState(store, { error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { error: getErrorMessage(e) });
           throw e;
         }
       },

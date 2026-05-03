@@ -49,7 +49,7 @@ describe('DialogService', () => {
     expect(injectorCreateSpy).toHaveBeenCalledTimes(1);
 
     const createConfig = injectorCreateSpy.mock.calls[0][0];
-    const providers = createConfig.providers as Array<{ provide: unknown; useValue: unknown }>;
+    const providers = createConfig.providers as { provide: unknown; useValue: unknown }[];
 
     const dataProvider = providers.find((provider) => provider.provide === DIALOG_DATA);
     const dialogRefProvider = providers.find((provider) => provider.provide === DIALOG_REF);

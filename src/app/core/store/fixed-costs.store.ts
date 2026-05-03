@@ -13,6 +13,8 @@ export const FixedCostsStore = signalStore(
 
   withMethods((store) => {
     const fs = inject(FirestoreService);
+    const getErrorMessage = (error: unknown): string =>
+      error instanceof Error ? error.message : String(error);
 
     const fixedCosts$ = fs.getCollection<FixedCost>('fixedCosts', orderBy('name', 'asc'));
     const allFixedCosts = toSignal(fixedCosts$, { initialValue: [] as FixedCost[] });
@@ -40,8 +42,8 @@ export const FixedCostsStore = signalStore(
           });
           patchState(store, { loading: false });
           return id;
-        } catch (e: any) {
-          patchState(store, { loading: false, error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { loading: false, error: getErrorMessage(e) });
           throw e;
         }
       },
@@ -49,10 +51,10 @@ export const FixedCostsStore = signalStore(
       async updateFixedCost(id: string, changes: Partial<FixedCost>) {
         patchState(store, { loading: true, error: null });
         try {
-          await fs.updateDocument('fixedCosts', id, changes as Record<string, any>);
+          await fs.updateDocument('fixedCosts', id, changes as Record<string, unknown>);
           patchState(store, { loading: false });
-        } catch (e: any) {
-          patchState(store, { loading: false, error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { loading: false, error: getErrorMessage(e) });
           throw e;
         }
       },
@@ -60,8 +62,8 @@ export const FixedCostsStore = signalStore(
       async deactivateFixedCost(id: string) {
         try {
           return await fs.updateDocument('fixedCosts', id, { active: false, endDate: Timestamp.now() });
-        } catch (e: any) {
-          patchState(store, { error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { error: getErrorMessage(e) });
           throw e;
         }
       },
@@ -69,8 +71,8 @@ export const FixedCostsStore = signalStore(
       async deleteFixedCost(id: string) {
         try {
           return await fs.deleteDocument('fixedCosts', id);
-        } catch (e: any) {
-          patchState(store, { error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { error: getErrorMessage(e) });
           throw e;
         }
       },
