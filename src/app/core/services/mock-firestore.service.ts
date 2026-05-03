@@ -8,6 +8,8 @@ import type { Customer } from '../models/customer';
 import type { FixedCost } from '../models/fixed-cost';
 import type { StockAdjustmentInput } from '../models/stock';
 
+type MockDocument = Record<string, unknown> & { id?: string; active?: boolean; endDate?: Timestamp };
+
 @Injectable()
 export class MockFirestoreService {
   private collections = new Map<string, BehaviorSubject<unknown[]>>();
@@ -30,17 +32,27 @@ export class MockFirestoreService {
 
   async updateDocument(path: string, id: string, data: Record<string, unknown>): Promise<void> {
     const col = this.getOrCreate(path);
-    col.next(col.value.map((item: any) => (item.id === id ? { ...item, ...data } : item)));
+    col.next(
+      col.value.map((item) => {
+        const doc = item as MockDocument;
+        return doc.id === id ? { ...doc, ...data } : doc;
+      }),
+    );
   }
 
   async deleteDocument(path: string, id: string): Promise<void> {
     const col = this.getOrCreate(path);
-    col.next(col.value.filter((item: any) => item.id !== id));
+    col.next(col.value.filter((item) => (item as MockDocument).id !== id));
   }
 
   async softDelete(path: string, id: string): Promise<void> {
     const col = this.getOrCreate(path);
-    col.next(col.value.map((item: any) => (item.id === id ? { ...item, active: false, endDate: Timestamp.now() } : item)));
+    col.next(
+      col.value.map((item) => {
+        const doc = item as MockDocument;
+        return doc.id === id ? { ...doc, active: false, endDate: Timestamp.now() } : doc;
+      }),
+    );
   }
 
   async applyStockAdjustments(

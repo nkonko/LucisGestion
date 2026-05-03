@@ -19,7 +19,8 @@ describe('Dashboard Utils', () => {
     });
 
     it('should return null for non-string input', () => {
-      const result = fromMonthInputValue(null as any);
+      const invalidInput = null as unknown as string;
+      const result = fromMonthInputValue(invalidInput);
       expect(result).toBeNull();
     });
 
