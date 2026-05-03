@@ -1,24 +1,21 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { filter, firstValueFrom } from 'rxjs';
+import { AuthStore } from '../store/auth.store';
 
-export const authGuard: CanActivateFn = () => {
-  const auth = inject(AuthService);
+export const authGuard: CanActivateFn = async () => {
+  const authStore = inject(AuthStore);
   const router = inject(Router);
+  const ready$ = toObservable(authStore.ready);
+  const isLoggedIn$ = toObservable(authStore.isLoggedIn);
 
-  return new Promise<boolean>((resolve) => {
-    const check = () => {
-      if (!auth.ready()) {
-        setTimeout(check, 50);
-        return;
-      }
-      if (auth.isLoggedIn()) {
-        resolve(true);
-      } else {
-        router.navigate(['/login']);
-        resolve(false);
-      }
-    };
-    check();
-  });
+  await firstValueFrom(ready$.pipe(filter((ready) => ready)));
+  const isLoggedIn = await firstValueFrom(isLoggedIn$);
+
+  if (isLoggedIn) {
+    return true;
+  }
+
+  return router.createUrlTree(['/login']);
 };

@@ -50,6 +50,12 @@
   --size-fab:                 calc(var(--space-8) + var(--space-6));
   --size-spinner:             calc(var(--space-8) + var(--space-2));
   --size-progress-height:     var(--space-2);
+  --size-layout-header-height: 34px;
+  --size-layout-header-height-compact: 24px;
+  --size-layout-brand-icon: 34px;
+  --size-layout-brand-name-font: 30px;
+  --size-layout-brand-name-max-width: 250px;
+  --size-layout-brand-icon-compact-scale: 0.75;
 
 
   // ── Z-index scale ────────────────────────────────────────────────────────────
@@ -63,6 +69,7 @@
 
   // ── Transitions ──────────────────────────────────────────────────────────────
   --transition-standard: 0.2s;
+  --transition-layout-brand-collapse: 0.32s;
 
   // ── Shadows / elevations ────────────────────────────────────────────────────
   --shadow-pressed: 0 1px 3px rgba(0, 0, 0, 0.2);

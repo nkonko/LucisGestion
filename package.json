@@ -27,6 +27,7 @@
     "@angular/router": "^21.2.0",
     "@angular/service-worker": "^21.2.11",
     "@ngrx/signals": "^21.1.0",
+    "@lucide/angular": "^1.14.0",
     "firebase": "^12.11.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
@@ -49,5 +50,8 @@
     "typescript": "~5.9.2",
     "typescript-eslint": "8.56.1",
     "vitest": "^4.0.8"
+  },
+  "overrides": {
+    "uuid": "^14.0.0"
   }
 }

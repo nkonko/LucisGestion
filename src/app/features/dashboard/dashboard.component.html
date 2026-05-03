@@ -4,20 +4,15 @@
   <button class="ui-toggle active" type="button" aria-pressed="true" (click)="store.setPeriod('month')">Mes</button>
 </div>
 
-<div class="grid grid-cols-2 gap-3 mb-6">
-  <article class="ui-card-surface touch-card text-center py-3">
-    <ui-icon name="trending_up" class="text-green-600" [decorative]="true" />
-    <div class="text-2xl font-bold">{{ monthlySales() | ars }}</div>
-    <div class="text-xs text-gray-500">Ingresos</div>
-  </article>
+<app-net-profit-card
+  class="mb-6"
+  [income]="monthlySales()"
+  [variableCosts]="monthlyExpenses()"
+  [fixedCosts]="periodFixedCosts()"
+  [netProfit]="netProfit()"
+></app-net-profit-card>
 
-  <article class="ui-card-surface touch-card text-center py-3">
-    <ui-icon name="savings" class="text-blue-600" [decorative]="true" />
-    <div class="text-2xl font-bold" [class]="netProfit() >= 0 ? 'text-blue-700' : 'text-red-600'">
-      {{ netProfit() | ars }}
-    </div>
-    <div class="text-xs text-gray-500">Ganancia neta</div>
-  </article>
+<div class="grid grid-cols-2 gap-3 mb-6">
 
   <article class="ui-card-surface touch-card text-center py-3" routerLink="/recetas">
     <ui-icon name="menu_book" class="text-purple-600" [decorative]="true" />

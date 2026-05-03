@@ -1,41 +1,19 @@
-import { Component, inject, signal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { IngredientsStore } from '../../core/store/ingredients.store';
-import { AuthService } from '../../core/services/auth.service';
-import { UiIconComponent } from '../ui/components';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { BottomNavComponent } from '../bottom-nav/bottom-nav.component';
+import { BrandHeaderComponent } from './brand-header/brand-header.component';
 
 @Component({
   selector: 'app-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, UiIconComponent],
+  imports: [RouterOutlet, BottomNavComponent, BrandHeaderComponent],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss',
-  host: {
-    '(document:click)': 'closeMenu()',
-  },
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LayoutComponent {
-  private ingredientsStore = inject(IngredientsStore);
-  readonly auth = inject(AuthService);
-  private router = inject(Router);
+  readonly isBrandCompact = signal(false);
 
-  readonly menuOpen = signal(false);
-  readonly lowStockCount = this.ingredientsStore.lowStockCount;
-
-  closeMenu(): void {
-    this.menuOpen.set(false);
-  }
-
-  toggleMenu(event: Event): void {
-    event.stopPropagation();
-    this.menuOpen.update((value) => !value);
-  }
-
-  onMenuClick(event: Event): void {
-    event.stopPropagation();
-  }
-
-  async logout(): Promise<void> {
-    await this.auth.logout();
-    this.router.navigate(['/login']);
+  onBrandCompactChanged(isCompact: boolean): void {
+    this.isBrandCompact.set(isCompact);
   }
 }

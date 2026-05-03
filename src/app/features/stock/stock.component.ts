@@ -5,9 +5,9 @@ import { IngredientsStore } from '../../core/store/ingredients.store';
 import { Ingredient } from '../../core/models/ingredient';
 import { getStockPriority } from '../../core/utils/stock.utils';
 import { IngredientFormComponent } from '../ingredients/ingredient-form.component';
-import { AuthService } from '../../core/services/auth.service';
 import { DialogService } from '../../core/services/dialog.service';
 import { UiIconComponent } from '../../shared/ui/components';
+import { AuthStore } from '../../core/store/auth.store';
 
 @Component({
   selector: 'app-stock',
@@ -18,7 +18,7 @@ import { UiIconComponent } from '../../shared/ui/components';
 })
 export class StockComponent {
   readonly store = inject(IngredientsStore);
-  readonly auth = inject(AuthService);
+  readonly auth = inject(AuthStore);
   private dialog = inject(DialogService);
   private notify = inject(NotificationService);
 
