@@ -19,7 +19,17 @@ export function toMonthInputValue(selectedDate: SelectedDate): string {
   return `${selectedDate.year}-${mm}`;
 }
 
-export function fromMonthInputValue(value: string): SelectedDate {
-  const [year, month] = value.split('-').map(Number);
+export function fromMonthInputValue(value: string): SelectedDate | null {
+  if (!value || typeof value !== 'string') return null;
+
+  const parts = value.split('-');
+  if (parts.length !== 2) return null;
+
+  const year = Number(parts[0]);
+  const month = Number(parts[1]);
+
+  if (isNaN(year) || isNaN(month)) return null;
+  if (month < 1 || month > 12) return null;
+
   return { year, month: month - 1 };
 }
