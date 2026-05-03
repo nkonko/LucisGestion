@@ -7,7 +7,7 @@ import {
   IngredientInput,
   StockMovementInput,
 } from '../models/ingredient';
-import { SupplyExpenseInput } from '../models/supply-expense';
+import { SupplyExpense, SupplyExpenseInput } from '../models/supply-expense';
 import { where, orderBy, Timestamp } from '@angular/fire/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
@@ -27,11 +27,14 @@ export const IngredientsStore = signalStore(
       orderBy('name', 'asc'),
     );
     const ingredients = toSignal(ingredients$, { initialValue: [] as Ingredient[] });
+    const supplyExpenses$ = fs.getCollection<SupplyExpense>('supplyExpenses', orderBy('date', 'desc'));
+    const supplyExpenses = toSignal(supplyExpenses$, { initialValue: [] as SupplyExpense[] });
 
     const lowStock = computed(() => ingredients().filter((i) => i.currentStock <= i.minimumStock));
 
     return {
       ingredients,
+      supplyExpenses,
       lowStock,
       lowStockCount: computed(() => lowStock().length),
       ingredientsSortedByStock: computed(() =>

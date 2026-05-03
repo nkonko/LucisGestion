@@ -1,6 +1,9 @@
 import {
   LucideBookOpenText,
+  LucideCalendarDays,
   LucideCalculator,
+  LucideChevronLeft,
+  LucideChevronRight,
   LucideCircleAlert,
   LucideCircleCheckBig,
   LucideCopy,
@@ -35,9 +38,12 @@ export const UI_ICON_FALLBACK = LucideCircleAlert.icon;
 export const UI_ICON_MAP: Record<string, LucideIconData> = {
   account_circle: LucideUserRound.icon,
   add: LucidePlus.icon,
+  calendar_month: LucideCalendarDays.icon,
   calculate: LucideCalculator.icon,
   chat: LucideMessageCircle.icon,
   check_circle: LucideCircleCheckBig.icon,
+  chevron_left: LucideChevronLeft.icon,
+  chevron_right: LucideChevronRight.icon,
   content_copy: LucideCopy.icon,
   egg: LucideEgg.icon,
   emoji_events: LucideTrophy.icon,

@@ -2,7 +2,8 @@ import { computed, inject } from '@angular/core';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
 import { FirestoreService } from '../services/firestore.service';
 import { FixedCost, FixedCostInput } from '../models/fixed-cost';
-import { where, orderBy } from '@angular/fire/firestore';
+import { orderBy } from '@angular/fire/firestore';
+import { Timestamp } from 'firebase/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BaseState } from './state/state';
 
@@ -13,20 +14,17 @@ export const FixedCostsStore = signalStore(
   withMethods((store) => {
     const fs = inject(FirestoreService);
 
-    const fixedCosts$ = fs.getCollection<FixedCost>(
-      'fixedCosts',
-      where('active', '==', true),
-      orderBy('name', 'asc'),
-    );
-    const fixedCosts = toSignal(fixedCosts$, { initialValue: [] as FixedCost[] });
+    const fixedCosts$ = fs.getCollection<FixedCost>('fixedCosts', orderBy('name', 'asc'));
+    const allFixedCosts = toSignal(fixedCosts$, { initialValue: [] as FixedCost[] });
+    const fixedCosts = computed(() => allFixedCosts().filter((cost) => cost.active));
 
     return {
+      allFixedCosts,
       fixedCosts,
 
       totalMonthlyFixedCosts: computed(() =>
         fixedCosts().reduce((sum, c) => {
           if (c.frequency === 'monthly') return sum + c.amount;
-          if (c.frequency === 'weekly') return sum + c.amount * 4;
           return sum;
         }, 0),
       ),
@@ -37,6 +35,8 @@ export const FixedCostsStore = signalStore(
           const id = await fs.addDocument<FixedCostInput>('fixedCosts', {
             ...fixedCost,
             active: true,
+            startDate: Timestamp.now(),
+            endDate: null,
           });
           patchState(store, { loading: false });
           return id;
@@ -57,9 +57,18 @@ export const FixedCostsStore = signalStore(
         }
       },
 
+      async deactivateFixedCost(id: string) {
+        try {
+          return await fs.updateDocument('fixedCosts', id, { active: false, endDate: Timestamp.now() });
+        } catch (e: any) {
+          patchState(store, { error: e.message });
+          throw e;
+        }
+      },
+
       async deleteFixedCost(id: string) {
         try {
-          return await fs.softDelete('fixedCosts', id);
+          return await fs.deleteDocument('fixedCosts', id);
         } catch (e: any) {
           patchState(store, { error: e.message });
           throw e;

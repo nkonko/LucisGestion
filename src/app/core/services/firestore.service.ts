@@ -5,6 +5,7 @@ import {
   collectionData,
   doc,
   addDoc,
+  deleteDoc,
   updateDoc,
   query,
   runTransaction,
@@ -37,6 +38,11 @@ export class FirestoreService {
     const ref = doc(this.firestore, path, id);
     const { id: _, ...dataWithoutId } = data;
     await updateDoc(ref, dataWithoutId);
+  }
+
+  async deleteDocument(path: string, id: string): Promise<void> {
+    const ref = doc(this.firestore, path, id);
+    await deleteDoc(ref);
   }
 
   async softDelete(path: string, id: string): Promise<void> {

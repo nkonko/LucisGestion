@@ -7,10 +7,12 @@ import { RecipesStore } from '../../core/store/recipes.store';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 import { UiIconComponent } from '../../shared/ui/components';
 import { NetProfitCardComponent } from './net-profit-card/net-profit-card.component';
+import { PeriodNavComponent } from './period-nav/period-nav.component';
+import { SelectedDate } from '../../core/models/dashboard';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, ArsPipe, UiIconComponent, NetProfitCardComponent],
+  imports: [RouterLink, ArsPipe, UiIconComponent, NetProfitCardComponent, PeriodNavComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,28 +29,33 @@ export class DashboardComponent {
   pendingOrders = this.salesStore.pendingOrdersCount;
   monthlySales = this.store.monthlySales;
   monthlyExpenses = this.store.monthlyExpenses;
+  periodVariableExpenses = this.store.periodVariableExpenses;
   periodFixedCosts = this.store.periodFixedCosts;
   totalPeriodExpenses = this.store.totalPeriodExpenses;
   netProfit = this.store.netProfit;
+  periodLabel = this.store.periodLabel;
+  monthInputValue = this.store.monthInputValue;
+  isCurrentMonth = this.store.isCurrentMonth;
+
+  readonly currentMonthMax = (() => {
+    const today = new Date();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    return `${today.getFullYear()}-${mm}`;
+  })();
+
   max = computed(() => Math.max(this.monthlySales(), this.totalPeriodExpenses(), 1));
 
-  incomeBarWidth = computed(() => {
-    return this.calculate(this.monthlySales());
-  });
-
-  ingredientsBarWidth = computed(() => {
-    return this.calculate(this.monthlyExpenses());
-  });
-
-  fixedCostsBarWidth = computed(() => {
-    return this.calculate(this.periodFixedCosts());
-  });
-
-  expensesBarWidth = computed(() => {
-    return this.calculate(this.totalPeriodExpenses());
-  });
+  incomeBarWidth = computed(() => this.calculate(this.monthlySales()));
+  ingredientsBarWidth = computed(() => this.calculate(this.monthlyExpenses()));
+  fixedCostsBarWidth = computed(() => this.calculate(this.periodFixedCosts()));
+  expensesBarWidth = computed(() => this.calculate(this.totalPeriodExpenses()));
 
   calculate(value: number) {
     return (value / this.max()) * 100;
   }
+
+  onMonthInputChange(date: SelectedDate) {
+    this.store.setSelectedDate(date);
+  }
 }
+
