@@ -20,7 +20,7 @@ export class BrandHeaderComponent implements OnInit {
   }
 
   onWindowScroll(): void {
-    const nextState = (globalThis.scrollY ?? 0) > COMPACT_BRAND_SCROLL_THRESHOLD;
+    const nextState = globalThis.scrollY > COMPACT_BRAND_SCROLL_THRESHOLD;
     if (nextState === this.isCompact()) {
       return;
     }
