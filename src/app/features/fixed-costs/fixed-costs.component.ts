@@ -59,14 +59,14 @@ export class FixedCostsComponent {
       data: cost,
     });
     ref.afterClosed.subscribe(async (result) => {
-      if (result === 'deactivate') {
-        await this.store.deactivateFixedCost(cost.id!);
+      if (result === 'deactivate' && cost.id) {
+        await this.store.deactivateFixedCost(cost.id);
         this.notify.success('Costo fijo dado de baja');
-      } else if (result === 'delete') {
-        await this.store.deleteFixedCost(cost.id!);
+      } else if (result === 'delete' && cost.id) {
+        await this.store.deleteFixedCost(cost.id);
         this.notify.success('Costo fijo borrado por error');
-      } else if (result) {
-        await this.store.updateFixedCost(cost.id!, result);
+      } else if (result !== 'deactivate' && result !== 'delete' && result && cost.id) {
+        await this.store.updateFixedCost(cost.id, result);
         this.notify.success('Costo fijo actualizado');
       }
     });

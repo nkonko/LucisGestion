@@ -16,9 +16,9 @@ export class PeriodNavComponent {
   currentMonthMax = input.required<string>();
   isCurrentMonth = input(false);
 
-  previousMonth = output<void>();
-  nextMonth = output<void>();
-  currentMonth = output<void>();
+  previousMonth = output();
+  nextMonth = output();
+  currentMonth = output();
   monthChange = output<SelectedDate>();
 
   onPreviousMonth(): void {
