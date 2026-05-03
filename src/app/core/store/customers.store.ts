@@ -5,6 +5,7 @@ import { Customer, CustomerInput } from '../models/customer';
 import { orderBy } from '@angular/fire/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BaseState } from './state/state';
+import { getErrorMessage } from '../utils/error.utils';
 
 export const CustomersStore = signalStore(
   { providedIn: 'root' },
@@ -12,8 +13,6 @@ export const CustomersStore = signalStore(
 
   withMethods((store) => {
     const fs = inject(FirestoreService);
-    const getErrorMessage = (error: unknown): string =>
-      error instanceof Error ? error.message : String(error);
 
     const customers$ = fs.getCollection<Customer>('customers', orderBy('name', 'asc'));
     const customers = toSignal(customers$, { initialValue: [] as Customer[] });

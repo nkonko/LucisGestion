@@ -13,6 +13,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
 import { BaseState } from './state/state';
 import { getStockPriority } from '../utils/stock.utils';
+import { getErrorMessage } from '../utils/error.utils';
 
 export const IngredientsStore = signalStore(
   { providedIn: 'root' },
@@ -20,8 +21,6 @@ export const IngredientsStore = signalStore(
 
   withMethods((store) => {
     const fs = inject(FirestoreService);
-    const getErrorMessage = (error: unknown): string =>
-      error instanceof Error ? error.message : String(error);
 
     const ingredients$ = fs.getCollection<Ingredient>(
       'ingredients',

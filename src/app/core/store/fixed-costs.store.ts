@@ -6,6 +6,7 @@ import { orderBy } from '@angular/fire/firestore';
 import { Timestamp } from 'firebase/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BaseState } from './state/state';
+import { getErrorMessage } from '../utils/error.utils';
 
 export const FixedCostsStore = signalStore(
   { providedIn: 'root' },
@@ -13,8 +14,6 @@ export const FixedCostsStore = signalStore(
 
   withMethods((store) => {
     const fs = inject(FirestoreService);
-    const getErrorMessage = (error: unknown): string =>
-      error instanceof Error ? error.message : String(error);
 
     const fixedCosts$ = fs.getCollection<FixedCost>('fixedCosts', orderBy('name', 'asc'));
     const allFixedCosts = toSignal(fixedCosts$, { initialValue: [] as FixedCost[] });
