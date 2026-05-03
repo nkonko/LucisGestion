@@ -6,9 +6,9 @@ import { Ingredient } from '../../core/models/ingredient';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 import { IngredientFormComponent } from './ingredient-form.component';
 import { PriceHistoryComponent } from './price-history.component';
-import { AuthService } from '../../core/services/auth.service';
 import { DialogService } from '../../core/services/dialog.service';
 import { UiIconComponent } from '../../shared/ui/components';
+import { AuthStore } from '../../core/store/auth.store';
 
 @Component({
   selector: 'app-ingredients',
@@ -20,7 +20,7 @@ import { UiIconComponent } from '../../shared/ui/components';
 export class IngredientsComponent {
   readonly store = inject(IngredientsStore);
   private recipesStore = inject(RecipesStore);
-  readonly auth = inject(AuthService);
+  readonly auth = inject(AuthStore);
   private dialog = inject(DialogService);
   private notify = inject(NotificationService);
 

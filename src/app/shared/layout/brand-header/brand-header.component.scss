@@ -1,0 +1,56 @@
+.layout-brand {
+  position: fixed;
+  top: var(--space-1);
+  left: var(--space-1);
+  z-index: var(--z-nav);
+  background: transparent;
+  width: fit-content;
+}
+
+.layout-brand__inner {
+  padding: 2px var(--space-1);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition:
+    padding var(--transition-layout-brand-collapse) ease,
+    gap var(--transition-layout-brand-collapse) ease;
+}
+
+.layout-brand__icon {
+  font-size: var(--size-layout-brand-icon);
+  line-height: 1;
+  transform-origin: left center;
+  transition: transform var(--transition-layout-brand-collapse) ease;
+}
+
+.layout-brand__name {
+  max-width: var(--size-layout-brand-name-max-width);
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--color-primary);
+  font-size: var(--size-layout-brand-name-font);
+  font-weight: 600;
+  line-height: 0.95;
+  opacity: 1;
+  transform: translateX(0);
+  transition:
+    max-width var(--transition-layout-brand-collapse) ease,
+    opacity var(--transition-layout-brand-collapse) ease,
+    transform var(--transition-layout-brand-collapse) ease;
+}
+
+.layout-brand__inner--compact {
+  padding: 0;
+  gap: 4px;
+}
+
+.layout-brand__inner--compact .layout-brand__icon {
+  transform: scale(var(--size-layout-brand-icon-compact-scale));
+}
+
+.layout-brand__inner--compact .layout-brand__name {
+  max-width: 0;
+  opacity: 0;
+  transform: translateX(calc(var(--space-2) * -1));
+}

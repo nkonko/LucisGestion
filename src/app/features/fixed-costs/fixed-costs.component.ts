@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { NotificationService } from '../../core/services/notification.service';
 import { FixedCostsStore } from '../../core/store/fixed-costs.store';
-import { AuthService } from '../../core/services/auth.service';
+import { AuthStore } from '../../core/store/auth.store';
 import {
   FixedCost,
   CostCategory,
@@ -22,7 +22,7 @@ import { UiIconComponent } from '../../shared/ui/components';
 })
 export class FixedCostsComponent {
   readonly store = inject(FixedCostsStore);
-  readonly auth = inject(AuthService);
+  readonly auth = inject(AuthStore);
   private dialog = inject(DialogService);
   private notify = inject(NotificationService);
 

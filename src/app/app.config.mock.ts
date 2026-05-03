@@ -1,4 +1,9 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import {
+  ApplicationConfig,
+  provideBrowserGlobalErrorListeners,
+  ENVIRONMENT_INITIALIZER,
+  inject,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -13,5 +18,12 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     { provide: FirestoreService, useClass: MockFirestoreService },
     { provide: AuthService, useClass: MockAuthService },
+    {
+      provide: ENVIRONMENT_INITIALIZER,
+      multi: true,
+      useValue: () => {
+        inject(AuthService);
+      },
+    },
   ],
 };

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { AuthStore } from '../../core/store/auth.store';
 
 @Component({
   selector: 'app-login',
@@ -11,6 +12,7 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class LoginComponent {
   private auth = inject(AuthService);
+  private authStore = inject(AuthStore);
   private router = inject(Router);
 
   loading = false;
@@ -21,7 +23,7 @@ export class LoginComponent {
     this.error = '';
     try {
       await this.auth.loginWithGoogle();
-      if (this.auth.isLoggedIn()) {
+      if (this.authStore.isLoggedIn()) {
         await this.router.navigate(['/dashboard']);
         return;
       }
