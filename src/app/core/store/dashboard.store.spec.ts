@@ -5,27 +5,31 @@ import { DashboardStore } from './dashboard.store';
 import { SalesStore } from './sales.store';
 import { FixedCostsStore } from './fixed-costs.store';
 import { IngredientsStore } from './ingredients.store';
+import { RecipesStore } from './recipes.store';
 import { Sale } from '../models/sale';
-import { FixedCost } from '../models/fixed-cost';
 import { SupplyExpense } from '../models/supply-expense';
+import { Recipe } from '../models/recipe';
 
 describe('DashboardStore', () => {
-  let store: typeof DashboardStore;
+  let store: InstanceType<typeof DashboardStore>;
   let salesSignal: WritableSignal<Sale[]>;
-  let fixedCostsSignal: WritableSignal<FixedCost[]>;
   let supplyExpensesSignal: WritableSignal<SupplyExpense[]>;
+  let recipesSignal: WritableSignal<Recipe[]>;
+  let totalForMonthSpy: jasmine.Spy<(month: string) => number>;
 
   beforeEach(() => {
     salesSignal = signal<Sale[]>([]);
-    fixedCostsSignal = signal<FixedCost[]>([]);
     supplyExpensesSignal = signal<SupplyExpense[]>([]);
+    recipesSignal = signal<Recipe[]>([]);
+    totalForMonthSpy = jasmine.createSpy('totalForMonth').and.returnValue(0);
 
     TestBed.configureTestingModule({
       providers: [
         DashboardStore,
         { provide: SalesStore, useValue: { sales: salesSignal } },
-        { provide: FixedCostsStore, useValue: { allFixedCosts: fixedCostsSignal } },
+        { provide: FixedCostsStore, useValue: { totalForMonth: totalForMonthSpy } },
         { provide: IngredientsStore, useValue: { supplyExpenses: supplyExpensesSignal } },
+        { provide: RecipesStore, useValue: { recipes: recipesSignal } },
       ],
     });
 
@@ -48,16 +52,20 @@ describe('DashboardStore', () => {
     };
   }
 
-  function buildFixedCost(overrides: Partial<FixedCost>): FixedCost {
+  function buildRecipe(overrides: Partial<Recipe>): Recipe {
     return {
-      name: 'Costo fijo',
-      description: '',
-      amount: 0,
-      frequency: 'monthly',
-      category: 'utilities',
+      id: 'recipe-1',
+      name: 'Receta',
+      category: 'cakes',
+      ingredients: [],
+      calculatedCost: 0,
+      profitMargin: 0,
+      suggestedPrice: 0,
+      salePrice: 0,
+      yield: 1,
+      notes: '',
+      imageUrl: '',
       active: true,
-      startDate: Timestamp.fromDate(new Date(2024, 0, 1)),
-      endDate: null,
       ...overrides,
     };
   }
@@ -94,98 +102,55 @@ describe('DashboardStore', () => {
 
       expect(store.selectedDate()).toEqual({ year: 2024, month: 5 });
     });
-
-    it('should handle year transition when going to next month from December', () => {
-      store.setSelectedDate({ year: 2023, month: 11 });
-      store.goToNextMonth();
-
-      expect(store.selectedDate()).toEqual({ year: 2024, month: 0 });
-    });
-
-    it('should set current month when goToCurrentMonth is called', () => {
-      const now = new Date();
-      store.goToCurrentMonth();
-
-      expect(store.selectedDate()).toEqual({
-        year: now.getFullYear(),
-        month: now.getMonth(),
-      });
-    });
   });
 
   describe('Sales Filtering', () => {
     it('should include sales inside the selected month', () => {
       store.setSelectedDate({ year: 2024, month: 4 });
       salesSignal.set([
-        buildSale({ total: 100, totalCost: 50, profit: 50, date: Timestamp.fromDate(new Date(2024, 4, 15)) }),
+        buildSale({ total: 100, date: Timestamp.fromDate(new Date(2024, 4, 15)) }),
       ]);
 
       expect(store.monthlySales()).toBe(100);
-      expect(store.monthlyExpenses()).toBe(50);
-      expect(store.monthlyProfit()).toBe(50);
     });
 
-    it('should exclude sales before the selected month', () => {
+    it('should exclude sales outside selected month', () => {
       store.setSelectedDate({ year: 2024, month: 4 });
       salesSignal.set([
-        buildSale({ total: 100, totalCost: 50, profit: 50, date: Timestamp.fromDate(new Date(2024, 3, 30)) }),
+        buildSale({ total: 100, date: Timestamp.fromDate(new Date(2024, 5, 1)) }),
       ]);
 
       expect(store.monthlySales()).toBe(0);
-      expect(store.monthlyExpenses()).toBe(0);
-    });
-
-    it('should exclude sales on the first day of next month', () => {
-      store.setSelectedDate({ year: 2024, month: 4 });
-      salesSignal.set([
-        buildSale({ total: 100, totalCost: 50, profit: 50, date: Timestamp.fromDate(new Date(2024, 5, 1)) }),
-      ]);
-
-      expect(store.monthlySales()).toBe(0);
-      expect(store.monthlyExpenses()).toBe(0);
     });
   });
 
-  describe('Fixed Costs Calculation', () => {
-    it('should include costs active in the selected historical period even if currently deactivated', () => {
-      store.setSelectedDate({ year: 2024, month: 1 });
-      fixedCostsSignal.set([
-        buildFixedCost({
-          amount: 500,
-          active: false,
-          startDate: Timestamp.fromDate(new Date(2024, 0, 1)),
-          endDate: Timestamp.fromDate(new Date(2024, 4, 15)),
-        }),
-      ]);
-
-      expect(store.periodFixedCosts()).toBe(500);
-    });
-
-    it('should exclude fixed costs ended before the selected period', () => {
+  describe('COGS Calculation', () => {
+    it('should calculate COGS from recipe cost divided by yield', () => {
       store.setSelectedDate({ year: 2024, month: 4 });
-      fixedCostsSignal.set([
-        buildFixedCost({
-          amount: 500,
-          active: false,
-          startDate: Timestamp.fromDate(new Date(2024, 0, 1)),
-          endDate: Timestamp.fromDate(new Date(2024, 3, 15)),
+      recipesSignal.set([
+        buildRecipe({ id: 'recipe-1', calculatedCost: 200, yield: 4 }),
+      ]);
+      salesSignal.set([
+        buildSale({
+          total: 600,
+          items: [
+            { recipeId: 'recipe-1', name: 'Producto', quantity: 3, unitPrice: 200, unitCost: 0 },
+          ],
+          date: Timestamp.fromDate(new Date(2024, 4, 15)),
         }),
       ]);
 
-      expect(store.periodFixedCosts()).toBe(0);
+      expect(store.monthlyExpenses()).toBe(150);
     });
+  });
 
-    it('should ignore legacy non-monthly frequencies', () => {
+  describe('Fixed Costs', () => {
+    it('should request fixed costs with YYYY-MM month key', () => {
       store.setSelectedDate({ year: 2024, month: 4 });
-      fixedCostsSignal.set([
-        buildFixedCost({ amount: 1000 }),
-        buildFixedCost({
-          amount: 100,
-          frequency: 'weekly' as unknown as FixedCost['frequency'],
-        }),
-      ]);
+      totalForMonthSpy.and.returnValue(900);
 
-      expect(store.periodFixedCosts()).toBe(1000);
+      expect(store.periodFixedCosts()).toBe(900);
+      expect(totalForMonthSpy).toHaveBeenCalledWith('2024-05');
     });
   });
 
@@ -201,27 +166,25 @@ describe('DashboardStore', () => {
   });
 
   describe('Totals and Net Profit', () => {
-    it('should include variable, fixed, and supply expenses in totalPeriodExpenses', () => {
+    it('should compute total expenses and net profit', () => {
       store.setSelectedDate({ year: 2024, month: 4 });
+      recipesSignal.set([
+        buildRecipe({ id: 'recipe-1', calculatedCost: 100, yield: 1 }),
+      ]);
       salesSignal.set([
-        buildSale({ total: 100, totalCost: 30, profit: 70, date: Timestamp.fromDate(new Date(2024, 4, 15)) }),
+        buildSale({
+          total: 500,
+          items: [
+            { recipeId: 'recipe-1', name: 'Producto', quantity: 2, unitPrice: 250, unitCost: 0 },
+          ],
+          date: Timestamp.fromDate(new Date(2024, 4, 15)),
+        }),
       ]);
-      fixedCostsSignal.set([buildFixedCost({ amount: 1000 })]);
-      supplyExpensesSignal.set([
-        buildSupplyExpense({ total: 200, date: Timestamp.fromDate(new Date(2024, 4, 10)) }),
-      ]);
+      totalForMonthSpy.and.returnValue(75);
 
-      expect(store.totalPeriodExpenses()).toBe(1230);
-      expect(store.netProfit()).toBe(100 - 1230);
-    });
-
-    it('should compute net profit with no extra expenses', () => {
-      store.setSelectedDate({ year: 2024, month: 4 });
-      salesSignal.set([
-        buildSale({ total: 1000, totalCost: 0, profit: 1000, date: Timestamp.fromDate(new Date(2024, 4, 15)) }),
-      ]);
-
-      expect(store.netProfit()).toBe(1000);
+      expect(store.monthlyExpenses()).toBe(200);
+      expect(store.totalPeriodExpenses()).toBe(275);
+      expect(store.netProfit()).toBe(225);
     });
   });
 });

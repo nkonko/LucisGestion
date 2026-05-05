@@ -4,11 +4,13 @@ import { DashboardStore } from '../../core/store/dashboard.store';
 import { IngredientsStore } from '../../core/store/ingredients.store';
 import { SalesStore } from '../../core/store/sales.store';
 import { RecipesStore } from '../../core/store/recipes.store';
+import { CustomersStore } from '../../core/store/customers.store';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 import { UiIconComponent } from '../../shared/ui/components';
 import { NetProfitCardComponent } from './net-profit-card/net-profit-card.component';
 import { PeriodNavComponent } from './period-nav/period-nav.component';
 import { SelectedDate } from '../../core/models/dashboard';
+import { SALE_STATUS_DISPLAY, SaleStatus } from '../../core/models/sale';
 
 @Component({
   selector: 'app-dashboard',
@@ -22,6 +24,7 @@ export class DashboardComponent {
   private ingredientsStore = inject(IngredientsStore);
   private salesStore = inject(SalesStore);
   private recipesStore = inject(RecipesStore);
+  private customersStore = inject(CustomersStore);
 
   lowStock = this.ingredientsStore.lowStock;
   totalRecipes = this.recipesStore.totalRecipes;
@@ -50,8 +53,21 @@ export class DashboardComponent {
   fixedCostsBarWidth = computed(() => this.calculate(this.periodFixedCosts()));
   expensesBarWidth = computed(() => this.calculate(this.totalPeriodExpenses()));
 
+  readonly statusDisplay = SALE_STATUS_DISPLAY;
+  readonly customersById = computed(
+    () => new Map(this.customersStore.customers().map((customer) => [customer.id, customer.name] as const)),
+  );
+
   calculate(value: number) {
     return (value / this.max()) * 100;
+  }
+
+  getCustomerName(customerId: string): string {
+    return this.customersById().get(customerId) ?? 'Cliente eliminado';
+  }
+
+  getStatusLabel(status: SaleStatus): string {
+    return this.statusDisplay[status];
   }
 
   onMonthInputChange(date: SelectedDate) {
