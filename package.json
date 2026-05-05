@@ -13,7 +13,8 @@
     "test:mock": "node scripts/test-mock.mjs",
     "test:ci": "node scripts/test-mock.mjs",
     "screenshot:mock": "node scripts/capture-mock.mjs",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "release": "node scripts/create-release.mjs"
   },
   "private": true,
   "packageManager": "npm@11.11.1",
