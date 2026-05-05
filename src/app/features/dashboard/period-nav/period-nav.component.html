@@ -1,0 +1,46 @@
+<nav class="period-nav" aria-label="Navegación de período">
+  <button
+    type="button"
+    class="period-nav__arrow"
+    aria-label="Mes anterior"
+    (click)="onPreviousMonth()"
+  >
+    <ui-icon name="chevron_left" [size]="20" [decorative]="true" />
+  </button>
+
+  <label class="sr-only" for="period-month-input">Seleccionar mes y año</label>
+  <div class="period-nav__picker">
+    <ui-icon name="calendar_month" class="period-nav__picker-icon" [size]="18" [decorative]="true" />
+    <span class="period-nav__label">{{ periodLabel() }}</span>
+    <input
+      id="period-month-input"
+      type="month"
+      class="period-nav__native-input"
+      [value]="monthInputValue()"
+      [max]="currentMonthMax()"
+      (change)="onMonthChange($event)"
+      aria-label="Período seleccionado"
+    />
+  </div>
+
+  <button
+    type="button"
+    class="period-nav__arrow"
+    aria-label="Mes siguiente"
+    [disabled]="isCurrentMonth()"
+    (click)="onNextMonth()"
+  >
+    <ui-icon name="chevron_right" [size]="20" [decorative]="true" />
+  </button>
+
+  @if (!isCurrentMonth()) {
+    <button
+      type="button"
+      class="period-nav__today"
+      aria-label="Ir al mes actual"
+      (click)="onCurrentMonth()"
+    >
+      Hoy
+    </button>
+  }
+</nav>
