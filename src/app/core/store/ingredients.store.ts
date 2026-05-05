@@ -7,12 +7,13 @@ import {
   IngredientInput,
   StockMovementInput,
 } from '../models/ingredient';
-import { SupplyExpenseInput } from '../models/supply-expense';
+import { SupplyExpense, SupplyExpenseInput } from '../models/supply-expense';
 import { where, orderBy, Timestamp } from '@angular/fire/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
 import { BaseState } from './state/state';
 import { getStockPriority } from '../utils/stock.utils';
+import { getErrorMessage } from '../utils/error.utils';
 
 export const IngredientsStore = signalStore(
   { providedIn: 'root' },
@@ -27,11 +28,14 @@ export const IngredientsStore = signalStore(
       orderBy('name', 'asc'),
     );
     const ingredients = toSignal(ingredients$, { initialValue: [] as Ingredient[] });
+    const supplyExpenses$ = fs.getCollection<SupplyExpense>('supplyExpenses', orderBy('date', 'desc'));
+    const supplyExpenses = toSignal(supplyExpenses$, { initialValue: [] as SupplyExpense[] });
 
     const lowStock = computed(() => ingredients().filter((i) => i.currentStock <= i.minimumStock));
 
     return {
       ingredients,
+      supplyExpenses,
       lowStock,
       lowStockCount: computed(() => lowStock().length),
       ingredientsSortedByStock: computed(() =>
@@ -47,8 +51,8 @@ export const IngredientsStore = signalStore(
           } as IngredientInput);
           patchState(store, { loading: false });
           return id;
-        } catch (e: any) {
-          patchState(store, { loading: false, error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { loading: false, error: getErrorMessage(e) });
           throw e;
         }
       },
@@ -56,7 +60,7 @@ export const IngredientsStore = signalStore(
       async updateIngredient(id: string, changes: Partial<Ingredient>) {
         patchState(store, { loading: true, error: null });
         try {
-          await fs.updateDocument('ingredients', id, changes as Record<string, any>);
+          await fs.updateDocument('ingredients', id, changes as Record<string, unknown>);
 
           // Record price history if price changed
           if (changes.unitPrice !== undefined) {
@@ -77,8 +81,8 @@ export const IngredientsStore = signalStore(
           }
 
           patchState(store, { loading: false });
-        } catch (e: any) {
-          patchState(store, { loading: false, error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { loading: false, error: getErrorMessage(e) });
           throw e;
         }
       },
@@ -86,8 +90,8 @@ export const IngredientsStore = signalStore(
       async deleteIngredient(id: string) {
         try {
           return await fs.softDelete('ingredients', id);
-        } catch (e: any) {
-          patchState(store, { error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { error: getErrorMessage(e) });
           throw e;
         }
       },
@@ -120,8 +124,8 @@ export const IngredientsStore = signalStore(
 
           patchState(store, { loading: false });
           return expenseId;
-        } catch (e: any) {
-          patchState(store, { loading: false, error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { loading: false, error: getErrorMessage(e) });
           throw e;
         }
       },
