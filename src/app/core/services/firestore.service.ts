@@ -5,6 +5,7 @@ import {
   collectionData,
   doc,
   addDoc,
+  deleteDoc,
   updateDoc,
   query,
   runTransaction,
@@ -20,23 +21,28 @@ export type { StockAdjustmentInput };
 export class FirestoreService {
   private firestore = inject(Firestore);
 
-  getCollection<T>(path: string, ...constraints: QueryConstraint[]): Observable<T[]> {
+  getCollection<T extends { id?: string }>(path: string, ...constraints: QueryConstraint[]): Observable<T[]> {
     const ref = collection(this.firestore, path) as CollectionReference<T>;
     const q = constraints.length > 0 ? query(ref, ...constraints) : ref;
-    return collectionData(q, { idField: 'id' as any }) as Observable<T[]>;
+    return collectionData(q, { idField: 'id' }) as Observable<T[]>;
   }
 
-  async addDocument<T extends Record<string, any>>(path: string, data: T): Promise<string> {
+  async addDocument<T extends object>(path: string, data: T): Promise<string> {
     const ref = collection(this.firestore, path);
-    const { id, ...dataWithoutId } = data;
-    const docRef = await addDoc(ref, dataWithoutId);
+    const { id: _, ...dataWithoutId } = data as T & { id?: unknown };
+    const docRef = await addDoc(ref, dataWithoutId as Record<string, unknown>);
     return docRef.id;
   }
 
-  async updateDocument(path: string, id: string, data: Record<string, any>): Promise<void> {
+  async updateDocument(path: string, id: string, data: Record<string, unknown>): Promise<void> {
     const ref = doc(this.firestore, path, id);
     const { id: _, ...dataWithoutId } = data;
     await updateDoc(ref, dataWithoutId);
+  }
+
+  async deleteDocument(path: string, id: string): Promise<void> {
+    const ref = doc(this.firestore, path, id);
+    await deleteDoc(ref);
   }
 
   async softDelete(path: string, id: string): Promise<void> {

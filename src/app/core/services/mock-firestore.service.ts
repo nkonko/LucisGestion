@@ -8,6 +8,8 @@ import type { Customer } from '../models/customer';
 import type { FixedCost } from '../models/fixed-cost';
 import type { StockAdjustmentInput } from '../models/stock';
 
+type MockDocument = Record<string, unknown> & { id?: string; active?: boolean; endDate?: Timestamp };
+
 @Injectable()
 export class MockFirestoreService {
   private collections = new Map<string, BehaviorSubject<unknown[]>>();
@@ -30,12 +32,27 @@ export class MockFirestoreService {
 
   async updateDocument(path: string, id: string, data: Record<string, unknown>): Promise<void> {
     const col = this.getOrCreate(path);
-    col.next(col.value.map((item: any) => (item.id === id ? { ...item, ...data } : item)));
+    col.next(
+      col.value.map((item) => {
+        const doc = item as MockDocument;
+        return doc.id === id ? { ...doc, ...data } : doc;
+      }),
+    );
+  }
+
+  async deleteDocument(path: string, id: string): Promise<void> {
+    const col = this.getOrCreate(path);
+    col.next(col.value.filter((item) => (item as MockDocument).id !== id));
   }
 
   async softDelete(path: string, id: string): Promise<void> {
     const col = this.getOrCreate(path);
-    col.next(col.value.filter((item: any) => item.id !== id));
+    col.next(
+      col.value.map((item) => {
+        const doc = item as MockDocument;
+        return doc.id === id ? { ...doc, active: false, endDate: Timestamp.now() } : doc;
+      }),
+    );
   }
 
   async applyStockAdjustments(
@@ -425,7 +442,32 @@ export class MockFirestoreService {
     this.getOrCreate('sales').next(sales);
     this.getOrCreate('priceHistory').next([]);
     this.getOrCreate('stockMovements').next([]);
-    this.getOrCreate('supplyExpenses').next([]);
+    this.getOrCreate('supplyExpenses').next([
+      {
+        id: 'sup-1',
+        date: ts(2026, 4, 2),
+        description: 'Compra semanal mayorista',
+        supplier: 'Distribuidora Centro',
+        total: 32000,
+        items: [],
+      },
+      {
+        id: 'sup-2',
+        date: ts(2026, 3, 18),
+        description: 'Reposicion de lácteos y chocolates',
+        supplier: 'Mercado Norte',
+        total: 24500,
+        items: [],
+      },
+      {
+        id: 'sup-3',
+        date: ts(2026, 2, 10),
+        description: 'Compra mensual de secos',
+        supplier: 'Proveedor Sur',
+        total: 18750,
+        items: [],
+      },
+    ]);
 
     // --- Fixed Costs ---------------------------------------------------------
     const fixedCosts: FixedCost[] = [
@@ -437,6 +479,8 @@ export class MockFirestoreService {
         frequency: 'monthly',
         category: 'rent',
         active: true,
+        startDate: ts(2026, 1, 1),
+        endDate: null,
       },
       {
         id: 'cf-2',
@@ -446,6 +490,8 @@ export class MockFirestoreService {
         frequency: 'monthly',
         category: 'utilities',
         active: true,
+        startDate: ts(2026, 1, 1),
+        endDate: null,
       },
       {
         id: 'cf-3',
@@ -455,6 +501,8 @@ export class MockFirestoreService {
         frequency: 'monthly',
         category: 'utilities',
         active: true,
+        startDate: ts(2026, 1, 1),
+        endDate: null,
       },
       {
         id: 'cf-4',
@@ -464,6 +512,8 @@ export class MockFirestoreService {
         frequency: 'monthly',
         category: 'utilities',
         active: true,
+        startDate: ts(2026, 1, 1),
+        endDate: null,
       },
       {
         id: 'cf-5',
@@ -473,6 +523,8 @@ export class MockFirestoreService {
         frequency: 'monthly',
         category: 'taxes',
         active: true,
+        startDate: ts(2026, 1, 1),
+        endDate: null,
       },
       {
         id: 'cf-6',
@@ -482,6 +534,8 @@ export class MockFirestoreService {
         frequency: 'monthly',
         category: 'other',
         active: true,
+        startDate: ts(2026, 1, 1),
+        endDate: null,
       },
     ];
     this.getOrCreate('fixedCosts').next(fixedCosts);

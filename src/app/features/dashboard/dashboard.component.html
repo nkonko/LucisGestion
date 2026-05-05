@@ -1,13 +1,22 @@
 <h2 class="text-xl font-semibold mb-4">Hola! 👋</h2>
 
-<div class="ui-toggle-group mb-4">
-  <button class="ui-toggle active" type="button" aria-pressed="true" (click)="store.setPeriod('month')">Mes</button>
-</div>
+<app-period-nav
+  class="mb-4"
+  [periodLabel]="periodLabel()"
+  [monthInputValue]="monthInputValue()"
+  [currentMonthMax]="currentMonthMax"
+  [isCurrentMonth]="isCurrentMonth()"
+  (previousMonth)="store.goToPreviousMonth()"
+  (nextMonth)="store.goToNextMonth()"
+  (currentMonth)="store.goToCurrentMonth()"
+  (monthChange)="onMonthInputChange($event)"
+/>
 
 <app-net-profit-card
   class="mb-6"
+  [periodLabel]="periodLabel()"
   [income]="monthlySales()"
-  [variableCosts]="monthlyExpenses()"
+  [variableCosts]="periodVariableExpenses()"
   [fixedCosts]="periodFixedCosts()"
   [netProfit]="netProfit()"
 ></app-net-profit-card>
@@ -20,7 +29,7 @@
     <div class="text-xs text-gray-500">Recetas activas</div>
   </article>
 
-  <article class="ui-card-surface touch-card text-center py-3" routerLink="/ventas">
+  <article class="ui-card-surface touch-card text-center py-3" routerLink="/pedidos">
     <ui-icon name="pending_actions" class="text-orange-600" [decorative]="true" />
     <div class="text-2xl font-bold">{{ pendingOrders() }}</div>
     <div class="text-xs text-gray-500">Pedidos pendientes</div>
@@ -47,7 +56,7 @@
   </div>
   <div class="border-t border-dashed border-gray-200"></div>
   <div class="flex items-center gap-2 py-2">
-    <span class="text-xs w-20 text-gray-500 shrink-0">Ingredientes</span>
+    <span class="text-xs w-20 text-gray-500 shrink-0">C. ventas</span>
     <div class="flex-1 ui-progress"><div class="ui-progress__bar bg-orange-400" [style.width.%]="ingredientsBarWidth()"></div></div>
     <span class="text-xs w-24 text-right font-medium shrink-0">{{ monthlyExpenses() | ars }}</span>
   </div>
@@ -85,14 +94,14 @@
 }
 
 @if (recentSales().length > 0) {
-  <h3 class="text-base font-medium mb-2">Últimas ventas</h3>
+  <h3 class="text-base font-medium mb-2">Últimos pedidos</h3>
   <section class="ui-card-surface ui-list">
     @for (sale of recentSales(); track sale.id) {
       <article class="ui-list-item">
         <ui-icon name="receipt" [size]="18" [decorative]="true" />
         <div class="flex items-center justify-between gap-2">
-          <span>{{ sale.customerName || 'Sin cliente' }} — {{ sale.total | ars }}</span>
-          <span class="ui-chip-static" [class]="sale.status === 'pending' ? 'stock-warning' : 'stock-ok'">{{ sale.status }}</span>
+          <span>{{ getCustomerName(sale.customerId) }} — {{ sale.total | ars }}</span>
+          <span class="ui-chip-static" [class]="sale.status === 'delivered' ? 'stock-ok' : sale.status === 'in_production' ? 'stock-warning' : 'stock-danger'">{{ getStatusLabel(sale.status) }}</span>
         </div>
       </article>
     }

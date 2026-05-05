@@ -3,9 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CurrencyPipe } from '@angular/common';
 import {
   FixedCost,
-  CostFrequency,
   CostCategory,
-  FREQUENCY_DISPLAY,
   COST_CATEGORY_DISPLAY,
   FixedCostInputForm,
 } from '../../core/models/fixed-cost';
@@ -19,7 +17,7 @@ import { DialogRef } from '../../core/models/dialog/dialog-ref.model';
   styleUrl: './fixed-cost-form.component.scss',
 })
 export class FixedCostFormComponent {
-  private dialogRef = inject(DIALOG_REF) as DialogRef<FixedCost | 'delete'>;
+  private dialogRef = inject(DIALOG_REF) as DialogRef<FixedCost | 'deactivate' | 'delete'>;
   private data = inject(DIALOG_DATA) as FixedCost | null;
 
   isEdit = !!this.data;
@@ -28,14 +26,9 @@ export class FixedCostFormComponent {
     name: this.data?.name ?? '',
     description: this.data?.description ?? '',
     amount: this.data?.amount ?? 0,
-    frequency: this.data?.frequency ?? 'monthly',
+    frequency: 'monthly',
     category: this.data?.category ?? 'other',
   };
-
-  frequencies = Object.entries(FREQUENCY_DISPLAY).map(([key, label]) => ({
-    key: key as CostFrequency,
-    label,
-  }));
 
   categories = Object.entries(COST_CATEGORY_DISPLAY).map(([key, label]) => ({
     key: key as CostCategory,
@@ -43,10 +36,7 @@ export class FixedCostFormComponent {
   }));
 
   monthlyEquivalent(): number {
-    const { amount, frequency } = this.form;
-    if (frequency === 'monthly') return amount;
-    if (frequency === 'weekly') return amount * 4;
-    return amount;
+    return this.form.amount;
   }
 
   isValid(): boolean {
@@ -55,7 +45,7 @@ export class FixedCostFormComponent {
 
   save(): void {
     if (this.isValid()) {
-      this.dialogRef.close({ ...this.form, active: true });
+      this.dialogRef.close({ ...this.form, frequency: 'monthly', active: true });
     }
   }
 
@@ -63,7 +53,11 @@ export class FixedCostFormComponent {
     this.dialogRef.close(undefined);
   }
 
-  remove(): void {
+  deactivate(): void {
+    this.dialogRef.close('deactivate');
+  }
+
+  deleteByError(): void {
     this.dialogRef.close('delete');
   }
 }
