@@ -5,12 +5,15 @@
   <label class="ui-field"><span>Categoría</span><select class="ui-select" [(ngModel)]="form.category" required>@for (c of categories; track c.key) {<option [value]="c.key">{{ c.label }}</option>}</select></label>
   <div class="grid grid-cols-2 gap-3">
     <label class="ui-field"><span>Monto</span><input class="ui-input" type="number" [(ngModel)]="form.amount" min="0" required /></label>
-    <label class="ui-field"><span>Frecuencia</span><select class="ui-select" [(ngModel)]="form.frequency" required>@for (f of frequencies; track f.key) {<option [value]="f.key">{{ f.label }}</option>}</select></label>
+    <label class="ui-field"><span>Frecuencia</span><input class="ui-input" value="Mensual" disabled aria-label="Frecuencia mensual" /></label>
   </div>
   <p class="text-xs text-gray-400 -mt-1">Equivale a <strong>{{ monthlyEquivalent() | currency: 'ARS' : 'symbol' : '1.0-0' }}/mes</strong></p>
 </div>
 <div class="flex justify-end gap-2 mt-4">
-  @if (isEdit) { <button class="ui-btn ui-btn-danger" type="button" (click)="remove()">Eliminar</button> }
+  @if (isEdit) {
+    <button class="ui-btn" type="button" (click)="deactivate()">Dar de baja</button>
+    <button class="ui-btn ui-btn-danger" type="button" (click)="deleteByError()">Borrar por error</button>
+  }
   <button class="ui-btn" type="button" (click)="cancel()">Cancelar</button>
   <button class="ui-btn ui-btn-primary" type="button" (click)="save()" [disabled]="!isValid()">{{ isEdit ? 'Guardar' : 'Crear' }}</button>
 </div>

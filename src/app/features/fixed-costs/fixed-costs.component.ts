@@ -5,7 +5,6 @@ import { AuthStore } from '../../core/store/auth.store';
 import {
   FixedCost,
   CostCategory,
-  FREQUENCY_DISPLAY,
   COST_CATEGORY_DISPLAY,
 } from '../../core/models/fixed-cost';
 import { FixedCostFormComponent } from './fixed-cost-form.component';
@@ -37,17 +36,8 @@ export class FixedCostsComponent {
     return Array.from(map.entries()).map(([category, items]) => ({ category, items }));
   }
 
-  frequencyLabel(f: FixedCost['frequency']): string {
-    return FREQUENCY_DISPLAY[f];
-  }
-
   categoryLabel(c: CostCategory): string {
     return COST_CATEGORY_DISPLAY[c];
-  }
-
-  monthlyAmount(c: FixedCost): number {
-    if (c.frequency === 'weekly') return c.amount * 4;
-    return c.amount;
   }
 
   create(): void {
@@ -64,16 +54,19 @@ export class FixedCostsComponent {
   }
 
   edit(cost: FixedCost): void {
-    const ref = this.dialog.open<FixedCost, FixedCost | 'delete'>(FixedCostFormComponent, {
+    const ref = this.dialog.open<FixedCost, FixedCost | 'deactivate' | 'delete'>(FixedCostFormComponent, {
       maxWidth: '480px',
       data: cost,
     });
     ref.afterClosed.subscribe(async (result) => {
-      if (result === 'delete') {
-        await this.store.deleteFixedCost(cost.id!);
-        this.notify.success('Costo fijo eliminado');
-      } else if (result) {
-        await this.store.updateFixedCost(cost.id!, result);
+      if (result === 'deactivate' && cost.id) {
+        await this.store.deactivateFixedCost(cost.id);
+        this.notify.success('Costo fijo dado de baja');
+      } else if (result === 'delete' && cost.id) {
+        await this.store.deleteFixedCost(cost.id);
+        this.notify.success('Costo fijo borrado por error');
+      } else if (result !== 'deactivate' && result !== 'delete' && result && cost.id) {
+        await this.store.updateFixedCost(cost.id, result);
         this.notify.success('Costo fijo actualizado');
       }
     });

@@ -5,6 +5,7 @@ import { Customer, CustomerInput } from '../models/customer';
 import { orderBy } from '@angular/fire/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BaseState } from './state/state';
+import { getErrorMessage } from '../utils/error.utils';
 
 export const CustomersStore = signalStore(
   { providedIn: 'root' },
@@ -22,8 +23,8 @@ export const CustomersStore = signalStore(
       async createCustomer(customer: CustomerInput) {
         try {
           return await fs.addDocument('customers', customer);
-        } catch (e: any) {
-          patchState(store, { error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { error: getErrorMessage(e) });
           throw e;
         }
       },
@@ -31,8 +32,8 @@ export const CustomersStore = signalStore(
       async updateCustomer(id: string, changes: Partial<Customer>) {
         try {
           return await fs.updateDocument('customers', id, changes);
-        } catch (e: any) {
-          patchState(store, { error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { error: getErrorMessage(e) });
           throw e;
         }
       },
@@ -40,8 +41,8 @@ export const CustomersStore = signalStore(
       async deleteCustomer(id: string) {
         try {
           return await fs.updateDocument('customers', id, { name: '[eliminado]' });
-        } catch (e: any) {
-          patchState(store, { error: e.message });
+        } catch (e: unknown) {
+          patchState(store, { error: getErrorMessage(e) });
           throw e;
         }
       },
