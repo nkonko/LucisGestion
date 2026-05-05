@@ -70,6 +70,9 @@ export class DashboardComponent {
   }
 
   getStatusLabel(status: SaleStatus): string {
+    if (typeof status !== 'string' || !(status in this.statusDisplay)) {
+      return status;
+    }
     return this.statusDisplay[status];
   }
 
