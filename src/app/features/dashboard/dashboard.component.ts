@@ -63,6 +63,9 @@ export class DashboardComponent {
   }
 
   getCustomerName(customerId: string): string {
+    if (typeof customerId !== 'string' || !customerId.trim()) {
+      return 'Cliente eliminado';
+    }
     return this.customersById().get(customerId) ?? 'Cliente eliminado';
   }
 
