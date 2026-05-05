@@ -70,10 +70,11 @@ export class DashboardComponent {
   }
 
   getStatusLabel(status: SaleStatus): string {
-    if (typeof status !== 'string' || !(status in this.statusDisplay)) {
-      return status;
+    const statuses = Object.keys(this.statusDisplay) as SaleStatus[];
+    if (statuses.includes(status)) {
+      return this.statusDisplay[status];
     }
-    return this.statusDisplay[status];
+    return status;
   }
 
   onMonthInputChange(date: SelectedDate) {
