@@ -1,0 +1,42 @@
+name: Firebase Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_id:
+        description: "Firebase Hosting version ID to promote to live"
+        required: true
+        type: string
+      site_id:
+        description: "Firebase Hosting site ID"
+        required: true
+        default: "lucis-gestion"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Install Firebase CLI
+        run: npm install --global firebase-tools
+
+      - name: Roll back live Hosting to selected version
+        run: |
+          firebase hosting:clone "${{ github.event.inputs.site_id }}:@${{ github.event.inputs.version_id }}" "${{ github.event.inputs.site_id }}:live" --project "${{ secrets.FIREBASE_PROJECT_ID }}" --non-interactive
