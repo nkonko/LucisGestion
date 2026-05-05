@@ -1,3 +1,4 @@
+import { Timestamp } from 'firebase/firestore';
 import type { CostFrequency } from './cost-frequency.model';
 import type { CostCategory } from './cost-category.model';
 
@@ -9,6 +10,8 @@ export interface FixedCost {
   frequency: CostFrequency;
   category: CostCategory;
   active: boolean;
+  startDate?: Timestamp;
+  endDate?: Timestamp | null;
 }
 
 export type FixedCostInput = Omit<FixedCost, 'id'>;
