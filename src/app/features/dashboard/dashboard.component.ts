@@ -70,11 +70,16 @@ export class DashboardComponent {
   }
 
   getStatusLabel(status: SaleStatus): string {
-    const statuses = Object.keys(this.statusDisplay) as SaleStatus[];
-    if (statuses.includes(status)) {
-      return this.statusDisplay[status];
+    switch (status) {
+      case 'pending':
+        return this.statusDisplay.pending;
+      case 'in_production':
+        return this.statusDisplay.in_production;
+      case 'delivered':
+        return this.statusDisplay.delivered;
+      default:
+        return status;
     }
-    return status;
   }
 
   onMonthInputChange(date: SelectedDate) {
