@@ -5,12 +5,21 @@ import { of } from 'rxjs';
 import { Timestamp } from 'firebase/firestore';
 
 describe('FixedCostsStore', () => {
-  let store: typeof FixedCostsStore;
-  let firestoreSpy: jasmine.SpyObj<FirestoreService>;
+  let store: InstanceType<typeof FixedCostsStore>;
+  let firestoreSpy: {
+    getCollection: ReturnType<typeof vi.fn>;
+    addDocument: ReturnType<typeof vi.fn>;
+    updateDocument: ReturnType<typeof vi.fn>;
+    deleteDocument: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
-    const spy = jasmine.createSpyObj('FirestoreService', ['getCollection', 'addDocument', 'updateDocument', 'deleteDocument']);
-    spy.getCollection.and.returnValue(of([]));
+    const spy = {
+      getCollection: vi.fn().mockReturnValue(of([])),
+      addDocument: vi.fn(),
+      updateDocument: vi.fn(),
+      deleteDocument: vi.fn(),
+    };
 
     TestBed.configureTestingModule({
       providers: [
@@ -20,7 +29,7 @@ describe('FixedCostsStore', () => {
     });
 
     store = TestBed.inject(FixedCostsStore);
-    firestoreSpy = TestBed.inject(FirestoreService) as jasmine.SpyObj<FirestoreService>;
+    firestoreSpy = TestBed.inject(FirestoreService) as typeof spy;
   });
 
   describe('deactivateFixedCost', () => {
@@ -32,9 +41,9 @@ describe('FixedCostsStore', () => {
       expect(firestoreSpy.updateDocument).toHaveBeenCalledWith(
         'fixedCosts',
         costId,
-        jasmine.objectContaining({
+        expect.objectContaining({
           active: false,
-          endDate: jasmine.any(Timestamp),
+          endDate: expect.any(Timestamp),
         })
       );
     });
@@ -46,7 +55,8 @@ describe('FixedCostsStore', () => {
       await store.deactivateFixedCost(costId);
 
       const afterDeactivate = Timestamp.now();
-      const callArgs = firestoreSpy.updateDocument.calls.mostRecent().args[2];
+      const calls = firestoreSpy.updateDocument.mock.calls;
+      const callArgs = calls[calls.length - 1][2] as { endDate: Timestamp };
 
       expect(callArgs.endDate instanceof Timestamp).toBe(true);
       expect(callArgs.endDate.seconds).toBeGreaterThanOrEqual(beforeDeactivate.seconds);
@@ -55,14 +65,9 @@ describe('FixedCostsStore', () => {
 
     it('should propagate errors from firestore', async () => {
       const error = new Error('Firestore error');
-      firestoreSpy.updateDocument.and.returnValue(Promise.reject(error));
+      firestoreSpy.updateDocument.mockReturnValue(Promise.reject(error));
 
-      try {
-        await store.deactivateFixedCost('test-id');
-        fail('should have thrown');
-      } catch (e) {
-        expect(e).toBe(error);
-      }
+      await expect(store.deactivateFixedCost('test-id')).rejects.toBe(error);
     });
   });
 
@@ -79,11 +84,12 @@ describe('FixedCostsStore', () => {
   describe('createFixedCost', () => {
     it('should set initial active state to true and startDate to now', async () => {
       const input = { name: 'Test Cost', amount: 100, frequency: 'monthly' as const, category: 'utility' as const };
-      firestoreSpy.addDocument.and.returnValue(Promise.resolve('new-id'));
+      firestoreSpy.addDocument.mockResolvedValue('new-id');
 
       await store.createFixedCost(input);
 
-      const callArgs = firestoreSpy.addDocument.calls.mostRecent().args[1];
+      const calls = firestoreSpy.addDocument.mock.calls;
+      const callArgs = calls[calls.length - 1][1] as { active: boolean; startDate: Timestamp; endDate: null };
       expect(callArgs.active).toBe(true);
       expect(callArgs.startDate instanceof Timestamp).toBe(true);
       expect(callArgs.endDate).toBeNull();
