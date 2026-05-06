@@ -45,4 +45,4 @@ jobs:
         run: npm install --global firebase-tools
 
       - name: Deploy to Firebase Hosting preview channel
-        run: firebase hosting:channel:deploy pr${{ github.event.pull_request.number }} --expires 7d --project "${{ secrets.FIREBASE_PROJECT_ID }}" --non-interactive
+        run: firebase hosting:channel:deploy pr${{ github.event.pull_request.number }} --expires 7d --project "${{ vars.FIREBASE_PROJECT_ID }}" --non-interactive

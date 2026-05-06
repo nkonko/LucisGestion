@@ -42,4 +42,4 @@ jobs:
 
       - name: Roll back live Hosting to selected version
         run: |
-          firebase hosting:clone "${{ github.event.inputs.site_id }}:@${{ github.event.inputs.version_id }}" "${{ github.event.inputs.site_id }}:live" --project "${{ secrets.FIREBASE_PROJECT_ID }}" --non-interactive
+          firebase hosting:clone "${{ github.event.inputs.site_id }}:@${{ github.event.inputs.version_id }}" "${{ github.event.inputs.site_id }}:live" --project "${{ vars.FIREBASE_PROJECT_ID }}" --non-interactive
