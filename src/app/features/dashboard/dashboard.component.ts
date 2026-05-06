@@ -84,7 +84,16 @@ export class DashboardComponent {
   }
 
   getStatusClass(status: SaleStatus): string {
-    return this.statusClass[status];
+    switch (status) {
+      case 'delivered':
+        return this.statusClass.delivered;
+      case 'pending':
+        return this.statusClass.pending;
+      case 'cancelled':
+        return this.statusClass.cancelled;
+      default:
+        return '';
+    }
   }
 
   onMonthInputChange(date: SelectedDate) {
