@@ -29,7 +29,7 @@ describe('FixedCostsStore', () => {
     });
 
     store = TestBed.inject(FixedCostsStore);
-    firestoreSpy = TestBed.inject(FirestoreService) as typeof spy;
+    firestoreSpy = TestBed.inject(FirestoreService) as unknown as typeof spy;
   });
 
   describe('deactivateFixedCost', () => {
@@ -83,7 +83,7 @@ describe('FixedCostsStore', () => {
 
   describe('createFixedCost', () => {
     it('should set initial active state to true and startDate to now', async () => {
-      const input = { name: 'Test Cost', amount: 100, frequency: 'monthly' as const, category: 'utility' as const };
+      const input = { name: 'Test Cost', description: '', amount: 100, frequency: 'monthly' as const, category: 'utility' as const, active: true };
       firestoreSpy.addDocument.mockResolvedValue('new-id');
 
       await store.createFixedCost(input);
