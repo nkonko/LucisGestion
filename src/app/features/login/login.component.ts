@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
@@ -13,18 +13,18 @@ export class LoginComponent {
   private auth = inject(AuthService);
   private router = inject(Router);
 
-  loading = false;
-  error = '';
+  readonly loading = signal(false);
+  readonly error = signal('');
 
   async loginGoogle(): Promise<void> {
-    this.loading = true;
-    this.error = '';
+    this.loading.set(true);
+    this.error.set('');
     try {
       await this.auth.loginWithGoogle();
       await this.router.navigate(['/dashboard']);
     } catch (error: unknown) {
-      this.error = error instanceof Error ? error.message : 'Error al iniciar sesión';
-      this.loading = false;
+      this.error.set(error instanceof Error ? error.message : 'Error al iniciar sesión');
+      this.loading.set(false);
     }
   }
 }

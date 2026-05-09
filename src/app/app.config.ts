@@ -1,8 +1,8 @@
 import {
   ApplicationConfig,
+  provideAppInitializer,
   provideBrowserGlobalErrorListeners,
   isDevMode,
-  ENVIRONMENT_INITIALIZER,
   inject,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
@@ -27,13 +27,9 @@ export const appConfig: ApplicationConfig = {
       }),
     ),
     provideAuth(() => getAuth()),
-    {
-      provide: ENVIRONMENT_INITIALIZER,
-      multi: true,
-      useValue: () => {
-        inject(AuthService);
-      },
-    },
+    provideAppInitializer(() => {
+      inject(AuthService);
+    }),
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000',
