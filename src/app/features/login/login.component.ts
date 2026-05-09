@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { filter, firstValueFrom } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { AuthStore } from '../../core/store/auth.store';
 
@@ -23,13 +25,15 @@ export class LoginComponent {
     this.error = '';
     try {
       await this.auth.loginWithGoogle();
-      if (this.authStore.isLoggedIn()) {
-        await this.router.navigate(['/dashboard']);
-        return;
-      }
 
-      this.error = 'No se pudo completar la sesión. Reintentá.';
-      this.loading = false;
+      const isLoggedIn$ = toObservable(this.authStore.isLoggedIn);
+      const isLoggedIn = await firstValueFrom(
+        isLoggedIn$.pipe(filter((loggedIn) => loggedIn))
+      );
+
+      if (isLoggedIn) {
+        await this.router.navigate(['/dashboard']);
+      }
     } catch (error: unknown) {
       this.error = error instanceof Error ? error.message : 'Error al iniciar sesión';
       this.loading = false;
