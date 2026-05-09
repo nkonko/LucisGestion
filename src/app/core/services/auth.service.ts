@@ -21,6 +21,7 @@ import {
   startWith,
   switchMap,
   take,
+  timeout,
 } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AppUser } from '../models/user/app-user.model';
@@ -41,7 +42,13 @@ export class AuthService {
   private readonly appUserState$ = this.authState$.pipe(
     switchMap((user) =>
       user
-        ? from(this.loadOrCreateProfile(user)).pipe(catchError(() => of(null)))
+        ? from(this.loadOrCreateProfile(user)).pipe(
+            timeout(10000),
+            catchError((error) => {
+              console.error('Unable to login - Failed to load user profile:', error);
+              return of(null);
+            }),
+          )
         : of(null),
     ),
     shareReplay({ bufferSize: 1, refCount: true }),
