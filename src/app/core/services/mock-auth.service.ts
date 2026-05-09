@@ -15,7 +15,6 @@ export class MockAuthService {
     role: 'owner',
   };
 
-  readonly user = this.authStore.user;
   readonly appUser = this.authStore.appUser;
   readonly ready = this.authStore.ready;
   readonly isLoggedIn = this.authStore.isLoggedIn;
@@ -23,15 +22,15 @@ export class MockAuthService {
   readonly isAssistant = this.authStore.isAssistant;
 
   constructor() {
-    this.authStore.setAuthState(null, this.mockAppUser, true);
+    this.authStore.setAuthState(this.mockAppUser, true);
   }
 
   async loginWithGoogle(): Promise<void> {
-    this.authStore.setAuthState(null, this.mockAppUser, true);
+    this.authStore.setAuthState(this.mockAppUser, true);
   }
 
   async logout(): Promise<void> {
-    this.authStore.setAuthState(null, null, true);
+    this.authStore.setAuthState(null, true);
   }
 
   async setUserRole(_uid: string, _role: UserRole): Promise<void> {

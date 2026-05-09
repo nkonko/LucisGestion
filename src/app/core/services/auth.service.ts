@@ -65,23 +65,23 @@ export class AuthService {
 
   private async handleAuthChange(user: User | null): Promise<void> {
     if (!user) {
-      this.authStore.setAuthState(null, null, true);
+      this.authStore.setAuthState(null, true);
       return;
     }
 
     const email = user.email?.toLowerCase() ?? '';
     if (!environment.allowedEmails.includes(email)) {
       await signOut(this.auth);
-      this.authStore.setAuthState(null, null, true);
+      this.authStore.setAuthState(null, true);
       return;
     }
 
     try {
       const appUser = await this.loadOrCreateProfile(user);
-      this.authStore.setAuthState(user, appUser, true);
+      this.authStore.setAuthState(appUser, true);
     } catch (error) {
       console.error('Login failed - unable to load user profile:', error);
-      this.authStore.setAuthState(user, null, true);
+      this.authStore.setAuthState(null, true);
     }
   }
 
