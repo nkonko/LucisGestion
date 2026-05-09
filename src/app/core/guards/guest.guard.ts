@@ -4,11 +4,11 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { filter, firstValueFrom } from 'rxjs';
 import { AuthStore } from '../store/auth.store';
 
-export const authGuard: CanActivateFn = async () => {
+export const guestGuard: CanActivateFn = async () => {
   const authStore = inject(AuthStore);
   const router = inject(Router);
 
   await firstValueFrom(toObservable(authStore.ready).pipe(filter(Boolean)));
 
-  return authStore.isLoggedIn() ? true : router.createUrlTree(['/login']);
+  return authStore.isLoggedIn() ? router.createUrlTree(['/dashboard']) : true;
 };
