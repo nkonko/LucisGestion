@@ -97,13 +97,16 @@ jobs:
           fi
 
           BEST=$(echo "$RELEASES_JSON" | jq -c --argjson target "$COMMIT_EPOCH" '
+            def to_epoch:
+              # Strip fractional seconds (".123") because jq fromdateiso8601 does not accept them.
+              sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601;
             [.releases[]
               | select(.type == "DEPLOY")
               | select(.version != null)
               | {
                   versionId: (.version.name | split("/") | last),
                   releaseTime: .releaseTime,
-                  diff: ((.releaseTime | fromdateiso8601) - $target | fabs)
+                  diff: ((.releaseTime | to_epoch) - $target | fabs)
                 }]
             | sort_by(.diff)
             | .[0] // empty
