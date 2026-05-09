@@ -14,7 +14,7 @@ on:
       site_id:
         description: "Firebase Hosting site ID"
         required: true
-        default: "lucis-gestion"
+        default: "lucis-gestion-6cea2"
         type: string
 
 permissions:
