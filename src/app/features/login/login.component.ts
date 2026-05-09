@@ -1,9 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { toObservable } from '@angular/core/rxjs-interop';
-import { filter, firstValueFrom } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
-import { AuthStore } from '../../core/store/auth.store';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +11,6 @@ import { AuthStore } from '../../core/store/auth.store';
 })
 export class LoginComponent {
   private auth = inject(AuthService);
-  private authStore = inject(AuthStore);
   private router = inject(Router);
 
   loading = false;
@@ -25,15 +21,7 @@ export class LoginComponent {
     this.error = '';
     try {
       await this.auth.loginWithGoogle();
-
-      const isLoggedIn$ = toObservable(this.authStore.isLoggedIn);
-      const isLoggedIn = await firstValueFrom(
-        isLoggedIn$.pipe(filter((loggedIn) => loggedIn))
-      );
-
-      if (isLoggedIn) {
-        await this.router.navigate(['/dashboard']);
-      }
+      await this.router.navigate(['/dashboard']);
     } catch (error: unknown) {
       this.error = error instanceof Error ? error.message : 'Error al iniciar sesión';
       this.loading = false;
