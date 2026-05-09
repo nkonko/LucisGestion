@@ -33,28 +33,55 @@ jobs:
         run: npm run test:ci
 
       - name: Generate production environment file
+        env:
+          ALLOWED_EMAILS: ${{ vars.ALLOWED_EMAILS }}
+          FIREBASE_API_KEY: ${{ vars.FIREBASE_API_KEY }}
+          FIREBASE_AUTH_DOMAIN: ${{ vars.FIREBASE_AUTH_DOMAIN }}
+          FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+          FIREBASE_STORAGE_BUCKET: ${{ vars.FIREBASE_STORAGE_BUCKET }}
+          FIREBASE_MESSAGING_SENDER_ID: ${{ vars.FIREBASE_MESSAGING_SENDER_ID }}
+          FIREBASE_APP_ID: ${{ vars.FIREBASE_APP_ID }}
         run: |
-          ALLOWED_EMAILS_TS=$(echo "${{ vars.ALLOWED_EMAILS }}" | tr ',' '\n' | sed 's/^ *//;s/ *$//' | sed '/^$/d' | sed "s/.*/'&'/" | paste -sd, -)
+          node <<'NODE'
+          const fs = require('fs');
 
-          if [ -z "$ALLOWED_EMAILS_TS" ]; then
-            echo "ALLOWED_EMAILS is empty. Configure it in the Production environment variables."
-            exit 1
-          fi
+          const clean = (v) => (v ?? '').replace(/\r/g, '').trim();
 
-          cat > src/environments/environment.ts <<EOF
-          export const environment = {
-            production: true,
-            allowedEmails: [$ALLOWED_EMAILS_TS],
-            firebase: {
-              apiKey: '${{ vars.FIREBASE_API_KEY }}',
-              authDomain: '${{ vars.FIREBASE_AUTH_DOMAIN }}',
-              projectId: '${{ vars.FIREBASE_PROJECT_ID }}',
-              storageBucket: '${{ vars.FIREBASE_STORAGE_BUCKET }}',
-              messagingSenderId: '${{ vars.FIREBASE_MESSAGING_SENDER_ID }}',
-              appId: '${{ vars.FIREBASE_APP_ID }}',
-            },
+          const emails = clean(process.env.ALLOWED_EMAILS)
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean);
+
+          if (emails.length === 0) {
+            console.error('ALLOWED_EMAILS is empty. Configure it in the Production environment variables.');
+            process.exit(1);
+          }
+
+          const firebase = {
+            apiKey: clean(process.env.FIREBASE_API_KEY),
+            authDomain: clean(process.env.FIREBASE_AUTH_DOMAIN),
+            projectId: clean(process.env.FIREBASE_PROJECT_ID),
+            storageBucket: clean(process.env.FIREBASE_STORAGE_BUCKET),
+            messagingSenderId: clean(process.env.FIREBASE_MESSAGING_SENDER_ID),
+            appId: clean(process.env.FIREBASE_APP_ID),
           };
-          EOF
+
+          for (const [key, value] of Object.entries(firebase)) {
+            if (!value) {
+              console.error(`Missing Firebase variable: ${key}`);
+              process.exit(1);
+            }
+          }
+
+          const contents = `export const environment = ${JSON.stringify(
+            { production: true, allowedEmails: emails, firebase },
+            null,
+            2,
+          )};\n`;
+
+          fs.writeFileSync('src/environments/environment.ts', contents);
+          console.log('environment.ts generated with', emails.length, 'allowed email(s).');
+          NODE
 
       - name: Build app
         run: npm run build
