@@ -24,7 +24,7 @@ export class CustomersComponent {
 
   filteredCustomers = computed(() => {
     const term = this.searchTerm().toLowerCase().trim();
-    const items = this.store.customers();
+    const items = this.store.customers().filter((c) => c.name !== '[eliminado]');
     if (!term) return items;
     return items.filter(
       (c) => c.name.toLowerCase().includes(term) || c.phone.toLowerCase().includes(term),

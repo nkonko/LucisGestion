@@ -40,7 +40,7 @@ export const CustomersStore = signalStore(
 
       async deleteCustomer(id: string) {
         try {
-          return await fs.updateDocument('customers', id, { name: '[eliminado]' });
+          return await fs.deleteDocument('customers', id);
         } catch (e: unknown) {
           patchState(store, { error: getErrorMessage(e) });
           throw e;
