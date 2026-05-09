@@ -16,8 +16,8 @@ export class MonthNavComponent {
   readonly previousLabel = input('Mes anterior');
   readonly nextLabel = input('Mes siguiente');
 
-  readonly previous = output<void>();
-  readonly next = output<void>();
+  readonly previous = output();
+  readonly next = output();
 
   onPrevious(): void {
     if (!this.disablePrevious()) this.previous.emit();
