@@ -7,7 +7,8 @@ import {
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+import { provideFirestore, initializeFirestore } from '@angular/fire/firestore';
+import { getApp } from 'firebase/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 
 import { routes } from './app.routes';
@@ -20,7 +21,11 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideFirestore(() => getFirestore()),
+    provideFirestore(() =>
+      initializeFirestore(getApp(), {
+        experimentalAutoDetectLongPolling: true,
+      }),
+    ),
     provideAuth(() => getAuth()),
     {
       provide: ENVIRONMENT_INITIALIZER,
