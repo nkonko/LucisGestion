@@ -1,5 +1,5 @@
 import { computed, inject } from '@angular/core';
-import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
+import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { FirestoreService } from '../services/firestore.service';
 import {
   Ingredient,
@@ -19,7 +19,7 @@ export const IngredientsStore = signalStore(
   { providedIn: 'root' },
   withState<BaseState>({ loading: false, error: null }),
 
-  withMethods((store) => {
+  withComputed(() => {
     const fs = inject(FirestoreService);
 
     const ingredients$ = fs.getCollection<Ingredient>(
@@ -31,7 +31,9 @@ export const IngredientsStore = signalStore(
     const supplyExpenses$ = fs.getCollection<SupplyExpense>('supplyExpenses', orderBy('date', 'desc'));
     const supplyExpenses = toSignal(supplyExpenses$, { initialValue: [] as SupplyExpense[] });
 
-    const lowStock = computed(() => ingredients().filter((i) => i.currentStock <= i.minimumStock));
+    const lowStock = computed(() =>
+      ingredients().filter((ingredient) => ingredient.currentStock <= ingredient.minimumStock),
+    );
 
     return {
       ingredients,
@@ -41,7 +43,13 @@ export const IngredientsStore = signalStore(
       ingredientsSortedByStock: computed(() =>
         [...ingredients()].sort((a, b) => getStockPriority(a) - getStockPriority(b)),
       ),
+    };
+  }),
 
+  withMethods((store) => {
+    const fs = inject(FirestoreService);
+
+    return {
       async createIngredient(ingredient: IngredientInput) {
         patchState(store, { loading: true, error: null });
         try {
@@ -51,9 +59,9 @@ export const IngredientsStore = signalStore(
           } as IngredientInput);
           patchState(store, { loading: false });
           return id;
-        } catch (e: unknown) {
-          patchState(store, { loading: false, error: getErrorMessage(e) });
-          throw e;
+        } catch (error: unknown) {
+          patchState(store, { loading: false, error: getErrorMessage(error) });
+          throw error;
         }
       },
 
@@ -62,9 +70,8 @@ export const IngredientsStore = signalStore(
         try {
           await fs.updateDocument('ingredients', id, changes as Record<string, unknown>);
 
-          // Record price history if price changed
           if (changes.unitPrice !== undefined) {
-            const current = ingredients().find((i) => i.id === id);
+            const current = store.ingredients().find((ingredient) => ingredient.id === id);
             if (current && current.unitPrice !== changes.unitPrice) {
               await fs.addDocument('priceHistory', {
                 ingredientId: id,
@@ -81,18 +88,18 @@ export const IngredientsStore = signalStore(
           }
 
           patchState(store, { loading: false });
-        } catch (e: unknown) {
-          patchState(store, { loading: false, error: getErrorMessage(e) });
-          throw e;
+        } catch (error: unknown) {
+          patchState(store, { loading: false, error: getErrorMessage(error) });
+          throw error;
         }
       },
 
       async deleteIngredient(id: string) {
         try {
           return await fs.softDelete('ingredients', id);
-        } catch (e: unknown) {
-          patchState(store, { error: getErrorMessage(e) });
-          throw e;
+        } catch (error: unknown) {
+          patchState(store, { error: getErrorMessage(error) });
+          throw error;
         }
       },
 
@@ -102,7 +109,7 @@ export const IngredientsStore = signalStore(
           const expenseId = await fs.addDocument('supplyExpenses', expense as SupplyExpenseInput);
 
           for (const item of expense.items) {
-            const ingredient = ingredients().find((i) => i.id === item.ingredientId);
+            const ingredient = store.ingredients().find((candidate) => candidate.id === item.ingredientId);
             if (!ingredient) continue;
 
             const newStock = ingredient.currentStock + item.quantity;
@@ -124,9 +131,9 @@ export const IngredientsStore = signalStore(
 
           patchState(store, { loading: false });
           return expenseId;
-        } catch (e: unknown) {
-          patchState(store, { loading: false, error: getErrorMessage(e) });
-          throw e;
+        } catch (error: unknown) {
+          patchState(store, { loading: false, error: getErrorMessage(error) });
+          throw error;
         }
       },
 

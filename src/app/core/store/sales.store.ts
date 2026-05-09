@@ -1,5 +1,5 @@
 import { computed, inject } from '@angular/core';
-import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
+import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { FirestoreService } from '../services/firestore.service';
 import { StockAdjustmentInput } from '../models/stock';
 import { Sale, SaleInput } from '../models/sale';
@@ -13,17 +13,24 @@ export const SalesStore = signalStore(
   { providedIn: 'root' },
   withState<BaseState>({ loading: false, error: null }),
 
+  withComputed(() => {
+    const fs = inject(FirestoreService);
+    const sales$ = fs.getCollection<Sale>('sales', orderBy('date', 'desc'));
+    const sales = toSignal(sales$, { initialValue: [] as Sale[] });
+    const pendingOrders = computed(() => sales().filter((sale) => sale.status === 'pending'));
+
+    return {
+      sales,
+      pendingOrders,
+      pendingOrdersCount: computed(() => pendingOrders().length),
+      recentSales: computed(() => sales().slice(0, 5)),
+    };
+  }),
+
   withMethods((store) => {
     const fs = inject(FirestoreService);
     const ingredientsStore = inject(IngredientsStore);
     const recipesStore = inject(RecipesStore);
-
-    const sales$ = fs.getCollection<Sale>('sales', orderBy('date', 'desc'));
-    const sales = toSignal(sales$, { initialValue: [] as Sale[] });
-
-    const pendingOrders = computed(() => sales().filter((v) => v.status === 'pending'));
-    const pendingOrdersCount = computed(() => pendingOrders().length);
-    const recentSales = computed(() => sales().slice(0, 5));
 
     const buildStockAdjustments = (
       items: { recipeId: string; quantity: number }[],
@@ -32,24 +39,24 @@ export const SalesStore = signalStore(
       const adjustmentsByIngredient = new Map<string, StockAdjustmentInput>();
 
       for (const item of items) {
-        const recipe = recipesStore.recipes().find((r) => r.id === item.recipeId);
+        const recipe = recipesStore.recipes().find((candidate) => candidate.id === item.recipeId);
         if (!recipe) continue;
 
-        for (const ri of recipe.ingredients) {
-          const delta = ri.quantity * item.quantity * factor;
+        for (const recipeIngredient of recipe.ingredients) {
+          const delta = recipeIngredient.quantity * item.quantity * factor;
           if (delta === 0) continue;
 
-          const current = adjustmentsByIngredient.get(ri.ingredientId);
+          const current = adjustmentsByIngredient.get(recipeIngredient.ingredientId);
           if (current) {
             current.delta += delta;
             continue;
           }
 
           const ingredientName =
-            ingredientsStore.ingredients().find((i) => i.id === ri.ingredientId)?.name ?? ri.name;
+            ingredientsStore.ingredients().find((ingredient) => ingredient.id === recipeIngredient.ingredientId)?.name ?? recipeIngredient.name;
 
-          adjustmentsByIngredient.set(ri.ingredientId, {
-            ingredientId: ri.ingredientId,
+          adjustmentsByIngredient.set(recipeIngredient.ingredientId, {
+            ingredientId: recipeIngredient.ingredientId,
             ingredientName,
             delta,
           });
@@ -59,18 +66,13 @@ export const SalesStore = signalStore(
       return [...adjustmentsByIngredient.values()];
     };
 
-    const handleStoreError = (e: unknown): never => {
-      const error = e instanceof Error ? e : new Error(String(e));
+    const handleStoreError = (cause: unknown): never => {
+      const error = cause instanceof Error ? cause : new Error(String(cause));
       patchState(store, { loading: false, error: error.message });
       throw error;
     };
 
     return {
-      sales,
-      pendingOrders,
-      pendingOrdersCount,
-      recentSales,
-
       async registerSale(sale: SaleInput) {
         patchState(store, { loading: true, error: null });
         try {
@@ -81,8 +83,8 @@ export const SalesStore = signalStore(
 
           patchState(store, { loading: false });
           return saleId;
-        } catch (e: unknown) {
-          return handleStoreError(e);
+        } catch (error: unknown) {
+          return handleStoreError(error);
         }
       },
 
@@ -92,7 +94,7 @@ export const SalesStore = signalStore(
           await fs.updateDocument('sales', id, { status });
 
           if (status === 'cancelled') {
-            const sale = sales().find((v) => v.id === id);
+            const sale = store.sales().find((candidate) => candidate.id === id);
             if (sale) {
               const adjustments = buildStockAdjustments(sale.items, 1);
               await fs.applyStockAdjustments(id, 'cancellation_restock', adjustments);
@@ -100,8 +102,8 @@ export const SalesStore = signalStore(
           }
 
           patchState(store, { loading: false });
-        } catch (e: unknown) {
-          return handleStoreError(e);
+        } catch (error: unknown) {
+          return handleStoreError(error);
         }
       },
     };

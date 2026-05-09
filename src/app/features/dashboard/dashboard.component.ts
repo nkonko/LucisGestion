@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DashboardStore } from '../../core/store/dashboard.store';
+import { DashboardMetricsService } from '../../core/services/dashboard-metrics.service';
 import { IngredientsStore } from '../../core/store/ingredients.store';
 import { SalesStore } from '../../core/store/sales.store';
 import { RecipesStore } from '../../core/store/recipes.store';
@@ -21,6 +22,7 @@ import { SALE_STATUS_CLASS, SALE_STATUS_DISPLAY, SaleStatus } from '../../core/m
 })
 export class DashboardComponent {
   readonly store = inject(DashboardStore);
+  private metrics = inject(DashboardMetricsService);
   private ingredientsStore = inject(IngredientsStore);
   private salesStore = inject(SalesStore);
   private recipesStore = inject(RecipesStore);
@@ -30,12 +32,13 @@ export class DashboardComponent {
   totalRecipes = this.recipesStore.totalRecipes;
   recentSales = this.salesStore.recentSales;
   pendingOrders = this.salesStore.pendingOrdersCount;
-  monthlySales = this.store.monthlySales;
-  monthlyExpenses = this.store.monthlyExpenses;
-  periodVariableExpenses = this.store.periodVariableExpenses;
-  periodFixedCosts = this.store.periodFixedCosts;
-  totalPeriodExpenses = this.store.totalPeriodExpenses;
-  netProfit = this.store.netProfit;
+  monthlySales = this.metrics.monthlySales;
+  monthlyExpenses = this.metrics.monthlyExpenses;
+  periodVariableExpenses = this.metrics.periodVariableExpenses;
+  periodFixedCosts = this.metrics.periodFixedCosts;
+  totalPeriodExpenses = this.metrics.totalPeriodExpenses;
+  netProfit = this.metrics.netProfit;
+  topSellingProduct = this.metrics.topSellingProduct;
   periodLabel = this.store.periodLabel;
   monthInputValue = this.store.monthInputValue;
   isCurrentMonth = this.store.isCurrentMonth;

@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { signal, WritableSignal } from '@angular/core';
 import { Timestamp } from 'firebase/firestore';
 import { DashboardStore } from './dashboard.store';
+import { DashboardMetricsService } from '../services/dashboard-metrics.service';
 import { SalesStore } from './sales.store';
 import { FixedCostsStore } from './fixed-costs.store';
 import { IngredientsStore } from './ingredients.store';
@@ -10,8 +11,41 @@ import { Sale } from '../models/sale';
 import { SupplyExpense } from '../models/supply-expense';
 import { Recipe } from '../models/recipe';
 
-describe('DashboardStore', () => {
+describe('DashboardStore (UI state)', () => {
   let store: InstanceType<typeof DashboardStore>;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({ providers: [DashboardStore] });
+    store = TestBed.inject(DashboardStore);
+  });
+
+  describe('Month Navigation', () => {
+    it('should update selectedDate when going to previous month', () => {
+      store.setSelectedDate({ year: 2024, month: 4 });
+      store.goToPreviousMonth();
+
+      expect(store.selectedDate()).toEqual({ year: 2024, month: 3 });
+    });
+
+    it('should handle year transition when going to previous month from January', () => {
+      store.setSelectedDate({ year: 2024, month: 0 });
+      store.goToPreviousMonth();
+
+      expect(store.selectedDate()).toEqual({ year: 2023, month: 11 });
+    });
+
+    it('should update selectedDate when going to next month', () => {
+      store.setSelectedDate({ year: 2024, month: 4 });
+      store.goToNextMonth();
+
+      expect(store.selectedDate()).toEqual({ year: 2024, month: 5 });
+    });
+  });
+});
+
+describe('DashboardMetricsService', () => {
+  let store: InstanceType<typeof DashboardStore>;
+  let metrics: DashboardMetricsService;
   let salesSignal: WritableSignal<Sale[]>;
   let supplyExpensesSignal: WritableSignal<SupplyExpense[]>;
   let recipesSignal: WritableSignal<Recipe[]>;
@@ -26,6 +60,7 @@ describe('DashboardStore', () => {
     TestBed.configureTestingModule({
       providers: [
         DashboardStore,
+        DashboardMetricsService,
         { provide: SalesStore, useValue: { sales: salesSignal } },
         { provide: FixedCostsStore, useValue: { totalForMonth: totalForMonthSpy } },
         { provide: IngredientsStore, useValue: { supplyExpenses: supplyExpensesSignal } },
@@ -34,6 +69,7 @@ describe('DashboardStore', () => {
     });
 
     store = TestBed.inject(DashboardStore);
+    metrics = TestBed.inject(DashboardMetricsService);
   });
 
   function buildSale(overrides: Partial<Sale>): Sale {
@@ -81,29 +117,6 @@ describe('DashboardStore', () => {
     };
   }
 
-  describe('Month Navigation', () => {
-    it('should update selectedDate when going to previous month', () => {
-      store.setSelectedDate({ year: 2024, month: 4 });
-      store.goToPreviousMonth();
-
-      expect(store.selectedDate()).toEqual({ year: 2024, month: 3 });
-    });
-
-    it('should handle year transition when going to previous month from January', () => {
-      store.setSelectedDate({ year: 2024, month: 0 });
-      store.goToPreviousMonth();
-
-      expect(store.selectedDate()).toEqual({ year: 2023, month: 11 });
-    });
-
-    it('should update selectedDate when going to next month', () => {
-      store.setSelectedDate({ year: 2024, month: 4 });
-      store.goToNextMonth();
-
-      expect(store.selectedDate()).toEqual({ year: 2024, month: 5 });
-    });
-  });
-
   describe('Sales Filtering', () => {
     it('should include sales inside the selected month', () => {
       store.setSelectedDate({ year: 2024, month: 4 });
@@ -111,7 +124,7 @@ describe('DashboardStore', () => {
         buildSale({ total: 100, date: Timestamp.fromDate(new Date(2024, 4, 15)) }),
       ]);
 
-      expect(store.monthlySales()).toBe(100);
+      expect(metrics.monthlySales()).toBe(100);
     });
 
     it('should exclude sales outside selected month', () => {
@@ -120,7 +133,7 @@ describe('DashboardStore', () => {
         buildSale({ total: 100, date: Timestamp.fromDate(new Date(2024, 5, 1)) }),
       ]);
 
-      expect(store.monthlySales()).toBe(0);
+      expect(metrics.monthlySales()).toBe(0);
     });
   });
 
@@ -140,7 +153,7 @@ describe('DashboardStore', () => {
         }),
       ]);
 
-      expect(store.monthlyExpenses()).toBe(150);
+      expect(metrics.monthlyExpenses()).toBe(150);
     });
   });
 
@@ -149,7 +162,7 @@ describe('DashboardStore', () => {
       store.setSelectedDate({ year: 2024, month: 4 });
       totalForMonthSpy.mockReturnValue(900);
 
-      expect(store.periodFixedCosts()).toBe(900);
+      expect(metrics.periodFixedCosts()).toBe(900);
       expect(totalForMonthSpy).toHaveBeenCalledWith('2024-05');
     });
   });
@@ -161,7 +174,7 @@ describe('DashboardStore', () => {
         buildSupplyExpense({ total: 200, date: Timestamp.fromDate(new Date(2024, 4, 10)) }),
       ]);
 
-      expect(store.periodSupplyExpenses()).toBe(200);
+      expect(metrics.periodSupplyExpenses()).toBe(200);
     });
   });
 
@@ -182,9 +195,9 @@ describe('DashboardStore', () => {
       ]);
       totalForMonthSpy.mockReturnValue(75);
 
-      expect(store.monthlyExpenses()).toBe(200);
-      expect(store.totalPeriodExpenses()).toBe(275);
-      expect(store.netProfit()).toBe(225);
+      expect(metrics.monthlyExpenses()).toBe(200);
+      expect(metrics.totalPeriodExpenses()).toBe(275);
+      expect(metrics.netProfit()).toBe(225);
     });
   });
 });

@@ -1,5 +1,5 @@
 import { computed, inject } from '@angular/core';
-import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
+import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { FirestoreService } from '../services/firestore.service';
 import { FixedCost, FixedCostInput } from '../models/fixed-cost';
 import { orderBy } from '@angular/fire/firestore';
@@ -12,9 +12,8 @@ export const FixedCostsStore = signalStore(
   { providedIn: 'root' },
   withState<BaseState>({ loading: false, error: null }),
 
-  withMethods((store) => {
+  withComputed(() => {
     const fs = inject(FirestoreService);
-
     const fixedCosts$ = fs.getCollection<FixedCost>('fixedCosts', orderBy('name', 'asc'));
     const allFixedCosts = toSignal(fixedCosts$, { initialValue: [] as FixedCost[] });
     const fixedCosts = computed(() => allFixedCosts().filter((cost) => cost.active));
@@ -22,25 +21,31 @@ export const FixedCostsStore = signalStore(
     return {
       allFixedCosts,
       fixedCosts,
-
       totalMonthlyFixedCosts: computed(() =>
-        fixedCosts().reduce((sum, c) => {
-          if (c.frequency === 'monthly') return sum + c.amount;
+        fixedCosts().reduce((sum, cost) => {
+          if (cost.frequency === 'monthly') return sum + cost.amount;
           return sum;
         }, 0),
       ),
+    };
+  }),
 
+  withMethods((store) => {
+    const fs = inject(FirestoreService);
+
+    return {
       totalForMonth(monthKey: string): number {
         const [year, monthNum] = monthKey.split('-').map(Number);
         const monthStart = new Date(year, monthNum - 1, 1);
         const monthEnd = new Date(year, monthNum, 1);
-        return allFixedCosts()
+        return store
+          .allFixedCosts()
           .filter((cost) => {
             const start = cost.startDate?.toDate() ?? new Date(0);
             const end = cost.endDate ? cost.endDate.toDate() : null;
             return start < monthEnd && (end === null || end > monthStart);
           })
-          .reduce((sum, c) => sum + c.amount, 0);
+          .reduce((sum, cost) => sum + cost.amount, 0);
       },
 
       async createFixedCost(fixedCost: FixedCostInput) {
@@ -54,9 +59,9 @@ export const FixedCostsStore = signalStore(
           });
           patchState(store, { loading: false });
           return id;
-        } catch (e: unknown) {
-          patchState(store, { loading: false, error: getErrorMessage(e) });
-          throw e;
+        } catch (error: unknown) {
+          patchState(store, { loading: false, error: getErrorMessage(error) });
+          throw error;
         }
       },
 
@@ -65,27 +70,27 @@ export const FixedCostsStore = signalStore(
         try {
           await fs.updateDocument('fixedCosts', id, changes as Record<string, unknown>);
           patchState(store, { loading: false });
-        } catch (e: unknown) {
-          patchState(store, { loading: false, error: getErrorMessage(e) });
-          throw e;
+        } catch (error: unknown) {
+          patchState(store, { loading: false, error: getErrorMessage(error) });
+          throw error;
         }
       },
 
       async deactivateFixedCost(id: string) {
         try {
           return await fs.updateDocument('fixedCosts', id, { active: false, endDate: Timestamp.now() });
-        } catch (e: unknown) {
-          patchState(store, { error: getErrorMessage(e) });
-          throw e;
+        } catch (error: unknown) {
+          patchState(store, { error: getErrorMessage(error) });
+          throw error;
         }
       },
 
       async deleteFixedCost(id: string) {
         try {
           return await fs.deleteDocument('fixedCosts', id);
-        } catch (e: unknown) {
-          patchState(store, { error: getErrorMessage(e) });
-          throw e;
+        } catch (error: unknown) {
+          patchState(store, { error: getErrorMessage(error) });
+          throw error;
         }
       },
     };

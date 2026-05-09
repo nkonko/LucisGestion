@@ -1,5 +1,5 @@
 import { computed, inject } from '@angular/core';
-import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
+import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { FirestoreService } from '../services/firestore.service';
 import { Recipe, RecipeInput } from '../models/recipe';
 import { where, orderBy } from '@angular/fire/firestore';
@@ -13,7 +13,7 @@ export const RecipesStore = signalStore(
   { providedIn: 'root' },
   withState<BaseState>({ loading: false, error: null }),
 
-  withMethods((store) => {
+  withComputed(() => {
     const fs = inject(FirestoreService);
     const ingredientsStore = inject(IngredientsStore);
 
@@ -22,12 +22,28 @@ export const RecipesStore = signalStore(
       where('active', '==', true),
       orderBy('name', 'asc'),
     );
-    const recipes = toSignal(recipes$, { initialValue: [] as Recipe[] });
+    const rawRecipes = toSignal(recipes$, { initialValue: [] as Recipe[] });
+
+    const recipes = computed(() => {
+      const ingredients = ingredientsStore.ingredients();
+      return rawRecipes().map((recipe) => {
+        const calculatedCost = calculateRecipeCost(recipe.ingredients, ingredients);
+        const suggestedPrice = calculateSuggestedPrice(calculatedCost, recipe.profitMargin);
+        return { ...recipe, calculatedCost, suggestedPrice };
+      });
+    });
 
     return {
       recipes,
       totalRecipes: computed(() => recipes().length),
+    };
+  }),
 
+  withMethods((store) => {
+    const fs = inject(FirestoreService);
+    const ingredientsStore = inject(IngredientsStore);
+
+    return {
       async createRecipe(recipe: RecipeInput) {
         patchState(store, { loading: true, error: null });
         try {
@@ -46,28 +62,30 @@ export const RecipesStore = signalStore(
           } as RecipeInput);
           patchState(store, { loading: false });
           return id;
-        } catch (e: unknown) {
-          patchState(store, { loading: false, error: getErrorMessage(e) });
-          throw e;
+        } catch (error: unknown) {
+          patchState(store, { loading: false, error: getErrorMessage(error) });
+          throw error;
         }
       },
 
       async updateRecipe(id: string, changes: Partial<Recipe>) {
         patchState(store, { loading: true, error: null });
         try {
+          let nextChanges: Partial<Recipe> = changes;
           if (changes.ingredients || changes.profitMargin !== undefined) {
-            const current = recipes().find((r) => r.id === id);
-            const ings = changes.ingredients ?? current?.ingredients ?? [];
+            const current = store.recipes().find((recipe) => recipe.id === id);
+            const ingredients = changes.ingredients ?? current?.ingredients ?? [];
             const margin = changes.profitMargin ?? current?.profitMargin ?? 0;
 
-            changes.calculatedCost = calculateRecipeCost(ings, ingredientsStore.ingredients());
-            changes.suggestedPrice = calculateSuggestedPrice(changes.calculatedCost, margin);
+            const calculatedCost = calculateRecipeCost(ingredients, ingredientsStore.ingredients());
+            const suggestedPrice = calculateSuggestedPrice(calculatedCost, margin);
+            nextChanges = { ...changes, calculatedCost, suggestedPrice };
           }
-          await fs.updateDocument('recipes', id, changes as Record<string, unknown>);
+          await fs.updateDocument('recipes', id, nextChanges as Record<string, unknown>);
           patchState(store, { loading: false });
-        } catch (e: unknown) {
-          patchState(store, { loading: false, error: getErrorMessage(e) });
-          throw e;
+        } catch (error: unknown) {
+          patchState(store, { loading: false, error: getErrorMessage(error) });
+          throw error;
         }
       },
 
@@ -79,33 +97,18 @@ export const RecipesStore = signalStore(
             name: `${data.name} (copia)`,
             active: true,
           } as RecipeInput);
-        } catch (e: unknown) {
-          patchState(store, { error: getErrorMessage(e) });
-          throw e;
+        } catch (error: unknown) {
+          patchState(store, { error: getErrorMessage(error) });
+          throw error;
         }
       },
 
       async deleteRecipe(id: string) {
         try {
           return await fs.softDelete('recipes', id);
-        } catch (e: unknown) {
-          patchState(store, { error: getErrorMessage(e) });
-          throw e;
-        }
-      },
-
-      /** Recalculates costs for all recipes using a given ingredient */
-      async recalculateForIngredientChange(ingredientId: string) {
-        const affected = recipes().filter((r) =>
-          r.ingredients.some((i) => i.ingredientId === ingredientId),
-        );
-        for (const recipe of affected) {
-          const calculatedCost = calculateRecipeCost(
-            recipe.ingredients,
-            ingredientsStore.ingredients(),
-          );
-          const suggestedPrice = calculateSuggestedPrice(calculatedCost, recipe.profitMargin);
-          await fs.updateDocument('recipes', recipe.id!, { calculatedCost, suggestedPrice });
+        } catch (error: unknown) {
+          patchState(store, { error: getErrorMessage(error) });
+          throw error;
         }
       },
     };
