@@ -10,7 +10,7 @@ import { UiIconComponent } from '../../shared/ui/components';
 import { NetProfitCardComponent } from './net-profit-card/net-profit-card.component';
 import { PeriodNavComponent } from './period-nav/period-nav.component';
 import { SelectedDate } from '../../core/models/dashboard';
-import { SALE_STATUS_DISPLAY, SaleStatus } from '../../core/models/sale';
+import { SALE_STATUS_CLASS, SALE_STATUS_DISPLAY, SaleStatus } from '../../core/models/sale';
 
 @Component({
   selector: 'app-dashboard',
@@ -54,6 +54,7 @@ export class DashboardComponent {
   expensesBarWidth = computed(() => this.calculate(this.totalPeriodExpenses()));
 
   readonly statusDisplay = SALE_STATUS_DISPLAY;
+  readonly statusClass = SALE_STATUS_CLASS;
   readonly customersById = computed(
     () => new Map(this.customersStore.customers().map((customer) => [customer.id, customer.name] as const)),
   );
@@ -62,7 +63,7 @@ export class DashboardComponent {
     return (value / this.max()) * 100;
   }
 
-  getCustomerName(customerId: string): string {
+  getCustomerName(customerId: string | null): string {
     if (typeof customerId !== 'string' || !customerId.trim() || !this.customersById().has(customerId)) {
       return 'Cliente eliminado';
     }
@@ -73,12 +74,25 @@ export class DashboardComponent {
     switch (status) {
       case 'pending':
         return this.statusDisplay.pending;
-      case 'in_production':
-        return this.statusDisplay.in_production;
       case 'delivered':
         return this.statusDisplay.delivered;
+      case 'cancelled':
+        return this.statusDisplay.cancelled;
       default:
         return status;
+    }
+  }
+
+  getStatusClass(status: SaleStatus): string {
+    switch (status) {
+      case 'delivered':
+        return this.statusClass.delivered;
+      case 'pending':
+        return this.statusClass.pending;
+      case 'cancelled':
+        return this.statusClass.cancelled;
+      default:
+        return '';
     }
   }
 

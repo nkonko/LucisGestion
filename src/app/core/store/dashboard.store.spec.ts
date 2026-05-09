@@ -15,13 +15,13 @@ describe('DashboardStore', () => {
   let salesSignal: WritableSignal<Sale[]>;
   let supplyExpensesSignal: WritableSignal<SupplyExpense[]>;
   let recipesSignal: WritableSignal<Recipe[]>;
-  let totalForMonthSpy: jasmine.Spy<(month: string) => number>;
+  let totalForMonthSpy: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     salesSignal = signal<Sale[]>([]);
     supplyExpensesSignal = signal<SupplyExpense[]>([]);
     recipesSignal = signal<Recipe[]>([]);
-    totalForMonthSpy = jasmine.createSpy('totalForMonth').and.returnValue(0);
+    totalForMonthSpy = vi.fn().mockReturnValue(0);
 
     TestBed.configureTestingModule({
       providers: [
@@ -147,7 +147,7 @@ describe('DashboardStore', () => {
   describe('Fixed Costs', () => {
     it('should request fixed costs with YYYY-MM month key', () => {
       store.setSelectedDate({ year: 2024, month: 4 });
-      totalForMonthSpy.and.returnValue(900);
+      totalForMonthSpy.mockReturnValue(900);
 
       expect(store.periodFixedCosts()).toBe(900);
       expect(totalForMonthSpy).toHaveBeenCalledWith('2024-05');
@@ -180,7 +180,7 @@ describe('DashboardStore', () => {
           date: Timestamp.fromDate(new Date(2024, 4, 15)),
         }),
       ]);
-      totalForMonthSpy.and.returnValue(75);
+      totalForMonthSpy.mockReturnValue(75);
 
       expect(store.monthlyExpenses()).toBe(200);
       expect(store.totalPeriodExpenses()).toBe(275);

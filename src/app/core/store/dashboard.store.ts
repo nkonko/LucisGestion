@@ -27,8 +27,8 @@ export const DashboardStore = signalStore(
       const start = getPeriodStart(store.selectedPeriod(), store.selectedDate());
       const end = getPeriodEnd(store.selectedPeriod(), store.selectedDate());
       return salesStore.sales().filter((v) => {
-        const d = new Date(v.createdAt);
-        return !Number.isNaN(d.getTime()) && d >= start && d < end;
+        const d = v.date.toDate();
+        return d >= start && d < end;
       });
     });
 

@@ -22,6 +22,8 @@ export function toMonthInputValue(selectedDate: SelectedDate): string {
 export function fromMonthInputValue(value: string): SelectedDate | null {
   if (!value || typeof value !== 'string') return null;
 
+  if (!/^\d{4}-\d{2}$/.test(value)) return null;
+
   const parts = value.split('-');
   if (parts.length !== 2) return null;
 

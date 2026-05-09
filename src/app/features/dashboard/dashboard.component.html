@@ -101,7 +101,7 @@
         <ui-icon name="receipt" [size]="18" [decorative]="true" />
         <div class="flex items-center justify-between gap-2">
           <span>{{ getCustomerName(sale.customerId) }} — {{ sale.total | ars }}</span>
-          <span class="ui-chip-static" [class]="sale.status === 'delivered' ? 'stock-ok' : sale.status === 'in_production' ? 'stock-warning' : 'stock-danger'">{{ getStatusLabel(sale.status) }}</span>
+          <span class="ui-chip-static" [class]="getStatusClass(sale.status)">{{ getStatusLabel(sale.status) }}</span>
         </div>
       </article>
     }

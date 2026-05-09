@@ -30,6 +30,19 @@ export const FixedCostsStore = signalStore(
         }, 0),
       ),
 
+      totalForMonth(monthKey: string): number {
+        const [year, monthNum] = monthKey.split('-').map(Number);
+        const monthStart = new Date(year, monthNum - 1, 1);
+        const monthEnd = new Date(year, monthNum, 1);
+        return allFixedCosts()
+          .filter((cost) => {
+            const start = cost.startDate?.toDate() ?? new Date(0);
+            const end = cost.endDate ? cost.endDate.toDate() : null;
+            return start < monthEnd && (end === null || end > monthStart);
+          })
+          .reduce((sum, c) => sum + c.amount, 0);
+      },
+
       async createFixedCost(fixedCost: FixedCostInput) {
         patchState(store, { loading: true, error: null });
         try {
