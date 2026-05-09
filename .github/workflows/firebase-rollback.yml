@@ -3,9 +3,13 @@ name: Firebase Rollback
 on:
   workflow_dispatch:
     inputs:
+      git_tag:
+        description: "Git tag to roll back to (e.g. v0.1.3). Leave empty if you provide version_id."
+        required: false
+        type: string
       version_id:
-        description: "Firebase Hosting version ID to promote to live"
-        required: true
+        description: "Firebase Hosting version ID (overrides git_tag if both are set)."
+        required: false
         type: string
       site_id:
         description: "Firebase Hosting site ID"
@@ -24,8 +28,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Validate inputs
+        run: |
+          if [ -z "${{ github.event.inputs.git_tag }}" ] && [ -z "${{ github.event.inputs.version_id }}" ]; then
+            echo "::error::You must provide either git_tag or version_id."
+            exit 1
+          fi
+
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -37,9 +51,104 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
       - name: Install Firebase CLI
         run: npm install --global firebase-tools
 
-      - name: Roll back live Hosting to selected version
+      - name: Resolve version_id
+        id: resolve
+        env:
+          INPUT_GIT_TAG: ${{ github.event.inputs.git_tag }}
+          INPUT_VERSION_ID: ${{ github.event.inputs.version_id }}
+          SITE_ID: ${{ github.event.inputs.site_id }}
         run: |
-          firebase hosting:clone "${{ github.event.inputs.site_id }}:@${{ github.event.inputs.version_id }}" "${{ github.event.inputs.site_id }}:live" --project "${{ vars.FIREBASE_PROJECT_ID }}" --non-interactive
+          set -euo pipefail
+
+          if [ -n "$INPUT_VERSION_ID" ]; then
+            echo "Using version_id from input: $INPUT_VERSION_ID"
+            echo "version_id=$INPUT_VERSION_ID" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          TAG="$INPUT_GIT_TAG"
+          echo "Resolving Firebase Hosting version for git tag: $TAG"
+
+          if ! git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "::error::Tag '$TAG' not found in repository."
+            exit 1
+          fi
+
+          COMMIT_SHA=$(git rev-list -n 1 "refs/tags/$TAG")
+          COMMIT_TS=$(git show -s --format=%cI "$COMMIT_SHA")
+          COMMIT_EPOCH=$(date -d "$COMMIT_TS" +%s)
+          echo "Tag commit: $COMMIT_SHA ($COMMIT_TS)"
+
+          ACCESS_TOKEN=$(gcloud auth print-access-token)
+
+          RELEASES_JSON=$(curl -sS -H "Authorization: Bearer $ACCESS_TOKEN" \
+            "https://firebasehosting.googleapis.com/v1beta1/sites/$SITE_ID/releases?pageSize=100")
+
+          if [ "$(echo "$RELEASES_JSON" | jq -r '.releases | length // 0')" = "0" ]; then
+            echo "::error::No releases returned from Firebase Hosting API."
+            echo "$RELEASES_JSON"
+            exit 1
+          fi
+
+          BEST=$(echo "$RELEASES_JSON" | jq -c --argjson target "$COMMIT_EPOCH" '
+            [.releases[]
+              | select(.type == "DEPLOY")
+              | select(.version != null)
+              | {
+                  versionId: (.version.name | split("/") | last),
+                  releaseTime: .releaseTime,
+                  diff: ((.releaseTime | fromdateiso8601) - $target | fabs)
+                }]
+            | sort_by(.diff)
+            | .[0] // empty
+          ')
+
+          if [ -z "$BEST" ] || [ "$BEST" = "null" ]; then
+            echo "::error::Could not find a matching Firebase Hosting release for tag $TAG."
+            exit 1
+          fi
+
+          VERSION_ID=$(echo "$BEST" | jq -r '.versionId')
+          RELEASE_TIME=$(echo "$BEST" | jq -r '.releaseTime')
+          DIFF=$(echo "$BEST" | jq -r '.diff')
+
+          echo "Matched release:"
+          echo "  version_id : $VERSION_ID"
+          echo "  releaseTime: $RELEASE_TIME"
+          echo "  delta(s)   : $DIFF"
+
+          if [ "${DIFF%.*}" -gt 86400 ]; then
+            echo "::warning::Closest Firebase release is more than 24h away from the tag commit. Verify it is correct before relying on the rollback."
+          fi
+
+          echo "version_id=$VERSION_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Roll back live Hosting to selected version
+        env:
+          SITE_ID: ${{ github.event.inputs.site_id }}
+          VERSION_ID: ${{ steps.resolve.outputs.version_id }}
+          PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+        run: |
+          echo "Cloning $SITE_ID:@$VERSION_ID into $SITE_ID:live"
+          firebase hosting:clone "$SITE_ID:@$VERSION_ID" "$SITE_ID:live" \
+            --project "$PROJECT_ID" --non-interactive
+
+      - name: Summary
+        env:
+          VERSION_ID: ${{ steps.resolve.outputs.version_id }}
+          GIT_TAG: ${{ github.event.inputs.git_tag }}
+          SITE_ID: ${{ github.event.inputs.site_id }}
+        run: |
+          {
+            echo "## Firebase Rollback"
+            echo ""
+            echo "- Site: \`$SITE_ID\`"
+            [ -n "$GIT_TAG" ] && echo "- Git tag: \`$GIT_TAG\`"
+            echo "- Version cloned to live: \`$VERSION_ID\`"
+          } >> "$GITHUB_STEP_SUMMARY"
