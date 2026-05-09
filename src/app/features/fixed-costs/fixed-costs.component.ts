@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 import { UiIconComponent } from '../../shared/ui/components';
+import { MonthNavComponent } from '../../shared/month-nav/month-nav.component';
 import { FixedCostsStore } from '../../core/store/fixed-costs.store';
 import { AuthStore } from '../../core/store/auth.store';
 import { DialogService } from '../../core/services/dialog.service';
@@ -12,36 +13,22 @@ import {
 } from './fixed-cost-form.component';
 import { ConfirmDialogComponent } from '../../shared/ui-modal/confirm-dialog.component';
 import { ConfirmDialogData } from '../../shared/ui-modal/confirm-dialog.model';
+import { formatPeriodLabel } from '../../core/utils/dashboard.utils';
+import { SelectedDate } from '../../core/models/dashboard';
 
-interface SelectedMonth {
-  year: number;
-  month: number;
-}
-
-const MONTH_LABEL_FORMATTER = new Intl.DateTimeFormat('es-AR', {
-  month: 'long',
-  year: 'numeric',
-});
-
-function monthKeyOf(date: SelectedMonth): string {
+function monthKeyOf(date: SelectedDate): string {
   return `${date.year}-${String(date.month + 1).padStart(2, '0')}`;
-}
-
-function labelOf(date: SelectedMonth): string {
-  const d = new Date(date.year, date.month, 1);
-  const formatted = MONTH_LABEL_FORMATTER.format(d);
-  return formatted.charAt(0).toLocaleUpperCase('es-AR') + formatted.slice(1);
 }
 
 function labelFromMonthKey(monthKey: string): string {
   const [y, m] = monthKey.split('-').map(Number);
-  return labelOf({ year: y, month: m - 1 });
+  return formatPeriodLabel({ year: y, month: m - 1 });
 }
 
 @Component({
   selector: 'app-fixed-costs',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ArsPipe, UiIconComponent],
+  imports: [ArsPipe, UiIconComponent, MonthNavComponent],
   templateUrl: './fixed-costs.component.html',
   styleUrl: './fixed-costs.component.scss',
 })
@@ -52,13 +39,13 @@ export class FixedCostsComponent {
   private readonly notify = inject(NotificationService);
 
   private readonly today = new Date();
-  readonly selected = signal<SelectedMonth>({
+  readonly selected = signal<SelectedDate>({
     year: this.today.getFullYear(),
     month: this.today.getMonth(),
   });
 
   readonly monthKey = computed(() => monthKeyOf(this.selected()));
-  readonly monthLabel = computed(() => labelOf(this.selected()));
+  readonly monthLabel = computed(() => formatPeriodLabel(this.selected()));
   readonly entries = computed(() => this.store.entriesForMonth(this.monthKey()));
   readonly status = computed(() => this.store.statusForMonth(this.monthKey()));
   readonly total = computed(() => this.store.totalForMonth(this.monthKey()));
