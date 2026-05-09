@@ -1,19 +1,55 @@
-<h2 class="text-xl font-semibold mb-3">{{ isEdit ? 'Editar' : 'Nuevo' }} Costo Fijo</h2>
+<h2 class="text-xl font-semibold mb-1">{{ isEdit ? 'Editar costo fijo' : 'Nuevo costo fijo' }}</h2>
+<p class="text-sm text-gray-500 mb-4">Aplica a {{ monthLabel }}</p>
+
 <div class="flex flex-col gap-3">
-  <label class="ui-field"><span>Nombre</span><input data-initial-focus class="ui-input" [(ngModel)]="form.name" required /></label>
-  <label class="ui-field"><span>Descripción (opcional)</span><input class="ui-input" [(ngModel)]="form.description" /></label>
-  <label class="ui-field"><span>Categoría</span><select class="ui-select" [(ngModel)]="form.category" required>@for (c of categories; track c.key) {<option [value]="c.key">{{ c.label }}</option>}</select></label>
-  <div class="grid grid-cols-2 gap-3">
-    <label class="ui-field"><span>Monto</span><input class="ui-input" type="number" [(ngModel)]="form.amount" min="0" required /></label>
-    <label class="ui-field"><span>Frecuencia</span><input class="ui-input" value="Mensual" disabled aria-label="Frecuencia mensual" /></label>
-  </div>
-  <p class="text-xs text-gray-400 -mt-1">Equivale a <strong>{{ monthlyEquivalent() | currency: 'ARS' : 'symbol' : '1.0-0' }}/mes</strong></p>
+  <label class="ui-field">
+    <span>Nombre</span>
+    <input
+      data-initial-focus
+      class="ui-input"
+      type="text"
+      [(ngModel)]="form.name"
+      required
+      autocomplete="off"
+    />
+  </label>
+
+  <label class="ui-field">
+    <span>Descripción (opcional)</span>
+    <input class="ui-input" type="text" [(ngModel)]="form.description" autocomplete="off" />
+  </label>
+
+  <label class="ui-field">
+    <span>Categoría</span>
+    <select class="ui-select" [(ngModel)]="form.category" required>
+      @for (c of categories; track c.key) {
+        <option [value]="c.key">{{ c.label }}</option>
+      }
+    </select>
+  </label>
+
+  <label class="ui-field">
+    <span>Monto (mensual)</span>
+    <input
+      class="ui-input"
+      type="number"
+      inputmode="decimal"
+      min="0"
+      step="1"
+      [(ngModel)]="form.amount"
+      required
+    />
+  </label>
 </div>
-<div class="flex justify-end gap-2 mt-4">
-  @if (isEdit) {
-    <button class="ui-btn" type="button" (click)="deactivate()">Dar de baja</button>
-    <button class="ui-btn ui-btn-danger" type="button" (click)="deleteByError()">Borrar por error</button>
-  }
+
+<div class="flex justify-end gap-2 mt-5">
   <button class="ui-btn" type="button" (click)="cancel()">Cancelar</button>
-  <button class="ui-btn ui-btn-primary" type="button" (click)="save()" [disabled]="!isValid()">{{ isEdit ? 'Guardar' : 'Crear' }}</button>
+  <button
+    class="ui-btn ui-btn-primary"
+    type="button"
+    (click)="save()"
+    [disabled]="!isValid()"
+  >
+    {{ isEdit ? 'Guardar cambios' : 'Crear' }}
+  </button>
 </div>

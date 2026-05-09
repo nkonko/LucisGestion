@@ -1,52 +1,98 @@
 <div class="flex items-center justify-between mb-4">
-  <h2 class="text-xl font-semibold">Costos Fijos</h2>
+  <h2 class="text-xl font-semibold">Costos fijos</h2>
+  @if (auth.isOwner()) {
+    <button class="ui-btn ui-btn-primary" type="button" (click)="create()">
+      <ui-icon name="add" [size]="18" [decorative]="true" />
+      <span>Agregar costo</span>
+    </button>
+  }
 </div>
 
-<section class="ui-card-surface mb-4 bg-orange-50">
-  <div class="py-3">
-    <div class="flex items-center gap-2 mb-1">
-      <ui-icon name="calculate" class="text-orange-500" [decorative]="true" />
-      <span class="font-medium text-orange-800">Total mensual</span>
+<section class="month-nav ui-card-surface mb-3" aria-label="Selector de mes">
+  <div class="month-nav__row">
+    <button
+      type="button"
+      class="month-nav__arrow"
+      aria-label="Mes anterior"
+      (click)="previousMonth()"
+    >
+      <ui-icon name="chevron_left" [size]="22" [decorative]="true" />
+    </button>
+
+    <div class="month-nav__center">
+      <div class="month-nav__title">{{ monthLabel() }}</div>
+      <div class="month-nav__caption">{{ statusCaption() }}</div>
     </div>
-    <div class="text-2xl font-bold text-orange-700">{{ store.totalMonthlyFixedCosts() | ars }}</div>
-    <div class="text-xs text-orange-600 mt-1">Suma de todos los costos fijos mensuales</div>
+
+    <button
+      type="button"
+      class="month-nav__arrow"
+      aria-label="Mes siguiente"
+      (click)="nextMonth()"
+    >
+      <ui-icon name="chevron_right" [size]="22" [decorative]="true" />
+    </button>
   </div>
 </section>
 
-@if (store.fixedCosts().length === 0) {
-  <div class="text-center py-8 text-gray-400">
-    <ui-icon name="receipt_long" [size]="48" [decorative]="true" />
-    <p>No hay costos fijos cargados</p>
-    <p class="text-sm">Tocá el botón + para agregar luz, gas, alquiler, etc.</p>
-  </div>
+@if (canRevert() && auth.isOwner()) {
+  <button
+    type="button"
+    class="month-nav__revert"
+    (click)="confirmRevert()"
+  >
+    <ui-icon name="restart_alt" [size]="16" [decorative]="true" />
+    <span>Volver al mes anterior</span>
+  </button>
 }
 
-@for (group of groupsByCategory(); track group.category) {
-  <div class="mb-2">
-    <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide px-1 mb-1">{{ categoryLabel(group.category) }}</div>
-    @for (cost of group.items; track cost.id) {
-      <article class="ui-card-surface touch-card mb-2" (click)="auth.isOwner() ? edit(cost) : null">
-        <div class="py-2">
-          <div class="flex items-center justify-between">
-            <div class="flex-1 min-w-0">
-              <div class="font-medium truncate">{{ cost.name }}</div>
-              @if (cost.description) {
-                <div class="text-xs text-gray-500 truncate">{{ cost.description }}</div>
-              }
-            </div>
-            <div class="text-right ml-3 shrink-0">
-              <div class="font-semibold text-orange-700">{{ cost.amount | ars }}</div>
-              <span class="ui-chip-static">Mensual</span>
-            </div>
-          </div>
-        </div>
-      </article>
+@if (entries().length === 0) {
+  <div class="ui-card-surface text-center py-8 text-gray-500">
+    <ui-icon name="receipt_long" [size]="40" [decorative]="true" />
+    <p class="mt-2">No hay costos fijos en {{ monthLabel() }}</p>
+    @if (auth.isOwner()) {
+      <p class="text-sm text-gray-400">Tocá “Agregar costo” para empezar.</p>
     }
   </div>
-}
+} @else {
+  <ul class="cost-list ui-card-surface" role="list">
+    @for (entry of entries(); track trackEntry($index, entry)) {
+      <li class="cost-row">
+        <button
+          type="button"
+          class="cost-row__main"
+          [attr.aria-label]="'Editar ' + entry.name"
+          (click)="auth.isOwner() ? edit(entry) : null"
+          [disabled]="!auth.isOwner()"
+        >
+          <span class="cost-row__name">{{ entry.name }}</span>
+          <span class="cost-row__amount">{{ entry.amount | ars }}</span>
+        </button>
 
-@if (auth.isOwner()) {
-  <button class="fab-bottom-right ui-fab" (click)="create()" aria-label="Agregar costo fijo" type="button">
-    <ui-icon name="add" [decorative]="true" />
-  </button>
+        @if (auth.isOwner()) {
+          <button
+            type="button"
+            class="cost-row__action"
+            [attr.aria-label]="'Editar ' + entry.name"
+            (click)="editFromIcon(entry, $event)"
+          >
+            <ui-icon name="edit" [size]="18" [decorative]="true" />
+          </button>
+          <button
+            type="button"
+            class="cost-row__action cost-row__action--danger"
+            [attr.aria-label]="'Borrar ' + entry.name"
+            (click)="confirmDelete(entry, $event)"
+          >
+            <ui-icon name="delete" [size]="18" [decorative]="true" />
+          </button>
+        }
+      </li>
+    }
+
+    <li class="cost-row cost-row--total" aria-label="Total mensual">
+      <span class="cost-row__name">Total</span>
+      <span class="cost-row__amount">{{ total() | ars }}</span>
+    </li>
+  </ul>
 }

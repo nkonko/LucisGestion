@@ -1,63 +1,60 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CurrencyPipe } from '@angular/common';
 import {
-  FixedCost,
   CostCategory,
   COST_CATEGORY_DISPLAY,
-  FixedCostInputForm,
+  FixedCostEntry,
+  FixedCostEntryInput,
 } from '../../core/models/fixed-cost';
 import { DIALOG_DATA, DIALOG_REF } from '../../core/models/dialog/dialog-tokens.model';
 import { DialogRef } from '../../core/models/dialog/dialog-ref.model';
 
+export interface FixedCostFormData {
+  monthLabel: string;
+  entry: FixedCostEntry | null;
+}
+
 @Component({
   selector: 'app-fixed-cost-form',
-  imports: [FormsModule, CurrencyPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [FormsModule],
   templateUrl: './fixed-cost-form.component.html',
   styleUrl: './fixed-cost-form.component.scss',
 })
 export class FixedCostFormComponent {
-  private dialogRef = inject(DIALOG_REF) as DialogRef<FixedCost | 'deactivate' | 'delete'>;
-  private data = inject(DIALOG_DATA) as FixedCost | null;
+  private readonly dialogRef = inject(DIALOG_REF) as DialogRef<FixedCostEntryInput>;
+  private readonly data = inject(DIALOG_DATA) as FixedCostFormData;
 
-  isEdit = !!this.data;
+  readonly isEdit = !!this.data.entry;
+  readonly monthLabel = this.data.monthLabel;
 
-  form: FixedCostInputForm = {
-    name: this.data?.name ?? '',
-    description: this.data?.description ?? '',
-    amount: this.data?.amount ?? 0,
-    frequency: 'monthly',
-    category: this.data?.category ?? 'other',
+  readonly form: FixedCostEntryInput = {
+    name: this.data.entry?.name ?? '',
+    description: this.data.entry?.description ?? '',
+    amount: this.data.entry?.amount ?? 0,
+    category: this.data.entry?.category ?? 'other',
   };
 
-  categories = Object.entries(COST_CATEGORY_DISPLAY).map(([key, label]) => ({
+  readonly categories = Object.entries(COST_CATEGORY_DISPLAY).map(([key, label]) => ({
     key: key as CostCategory,
     label,
   }));
 
-  monthlyEquivalent(): number {
-    return this.form.amount;
-  }
-
   isValid(): boolean {
-    return !!this.form.name && this.form.amount >= 0;
+    return !!this.form.name.trim() && Number.isFinite(this.form.amount) && this.form.amount >= 0;
   }
 
   save(): void {
-    if (this.isValid()) {
-      this.dialogRef.close({ ...this.form, frequency: 'monthly', active: true });
-    }
+    if (!this.isValid()) return;
+    this.dialogRef.close({
+      name: this.form.name.trim(),
+      description: this.form.description.trim(),
+      amount: Number(this.form.amount),
+      category: this.form.category,
+    });
   }
 
   cancel(): void {
     this.dialogRef.close(undefined);
-  }
-
-  deactivate(): void {
-    this.dialogRef.close('deactivate');
-  }
-
-  deleteByError(): void {
-    this.dialogRef.close('delete');
   }
 }

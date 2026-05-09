@@ -1,12 +1,37 @@
 import { computed, inject } from '@angular/core';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
-import { FirestoreService } from '../services/firestore.service';
-import { FixedCost, FixedCostInput } from '../models/fixed-cost';
-import { orderBy } from '@angular/fire/firestore';
-import { Timestamp } from 'firebase/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { FirestoreService } from '../services/firestore.service';
+import {
+  FixedCostMonthDoc,
+  FixedCostEntry,
+  FixedCostEntryInput,
+  FixedCostMonthStatus,
+} from '../models/fixed-cost';
 import { BaseState } from './state/state';
 import { getErrorMessage } from '../utils/error.utils';
+
+const COLLECTION = 'fixedCostsByMonth';
+
+function generateLineageId(): string {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID();
+  }
+  return `lin-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function toEntry(doc: FixedCostMonthDoc): FixedCostEntry | null {
+  if (doc.isAnchor || !doc.lineageId) return null;
+  return {
+    id: doc.id,
+    lineageId: doc.lineageId,
+    monthKey: doc.monthKey,
+    name: doc.name ?? '',
+    description: doc.description ?? '',
+    amount: typeof doc.amount === 'number' ? doc.amount : 0,
+    category: doc.category ?? 'other',
+  };
+}
 
 export const FixedCostsStore = signalStore(
   { providedIn: 'root' },
@@ -14,61 +39,137 @@ export const FixedCostsStore = signalStore(
 
   withComputed(() => {
     const fs = inject(FirestoreService);
-    const fixedCosts$ = fs.getCollection<FixedCost>('fixedCosts', orderBy('name', 'asc'));
-    const allFixedCosts = toSignal(fixedCosts$, { initialValue: [] as FixedCost[] });
-    const fixedCosts = computed(() => allFixedCosts().filter((cost) => cost.active));
-
-    return {
-      allFixedCosts,
-      fixedCosts,
-      totalMonthlyFixedCosts: computed(() =>
-        fixedCosts().reduce((sum, cost) => {
-          if (cost.frequency === 'monthly') return sum + cost.amount;
-          return sum;
-        }, 0),
-      ),
-    };
+    const docs$ = fs.getCollection<FixedCostMonthDoc>(COLLECTION);
+    const allDocs = toSignal(docs$, { initialValue: [] as FixedCostMonthDoc[] });
+    const editedMonths = computed(() => {
+      const set = new Set<string>();
+      for (const d of allDocs()) set.add(d.monthKey);
+      return set;
+    });
+    return { allDocs, editedMonths };
   }),
 
   withMethods((store) => {
     const fs = inject(FirestoreService);
 
+    function entriesForMonthRaw(monthKey: string): FixedCostEntry[] {
+      const out: FixedCostEntry[] = [];
+      for (const doc of store.allDocs()) {
+        if (doc.monthKey !== monthKey) continue;
+        const entry = toEntry(doc);
+        if (entry) out.push(entry);
+      }
+      out.sort((a, b) => a.name.localeCompare(b.name, 'es'));
+      return out;
+    }
+
+    function isMonthEdited(monthKey: string): boolean {
+      return store.editedMonths().has(monthKey);
+    }
+
+    function inheritanceSource(monthKey: string): string | null {
+      const editedPriorMonths: string[] = [];
+      for (const m of store.editedMonths()) {
+        if (m < monthKey) editedPriorMonths.push(m);
+      }
+      editedPriorMonths.sort().reverse();
+      for (const m of editedPriorMonths) {
+        if (entriesForMonthRaw(m).length > 0) return m;
+      }
+      return null;
+    }
+
+    function effectiveEntries(monthKey: string): FixedCostEntry[] {
+      if (isMonthEdited(monthKey)) return entriesForMonthRaw(monthKey);
+      const source = inheritanceSource(monthKey);
+      if (!source) return [];
+      return entriesForMonthRaw(source).map((e) => ({ ...e, monthKey, id: undefined }));
+    }
+
+    function statusForMonthInternal(monthKey: string): FixedCostMonthStatus {
+      if (isMonthEdited(monthKey)) return { kind: 'edited' };
+      const source = inheritanceSource(monthKey);
+      if (source) return { kind: 'inherited', sourceMonthKey: source };
+      return { kind: 'empty' };
+    }
+
+    async function ensureMaterialized(monthKey: string): Promise<void> {
+      if (isMonthEdited(monthKey)) return;
+      const inherited = effectiveEntries(monthKey);
+      await fs.addDocument<FixedCostMonthDoc>(COLLECTION, {
+        monthKey,
+        isAnchor: true,
+      });
+      for (const entry of inherited) {
+        await fs.addDocument<FixedCostMonthDoc>(COLLECTION, {
+          monthKey,
+          lineageId: entry.lineageId,
+          name: entry.name,
+          description: entry.description,
+          amount: entry.amount,
+          category: entry.category,
+        });
+      }
+    }
+
+    function findDocId(monthKey: string, lineageId: string): string | undefined {
+      const doc = store
+        .allDocs()
+        .find((d) => d.monthKey === monthKey && d.lineageId === lineageId && !d.isAnchor);
+      return doc?.id;
+    }
+
     return {
-      totalForMonth(monthKey: string): number {
-        const [year, monthNum] = monthKey.split('-').map(Number);
-        const monthStart = new Date(year, monthNum - 1, 1);
-        const monthEnd = new Date(year, monthNum, 1);
-        return store
-          .allFixedCosts()
-          .filter((cost) => {
-            const start = cost.startDate?.toDate() ?? new Date(0);
-            const end = cost.endDate ? cost.endDate.toDate() : null;
-            return start < monthEnd && (end === null || end > monthStart);
-          })
-          .reduce((sum, cost) => sum + cost.amount, 0);
+      entriesForMonth(monthKey: string): FixedCostEntry[] {
+        return effectiveEntries(monthKey);
       },
 
-      async createFixedCost(fixedCost: FixedCostInput) {
+      statusForMonth(monthKey: string): FixedCostMonthStatus {
+        return statusForMonthInternal(monthKey);
+      },
+
+      totalForMonth(monthKey: string): number {
+        return effectiveEntries(monthKey).reduce((sum, e) => sum + e.amount, 0);
+      },
+
+      async createForMonth(monthKey: string, input: FixedCostEntryInput): Promise<void> {
         patchState(store, { loading: true, error: null });
         try {
-          const id = await fs.addDocument<FixedCostInput>('fixedCosts', {
-            ...fixedCost,
-            active: true,
-            startDate: Timestamp.now(),
-            endDate: null,
+          await ensureMaterialized(monthKey);
+          await fs.addDocument<FixedCostMonthDoc>(COLLECTION, {
+            monthKey,
+            lineageId: generateLineageId(),
+            name: input.name,
+            description: input.description,
+            amount: input.amount,
+            category: input.category,
           });
           patchState(store, { loading: false });
-          return id;
         } catch (error: unknown) {
           patchState(store, { loading: false, error: getErrorMessage(error) });
           throw error;
         }
       },
 
-      async updateFixedCost(id: string, changes: Partial<FixedCost>) {
+      async updateForMonth(
+        monthKey: string,
+        lineageId: string,
+        changes: FixedCostEntryInput,
+      ): Promise<void> {
         patchState(store, { loading: true, error: null });
         try {
-          await fs.updateDocument('fixedCosts', id, changes as Record<string, unknown>);
+          await ensureMaterialized(monthKey);
+          const id = findDocId(monthKey, lineageId);
+          if (!id) {
+            patchState(store, { loading: false });
+            return;
+          }
+          await fs.updateDocument(COLLECTION, id, {
+            name: changes.name,
+            description: changes.description,
+            amount: changes.amount,
+            category: changes.category,
+          });
           patchState(store, { loading: false });
         } catch (error: unknown) {
           patchState(store, { loading: false, error: getErrorMessage(error) });
@@ -76,20 +177,33 @@ export const FixedCostsStore = signalStore(
         }
       },
 
-      async deactivateFixedCost(id: string) {
+      async deleteForMonth(monthKey: string, lineageId: string): Promise<void> {
+        patchState(store, { loading: true, error: null });
         try {
-          return await fs.updateDocument('fixedCosts', id, { active: false, endDate: Timestamp.now() });
+          await ensureMaterialized(monthKey);
+          const id = findDocId(monthKey, lineageId);
+          if (!id) {
+            patchState(store, { loading: false });
+            return;
+          }
+          await fs.deleteDocument(COLLECTION, id);
+          patchState(store, { loading: false });
         } catch (error: unknown) {
-          patchState(store, { error: getErrorMessage(error) });
+          patchState(store, { loading: false, error: getErrorMessage(error) });
           throw error;
         }
       },
 
-      async deleteFixedCost(id: string) {
+      async revertMonthToInherited(monthKey: string): Promise<void> {
+        patchState(store, { loading: true, error: null });
         try {
-          return await fs.deleteDocument('fixedCosts', id);
+          const docs = store.allDocs().filter((d) => d.monthKey === monthKey);
+          for (const d of docs) {
+            if (d.id) await fs.deleteDocument(COLLECTION, d.id);
+          }
+          patchState(store, { loading: false });
         } catch (error: unknown) {
-          patchState(store, { error: getErrorMessage(error) });
+          patchState(store, { loading: false, error: getErrorMessage(error) });
           throw error;
         }
       },

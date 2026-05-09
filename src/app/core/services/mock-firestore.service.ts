@@ -5,7 +5,7 @@ import type { Ingredient } from '../models/ingredient';
 import type { Recipe } from '../models/recipe';
 import type { Sale } from '../models/sale';
 import type { Customer } from '../models/customer';
-import type { FixedCost } from '../models/fixed-cost';
+import type { FixedCostMonthDoc } from '../models/fixed-cost';
 import type { StockAdjustmentInput } from '../models/stock';
 
 type MockDocument = Record<string, unknown> & { id?: string; active?: boolean; endDate?: Timestamp };
@@ -469,75 +469,64 @@ export class MockFirestoreService {
       },
     ]);
 
-    // --- Fixed Costs ---------------------------------------------------------
-    const fixedCosts: FixedCost[] = [
+    // --- Fixed Costs (monthly history) ---------------------------------------
+    const fixedCostsByMonth: FixedCostMonthDoc[] = [
+      { id: 'cfm-anchor-04', monthKey: '2026-04', isAnchor: true },
       {
-        id: 'cf-1',
+        id: 'cfm-1',
+        monthKey: '2026-04',
+        lineageId: 'lin-rent',
         name: 'Alquiler del local',
         description: 'Pago el 1 de cada mes',
         amount: 150000,
-        frequency: 'monthly',
         category: 'rent',
-        active: true,
-        startDate: ts(2026, 1, 1),
-        endDate: null,
       },
       {
-        id: 'cf-2',
+        id: 'cfm-2',
+        monthKey: '2026-04',
+        lineageId: 'lin-luz',
         name: 'Luz',
         description: 'EDESUR — bimestral prorrateado',
         amount: 25000,
-        frequency: 'monthly',
         category: 'utilities',
-        active: true,
-        startDate: ts(2026, 1, 1),
-        endDate: null,
       },
       {
-        id: 'cf-3',
+        id: 'cfm-3',
+        monthKey: '2026-04',
+        lineageId: 'lin-gas',
         name: 'Gas',
         description: 'Metrogas',
         amount: 18000,
-        frequency: 'monthly',
         category: 'utilities',
-        active: true,
-        startDate: ts(2026, 1, 1),
-        endDate: null,
       },
       {
-        id: 'cf-4',
+        id: 'cfm-4',
+        monthKey: '2026-04',
+        lineageId: 'lin-internet',
         name: 'Internet',
         description: 'Fibertel',
         amount: 12000,
-        frequency: 'monthly',
         category: 'utilities',
-        active: true,
-        startDate: ts(2026, 1, 1),
-        endDate: null,
       },
       {
-        id: 'cf-5',
+        id: 'cfm-5',
+        monthKey: '2026-04',
+        lineageId: 'lin-monotributo',
         name: 'Monotributo',
         description: 'Categoría D',
         amount: 35000,
-        frequency: 'monthly',
         category: 'taxes',
-        active: true,
-        startDate: ts(2026, 1, 1),
-        endDate: null,
       },
       {
-        id: 'cf-6',
+        id: 'cfm-6',
+        monthKey: '2026-04',
+        lineageId: 'lin-seguro',
         name: 'Seguro de comercio',
         description: '',
         amount: 15000,
-        frequency: 'monthly',
         category: 'other',
-        active: true,
-        startDate: ts(2026, 1, 1),
-        endDate: null,
       },
     ];
-    this.getOrCreate('fixedCosts').next(fixedCosts);
+    this.getOrCreate('fixedCostsByMonth').next(fixedCostsByMonth);
   }
 }
