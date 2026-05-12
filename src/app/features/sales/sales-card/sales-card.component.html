@@ -18,6 +18,10 @@
       }
     </div>
   </div>
+   <div class="sale-card-footer">
+    <div class="sale-date">{{ displayDate }}</div>
+    <div class="sale-total">{{ sale().total | ars }}</div>
+  </div>
 
   @if (sale().status === 'pending') {
     <div class="sale-card-actions">
@@ -32,13 +36,8 @@
           <ui-icon name="chat" [decorative]="true" />
         </button>
       }
-      <button class="ui-btn ui-btn-sm ui-btn-danger" (click)="requestStatusChange('cancelled')" type="button">Cancelar</button>
+      <button class="ui-btn ui-btn-sm sale-btn-cancel" (click)="requestStatusChange('cancelled')" type="button">Cancelar</button>
       <button class="ui-btn ui-btn-sm ui-btn-primary" (click)="requestStatusChange('delivered')" type="button">Entregar</button>
     </div>
   }
-
-  <div class="sale-card-footer">
-    <div class="sale-date">{{ displayDate }}</div>
-    <div class="sale-total">{{ sale().total | ars }}</div>
-  </div>
 </article>
