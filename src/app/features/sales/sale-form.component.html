@@ -1,20 +1,103 @@
-<h2 class="text-xl font-semibold mb-3">Nueva Venta</h2>
-<div class="flex flex-col gap-3">
-  <h3 class="text-sm font-medium">Seleccionar productos</h3>
-  <div class="grid grid-cols-2 gap-2">
-    @for (recipe of recipesStore.recipes(); track recipe.id) {
-      <div class="touch-card text-center py-2 px-2 border rounded-md" [class.selected-card]="getItemQuantity(recipe.id!) > 0" (click)="addItem(recipe)">
-        <div class="font-medium text-sm">{{ recipe.name }}</div><div class="text-sm font-bold">{{ recipe.salePrice | ars }}</div>
-        @if (getItemQuantity(recipe.id!) > 0) {
-          <div class="flex items-center justify-center gap-2 mt-1"><button class="ui-btn" type="button" (click)="decrementItem(recipe.id!); $event.stopPropagation()">-</button><span class="font-bold">{{ getItemQuantity(recipe.id!) }}</span><button class="ui-btn" type="button" (click)="addItem(recipe); $event.stopPropagation()">+</button></div>
+<div class="sale-form-container">
+  <div class="sale-form-header">
+    <h2 class="sale-form-title">Nueva Venta</h2>
+  </div>
+
+  <div class="sale-form-content">
+    <!-- Sección: Productos -->
+    <section class="sale-form-section">
+      <h3 class="sale-form-section-title">Productos</h3>
+      <div class="recipe-grid">
+        @for (recipe of recipesStore.recipes(); track recipe.id) {
+          <div
+            class="recipe-card touch-card"
+            [class.recipe-card--selected]="getItemQuantity(recipe.id!) > 0"
+            (click)="addItem(recipe)"
+            role="button"
+            tabindex="0"
+            [attr.aria-pressed]="getItemQuantity(recipe.id!) > 0"
+          >
+            <div class="recipe-card-name">{{ recipe.name }}</div>
+            <div class="recipe-card-price">{{ recipe.salePrice | ars }}</div>
+            @if (getItemQuantity(recipe.id!) > 0) {
+              <div class="recipe-card-controls">
+                <button class="ui-btn ui-btn-sm" type="button" (click)="decrementItem(recipe.id!); $event.stopPropagation()">−</button>
+                <span class="recipe-card-qty">{{ getItemQuantity(recipe.id!) }}</span>
+                <button class="ui-btn ui-btn-sm" type="button" (click)="addItem(recipe); $event.stopPropagation()">+</button>
+              </div>
+            }
+          </div>
         }
       </div>
+    </section>
+
+    <!-- Sección: Items seleccionados -->
+    @if (items().length > 0) {
+      <section class="sale-form-section">
+        <h3 class="sale-form-section-title">Detalle</h3>
+        <div class="selected-items">
+          @for (item of items(); track item.recipeId) {
+            <div class="selected-item">
+              <span class="selected-item-qty">{{ item.quantity }}×</span>
+              <span class="selected-item-name">{{ item.name }}</span>
+              <span class="selected-item-price">{{ (item.quantity * item.unitPrice) | ars }}</span>
+            </div>
+          }
+        </div>
+      </section>
     }
+
+    <!-- Sección: Cliente y Pago -->
+    <section class="sale-form-section">
+      <h3 class="sale-form-section-title">Cliente & Pago</h3>
+      <label class="ui-field">
+        <span>Cliente (opcional)</span>
+        <input
+          class="ui-input"
+          [ngModel]="customerSearch"
+          (ngModelChange)="handleCustomerSearchChange($event)"
+          data-initial-focus
+          placeholder="Nombre o teléfono"
+        />
+      </label>
+      <label class="ui-field">
+        <span>Seleccionar cliente registrado</span>
+        <select class="ui-select" [ngModel]="selectedCustomerId" (ngModelChange)="selectCustomerById($event)">
+          <option value="">Sin cliente</option>
+          @for (c of customers(); track c.id ?? c.phone) {
+            <option [value]="c.id ?? ''">{{ c.name }} · {{ c.phone }}</option>
+          }
+        </select>
+      </label>
+      <label class="ui-field">
+        <span>Medio de pago</span>
+        <select class="ui-select" [(ngModel)]="paymentMethod">
+          @for (mp of paymentMethods; track mp.key) {
+            <option [value]="mp.key">{{ mp.label }}</option>
+          }
+        </select>
+      </label>
+      <label class="ui-field">
+        <span>Notas</span>
+        <textarea class="ui-textarea" [(ngModel)]="notes" placeholder="Detalles adicionales..." rows="2"></textarea>
+      </label>
+    </section>
   </div>
-  <label class="ui-field"><span>Cliente (opcional)</span><input class="ui-input" [ngModel]="customerSearch" (ngModelChange)="handleCustomerSearchChange($event)" data-initial-focus /></label>
-  <label class="ui-field"><span>Seleccionar cliente existente</span><select class="ui-select" [ngModel]="selectedCustomerId" (ngModelChange)="selectCustomerById($event)"><option value="">Sin cliente registrado</option>@for (c of customers(); track c.id ?? c.phone) {<option [value]="c.id ?? ''">{{ c.name }} · {{ c.phone }}</option>}</select></label>
-  <label class="ui-field"><span>Medio de pago</span><select class="ui-select" [(ngModel)]="paymentMethod">@for (mp of paymentMethods; track mp.key) {<option [value]="mp.key">{{ mp.label }}</option>}</select></label>
-  <label class="ui-field"><span>Notas</span><input class="ui-input" [(ngModel)]="notes" /></label>
-  <div class="text-center py-2 bg-green-50 rounded-lg"><div class="text-sm text-gray-500">Total</div><div class="text-3xl font-bold text-green-700">{{ total() | ars }}</div><div class="text-xs text-gray-400">Ganancia estimada: {{ profit() | ars }}</div></div>
+
+  <!-- Resumen: sticky/fijo en móvil -->
+  <div class="sale-form-summary">
+    <div class="sale-summary-content">
+      <div class="sale-summary-item">
+        <span class="sale-summary-label">Total</span>
+        <span class="sale-summary-value">{{ total() | ars }}</span>
+      </div>
+    </div>
+    
+    <div class="sale-form-actions">
+      <button class="ui-btn" type="button" (click)="cancel()">Cancelar</button>
+      <button class="ui-btn ui-btn-primary" type="button" (click)="confirm()" [disabled]="items().length === 0">
+        Confirmar
+      </button>
+    </div>
+  </div>
 </div>
-<div class="flex justify-end gap-2 mt-4"><button class="ui-btn" type="button" (click)="cancel()">Cancelar</button><button class="ui-btn ui-btn-primary" type="button" (click)="confirm()" [disabled]="items().length === 0">Confirmar venta</button></div>
