@@ -2,10 +2,6 @@
   <div class="sale-card-header">
     <div class="sale-card-main">
       <div class="sale-customer-name">{{ sale().customerName || 'Sin cliente' }}</div>
-      <div class="sale-date">{{ sale().date.toDate() | date: 'dd/MM HH:mm' }}</div>
-    </div>
-    <div class="sale-card-summary">
-      <div class="sale-total">{{ sale().total | ars }}</div>
       <span class="sale-status" [class]="statusClass">
         {{ statusLabel }}
       </span>
@@ -40,4 +36,9 @@
       <button class="ui-btn ui-btn-sm ui-btn-primary" (click)="requestStatusChange('delivered')" type="button">Entregar</button>
     </div>
   }
+
+  <div class="sale-card-footer">
+    <div class="sale-date">{{ displayDate }}</div>
+    <div class="sale-total">{{ sale().total | ars }}</div>
+  </div>
 </article>

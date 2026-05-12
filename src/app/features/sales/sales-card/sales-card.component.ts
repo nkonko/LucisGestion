@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, output, input } from '@angular/core';
-import { DatePipe } from '@angular/common';
 import { ArsPipe } from '../../../shared/pipes/ars.pipe';
 import { UiIconComponent } from '../../../shared/ui/components';
 import type { Sale, SaleStatus } from '../../../core/models/sale';
@@ -7,7 +6,7 @@ import { SALE_STATUS_CLASS, SALE_STATUS_DISPLAY } from '../../../core/models/sal
 
 @Component({
   selector: 'app-sales-card',
-  imports: [DatePipe, ArsPipe, UiIconComponent],
+  imports: [ArsPipe, UiIconComponent],
   templateUrl: './sales-card.component.html',
   styleUrl: './sales-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,6 +23,16 @@ export class SalesCardComponent {
 
   get statusClass(): string {
     return SALE_STATUS_CLASS[this.sale().status];
+  }
+
+  get displayDate(): string {
+    const date = this.sale().date.toDate();
+    const weekday = new Intl.DateTimeFormat('es-AR', { weekday: 'long' }).format(date);
+    const day = new Intl.DateTimeFormat('es-AR', { day: 'numeric' }).format(date);
+    const month = new Intl.DateTimeFormat('es-AR', { month: 'long' }).format(date);
+    const year = new Intl.DateTimeFormat('es-AR', { year: 'numeric' }).format(date);
+
+    return `${weekday} ${day} de ${month} de ${year}`;
   }
 
   requestWhatsApp(): void {
