@@ -34,6 +34,29 @@
       <span>Desde</span>
       <input class="ui-input" type="date" (change)="onDateFromInput($event)" />
     </label>
+    <label class="ui-field flex-1 min-w-[180px]">
+      <span>Cliente</span>
+      <select class="ui-select" (change)="onCustomerFilterChange($event)" [value]="selectedCustomerId() ?? ''">
+        <option value="">Todos los clientes</option>
+        @for (customer of customers(); track customer.id ?? customer.phone) {
+          <option [value]="customer.id ?? ''">{{ customer.name }}</option>
+        }
+      </select>
+    </label>
+    <label class="ui-field w-[180px]">
+      <span>Estado</span>
+      <select class="ui-select" (change)="onStatusFilterChange($event)" [value]="selectedStatus() ?? ''">
+        <option value="">Todos los estados</option>
+        <option value="pending">{{ statusDisplay.pending }}</option>
+        <option value="delivered">{{ statusDisplay.delivered }}</option>
+        <option value="cancelled">{{ statusDisplay.cancelled }}</option>
+      </select>
+    </label>
+    @if (searchTerm() || dateFrom() || selectedCustomerId() || selectedStatus()) {
+      <button class="ui-btn" (click)="clearFilters()" type="button" title="Borrar todos los filtros activos">
+        Limpiar
+      </button>
+    }
   </div>
 
   @if (filteredHistory().length === 0) {

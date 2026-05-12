@@ -30,11 +30,28 @@
   gap: var(--space-3);
   margin-bottom: var(--space-4);
   flex-wrap: wrap;
+  align-items: flex-end;
+
+  .ui-field {
+    flex-shrink: 1;
+  }
+
+  .ui-btn {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 1024px) {
+    gap: var(--space-2);
+  }
 
   @media (max-width: 640px) {
     gap: var(--space-2);
     
     .ui-field {
+      min-width: 100%;
+    }
+
+    .ui-btn {
       min-width: 100%;
     }
   }

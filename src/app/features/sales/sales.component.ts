@@ -32,11 +32,17 @@ export class SalesComponent {
 
   searchTerm = signal('');
   dateFrom = signal<Date | null>(null);
+  selectedCustomerId = signal<string | null>(null);
+  selectedStatus = signal<SaleStatus | null>(null);
+
+  readonly customers = computed(() => this.customersStore.customers());
 
   filteredHistory = computed(() => {
     let items = this.store.sales();
     const term = this.searchTerm().toLowerCase().trim();
     const from = this.dateFrom();
+    const customerId = this.selectedCustomerId();
+    const status = this.selectedStatus();
 
     if (term) {
       items = items.filter(
@@ -47,6 +53,12 @@ export class SalesComponent {
     }
     if (from) {
       items = items.filter((v) => v.date?.toDate() >= from);
+    }
+    if (customerId) {
+      items = items.filter((v) => v.customerId === customerId);
+    }
+    if (status) {
+      items = items.filter((v) => v.status === status);
     }
     return items;
   });
@@ -60,6 +72,25 @@ export class SalesComponent {
     const htmlTarget = event.target as HTMLInputElement | null;
     const value = htmlTarget?.value ?? '';
     this.dateFrom.set(value ? new Date(`${value}T00:00:00`) : null);
+  }
+
+  onCustomerFilterChange(event: Event): void {
+    const htmlTarget = event.target as HTMLSelectElement | null;
+    const value = htmlTarget?.value ?? '';
+    this.selectedCustomerId.set(value ? value : null);
+  }
+
+  onStatusFilterChange(event: Event): void {
+    const htmlTarget = event.target as HTMLSelectElement | null;
+    const value = htmlTarget?.value as SaleStatus | '';
+    this.selectedStatus.set(value ? (value as SaleStatus) : null);
+  }
+
+  clearFilters(): void {
+    this.searchTerm.set('');
+    this.dateFrom.set(null);
+    this.selectedCustomerId.set(null);
+    this.selectedStatus.set(null);
   }
 
   getStatusClass(status: SaleStatus): string {
