@@ -30,6 +30,24 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-3);
+  cursor: pointer;
+  padding: var(--space-2);
+  margin: calc(var(--space-2) * -1);
+  border-radius: var(--space-1);
+  transition: background-color var(--transition-standard);
+
+  &:hover {
+    background-color: var(--color-surface-container);
+  }
+
+  &:active {
+    background-color: var(--color-surface-container-high);
+  }
+
+  &:focus {
+    outline: var(--border-width-medium) solid var(--color-primary);
+    outline-offset: var(--space-1);
+  }
 }
 
 .sale-customer-name {

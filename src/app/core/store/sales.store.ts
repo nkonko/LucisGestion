@@ -88,6 +88,39 @@ export const SalesStore = signalStore(
         }
       },
 
+      async updateSale(id: string, updatedSale: SaleInput) {
+        patchState(store, { loading: true, error: null });
+        try {
+          const oldSale = store.sales().find((candidate) => candidate.id === id);
+          
+          // If items changed, adjust stock
+          if (oldSale && JSON.stringify(oldSale.items) !== JSON.stringify(updatedSale.items)) {
+            // Restock the old items
+            const oldAdjustments = buildStockAdjustments(oldSale.items, 1);
+            await fs.applyStockAdjustments(id, 'edit_restock', oldAdjustments);
+            
+            // Destock the new items
+            const newAdjustments = buildStockAdjustments(updatedSale.items, -1);
+            await fs.applyStockAdjustments(id, 'edit_deduction', newAdjustments);
+          }
+
+          await fs.updateDocument('sales', id, {
+            items: updatedSale.items,
+            total: updatedSale.total,
+            totalCost: updatedSale.totalCost,
+            profit: updatedSale.profit,
+            customerId: updatedSale.customerId,
+            customerName: updatedSale.customerName,
+            paymentMethod: updatedSale.paymentMethod,
+            notes: updatedSale.notes,
+          });
+
+          patchState(store, { loading: false });
+        } catch (error: unknown) {
+          return handleStoreError(error);
+        }
+      },
+
       async updateSaleStatus(id: string, status: Sale['status']) {
         patchState(store, { loading: true, error: null });
         try {

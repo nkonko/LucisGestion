@@ -4,7 +4,7 @@ import { SalesStore } from '../../core/store/sales.store';
 import { CustomersStore } from '../../core/store/customers.store';
 import { WhatsAppService } from '../../core/services/whatsapp.service';
 import type { SaleStatus } from '../../core/models/sale/sale-status.model';
-import { Sale, SALE_STATUS_DISPLAY } from '../../core/models/sale';
+import { Sale, SaleInput, SALE_STATUS_DISPLAY } from '../../core/models/sale';
 import { SaleFormComponent } from './create-sale/sale-form.component';
 import { DialogService } from '../../core/services/dialog.service';
 import { UiIconComponent } from '../../shared/ui/components';
@@ -24,9 +24,7 @@ export class SalesComponent {
   private dialog = inject(DialogService);
   private notify = inject(NotificationService);
 
-  readonly selectedTab = signal<'pending' | 'history'>('pending');
   statusDisplay: Record<SaleStatus, string> = SALE_STATUS_DISPLAY;
-  pending = this.store.pendingOrders;
 
   searchTerm = signal('');
   dateFrom = signal<Date | null>(null);
@@ -35,7 +33,7 @@ export class SalesComponent {
 
   readonly customers = computed(() => this.customersStore.customers());
 
-  filteredHistory = computed(() => {
+  filteredSales = computed(() => {
     let items = this.store.sales();
     const term = this.searchTerm().toLowerCase().trim();
     const from = this.dateFrom();
@@ -92,7 +90,7 @@ export class SalesComponent {
   }
 
   newSale(): void {
-    const dialogRef = this.dialog.open<null, Sale>(SaleFormComponent, {
+    const dialogRef = this.dialog.open<null, SaleInput>(SaleFormComponent, {
       maxWidth: '560px',
       maxHeight: '90vh',
       data: null,
@@ -102,6 +100,21 @@ export class SalesComponent {
       if (result) {
         await this.store.registerSale(result);
         this.notify.success('Venta registrada. Stock actualizado.', 3000);
+      }
+    });
+  }
+
+  editSale(sale: Sale): void {
+    const dialogRef = this.dialog.open<Sale, SaleInput>(SaleFormComponent, {
+      maxWidth: '560px',
+      maxHeight: '90vh',
+      data: sale,
+    });
+
+    dialogRef.afterClosed.subscribe(async (result) => {
+      if (result) {
+        await this.store.updateSale(sale.id!, result);
+        this.notify.success('Venta actualizada.', 3000);
       }
     });
   }
@@ -120,5 +133,9 @@ export class SalesComponent {
 
   onStatusChange(event: { sale: Sale; status: SaleStatus }): void {
     void this.changeStatus(event.sale, event.status);
+  }
+
+  onEditRequested(sale: Sale): void {
+    this.editSale(sale);
   }
 }

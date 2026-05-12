@@ -1,6 +1,6 @@
 <div class="sale-form-container">
   <div class="sale-form-header">
-    <h2 class="sale-form-title">Nueva Venta</h2>
+    <h2 class="sale-form-title">{{ pageTitle() }}</h2>
   </div>
 
   <div class="sale-form-content">
@@ -92,9 +92,9 @@
     </div>
     
     <div class="sale-form-actions">
-      <button class="ui-btn" type="button" (click)="cancel()">Cancelar</button>
+      <button class="ui-btn" type="button" (click)="cancel()">{{ isEdit() ? 'Cerrar' : 'Cancelar' }}</button>
       <button class="ui-btn ui-btn-primary" type="button" (click)="confirm()" [disabled]="items().length === 0">
-        Confirmar
+        {{ buttonLabel() }}
       </button>
     </div>
   </div>

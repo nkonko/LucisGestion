@@ -1,85 +1,59 @@
 <div class="sales-header">
   <h2 class="text-2xl font-bold">Ventas</h2>
-  <div class="ui-tabs">
-    <button class="ui-tab" [class.active]="selectedTab() === 'pending'" (click)="selectedTab.set('pending')" type="button">
-      Pendientes <span class="ui-tab-badge">{{ pending().length }}</span>
-    </button>
-    <button class="ui-tab" [class.active]="selectedTab() === 'history'" (click)="selectedTab.set('history')" type="button">
-      Historial
-    </button>
-  </div>
 </div>
 
-@if (selectedTab() === 'pending') {
-  @if (pending().length === 0) {
-    <div class="empty-state">
-      <ui-icon name="check_circle" [size]="48" [decorative]="true" />
-      <p>No hay pedidos pendientes</p>
-    </div>
+<div class="sales-filters">
+  <label class="ui-field flex-1 min-w-[180px]">
+    <span>Buscar cliente / producto</span>
+    <input class="ui-input" (input)="onSearchInput($event)" [value]="searchTerm()" placeholder="Escribe para filtrar..." />
+  </label>
+  <label class="ui-field w-[200px]">
+    <span>Desde</span>
+    <input class="ui-input" type="date" (change)="onDateFromInput($event)" />
+  </label>
+  <label class="ui-field flex-1 min-w-[180px]">
+    <span>Cliente</span>
+    <select class="ui-select" (change)="onCustomerFilterChange($event)" [value]="selectedCustomerId() ?? ''">
+      <option value="">Todos los clientes</option>
+      @for (customer of customers(); track customer.id ?? customer.phone) {
+        <option [value]="customer.id ?? ''">{{ customer.name }}</option>
+      }
+    </select>
+  </label>
+  <label class="ui-field w-[180px]">
+    <span>Estado</span>
+    <select class="ui-select" (change)="onStatusFilterChange($event)" [value]="selectedStatus() ?? ''">
+      <option value="">Todos los estados</option>
+      <option value="pending">{{ statusDisplay.pending }}</option>
+      <option value="production">{{ statusDisplay.production }}</option>
+      <option value="delivered">{{ statusDisplay.delivered }}</option>
+      <option value="cancelled">{{ statusDisplay.cancelled }}</option>
+    </select>
+  </label>
+  @if (searchTerm() || dateFrom() || selectedCustomerId() || selectedStatus()) {
+    <button class="ui-btn" (click)="clearFilters()" type="button" title="Borrar todos los filtros activos">
+      Limpiar
+    </button>
   }
-  <div class="sales-list">
-    @for (sale of pending(); track sale.id) {
-      <app-sales-card
-        [sale]="sale"
-        (whatsappRequested)="sendWhatsApp($event)"
-        (statusChangeRequested)="onStatusChange($event)"
-      />
-    }
+</div>
+
+@if (filteredSales().length === 0) {
+  <div class="empty-state">
+    <ui-icon name="inbox" [size]="48" [decorative]="true" />
+    <p>No se encontraron ventas</p>
   </div>
 }
 
-@if (selectedTab() === 'history') {
-  <div class="sales-filters">
-    <label class="ui-field flex-1 min-w-[180px]">
-      <span>Buscar cliente / producto</span>
-      <input class="ui-input" (input)="onSearchInput($event)" [value]="searchTerm()" placeholder="Escribe para filtrar..." />
-    </label>
-    <label class="ui-field w-[200px]">
-      <span>Desde</span>
-      <input class="ui-input" type="date" (change)="onDateFromInput($event)" />
-    </label>
-    <label class="ui-field flex-1 min-w-[180px]">
-      <span>Cliente</span>
-      <select class="ui-select" (change)="onCustomerFilterChange($event)" [value]="selectedCustomerId() ?? ''">
-        <option value="">Todos los clientes</option>
-        @for (customer of customers(); track customer.id ?? customer.phone) {
-          <option [value]="customer.id ?? ''">{{ customer.name }}</option>
-        }
-      </select>
-    </label>
-    <label class="ui-field w-[180px]">
-      <span>Estado</span>
-      <select class="ui-select" (change)="onStatusFilterChange($event)" [value]="selectedStatus() ?? ''">
-        <option value="">Todos los estados</option>
-        <option value="pending">{{ statusDisplay.pending }}</option>
-        <option value="delivered">{{ statusDisplay.delivered }}</option>
-        <option value="cancelled">{{ statusDisplay.cancelled }}</option>
-      </select>
-    </label>
-    @if (searchTerm() || dateFrom() || selectedCustomerId() || selectedStatus()) {
-      <button class="ui-btn" (click)="clearFilters()" type="button" title="Borrar todos los filtros activos">
-        Limpiar
-      </button>
-    }
-  </div>
-
-  @if (filteredHistory().length === 0) {
-    <div class="empty-state">
-      <ui-icon name="inbox" [size]="48" [decorative]="true" />
-      <p>No se encontraron ventas</p>
-    </div>
+<div class="sales-list">
+  @for (sale of filteredSales(); track sale.id) {
+    <app-sales-card
+      [sale]="sale"
+      (editRequested)="onEditRequested($event)"
+      (whatsappRequested)="sendWhatsApp($event)"
+      (statusChangeRequested)="onStatusChange($event)"
+    />
   }
-
-  <div class="sales-list">
-    @for (sale of filteredHistory(); track sale.id) {
-      <app-sales-card
-        [sale]="sale"
-        (whatsappRequested)="sendWhatsApp($event)"
-        (statusChangeRequested)="onStatusChange($event)"
-      />
-    }
-  </div>
-}
+</div>
 
 <button class="fab-bottom-right ui-fab" (click)="newSale()" type="button" aria-label="Nueva venta">
   <ui-icon name="add" [decorative]="true" />

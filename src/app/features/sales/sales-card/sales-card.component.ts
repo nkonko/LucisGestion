@@ -16,6 +16,7 @@ export class SalesCardComponent {
 
   readonly whatsappRequested = output<Sale>();
   readonly statusChangeRequested = output<{ sale: Sale; status: SaleStatus }>();
+  readonly editRequested = output<Sale>();
 
   get statusLabel(): string {
     return SALE_STATUS_DISPLAY[this.sale().status];
@@ -35,11 +36,26 @@ export class SalesCardComponent {
     return `${weekday} ${day} de ${month} de ${year}`;
   }
 
+  requestEdit(): void {
+    this.editRequested.emit(this.sale());
+  }
+
   requestWhatsApp(): void {
     this.whatsappRequested.emit(this.sale());
   }
 
   requestStatusChange(status: SaleStatus): void {
     this.statusChangeRequested.emit({ sale: this.sale(), status });
+  }
+
+  getNextStatus(): SaleStatus | null {
+    const status = this.sale().status;
+    const transitions: Record<SaleStatus, SaleStatus | null> = {
+      pending: 'production',
+      production: 'delivered',
+      delivered: null,
+      cancelled: null,
+    };
+    return transitions[status];
   }
 }

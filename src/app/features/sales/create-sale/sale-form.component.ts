@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RecipesStore } from '../../../core/store/recipes.store';
 import { CustomersStore } from '../../../core/store/customers.store';
@@ -11,7 +11,7 @@ import {
 } from '../../../core/models/sale';
 import { Timestamp } from '@angular/fire/firestore';
 import { ArsPipe } from '../../../shared/pipes/ars.pipe';
-import { DIALOG_REF } from '../../../core/models/dialog/dialog-tokens.model';
+import { DIALOG_REF, DIALOG_DATA } from '../../../core/models/dialog/dialog-tokens.model';
 import { DialogRef } from '../../../core/models/dialog/dialog-ref.model';
 import { Customer } from '../../../core/models/customer';
 import { Recipe } from '../../../core/models/recipe';
@@ -24,9 +24,15 @@ import { Recipe } from '../../../core/models/recipe';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SaleFormComponent {
-  private dialogRef = inject(DIALOG_REF) as DialogRef<Sale>;
+  private dialogRef = inject(DIALOG_REF) as DialogRef<SaleInput>;
+  private dialogData = inject(DIALOG_DATA) as Sale | null;
   readonly recipesStore = inject(RecipesStore);
   private customersStore = inject(CustomersStore);
+
+  private readonly existingSale = signal<Sale | null>(this.dialogData);
+  readonly isEdit = computed(() => this.existingSale() !== null);
+  readonly pageTitle = computed(() => (this.isEdit() ? 'Editar Venta' : 'Nueva Venta'));
+  readonly buttonLabel = computed(() => (this.isEdit() ? 'Guardar Cambios' : 'Confirmar'));
 
   items = signal<SaleItem[]>([]);
   customerSearch = '';
@@ -44,6 +50,19 @@ export class SaleFormComponent {
   total = computed(() => this.items().reduce((sum, i) => sum + i.quantity * i.unitPrice, 0));
   totalCost = computed(() => this.items().reduce((sum, i) => sum + i.quantity * i.unitCost, 0));
   profit = computed(() => this.total() - this.totalCost());
+
+  constructor() {
+    effect(() => {
+      const sale = this.existingSale();
+      if (sale) {
+        this.items.set(sale.items);
+        this.selectedCustomerId = sale.customerId ?? '';
+        this.customerSearch = sale.customerName;
+        this.paymentMethod = sale.paymentMethod;
+        this.notes = sale.notes;
+      }
+    });
+  }
 
   private getSelectedCustomer(): Customer | null {
     return this.customers().find((customer) => customer.id === this.selectedCustomerId) ?? null;
@@ -120,9 +139,10 @@ export class SaleFormComponent {
     if (this.items().length === 0) return;
 
     const selectedCustomer = this.getSelectedCustomer();
+    const existingSale = this.existingSale();
 
     const sale: SaleInput = {
-      date: Timestamp.now(),
+      date: existingSale?.date ?? Timestamp.now(),
       customerId: selectedCustomer?.id ?? null,
       customerName: selectedCustomer?.name ?? this.customerSearch,
       items: this.items(),
@@ -130,7 +150,7 @@ export class SaleFormComponent {
       totalCost: this.totalCost(),
       profit: this.profit(),
       paymentMethod: this.paymentMethod,
-      status: 'pending',
+      status: existingSale?.status ?? 'pending',
       notes: this.notes,
     };
 

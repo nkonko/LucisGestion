@@ -1,5 +1,5 @@
 <article class="sale-card ui-card-surface">
-  <div class="sale-card-header">
+  <div class="sale-card-header" (click)="requestEdit()" role="button" tabindex="0" (keydown.enter)="requestEdit()" (keydown.space)="requestEdit()" title="Click para editar">
     <div class="sale-customer-name">{{ sale().customerName || 'Sin cliente' }}</div>
     <span class="sale-status" [class]="statusClass">
       {{ statusLabel }}
@@ -22,9 +22,9 @@
 
   <div class="sale-card-meta">
     <div class="sale-date">{{ displayDate }}</div>
-    @if (sale().status === 'pending') {
+    @if (sale().status !== 'delivered' && sale().status !== 'cancelled') {
       <div class="sale-card-actions">
-        @if (sale().customerName) {
+        @if (sale().status === 'pending' && sale().customerName) {
           <button
             class="ui-icon-btn"
             (click)="requestWhatsApp()"
@@ -35,8 +35,16 @@
             <ui-icon name="chat" [decorative]="true" />
           </button>
         }
-        <button class="ui-btn ui-btn-sm ui-btn-primary" (click)="requestStatusChange('cancelled')" type="button">Cancelar</button>
-        <button class="ui-btn ui-btn-sm sale-btn-deliver" (click)="requestStatusChange('delivered')" type="button">Entregar</button>
+        @if (sale().status === 'pending') {
+          <button class="ui-btn ui-btn-sm ui-btn-primary" (click)="requestStatusChange('production')" type="button">
+            Producción
+          </button>
+          <button class="ui-btn ui-btn-sm ui-btn-primary" (click)="requestStatusChange('cancelled')" type="button">Cancelar</button>
+        }
+        @if (sale().status === 'production') {
+          <button class="ui-btn ui-btn-sm sale-btn-deliver" (click)="requestStatusChange('delivered')" type="button">Entregar</button>
+          <button class="ui-btn ui-btn-sm ui-btn-primary" (click)="requestStatusChange('cancelled')" type="button">Cancelar</button>
+        }
       </div>
     }
   </div>
