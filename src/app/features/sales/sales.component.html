@@ -1,31 +1,34 @@
-<h2 class="text-xl font-semibold mb-4">Ventas</h2>
-
-<div class="ui-tabs">
-  <button class="ui-tab" [class.active]="selectedTab() === 'pending'" (click)="selectedTab.set('pending')" type="button">
-    Pendientes ({{ pending().length }})
-  </button>
-  <button class="ui-tab" [class.active]="selectedTab() === 'history'" (click)="selectedTab.set('history')" type="button">
-    Historial
-  </button>
+<div class="sales-header">
+  <h2 class="text-2xl font-bold">Ventas</h2>
+  <div class="ui-tabs">
+    <button class="ui-tab" [class.active]="selectedTab() === 'pending'" (click)="selectedTab.set('pending')" type="button">
+      Pendientes <span class="ui-tab-badge">{{ pending().length }}</span>
+    </button>
+    <button class="ui-tab" [class.active]="selectedTab() === 'history'" (click)="selectedTab.set('history')" type="button">
+      Historial
+    </button>
+  </div>
 </div>
 
 @if (selectedTab() === 'pending') {
   @if (pending().length === 0) {
-    <div class="text-center py-8 text-gray-400">
+    <div class="empty-state">
       <ui-icon name="check_circle" [size]="48" [decorative]="true" />
       <p>No hay pedidos pendientes</p>
     </div>
   }
-  @for (sale of pending(); track sale.id) {
-    <ng-container *ngTemplateOutlet="saleCard; context: { $implicit: sale }"></ng-container>
-  }
+  <div class="sales-list">
+    @for (sale of pending(); track sale.id) {
+      <ng-container *ngTemplateOutlet="saleCard; context: { $implicit: sale }"></ng-container>
+    }
+  </div>
 }
 
 @if (selectedTab() === 'history') {
-  <div class="flex gap-2 mt-3 mb-2 flex-wrap">
+  <div class="sales-filters">
     <label class="ui-field flex-1 min-w-[180px]">
       <span>Buscar cliente / producto</span>
-      <input class="ui-input" (input)="onSearchInput($event)" [value]="searchTerm()" />
+      <input class="ui-input" (input)="onSearchInput($event)" [value]="searchTerm()" placeholder="Escribe para filtrar..." />
     </label>
     <label class="ui-field w-[200px]">
       <span>Desde</span>
@@ -34,50 +37,56 @@
   </div>
 
   @if (filteredHistory().length === 0) {
-    <div class="text-center py-6 text-gray-400">
+    <div class="empty-state">
+      <ui-icon name="inbox" [size]="48" [decorative]="true" />
       <p>No se encontraron ventas</p>
     </div>
   }
 
-  @for (sale of filteredHistory(); track sale.id) {
-    <ng-container *ngTemplateOutlet="saleCard; context: { $implicit: sale }"></ng-container>
-  }
+  <div class="sales-list">
+    @for (sale of filteredHistory(); track sale.id) {
+      <ng-container *ngTemplateOutlet="saleCard; context: { $implicit: sale }"></ng-container>
+    }
+  </div>
 }
 
 <ng-template #saleCard let-sale>
-  <article class="ui-card-surface touch-card mb-3 mt-3">
-    <div class="py-2">
-      <div class="flex items-center justify-between mb-1">
-        <div>
-          <div class="font-medium">{{ sale.customerName || 'Sin cliente' }}</div>
-          <div class="text-xs text-gray-400">{{ sale.date?.toDate() | date: 'dd/MM HH:mm' }}</div>
-        </div>
-        <div class="text-right">
-          <div class="text-lg font-bold">{{ sale.total | ars }}</div>
-          <span class="ui-chip-static" [class]="getStatusClass(sale.status)">
-            {{ getStatusLabel(sale.status) }}
-          </span>
-        </div>
+  <article class="sale-card ui-card-surface">
+    <div class="sale-card-header">
+      <div class="sale-card-main">
+        <div class="sale-customer-name">{{ sale.customerName || 'Sin cliente' }}</div>
+        <div class="sale-date">{{ sale.date?.toDate() | date: 'dd/MM HH:mm' }}</div>
       </div>
+      <div class="sale-card-summary">
+        <div class="sale-total">{{ sale.total | ars }}</div>
+        <span class="sale-status" [class]="getStatusClass(sale.status)">
+          {{ getStatusLabel(sale.status) }}
+        </span>
+      </div>
+    </div>
 
-      <div class="text-xs text-gray-500">
+    <div class="sale-card-items">
+      <div class="sale-items-list">
         @for (item of sale.items; track item.recipeId) {
-          {{ item.quantity }}x {{ item.name }}{{ !$last ? ' · ' : '' }}
+          <div class="sale-item">
+            <span class="sale-item-qty">{{ item.quantity }}×</span>
+            <span class="sale-item-name">{{ item.name }}</span>
+          </div>
         }
       </div>
-
-      @if (sale.status === 'pending') {
-        <div class="flex justify-end gap-2 mt-2">
-          @if (sale.customerName) {
-            <button class="ui-icon-btn" (click)="sendWhatsApp(sale)" aria-label="Enviar por WhatsApp" type="button">
-              <ui-icon name="chat" [decorative]="true" />
-            </button>
-          }
-          <button class="ui-btn ui-btn-danger" (click)="changeStatus(sale, 'cancelled')" type="button">Cancelar</button>
-          <button class="ui-btn ui-btn-primary" (click)="changeStatus(sale, 'delivered')" type="button">Entregar ✓</button>
-        </div>
-      }
     </div>
+
+    @if (sale.status === 'pending') {
+      <div class="sale-card-actions">
+        @if (sale.customerName) {
+          <button class="ui-icon-btn" (click)="sendWhatsApp(sale)" aria-label="Enviar por WhatsApp" title="Enviar por WhatsApp" type="button">
+            <ui-icon name="chat" [decorative]="true" />
+          </button>
+        }
+        <button class="ui-btn ui-btn-sm ui-btn-danger" (click)="changeStatus(sale, 'cancelled')" type="button">Cancelar</button>
+        <button class="ui-btn ui-btn-sm ui-btn-primary" (click)="changeStatus(sale, 'delivered')" type="button">Entregar</button>
+      </div>
+    }
   </article>
 </ng-template>
 
