@@ -1,11 +1,9 @@
 <article class="sale-card ui-card-surface">
   <div class="sale-card-header">
-    <div class="sale-card-main">
-      <div class="sale-customer-name">{{ sale().customerName || 'Sin cliente' }}</div>
-      <span class="sale-status" [class]="statusClass">
-        {{ statusLabel }}
-      </span>
-    </div>
+    <div class="sale-customer-name">{{ sale().customerName || 'Sin cliente' }}</div>
+    <span class="sale-status" [class]="statusClass">
+      {{ statusLabel }}
+    </span>
   </div>
 
   <div class="sale-card-items">
