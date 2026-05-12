@@ -15,27 +15,29 @@
         </div>
       }
     </div>
-  </div>
-   <div class="sale-card-footer">
-    <div class="sale-date">{{ displayDate }}</div>
-    <div class="sale-total">{{ sale().total | ars }}</div>
+    <div class="sale-card-items-total">
+      <div class="sale-total">{{ sale().total | ars }}</div>
+    </div>
   </div>
 
-  @if (sale().status === 'pending') {
-    <div class="sale-card-actions">
-      @if (sale().customerName) {
-        <button
-          class="ui-icon-btn"
-          (click)="requestWhatsApp()"
-          aria-label="Enviar por WhatsApp"
-          title="Enviar por WhatsApp"
-          type="button"
-        >
-          <ui-icon name="chat" [decorative]="true" />
-        </button>
-      }
-      <button class="ui-btn ui-btn-sm sale-btn-cancel" (click)="requestStatusChange('cancelled')" type="button">Cancelar</button>
-      <button class="ui-btn ui-btn-sm ui-btn-primary" (click)="requestStatusChange('delivered')" type="button">Entregar</button>
-    </div>
-  }
+  <div class="sale-card-meta">
+    <div class="sale-date">{{ displayDate }}</div>
+    @if (sale().status === 'pending') {
+      <div class="sale-card-actions">
+        @if (sale().customerName) {
+          <button
+            class="ui-icon-btn"
+            (click)="requestWhatsApp()"
+            aria-label="Enviar por WhatsApp"
+            title="Enviar por WhatsApp"
+            type="button"
+          >
+            <ui-icon name="chat" [decorative]="true" />
+          </button>
+        }
+        <button class="ui-btn ui-btn-sm ui-btn-primary" (click)="requestStatusChange('cancelled')" type="button">Cancelar</button>
+        <button class="ui-btn ui-btn-sm sale-btn-deliver" (click)="requestStatusChange('delivered')" type="button">Entregar</button>
+      </div>
+    }
+  </div>
 </article>
