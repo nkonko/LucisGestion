@@ -15,8 +15,8 @@
     <span>Cliente</span>
     <select class="ui-select" (change)="onCustomerFilterChange($event)" [value]="selectedCustomerId() ?? ''">
       <option value="">Todos los clientes</option>
-      @for (customer of customers(); track customer.id ?? customer.phone) {
-        <option [value]="customer.id ?? ''">{{ customer.name }}</option>
+      @for (customer of customers(); track customer.id) {
+        <option [value]="customer.id">{{ customer.name }}</option>
       }
     </select>
   </label>

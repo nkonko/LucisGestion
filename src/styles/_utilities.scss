@@ -44,6 +44,15 @@
   border-color: var(--color-primary);
 }
 
+.ui-input:disabled,
+.ui-select:disabled,
+.ui-textarea:disabled {
+  background: var(--color-disabled-bg);
+  border-color: var(--color-disabled-border);
+  color: var(--color-disabled-fg);
+  cursor: not-allowed;
+}
+
 .ui-btn {
   border: var(--border-width-thin) solid var(--color-outline-variant);
   border-radius: var(--space-2);
@@ -236,6 +245,124 @@
   align-items: center;
   gap: var(--space-2);
   cursor: pointer;
+}
+
+.ui-modal-close-btn {
+  width: var(--size-icon-button);
+  height: var(--size-icon-button);
+  border: var(--border-width-thin) solid var(--color-outline-variant);
+  border-radius: var(--radius-avatar);
+  background: var(--color-surface);
+  color: var(--color-on-surface-variant);
+  font-size: var(--size-font-lg);
+  line-height: 1;
+  cursor: pointer;
+  transition: box-shadow var(--transition-standard), border-color var(--transition-standard), color var(--transition-standard);
+}
+
+.ui-modal-close-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-soft);
+}
+
+.ui-row-picker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: var(--border-width-thin) solid var(--color-outline-variant);
+  border-radius: var(--space-4);
+  background: var(--color-surface);
+  transition: border-color var(--transition-standard), box-shadow var(--transition-standard), background var(--transition-standard);
+}
+
+.ui-row-picker--selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-container);
+  box-shadow: var(--shadow-soft);
+}
+
+.ui-stepper-btn {
+  width: calc(var(--space-8) + var(--space-2));
+  height: calc(var(--space-8) + var(--space-2));
+  border-radius: var(--radius-avatar);
+  border: var(--border-width-thin) solid var(--color-outline-variant);
+  background: var(--color-surface);
+  color: var(--color-on-surface-variant);
+  font-size: var(--size-font-lg);
+  cursor: pointer;
+  transition: box-shadow var(--transition-standard), transform var(--transition-standard), background var(--transition-standard), border-color var(--transition-standard), color var(--transition-standard);
+}
+
+.ui-stepper-btn:hover:not(:disabled) {
+  box-shadow: var(--shadow-soft);
+  transform: translateY(calc(-1 * var(--space-1) / 2));
+}
+
+.ui-stepper-btn--primary {
+  background: color-mix(in srgb, var(--color-warning) 82%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-warning) 82%, var(--color-surface));
+  color: var(--color-on-primary);
+}
+
+.ui-payment-toggle {
+  width: 100%;
+  min-height: calc(var(--space-8) + var(--space-8));
+  border: var(--border-width-thin) solid var(--color-outline-variant);
+  border-radius: var(--space-4);
+  background: var(--color-surface);
+  color: var(--color-on-surface-variant);
+  font-size: var(--size-font-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-standard), color var(--transition-standard), box-shadow var(--transition-standard), border-color var(--transition-standard);
+}
+
+.ui-payment-toggle:hover {
+  box-shadow: var(--shadow-soft);
+}
+
+.ui-payment-toggle--paid {
+  background: color-mix(in srgb, var(--color-status-ok) 18%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-status-ok) 45%, var(--color-surface));
+  color: color-mix(in srgb, var(--color-status-ok) 70%, var(--color-on-surface));
+}
+
+.ui-payment-toggle:disabled,
+.ui-payment-toggle--paid:disabled {
+  background: var(--color-disabled-bg);
+  border-color: var(--color-disabled-border);
+  color: var(--color-disabled-fg);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.ui-primary-cta-btn {
+  width: 100%;
+  min-height: calc(var(--space-8) + var(--space-8));
+  border: none;
+  border-radius: calc(var(--space-8) + var(--space-2));
+  background: var(--bg-gradient-cta);
+  color: var(--color-on-primary);
+  font-size: calc(var(--size-font-lg) + var(--space-1));
+  font-weight: 700;
+  cursor: pointer;
+  transition: box-shadow var(--transition-standard), transform var(--transition-standard), filter var(--transition-standard);
+}
+
+.ui-primary-cta-btn:hover:not(:disabled) {
+  box-shadow: var(--shadow-elevated);
+  filter: saturate(1.1);
+  transform: translateY(calc(-1 * var(--space-1) / 2));
+}
+
+.ui-primary-cta-btn:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+  filter: grayscale(0.1);
+  transform: none;
+  box-shadow: none;
 }
 
 @keyframes spin {

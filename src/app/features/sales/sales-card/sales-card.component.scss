@@ -30,24 +30,17 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-3);
-  cursor: pointer;
-  padding: var(--space-2);
-  margin: calc(var(--space-2) * -1);
-  border-radius: var(--space-1);
-  transition: background-color var(--transition-standard);
+}
 
-  &:hover {
-    background-color: var(--color-surface-container);
-  }
+.sale-card-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
 
-  &:active {
-    background-color: var(--color-surface-container-high);
-  }
-
-  &:focus {
-    outline: var(--border-width-medium) solid var(--color-primary);
-    outline-offset: var(--space-1);
-  }
+.sale-edit-btn {
+  width: calc(var(--size-icon-button) - var(--space-1));
+  height: calc(var(--size-icon-button) - var(--space-1));
 }
 
 .sale-customer-name {
@@ -83,6 +76,30 @@
   display: flex;
   justify-content: flex-end;
   margin-top: var(--space-3);
+}
+
+.sale-card-extra {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) 0;
+  border-bottom: var(--border-width-thin) solid var(--color-outline-variant);
+}
+
+.sale-extra-row {
+  display: flex;
+  gap: var(--space-2);
+  font-size: var(--size-font-2xs);
+  color: var(--color-on-surface-variant);
+}
+
+.sale-extra-label {
+  font-weight: 600;
+  color: var(--color-on-surface);
+}
+
+.sale-extra-value {
+  flex: 1;
 }
 
 .sale-items-list {
@@ -140,6 +157,16 @@
 
 .sale-card-actions .ui-btn-primary:hover:not(:disabled) {
   background: color-mix(in srgb, var(--color-primary) 88%, black);
+}
+
+.sale-btn-production {
+  background: var(--color-warning);
+  border-color: var(--color-warning);
+  color: var(--color-on-primary);
+}
+
+.sale-btn-production:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-warning) 86%, black);
 }
 
 .sale-btn-deliver {

@@ -109,8 +109,10 @@ export const SalesStore = signalStore(
             total: updatedSale.total,
             totalCost: updatedSale.totalCost,
             profit: updatedSale.profit,
+            deliveryDate: updatedSale.deliveryDate ?? null,
             customerId: updatedSale.customerId,
             customerName: updatedSale.customerName,
+            isPaid: updatedSale.isPaid ?? false,
             paymentMethod: updatedSale.paymentMethod,
             notes: updatedSale.notes,
           });

@@ -32,6 +32,13 @@ export class SalesComponent {
   selectedStatus = signal<SaleStatus | null>(null);
 
   readonly customers = computed(() => this.customersStore.customers());
+  readonly hasActiveFilters = computed(
+    () =>
+      Boolean(this.searchTerm().trim()) ||
+      this.dateFrom() !== null ||
+      this.selectedCustomerId() !== null ||
+      this.selectedStatus() !== null,
+  );
 
   filteredSales = computed(() => {
     let items = this.store.sales();
@@ -56,6 +63,22 @@ export class SalesComponent {
     if (status) {
       items = items.filter((v) => v.status === status);
     }
+
+    if (!this.hasActiveFilters()) {
+      const statusPriority: Record<SaleStatus, number> = {
+        pending: 0,
+        production: 1,
+        delivered: 2,
+        cancelled: 3,
+      };
+
+      return [...items].sort((a, b) => {
+        const statusDiff = statusPriority[a.status] - statusPriority[b.status];
+        if (statusDiff !== 0) return statusDiff;
+        return b.date.toMillis() - a.date.toMillis();
+      });
+    }
+
     return items;
   });
 
@@ -136,6 +159,11 @@ export class SalesComponent {
   }
 
   onEditRequested(sale: Sale): void {
+    if (sale.status !== 'pending' && sale.status !== 'production') {
+      this.notify.error('Solo se pueden modificar ventas pendientes o en producción.');
+      return;
+    }
+
     this.editSale(sale);
   }
 }

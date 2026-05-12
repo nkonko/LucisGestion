@@ -28,6 +28,21 @@ export class SalesCardComponent {
 
   get displayDate(): string {
     const date = this.sale().date.toDate();
+    return this.formatLongDate(date);
+  }
+
+  get displayDeliveryDate(): string | null {
+    const deliveryDate = this.sale().deliveryDate;
+    if (!deliveryDate) return null;
+
+    return this.formatLongDate(deliveryDate.toDate());
+  }
+
+  get hasNotes(): boolean {
+    return this.sale().notes.trim().length > 0;
+  }
+
+  private formatLongDate(date: Date): string {
     const weekday = new Intl.DateTimeFormat('es-AR', { weekday: 'long' }).format(date);
     const day = new Intl.DateTimeFormat('es-AR', { day: 'numeric' }).format(date);
     const month = new Intl.DateTimeFormat('es-AR', { month: 'long' }).format(date);
