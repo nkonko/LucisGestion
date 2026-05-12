@@ -6,7 +6,7 @@ import { WhatsAppService } from '../../core/services/whatsapp.service';
 import type { SaleStatus } from '../../core/models/sale/sale-status.model';
 import { Sale, SaleInput, SALE_STATUS_DISPLAY } from '../../core/models/sale';
 import { SaleFormComponent } from './create-sale/sale-form.component';
-import { DialogService } from '../../core/services/dialog.service';
+import { BottomSheetService } from '../../core/services/bottom-sheet.service';
 import { UiIconComponent } from '../../shared/ui/components';
 import { SalesCardComponent } from './sales-card/sales-card.component';
 
@@ -21,7 +21,7 @@ export class SalesComponent {
   readonly store = inject(SalesStore);
   private customersStore = inject(CustomersStore);
   private whatsApp = inject(WhatsAppService);
-  private dialog = inject(DialogService);
+  private bottomSheet = inject(BottomSheetService);
   private notify = inject(NotificationService);
 
   statusDisplay: Record<SaleStatus, string> = SALE_STATUS_DISPLAY;
@@ -30,6 +30,7 @@ export class SalesComponent {
   dateFrom = signal<Date | null>(null);
   selectedCustomerId = signal<string | null>(null);
   selectedStatus = signal<SaleStatus | null>(null);
+  selectedPaymentStatus = signal<'paid' | 'unpaid' | null>(null);
 
   readonly customers = computed(() => this.customersStore.customers());
   readonly hasActiveFilters = computed(
@@ -37,7 +38,8 @@ export class SalesComponent {
       Boolean(this.searchTerm().trim()) ||
       this.dateFrom() !== null ||
       this.selectedCustomerId() !== null ||
-      this.selectedStatus() !== null,
+        this.selectedStatus() !== null ||
+        this.selectedPaymentStatus() !== null,
   );
 
   filteredSales = computed(() => {
@@ -46,6 +48,7 @@ export class SalesComponent {
     const from = this.dateFrom();
     const customerId = this.selectedCustomerId();
     const status = this.selectedStatus();
+    const paymentStatus = this.selectedPaymentStatus();
 
     if (term) {
       items = items.filter(
@@ -62,6 +65,9 @@ export class SalesComponent {
     }
     if (status) {
       items = items.filter((v) => v.status === status);
+    }
+    if (paymentStatus) {
+      items = items.filter((v) => (paymentStatus === 'paid' ? v.isPaid === true : v.isPaid !== true));
     }
 
     if (!this.hasActiveFilters()) {
@@ -105,39 +111,54 @@ export class SalesComponent {
     this.selectedStatus.set(value ? (value as SaleStatus) : null);
   }
 
+  onPaymentStatusFilterChange(event: Event): void {
+    const htmlTarget = event.target as HTMLSelectElement | null;
+    const value = (htmlTarget?.value ?? '') as 'paid' | 'unpaid' | '';
+    this.selectedPaymentStatus.set(value ? value : null);
+  }
+
   clearFilters(): void {
     this.searchTerm.set('');
     this.dateFrom.set(null);
     this.selectedCustomerId.set(null);
     this.selectedStatus.set(null);
+    this.selectedPaymentStatus.set(null);
   }
 
   newSale(): void {
-    const dialogRef = this.dialog.open<null, SaleInput>(SaleFormComponent, {
-      maxWidth: '560px',
+    const dialogRef = this.bottomSheet.open<null, SaleInput>(SaleFormComponent, {
+      maxWidth: '760px',
       maxHeight: '90vh',
       data: null,
     });
 
     dialogRef.afterClosed.subscribe(async (result) => {
       if (result) {
-        await this.store.registerSale(result);
-        this.notify.success('Venta registrada. Stock actualizado.', 3000);
+        try {
+          await this.store.registerSale(result);
+          this.notify.success('Venta registrada. Stock actualizado.', 3000);
+        } catch (error) {
+          this.notify.errorFrom(error, 'No se pudo registrar la venta por stock insuficiente.');
+        }
       }
     });
   }
 
   editSale(sale: Sale): void {
-    const dialogRef = this.dialog.open<Sale, SaleInput>(SaleFormComponent, {
-      maxWidth: '560px',
+    const dialogRef = this.bottomSheet.open<Sale, SaleInput>(SaleFormComponent, {
+      maxWidth: '760px',
       maxHeight: '90vh',
       data: sale,
     });
 
     dialogRef.afterClosed.subscribe(async (result) => {
       if (result) {
-        await this.store.updateSale(sale.id!, result);
-        this.notify.success('Venta actualizada.', 3000);
+        try {
+          await this.store.updateSale(sale.id!, result);
+          this.notify.success('Venta actualizada.', 3000);
+        } catch (error) {
+          this.notify.errorFrom(error, 'No se pudo actualizar la venta por stock insuficiente.');
+        }
       }
     });
   }

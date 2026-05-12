@@ -30,7 +30,15 @@
       <option value="cancelled">{{ statusDisplay.cancelled }}</option>
     </select>
   </label>
-  @if (searchTerm() || dateFrom() || selectedCustomerId() || selectedStatus()) {
+  <label class="ui-field w-[180px]">
+    <span>Pago</span>
+    <select class="ui-select" (change)="onPaymentStatusFilterChange($event)" [value]="selectedPaymentStatus() ?? ''">
+      <option value="">Todos</option>
+      <option value="paid">Pagado</option>
+      <option value="unpaid">Impago</option>
+    </select>
+  </label>
+  @if (searchTerm() || dateFrom() || selectedCustomerId() || selectedStatus() || selectedPaymentStatus()) {
     <button class="ui-btn" (click)="clearFilters()" type="button" title="Borrar todos los filtros activos">
       Limpiar
     </button>

@@ -32,6 +32,11 @@ export const SalesStore = signalStore(
     const ingredientsStore = inject(IngredientsStore);
     const recipesStore = inject(RecipesStore);
 
+    type RequiredIngredient = {
+      ingredientName: string;
+      required: number;
+    };
+
     const buildStockAdjustments = (
       items: { recipeId: string; quantity: number }[],
       factor: -1 | 1,
@@ -72,10 +77,101 @@ export const SalesStore = signalStore(
       throw error;
     };
 
+    const getRequiredIngredients = (
+      items: { recipeId: string; quantity: number }[],
+    ): Map<string, RequiredIngredient> => {
+      const requiredByIngredient = new Map<string, RequiredIngredient>();
+
+      for (const item of items) {
+        const recipe = recipesStore.recipes().find((candidate) => candidate.id === item.recipeId);
+        if (!recipe) continue;
+
+        for (const recipeIngredient of recipe.ingredients) {
+          const requiredQuantity = recipeIngredient.quantity * item.quantity;
+          const current = requiredByIngredient.get(recipeIngredient.ingredientId);
+
+          if (current) {
+            current.required += requiredQuantity;
+            continue;
+          }
+
+          requiredByIngredient.set(recipeIngredient.ingredientId, {
+            ingredientName: recipeIngredient.name,
+            required: requiredQuantity,
+          });
+        }
+      }
+
+      return requiredByIngredient;
+    };
+
+    const throwIfInsufficientForCreation = (items: { recipeId: string; quantity: number }[]): void => {
+      const requiredByIngredient = getRequiredIngredients(items);
+      const shortages: string[] = [];
+
+      for (const [ingredientId, required] of requiredByIngredient) {
+        const ingredient = ingredientsStore
+          .ingredients()
+          .find((candidate) => candidate.id === ingredientId);
+
+        const currentStock = ingredient?.currentStock ?? 0;
+        if (currentStock >= required.required) continue;
+
+        const missing = required.required - currentStock;
+        const ingredientName = ingredient?.name ?? required.ingredientName;
+        const unit = ingredient?.unit ?? '';
+        shortages.push(`${ingredientName} (faltan ${missing.toFixed(2)} ${unit})`);
+      }
+
+      if (shortages.length > 0) {
+        throw new Error(`Stock insuficiente para registrar la venta: ${shortages.join(', ')}`);
+      }
+    };
+
+    const throwIfInsufficientForEdition = (
+      oldItems: { recipeId: string; quantity: number }[],
+      newItems: { recipeId: string; quantity: number }[],
+    ): void => {
+      const oldRequired = getRequiredIngredients(oldItems);
+      const newRequired = getRequiredIngredients(newItems);
+      const ingredientIds = new Set([...oldRequired.keys(), ...newRequired.keys()]);
+      const shortages: string[] = [];
+
+      for (const ingredientId of ingredientIds) {
+        const previous = oldRequired.get(ingredientId)?.required ?? 0;
+        const next = newRequired.get(ingredientId)?.required ?? 0;
+        const extraNeeded = next - previous;
+
+        if (extraNeeded <= 0) continue;
+
+        const ingredient = ingredientsStore
+          .ingredients()
+          .find((candidate) => candidate.id === ingredientId);
+
+        const currentStock = ingredient?.currentStock ?? 0;
+        if (currentStock >= extraNeeded) continue;
+
+        const missing = extraNeeded - currentStock;
+        const ingredientName =
+          ingredient?.name ??
+          newRequired.get(ingredientId)?.ingredientName ??
+          oldRequired.get(ingredientId)?.ingredientName ??
+          ingredientId;
+        const unit = ingredient?.unit ?? '';
+        shortages.push(`${ingredientName} (faltan ${missing.toFixed(2)} ${unit})`);
+      }
+
+      if (shortages.length > 0) {
+        throw new Error(`Stock insuficiente para modificar la venta: ${shortages.join(', ')}`);
+      }
+    };
+
     return {
       async registerSale(sale: SaleInput) {
         patchState(store, { loading: true, error: null });
         try {
+          throwIfInsufficientForCreation(sale.items);
+
           const saleId = await fs.addDocument<SaleInput>('sales', sale);
 
           const adjustments = buildStockAdjustments(sale.items, -1);
@@ -95,6 +191,8 @@ export const SalesStore = signalStore(
           
           // If items changed, adjust stock
           if (oldSale && JSON.stringify(oldSale.items) !== JSON.stringify(updatedSale.items)) {
+            throwIfInsufficientForEdition(oldSale.items, updatedSale.items);
+
             // Restock the old items
             const oldAdjustments = buildStockAdjustments(oldSale.items, 1);
             await fs.applyStockAdjustments(id, 'edit_restock', oldAdjustments);
