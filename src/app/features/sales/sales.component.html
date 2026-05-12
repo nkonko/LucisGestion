@@ -19,7 +19,11 @@
   }
   <div class="sales-list">
     @for (sale of pending(); track sale.id) {
-      <ng-container *ngTemplateOutlet="saleCard; context: { $implicit: sale }"></ng-container>
+      <app-sales-card
+        [sale]="sale"
+        (whatsappRequested)="sendWhatsApp($event)"
+        (statusChangeRequested)="onStatusChange($event)"
+      />
     }
   </div>
 }
@@ -68,50 +72,14 @@
 
   <div class="sales-list">
     @for (sale of filteredHistory(); track sale.id) {
-      <ng-container *ngTemplateOutlet="saleCard; context: { $implicit: sale }"></ng-container>
+      <app-sales-card
+        [sale]="sale"
+        (whatsappRequested)="sendWhatsApp($event)"
+        (statusChangeRequested)="onStatusChange($event)"
+      />
     }
   </div>
 }
-
-<ng-template #saleCard let-sale>
-  <article class="sale-card ui-card-surface">
-    <div class="sale-card-header">
-      <div class="sale-card-main">
-        <div class="sale-customer-name">{{ sale.customerName || 'Sin cliente' }}</div>
-        <div class="sale-date">{{ sale.date?.toDate() | date: 'dd/MM HH:mm' }}</div>
-      </div>
-      <div class="sale-card-summary">
-        <div class="sale-total">{{ sale.total | ars }}</div>
-        <span class="sale-status" [class]="getStatusClass(sale.status)">
-          {{ getStatusLabel(sale.status) }}
-        </span>
-      </div>
-    </div>
-
-    <div class="sale-card-items">
-      <div class="sale-items-list">
-        @for (item of sale.items; track item.recipeId) {
-          <div class="sale-item">
-            <span class="sale-item-qty">{{ item.quantity }}×</span>
-            <span class="sale-item-name">{{ item.name }}</span>
-          </div>
-        }
-      </div>
-    </div>
-
-    @if (sale.status === 'pending') {
-      <div class="sale-card-actions">
-        @if (sale.customerName) {
-          <button class="ui-icon-btn" (click)="sendWhatsApp(sale)" aria-label="Enviar por WhatsApp" title="Enviar por WhatsApp" type="button">
-            <ui-icon name="chat" [decorative]="true" />
-          </button>
-        }
-        <button class="ui-btn ui-btn-sm ui-btn-danger" (click)="changeStatus(sale, 'cancelled')" type="button">Cancelar</button>
-        <button class="ui-btn ui-btn-sm ui-btn-primary" (click)="changeStatus(sale, 'delivered')" type="button">Entregar</button>
-      </div>
-    }
-  </article>
-</ng-template>
 
 <button class="fab-bottom-right ui-fab" (click)="newSale()" type="button" aria-label="Nueva venta">
   <ui-icon name="add" [decorative]="true" />

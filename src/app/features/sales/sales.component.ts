@@ -1,20 +1,18 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { NotificationService } from '../../core/services/notification.service';
 import { SalesStore } from '../../core/store/sales.store';
 import { CustomersStore } from '../../core/store/customers.store';
 import { WhatsAppService } from '../../core/services/whatsapp.service';
-import { SALE_STATUS_CLASS } from '../../core/models/sale/sale-status.model';
 import type { SaleStatus } from '../../core/models/sale/sale-status.model';
 import { Sale, SALE_STATUS_DISPLAY } from '../../core/models/sale';
-import { ArsPipe } from '../../shared/pipes/ars.pipe';
-import { SaleFormComponent } from './sale-form.component';
+import { SaleFormComponent } from './create-sale/sale-form.component';
 import { DialogService } from '../../core/services/dialog.service';
 import { UiIconComponent } from '../../shared/ui/components';
+import { SalesCardComponent } from './sales-card/sales-card.component';
 
 @Component({
   selector: 'app-sales',
-  imports: [NgTemplateOutlet, DatePipe, ArsPipe, UiIconComponent],
+  imports: [UiIconComponent, SalesCardComponent],
   templateUrl: './sales.component.html',
   styleUrl: './sales.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -93,14 +91,6 @@ export class SalesComponent {
     this.selectedStatus.set(null);
   }
 
-  getStatusClass(status: SaleStatus): string {
-    return SALE_STATUS_CLASS[status];
-  }
-
-  getStatusLabel(status: SaleStatus): string {
-    return SALE_STATUS_DISPLAY[status];
-  }
-
   newSale(): void {
     const dialogRef = this.dialog.open<null, Sale>(SaleFormComponent, {
       maxWidth: '560px',
@@ -118,7 +108,7 @@ export class SalesComponent {
 
   async changeStatus(sale: Sale, newStatus: Sale['status']): Promise<void> {
     await this.store.updateSaleStatus(sale.id!, newStatus);
-    this.notify.success(`Pedido marcado como ${this.getStatusLabel(newStatus).toLowerCase()}`);
+    this.notify.success(`Pedido marcado como ${SALE_STATUS_DISPLAY[newStatus].toLowerCase()}`);
   }
 
   sendWhatsApp(sale: Sale): void {
@@ -126,5 +116,9 @@ export class SalesComponent {
     const items = sale.items.map((i) => `${i.quantity}x ${i.name}`).join('\n');
     const msg = `Hola ${sale.customerName}! 🧁\n\nTu pedido de Lucis Pastelería:\n${items}\n\nTotal: $${sale.total}\n\n¡Gracias!`;
     this.whatsApp.sendMessage(customer?.phone ?? '', msg);
+  }
+
+  onStatusChange(event: { sale: Sale; status: SaleStatus }): void {
+    void this.changeStatus(event.sale, event.status);
   }
 }

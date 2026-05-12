@@ -1,20 +1,20 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RecipesStore } from '../../core/store/recipes.store';
-import { CustomersStore } from '../../core/store/customers.store';
+import { RecipesStore } from '../../../core/store/recipes.store';
+import { CustomersStore } from '../../../core/store/customers.store';
 import {
   Sale,
   SaleItem,
   PaymentMethod,
   PAYMENT_METHOD_DISPLAY,
   SaleInput,
-} from '../../core/models/sale';
+} from '../../../core/models/sale';
 import { Timestamp } from '@angular/fire/firestore';
-import { ArsPipe } from '../../shared/pipes/ars.pipe';
-import { DIALOG_REF } from '../../core/models/dialog/dialog-tokens.model';
-import { DialogRef } from '../../core/models/dialog/dialog-ref.model';
-import { Customer } from '../../core/models/customer';
-import { Recipe } from '../../core/models/recipe';
+import { ArsPipe } from '../../../shared/pipes/ars.pipe';
+import { DIALOG_REF } from '../../../core/models/dialog/dialog-tokens.model';
+import { DialogRef } from '../../../core/models/dialog/dialog-ref.model';
+import { Customer } from '../../../core/models/customer';
+import { Recipe } from '../../../core/models/recipe';
 
 @Component({
   selector: 'app-sale-form',
