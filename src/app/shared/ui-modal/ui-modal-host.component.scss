@@ -11,14 +11,32 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-4);
-  background: color-mix(in srgb, var(--color-on-surface) 35%, transparent);
+  background: color-mix(in srgb, var(--color-on-surface) 42%, transparent);
+  backdrop-filter: blur(4px);
 }
 
 .ui-modal-panel {
   background: var(--color-surface);
   color: var(--color-on-surface);
-  border-radius: var(--space-2);
-  padding: var(--space-4);
+  border: var(--border-width-thin) solid color-mix(in srgb, var(--color-outline-variant) 70%, transparent);
+  border-radius: var(--space-3);
+  padding: 0;
   overflow: auto;
   box-shadow: var(--shadow-modal);
+  width: min(100%, 560px);
+}
+
+@media (max-width: 640px) {
+  .ui-modal-backdrop {
+    align-items: flex-end;
+    padding: var(--space-2);
+  }
+
+  .ui-modal-panel {
+    width: 100%;
+    max-width: 100%;
+    max-height: 92vh;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
 }

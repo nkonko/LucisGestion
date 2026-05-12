@@ -13,9 +13,11 @@
             class="recipe-card touch-card"
             [class.recipe-card--selected]="getItemQuantity(recipe.id!) > 0"
             (click)="addItem(recipe)"
+            (keydown)="onRecipeCardKeydown($event, recipe)"
             role="button"
             tabindex="0"
             [attr.aria-pressed]="getItemQuantity(recipe.id!) > 0"
+            [attr.aria-label]="'Agregar ' + recipe.name + ' a la venta'"
           >
             <div class="recipe-card-name">{{ recipe.name }}</div>
             <div class="recipe-card-price">{{ recipe.salePrice | ars }}</div>

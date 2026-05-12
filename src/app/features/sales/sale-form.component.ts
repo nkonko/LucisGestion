@@ -81,6 +81,13 @@ export class SaleFormComponent {
     });
   }
 
+  onRecipeCardKeydown(event: KeyboardEvent, recipe: Recipe): void {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this.addItem(recipe);
+    }
+  }
+
   selectCustomerById(customerId: string): void {
     const previousSelectedCustomer = this.getSelectedCustomer();
     this.selectedCustomerId = customerId;
