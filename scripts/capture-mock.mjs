@@ -50,7 +50,7 @@ export async function ensurePlaywright() {
   try {
     return await import('playwright');
   } catch (error) {
-    throw new Error('No se encontro playwright. Ejecuta: npm install ; npx playwright install chromium', {
+    throw new Error('No se encontro playwright. Ejecuta: pnpm install ; pnpm exec playwright install chromium', {
       cause: error,
     });
   }
