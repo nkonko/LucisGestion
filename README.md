@@ -15,30 +15,30 @@ Sistema de gestión para pastelería artesanal. Permite administrar ingredientes
 | Herramienta | Versión mínima |
 |---|---|
 | Node.js | 20+ |
-| npm | 10+ |
+| pnpm | 10+ |
 | Angular CLI | 21+ |
 
 ## Instalación
 
 ```bash
-npm install
+pnpm install
 ```
 
 ## Comandos
 
 | Comando | Descripción |
 |---|---|
-| `npm start` | Servidor de desarrollo (requiere Firebase configurado) |
-| `npm run start:mock` | **Servidor con datos de prueba** (sin Firebase, sin login) |
-| `npm run build` | Build de producción |
-| `npm test` | Tests unitarios con Vitest |
+| `pnpm start` | Servidor de desarrollo (requiere Firebase configurado) |
+| `pnpm start:mock` | **Servidor con datos de prueba** (sin Firebase, sin login) |
+| `pnpm build` | Build de producción |
+| `pnpm test` | Tests unitarios con Vitest |
 
 ## Modo Mock (demo sin Firebase)
 
 Para levantar la app sin necesidad de Firebase ni conexión a internet:
 
 ```bash
-npm run start:mock
+pnpm start:mock
 ```
 
 Esto reemplaza los servicios de Firebase por implementaciones en memoria con datos de ejemplo preconfigurados:

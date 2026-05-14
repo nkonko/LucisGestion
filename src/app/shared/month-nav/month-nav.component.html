@@ -1,0 +1,33 @@
+<section class="month-nav ui-card-surface" aria-label="Selector de mes">
+  <div class="month-nav__row">
+    <button
+      type="button"
+      class="month-nav__arrow"
+      [attr.aria-label]="previousLabel()"
+      [disabled]="disablePrevious()"
+      (click)="onPrevious()"
+    >
+      <ui-icon name="chevron_left" [size]="22" [decorative]="true" />
+    </button>
+
+    <div class="month-nav__center">
+      <div class="month-nav__title">{{ label() }}</div>
+      @if (caption()) {
+        <div class="month-nav__caption">{{ caption() }}</div>
+      }
+      <ng-content select="[mn-overlay]" />
+    </div>
+
+    <button
+      type="button"
+      class="month-nav__arrow"
+      [attr.aria-label]="nextLabel()"
+      [disabled]="disableNext()"
+      (click)="onNext()"
+    >
+      <ui-icon name="chevron_right" [size]="22" [decorative]="true" />
+    </button>
+
+    <ng-content select="[mn-trailing]" />
+  </div>
+</section>

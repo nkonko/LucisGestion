@@ -11,7 +11,8 @@ export function getPeriodEnd(_period: Period, selectedDate: SelectedDate): Date 
 
 export function formatPeriodLabel(selectedDate: SelectedDate): string {
   const date = new Date(selectedDate.year, selectedDate.month, 1);
-  return new Intl.DateTimeFormat('es-AR', { month: 'long', year: 'numeric' }).format(date);
+  const formatted = new Intl.DateTimeFormat('es-AR', { month: 'long', year: 'numeric' }).format(date);
+  return formatted.charAt(0).toLocaleUpperCase('es-AR') + formatted.slice(1);
 }
 
 export function toMonthInputValue(selectedDate: SelectedDate): string {

@@ -1,16 +1,36 @@
 <h2 class="text-xl font-semibold mb-4">Hola! 👋</h2>
 
-<app-period-nav
-  class="mb-4"
-  [periodLabel]="periodLabel()"
-  [monthInputValue]="monthInputValue()"
-  [currentMonthMax]="currentMonthMax"
-  [isCurrentMonth]="isCurrentMonth()"
-  (previousMonth)="store.goToPreviousMonth()"
-  (nextMonth)="store.goToNextMonth()"
-  (currentMonth)="store.goToCurrentMonth()"
-  (monthChange)="onMonthInputChange($event)"
-/>
+<app-month-nav
+  class="mb-4 block"
+  [label]="periodLabel()"
+  [disableNext]="isCurrentMonth()"
+  (previous)="store.goToPreviousMonth()"
+  (next)="store.goToNextMonth()"
+>
+  <label class="period-overlay" mn-overlay>
+    <span class="sr-only">Seleccionar mes y año</span>
+    <input
+      type="month"
+      class="period-overlay__input"
+      [value]="monthInputValue()"
+      [max]="currentMonthMax"
+      (change)="onMonthInputChange($event)"
+      aria-label="Período seleccionado"
+    />
+  </label>
+
+  @if (!isCurrentMonth()) {
+    <button
+      type="button"
+      class="period-today"
+      mn-trailing
+      aria-label="Ir al mes actual"
+      (click)="store.goToCurrentMonth()"
+    >
+      Hoy
+    </button>
+  }
+</app-month-nav>
 
 <app-net-profit-card
   class="mb-6"
