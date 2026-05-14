@@ -21,14 +21,14 @@
 | Herramienta | Versión mínima | Comando para verificar |
 |---|---|---|
 | Node.js | 20+ | `node --version` |
-| npm | 10+ | `npm --version` |
+| pnpm | 10+ | `pnpm --version` |
 | Angular CLI | 21+ | `ng version` |
 | Firebase CLI | 13+ | `firebase --version` |
 
 ### Instalar Firebase CLI (si no lo tenés)
 
 ```bash
-npm install -g firebase-tools
+pnpm install -g firebase-tools
 ```
 
 ### Iniciar sesión en Firebase desde la terminal
@@ -182,7 +182,7 @@ Editar `.firebaserc` y reemplazar el project ID:
 
 ```bash
 cd lucis-gestion
-npm start
+pnpm start
 ```
 
 Abrir `http://localhost:4200` — verificar que el login con Google funcione.
@@ -192,7 +192,7 @@ Abrir `http://localhost:4200` — verificar que el login con Google funcione.
 Si querés verificar que la UI funciona antes de configurar Firebase:
 
 ```bash
-npm run start:mock
+pnpm start:mock
 ```
 
 Esto levanta la app con datos de prueba en memoria, sin necesidad de Firebase, sin login real. Ideal para hacer una primera revisión o demo rápida. Ver detalle en el [README](../README.md).
