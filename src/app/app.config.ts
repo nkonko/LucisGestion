@@ -31,7 +31,7 @@ export const appConfig: ApplicationConfig = {
       inject(AuthService);
     }),
     provideServiceWorker('ngsw-worker.js', {
-      enabled: !isDevMode(),
+      enabled: !isDevMode() && environment.production,
       registrationStrategy: 'registerWhenStable:30000',
     }),
   ],

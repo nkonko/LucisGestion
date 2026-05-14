@@ -62,11 +62,13 @@
   --size-font-2xs:            0.75rem; // Compact nav/support text size (12px)
   --size-font-sm:             0.875rem; // Small label/body text (14px)
   --size-font-lg:             1.125rem; // Section headings (18px)
+  --size-font-xl:             1.25rem;  // Card / month-nav titles (20px)
   --size-dialog-content-max-height: 80vh; // Recipe dialog max content height
   --size-sheet-max-width:     390px;   // Mobile bottom-sheet / narrow content max width
   --size-viewport-height:     100vh;   // Full viewport-height sections
   --size-icon-button:         var(--space-8);
   --size-fab:                 calc(var(--space-8) + var(--space-6));
+  --size-month-nav-arrow:     calc(var(--space-8) + var(--space-2)); // 40px circular arrow
   --size-spinner:             calc(var(--space-8) + var(--space-2));
   --size-progress-height:     var(--space-2);
   --size-layout-header-height: 34px;
@@ -85,6 +87,7 @@
   // ── Border radius ────────────────────────────────────────────────────────────
   --radius-chip:   16px;  // Pill / chip shape (e.g. active nav item)
   --radius-avatar: 50%;   // Circular avatar
+  --radius-pill:   9999px; // Fully rounded shape (icon buttons, FAB-like controls)
 
   // ── Transitions ──────────────────────────────────────────────────────────────
   --transition-standard: 0.2s;
