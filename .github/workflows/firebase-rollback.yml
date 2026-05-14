@@ -54,9 +54,6 @@ jobs:
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v3
 
-      - name: Install Firebase CLI
-        run: pnpm install --global firebase-tools
-
       - name: Resolve version_id
         id: resolve
         env:

@@ -69,8 +69,5 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
-      - name: Install Firebase CLI
-        run: pnpm install --global firebase-tools
-
       - name: Deploy to Firebase Hosting preview channel
-        run: firebase hosting:channel:deploy pr${{ github.event.pull_request.number }} --expires 7d --project "${{ vars.FIREBASE_PROJECT_ID }}" --non-interactive
+        run: pnpm exec firebase hosting:channel:deploy pr${{ github.event.pull_request.number }} --expires 7d --project "${{ vars.FIREBASE_PROJECT_ID }}" --non-interactive
