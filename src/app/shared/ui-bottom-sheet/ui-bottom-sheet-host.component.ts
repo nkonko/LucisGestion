@@ -11,6 +11,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { NgComponentOutlet } from '@angular/common';
+import { UI_BOTTOM_SHEET_DEFAULTS } from './ui-bottom-sheet.constants';
 
 @Component({
   selector: 'app-ui-bottom-sheet-host',
@@ -25,9 +26,9 @@ import { NgComponentOutlet } from '@angular/common';
 export class UiBottomSheetHostComponent implements AfterViewInit {
   readonly contentComponent = input.required<Type<unknown>>();
   readonly contentInjector = input.required<Injector>();
-  readonly maxWidth = input('720px');
-  readonly width = input('100%');
-  readonly maxHeight = input('92vh');
+  readonly maxWidth = input(UI_BOTTOM_SHEET_DEFAULTS.maxWidth);
+  readonly width = input(UI_BOTTOM_SHEET_DEFAULTS.width);
+  readonly maxHeight = input(UI_BOTTOM_SHEET_DEFAULTS.maxHeight);
   readonly panelClass = input<string | null>(null);
   readonly closeOnBackdropClick = input(true);
 
