@@ -5,11 +5,11 @@ import { WhatsAppService } from '../../core/services/whatsapp.service';
 import { Customer, CustomerInput } from '../../core/models/customer';
 import { CustomerFormComponent } from './customer-form.component';
 import { DialogService } from '../../core/services/dialog.service';
-import { UiIconComponent } from '../../shared/ui/components';
+import { UiCardComponent, UiIconComponent } from '../../shared/ui/components';
 
 @Component({
   selector: 'app-customers',
-  imports: [UiIconComponent],
+  imports: [UiCardComponent, UiIconComponent],
   templateUrl: './customers.component.html',
   styleUrl: './customers.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

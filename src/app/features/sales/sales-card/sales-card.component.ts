@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, output, input } from '@angular/core';
 import { ArsPipe } from '../../../shared/pipes/ars.pipe';
-import { UiIconComponent } from '../../../shared/ui/components';
+import { UiCardComponent, UiIconComponent } from '../../../shared/ui/components';
 import type { Sale, SaleStatus } from '../../../core/models/sale';
 import { SALE_STATUS_CLASS, SALE_STATUS_DISPLAY } from '../../../core/models/sale';
 
 @Component({
   selector: 'app-sales-card',
-  imports: [ArsPipe, UiIconComponent],
+  imports: [ArsPipe, UiCardComponent, UiIconComponent],
   templateUrl: './sales-card.component.html',
   styleUrl: './sales-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
