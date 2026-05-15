@@ -39,11 +39,6 @@ describe('IngredientFormComponent', () => {
     ingredients: signal(ingredients),
   };
 
-  const setRecipeIngredientsInput = (value: RecipeIngredient[]) => {
-    fixture.componentRef.setInput('recipeIngredients', value);
-    fixture.detectChanges();
-  };
-
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [IngredientFormComponent],
@@ -55,7 +50,9 @@ describe('IngredientFormComponent', () => {
   });
 
   it('adds ingredient only when exact ingredient name is selected', () => {
-    setRecipeIngredientsInput([]);
+    fixture.componentRef.setInput('recipeIngredients', [] as RecipeIngredient[]);
+    fixture.detectChanges();
+
     const emitSpy = vi.fn();
     component.recipeIngredientsChange.subscribe(emitSpy);
 
@@ -79,7 +76,7 @@ describe('IngredientFormComponent', () => {
   });
 
   it('emits updated list with recomputed line cost on quantity update', () => {
-    setRecipeIngredientsInput([
+    fixture.componentRef.setInput('recipeIngredients', [
       {
         ingredientId: 'ing-1',
         name: 'Chocolate',
@@ -87,7 +84,9 @@ describe('IngredientFormComponent', () => {
         unit: 'kg',
         lineCost: 10,
       },
-    ]);
+    ] as RecipeIngredient[]);
+    fixture.detectChanges();
+
     const emitSpy = vi.fn();
     component.recipeIngredientsChange.subscribe(emitSpy);
 
@@ -106,7 +105,7 @@ describe('IngredientFormComponent', () => {
   });
 
   it('emits filtered list when an ingredient is removed', () => {
-    setRecipeIngredientsInput([
+    fixture.componentRef.setInput('recipeIngredients', [
       {
         ingredientId: 'ing-1',
         name: 'Chocolate',
@@ -121,7 +120,9 @@ describe('IngredientFormComponent', () => {
         unit: 'kg',
         lineCost: 4,
       },
-    ]);
+    ] as RecipeIngredient[]);
+    fixture.detectChanges();
+
     const emitSpy = vi.fn();
     component.recipeIngredientsChange.subscribe(emitSpy);
 

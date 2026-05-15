@@ -31,9 +31,14 @@ export class IngredientFormComponent {
   filteredIngredients = computed(() => {
     const term = this.ingredientSearch().toLowerCase();
     const alreadyAdded = new Set(this.recipeIngredients().map((ri) => ri.ingredientId));
-    return this.ingredientsStore
-      .ingredients()
-      .filter((i) => !alreadyAdded.has(i.id!) && i.name.toLowerCase().includes(term));
+    return this.ingredientsStore.ingredients().filter((i) => {
+      const ingredientId = i.id;
+      if (!ingredientId) {
+        return false;
+      }
+
+      return !alreadyAdded.has(ingredientId) && i.name.toLowerCase().includes(term);
+    });
   });
 
   selectedIngredient = computed(() => {
