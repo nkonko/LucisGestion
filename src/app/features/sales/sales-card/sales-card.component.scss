@@ -7,22 +7,6 @@
   flex-direction: column;
   gap: var(--space-3);
   cursor: default;
-  transition: transform var(--transition-standard), box-shadow var(--transition-standard), border-color var(--transition-standard);
-  box-shadow: var(--shadow-soft);
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-elevated);
-  }
-
-  &:active {
-    box-shadow: var(--shadow-pressed);
-  }
-
-  &:focus-within {
-    outline: var(--border-width-medium) solid var(--color-primary);
-    outline-offset: var(--space-1);
-  }
 }
 
 .sale-card-header {

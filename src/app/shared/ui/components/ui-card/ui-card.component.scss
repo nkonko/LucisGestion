@@ -10,20 +10,20 @@
   padding: var(--space-4);
   box-shadow: var(--shadow-soft);
   transition: transform var(--transition-standard), box-shadow var(--transition-standard), border-color var(--transition-standard);
-}
 
-.ui-card-hover {
-  transition: transform var(--transition-standard), box-shadow var(--transition-standard);
-}
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-elevated);
+  }
 
-.ui-card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-elevated);
-}
+  &:active {
+    box-shadow: var(--shadow-pressed);
+  }
 
-.ui-card:focus-within {
-  outline: var(--border-width-medium) solid var(--color-primary);
-  outline-offset: var(--space-1);
+  &:focus-within {
+    outline: var(--border-width-medium) solid var(--color-primary);
+    outline-offset: var(--space-1);
+  }
 }
 
 .ui-card__title {
