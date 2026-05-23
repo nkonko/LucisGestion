@@ -9,7 +9,7 @@
   </label>
   <label class="ui-field w-[200px]">
     <span>Desde</span>
-    <input class="ui-input" type="date" (change)="onDateFromInput($event)" />
+    <input class="ui-input" type="date" (change)="onDateFromInput($event)" [value]="dateFromValue()" />
   </label>
   <label class="ui-field flex-1 min-w-[180px]">
     <span>Cliente</span>

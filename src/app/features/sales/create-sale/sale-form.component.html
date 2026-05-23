@@ -39,7 +39,7 @@
       <div class="sale-form-inline-grid">
         <label class="ui-field">
           <span>Medio de pago</span>
-          <select class="ui-select" [(ngModel)]="paymentMethod" [disabled]="isEdit()">
+          <select class="ui-select" [(ngModel)]="paymentMethod">
             @for (mp of paymentMethods; track mp.key) {
               <option [value]="mp.key">{{ mp.label }}</option>
             }
@@ -51,16 +51,15 @@
             class="payment-toggle ui-payment-toggle"
             type="button"
             [class.ui-payment-toggle--paid]="isPaid"
-            (click)="!isEdit() && (isPaid = !isPaid)"
+            (click)="isPaid = !isPaid"
             [attr.aria-pressed]="isPaid"
             [attr.aria-label]="isPaid ? 'Marcar como no pagado' : 'Marcar como pagado'"
-            [disabled]="isEdit()"
           >
             {{ isPaid ? 'Pagado' : 'No pagado' }}
           </button>
         </label>
       </div>
-    </section>
+    </section> 
 
     <section class="sale-form-section">
       <h3 class="sale-form-section-title">Entrega y notas</h3>

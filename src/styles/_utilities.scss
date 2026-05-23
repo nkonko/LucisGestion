@@ -232,6 +232,17 @@
   min-width: 180px;
   box-shadow: var(--shadow-pressed);
   z-index: var(--z-nav);
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+
+  @media (max-width: 640px) {
+    min-width: 160px;
+  }
+}
+
+.ui-menu--nav {
+  min-width: 150px;
 }
 
 .ui-menu-item {
@@ -245,6 +256,16 @@
   align-items: center;
   gap: var(--space-2);
   cursor: pointer;
+  text-decoration: none;
+
+  &:hover {
+    background: var(--color-surface-hover);
+  }
+
+  &.active {
+    background: var(--color-primary-container);
+    color: var(--color-primary);
+  }
 }
 
 .ui-modal-close-btn {

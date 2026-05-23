@@ -141,8 +141,8 @@ export class SaleFormComponent {
       total: this.total(),
       totalCost: this.totalCost(),
       profit: this.profit(),
-      isPaid: existingSale?.isPaid ?? this.isPaid,
-      paymentMethod: existingSale?.paymentMethod ?? this.paymentMethod,
+      isPaid: this.isPaid,
+      paymentMethod: this.paymentMethod,
       status: existingSale?.status ?? 'pending',
       notes: this.notes,
     };
