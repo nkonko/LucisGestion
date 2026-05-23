@@ -8,6 +8,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { IngredientsStore } from './ingredients.store';
 import { RecipesStore } from './recipes.store';
 import { BaseState } from './state/state';
+import { RequiredIngredient } from '../models/sale/required-ingredient';
 
 export const SalesStore = signalStore(
   { providedIn: 'root' },
@@ -32,10 +33,7 @@ export const SalesStore = signalStore(
     const ingredientsStore = inject(IngredientsStore);
     const recipesStore = inject(RecipesStore);
 
-    type RequiredIngredient = {
-      ingredientName: string;
-      required: number;
-    };
+    
 
     const buildStockAdjustments = (
       items: { recipeId: string; quantity: number }[],
