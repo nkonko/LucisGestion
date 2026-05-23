@@ -64,13 +64,14 @@ export class SalesCardComponent {
   }
 
   getNextStatus(): SaleStatus | null {
-    const status = this.sale().status;
-    const transitions: Record<SaleStatus, SaleStatus | null> = {
-      pending: 'production',
-      production: 'delivered',
-      delivered: null,
-      cancelled: null,
-    };
-    return transitions[status];
+    switch (this.sale().status) {
+      case 'pending':
+        return 'production';
+      case 'production':
+        return 'delivered';
+      case 'delivered':
+      case 'cancelled':
+        return null;
+    }
   }
 }

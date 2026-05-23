@@ -116,14 +116,14 @@ export class SalesComponent {
 
   onStatusFilterChange(event: Event): void {
     const htmlTarget = event.target as HTMLSelectElement | null;
-    const value = htmlTarget?.value as SaleStatus | '';
-    this.selectedStatus.set(value ? (value as SaleStatus) : null);
+    const selectedStatusValue = htmlTarget?.value as SaleStatus | '';
+    this.selectedStatus.set(selectedStatusValue ? selectedStatusValue : null);
   }
 
   onPaymentStatusFilterChange(event: Event): void {
     const htmlTarget = event.target as HTMLSelectElement | null;
-    const value = (htmlTarget?.value ?? '') as 'paid' | 'unpaid' | '';
-    this.selectedPaymentStatus.set(value ? value : null);
+    const selectedPaymentStatusValue = (htmlTarget?.value ?? '') as 'paid' | 'unpaid' | '';
+    this.selectedPaymentStatus.set(selectedPaymentStatusValue ? selectedPaymentStatusValue : null);
   }
 
   clearFilters(): void {
@@ -154,6 +154,12 @@ export class SalesComponent {
   }
 
   editSale(sale: Sale): void {
+    const saleId = sale.id;
+    if (!saleId) {
+      this.notify.error('Venta inválida.');
+      return;
+    }
+
     const dialogRef = this.bottomSheet.open<Sale, SaleInput>(SaleFormComponent, {
       maxWidth: '760px',
       maxHeight: '90vh',
@@ -163,7 +169,7 @@ export class SalesComponent {
     dialogRef.afterClosed.subscribe(async (result) => {
       if (result) {
         try {
-          await this.store.updateSale(sale.id!, result);
+          await this.store.updateSale(saleId, result);
           this.notify.success('Venta actualizada.', 3000);
         } catch (error) {
           this.notify.errorFrom(error, 'No se pudo actualizar la venta por stock insuficiente.');
@@ -173,8 +179,28 @@ export class SalesComponent {
   }
 
   async changeStatus(sale: Sale, newStatus: Sale['status']): Promise<void> {
-    await this.store.updateSaleStatus(sale.id!, newStatus);
-    this.notify.success(`Pedido marcado como ${SALE_STATUS_DISPLAY[newStatus].toLowerCase()}`);
+    const saleId = sale.id;
+    if (!saleId) {
+      this.notify.error('Venta inválida.');
+      return;
+    }
+
+    await this.store.updateSaleStatus(saleId, newStatus);
+
+    const statusLabel = (() => {
+      switch (newStatus) {
+        case 'pending':
+          return 'Pendiente';
+        case 'production':
+          return 'En Producción';
+        case 'delivered':
+          return 'Entregado';
+        case 'cancelled':
+          return 'Cancelado';
+      }
+    })();
+
+    this.notify.success(`Pedido marcado como ${statusLabel.toLowerCase()}`);
   }
 
   sendWhatsApp(sale: Sale): void {

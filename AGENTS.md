@@ -21,6 +21,15 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Always use separated files for models/types, do not introduce models inside services or components, one interface for file
 - Put models/types on a separate folder called models
 
+## PR Review Verification
+
+- When reviewing PRs, verify recurring static-analysis patterns frequently seen in this repo:
+  - non-serializable expressions in signal store helpers must be wrapped with `$()`
+  - avoid `output<void>()`; use `output<undefined>()`
+  - avoid generic object injection sinks such as dynamic record lookup objects in component logic
+  - avoid raw HTML variable names like `value` when holding non-HTML content
+  - avoid non-null assertions such as `foo!` in component or service code
+
 ## Accessibility Requirements
 
 - It MUST pass all AXE checks.

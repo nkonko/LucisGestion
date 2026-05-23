@@ -13,8 +13,8 @@ export class SaleProductItemComponent {
   readonly recipe = input.required<Recipe>();
   readonly quantity = input(0);
 
-  readonly increment = output<void>();
-  readonly decrement = output<void>();
+  readonly increment = output();
+  readonly decrement = output();
 
   onIncrement(): void {
     this.increment.emit();
