@@ -33,8 +33,8 @@ importers:
         specifier: ^21.2.14
         version: 21.2.14(@angular/core@21.2.12(@angular/compiler@21.2.12)(rxjs@7.8.2))(rxjs@7.8.2)
       '@lucide/angular':
-        specifier: ^1.14.0
-        version: 1.14.0(@angular/common@21.2.14(@angular/core@21.2.12(@angular/compiler@21.2.12)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.2.12(@angular/compiler@21.2.12)(rxjs@7.8.2))
+        specifier: ^1.16.0
+        version: 1.16.0(@angular/common@21.2.14(@angular/core@21.2.12(@angular/compiler@21.2.12)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.2.12(@angular/compiler@21.2.12)(rxjs@7.8.2))
       '@ngrx/signals':
         specifier: ^21.1.0
         version: 21.1.0(@angular/core@21.2.12(@angular/compiler@21.2.12)(rxjs@7.8.2))(rxjs@7.8.2)
@@ -1287,8 +1287,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@lucide/angular@1.14.0':
-    resolution: {integrity: sha512-S1f9kSP0qgsqD1ToCxmu0f8rNJGKDet3ee0ZnaEo+aiCekCqu5kz/39IqzLYxc1ltqXLNYcLaAr6FRI4K05bkQ==}
+  '@lucide/angular@1.16.0':
+    resolution: {integrity: sha512-jszfiRHn8uuESXHT0aGExBWtGRr35L3nj+dovP05gvrwV8Mnk4jEU45v2kVvcrNe5GBcrKiFJWyoFX2qFfW0nA==}
     peerDependencies:
       '@angular/common': 17.x - 21.x
       '@angular/core': 17.x - 21.x
@@ -6748,7 +6748,7 @@ snapshots:
   '@lmdb/lmdb-win32-x64@3.5.1':
     optional: true
 
-  '@lucide/angular@1.14.0(@angular/common@21.2.14(@angular/core@21.2.12(@angular/compiler@21.2.12)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.2.12(@angular/compiler@21.2.12)(rxjs@7.8.2))':
+  '@lucide/angular@1.16.0(@angular/common@21.2.14(@angular/core@21.2.12(@angular/compiler@21.2.12)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.2.12(@angular/compiler@21.2.12)(rxjs@7.8.2))':
     dependencies:
       '@angular/common': 21.2.14(@angular/core@21.2.12(@angular/compiler@21.2.12)(rxjs@7.8.2))(rxjs@7.8.2)
       '@angular/core': 21.2.12(@angular/compiler@21.2.12)(rxjs@7.8.2)
