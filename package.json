@@ -14,7 +14,8 @@
     "test:ci": "node scripts/test-mock.mjs",
     "screenshot:mock": "node scripts/capture-mock.mjs",
     "lint": "ng lint",
-    "release": "node scripts/create-release.mjs"
+    "release": "node scripts/create-release.mjs",
+    "coverage:check": "node scripts/check-coverage.mjs"
   },
   "private": true,
   "packageManager": "pnpm@11.1.1",

@@ -38,3 +38,6 @@ jobs:
 
       - name: Run tests
         run: pnpm test:ci
+
+      - name: Enforce coverage thresholds
+        run: pnpm coverage:check
