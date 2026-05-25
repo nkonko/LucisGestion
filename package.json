@@ -20,7 +20,7 @@
   "packageManager": "pnpm@11.1.1",
   "dependencies": {
     "@angular/common": "^21.2.14",
-    "@angular/compiler": "^21.2.11",
+    "@angular/compiler": "^21.2.14",
     "@angular/core": "^21.2.14",
     "@angular/fire": "^21.0.0-rc.0",
     "@angular/forms": "^21.2.14",
