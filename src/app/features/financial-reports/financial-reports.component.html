@@ -1,0 +1,26 @@
+<section class="ui-card-surface p-4" aria-labelledby="clientes-a-cuidar-title">
+  <div class="flex items-center justify-between gap-2 mb-3">
+    <h2 id="clientes-a-cuidar-title" class="text-lg font-semibold">Clientes a cuidar</h2>
+    <span class="text-xs text-gray-500">Ordenado por impacto y frecuencia</span>
+  </div>
+
+  @if (hasCustomersToCare()) {
+    <ul class="space-y-2">
+      @for (customer of customersToCare(); track customer.customerId ?? customer.customerName) {
+        <li class="border rounded-lg p-3">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="font-medium">{{ customer.customerName }}</p>
+              <p class="text-sm text-gray-600">{{ customer.revenue | ars }} · {{ customer.ordersCount }} compras</p>
+              <p class="text-sm text-gray-600">Última compra: {{ customer.lastPurchaseAt | date: 'dd/MM/yyyy' }}</p>
+            </div>
+            <span class="text-xs px-2 py-1 rounded-full border">{{ customer.importanceTier }}</span>
+          </div>
+          <p class="text-sm mt-2">{{ customer.retentionHint }}</p>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="text-sm text-gray-600">Sin clientes con ventas en el período seleccionado.</p>
+  }
+</section>
