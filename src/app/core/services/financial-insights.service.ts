@@ -46,7 +46,7 @@ export class FinancialInsightsService {
     });
   });
 
-  readonly productOpportunities = computed<ProductOpportunity[]>(() => {
+  readonly productOpportunities = computed((): ProductOpportunity[] => {
     const quantitiesByRecipe = new Map<string, number>();
     for (const sale of this.salesForSelectedMonth()) {
       for (const item of sale.items) {
@@ -57,31 +57,31 @@ export class FinancialInsightsService {
 
     const ingredientCount = this.ingredientsStore.ingredients().length;
 
-    return [...quantitiesByRecipe.entries()]
-      .map(([recipeId, soldUnits]) => {
-        const recipe = this.recipesStore.recipes().find((candidate) => candidate.id === recipeId);
-        if (!recipe || soldUnits < this.thresholds.highRotationUnits) return null;
+    const opportunities: ProductOpportunity[] = [];
+    for (const [recipeId, soldUnits] of quantitiesByRecipe.entries()) {
+      const recipe = this.recipesStore.recipes().find((candidate) => candidate.id === recipeId);
+      if (!recipe || soldUnits < this.thresholds.highRotationUnits) continue;
 
-        const estimatedRevenue = soldUnits * recipe.salePrice;
-        return {
-          id: `product-opportunity-${recipeId}`,
-          type: 'product-opportunity',
-          severity: 'info',
-          recipeId,
-          recipeName: recipe.name,
-          soldUnits,
-          estimatedRevenue,
-          title: `Alta rotación: ${recipe.name}`,
-          description: `Se vendieron ${soldUnits} unidades durante el período seleccionado.`,
-          impact: `Ingresos estimados: $${estimatedRevenue.toLocaleString('es-AR')}.`,
-          recommendation: `Evalúa aumentar producción o variantes para sostener la demanda con base en ${ingredientCount} ingredientes activos.`,
-        } satisfies ProductOpportunity;
-      })
-      .filter((opportunity): opportunity is ProductOpportunity => opportunity !== null)
-      .sort((a, b) => b.soldUnits - a.soldUnits);
+      const estimatedRevenue = soldUnits * recipe.salePrice;
+      opportunities.push({
+        id: `product-opportunity-${recipeId}`,
+        type: 'product-opportunity',
+        severity: 'info',
+        recipeId,
+        recipeName: recipe.name,
+        soldUnits,
+        estimatedRevenue,
+        title: `Alta rotación: ${recipe.name}`,
+        description: `Se vendieron ${soldUnits} unidades durante el período seleccionado.`,
+        impact: `Ingresos estimados: $${estimatedRevenue.toLocaleString('es-AR')}.`,
+        recommendation: `Evalúa aumentar producción o variantes para sostener la demanda con base en ${ingredientCount} ingredientes activos.`,
+      });
+    }
+
+    return opportunities.sort((a, b) => b.soldUnits - a.soldUnits);
   });
 
-  readonly expenseAnomalies = computed<ExpenseAnomaly[]>(() => {
+  readonly expenseAnomalies = computed((): ExpenseAnomaly[] => {
     const monthKey = this.selectedMonthKey();
     const [yearText, monthText] = monthKey.split('-');
     const year = Number(yearText);
@@ -90,46 +90,46 @@ export class FinancialInsightsService {
 
     const categories: CostCategory[] = ['utilities', 'rent', 'wages', 'taxes', 'other'];
 
-    return categories
-      .map((category) => {
-        const currentAmount = currentEntries
+    const anomalies: ExpenseAnomaly[] = [];
+    for (const category of categories) {
+      const currentAmount = currentEntries
+        .filter((entry) => entry.category === category)
+        .reduce((sum, entry) => sum + entry.amount, 0);
+
+      const baselineMonths = this.previousMonths(year, month, 3);
+      const baselineTotal = baselineMonths.reduce((sum, baselineMonth) => {
+        const monthAmount = this.fixedCostsStore
+          .entriesForMonth(baselineMonth)
           .filter((entry) => entry.category === category)
-          .reduce((sum, entry) => sum + entry.amount, 0);
+          .reduce((categorySum, entry) => categorySum + entry.amount, 0);
+        return sum + monthAmount;
+      }, 0);
 
-        const baselineMonths = this.previousMonths(year, month, 3);
-        const baselineTotal = baselineMonths.reduce((sum, baselineMonth) => {
-          const monthAmount = this.fixedCostsStore
-            .entriesForMonth(baselineMonth)
-            .filter((entry) => entry.category === category)
-            .reduce((categorySum, entry) => categorySum + entry.amount, 0);
-          return sum + monthAmount;
-        }, 0);
+      const baselineAmount = baselineTotal / baselineMonths.length;
+      if (baselineAmount <= 0) continue;
 
-        const baselineAmount = baselineTotal / baselineMonths.length;
-        if (baselineAmount <= 0) return null;
+      const increaseRatio = (currentAmount - baselineAmount) / baselineAmount;
+      if (increaseRatio < this.thresholds.fixedCostIncreaseRatio) continue;
 
-        const increaseRatio = (currentAmount - baselineAmount) / baselineAmount;
-        if (increaseRatio < this.thresholds.fixedCostIncreaseRatio) return null;
+      anomalies.push({
+        id: `expense-anomaly-${category}-${monthKey}`,
+        type: 'expense-anomaly',
+        severity: increaseRatio >= 0.4 ? 'critical' : 'warning',
+        category,
+        currentAmount,
+        baselineAmount,
+        increaseRatio,
+        title: `Aumento de costos en ${category}`,
+        description: `El costo subió ${Math.round(increaseRatio * 100)}% frente al promedio de 3 meses previos.`,
+        impact: `Mes actual: $${currentAmount.toLocaleString('es-AR')} vs promedio: $${baselineAmount.toLocaleString('es-AR')}.`,
+        recommendation: 'Revisa contratos, consumo y opciones de negociación para esta categoría.',
+      });
+    }
 
-        return {
-          id: `expense-anomaly-${category}-${monthKey}`,
-          type: 'expense-anomaly',
-          severity: increaseRatio >= 0.4 ? 'critical' : 'warning',
-          category,
-          currentAmount,
-          baselineAmount,
-          increaseRatio,
-          title: `Aumento de costos en ${category}`,
-          description: `El costo subió ${Math.round(increaseRatio * 100)}% frente al promedio de 3 meses previos.`,
-          impact: `Mes actual: $${currentAmount.toLocaleString('es-AR')} vs promedio: $${baselineAmount.toLocaleString('es-AR')}.`,
-          recommendation: 'Revisa contratos, consumo y opciones de negociación para esta categoría.',
-        } satisfies ExpenseAnomaly;
-      })
-      .filter((anomaly): anomaly is ExpenseAnomaly => anomaly !== null)
-      .sort((a, b) => b.increaseRatio - a.increaseRatio);
+    return anomalies.sort((a, b) => b.increaseRatio - a.increaseRatio);
   });
 
-  readonly priorityCustomers = computed<PriorityCustomer[]>(() => {
+  readonly priorityCustomers = computed((): PriorityCustomer[] => {
     const customerSummary = new Map<string, { customerName: string; billedAmount: number; purchasesCount: number }>();
 
     for (const sale of this.salesForSelectedMonth()) {
@@ -158,8 +158,8 @@ export class FinancialInsightsService {
       )
       .map(([customerId, summary]) => ({
         id: `priority-customer-${customerId}`,
-        type: 'priority-customer',
-        severity: 'info',
+        type: 'priority-customer' as const,
+        severity: 'info' as const,
         customerId,
         customerName: summary.customerName,
         billedAmount: summary.billedAmount,
