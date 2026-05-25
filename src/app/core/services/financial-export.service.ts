@@ -15,25 +15,24 @@ export class FinancialExportService {
   private customersStore = inject(CustomersStore);
 
   async exportExcel(request: FinancialExportRequest): Promise<void> {
-    const { utils, writeFileXLSX } = await import('xlsx');
-    const workbook = utils.book_new();
+    const { exportSheetsAsExcelXml } = await import('./financial-export-excel.util');
+    const sheets: { name: string; rows: Record<string, string | number>[] }[] = [];
 
     for (const dataset of request.datasets) {
       const rows = this.normalizeDataset(dataset, request.period);
       if (rows.length === 0) {
         continue;
       }
-      const worksheet = utils.json_to_sheet(rows);
-      utils.book_append_sheet(workbook, worksheet, this.getSheetName(dataset));
+      sheets.push({ name: this.getSheetName(dataset), rows });
     }
 
-    if (workbook.SheetNames.length === 0) {
+    if (sheets.length === 0) {
       return;
     }
 
     const year = request.period.getFullYear();
     const month = String(request.period.getMonth() + 1).padStart(2, '0');
-    writeFileXLSX(workbook, `reportes-financieros-${year}-${month}.xlsx`);
+    exportSheetsAsExcelXml(sheets, `reportes-financieros-${year}-${month}.xlsx`);
   }
 
   private normalizeDataset(dataset: FinancialExportRequest['datasets'][number], period: Date): Record<string, string | number>[] {
