@@ -1,0 +1,49 @@
+<section class="ui-card-surface p-4">
+  <h2 class="text-xl font-semibold mb-2">Reportes financieros</h2>
+  <p class="text-sm text-gray-600 mb-4">Seleccioná datasets para exportar un Excel del período.</p>
+
+  <app-month-nav
+    class="mb-4 block"
+    [label]="periodLabel()"
+    [disableNext]="isCurrentMonth()"
+    (previous)="dashboardStore.goToPreviousMonth()"
+    (next)="dashboardStore.goToNextMonth()"
+  >
+    <label class="period-overlay" mn-overlay>
+      <span class="sr-only">Seleccionar mes del reporte</span>
+      <input
+        type="month"
+        class="period-overlay__input"
+        [value]="monthInputValue()"
+        [max]="maxMonth"
+        (change)="onMonthInputChange($event)"
+        aria-label="Período del reporte"
+      />
+    </label>
+  </app-month-nav>
+
+  <fieldset class="space-y-2" aria-describedby="export-hint">
+    <legend class="font-medium mb-2">Datasets disponibles</legend>
+    @for (option of exportOptions; track option.key) {
+      <label class="flex items-center gap-2">
+        <input
+          type="checkbox"
+          [checked]="selectedDatasets().includes(option.key)"
+          (change)="onDatasetChange($event, option.key)"
+        />
+        <span>{{ option.label }}</span>
+      </label>
+    }
+  </fieldset>
+
+  <p id="export-hint" class="text-xs text-gray-500 mt-2">Debés seleccionar al menos un dataset para habilitar la exportación.</p>
+
+  <button
+    type="button"
+    class="mt-4 ui-btn ui-btn--primary"
+    [disabled]="!isExportEnabled()"
+    (click)="export()"
+  >
+    Exportar Excel
+  </button>
+</section>

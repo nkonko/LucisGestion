@@ -56,6 +56,13 @@ export const routes: Routes = [
             (m) => m.FixedCostsComponent,
           ),
       },
+      {
+        path: 'reportes-financieros',
+        loadComponent: () =>
+          import('./features/financial-reports/financial-reports.component').then(
+            (m) => m.FinancialReportsComponent,
+          ),
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },
