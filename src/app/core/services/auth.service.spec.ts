@@ -15,6 +15,8 @@ import * as authApi from '@angular/fire/auth';
 import * as fsApi from '@angular/fire/firestore';
 import { AuthStore } from '../store/auth.store';
 
+const mockedAuthApi = vi.mocked(authApi);
+
 describe.skip('AuthService', () => {
   let service: AuthService;
   const authStoreMock = { appUser: vi.fn(), setAuthState: vi.fn() };
@@ -23,7 +25,7 @@ describe.skip('AuthService', () => {
     vi.restoreAllMocks();
     authStoreMock.appUser.mockReset();
     authStoreMock.setAuthState.mockReset();
-    (authApi.onAuthStateChanged as unknown as any).mockImplementation(() => vi.fn());
+    mockedAuthApi.onAuthStateChanged.mockImplementation(() => vi.fn());
 
     TestBed.configureTestingModule({
       providers: [

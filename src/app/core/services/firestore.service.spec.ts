@@ -13,6 +13,8 @@ vi.mock('@angular/fire/firestore', () => ({
 }));
 import * as afs from '@angular/fire/firestore';
 
+const mockedAfs = vi.mocked(afs);
+
 describe.skip('FirestoreService', () => {
   let service: FirestoreService;
 
@@ -22,22 +24,22 @@ describe.skip('FirestoreService', () => {
   });
 
   it('addDocument removes id from payload', async () => {
-    (afs.addDoc as unknown as any).mockResolvedValue({ id: 'abc' } as never);
-    (afs.collection as unknown as any).mockReturnValue({} as never);
+    mockedAfs.addDoc.mockResolvedValue({ id: 'abc' } as never);
+    mockedAfs.collection.mockReturnValue({} as never);
 
     const id = await service.addDocument('recipes', { id: 'legacy', name: 'Pan' });
 
     expect(id).toBe('abc');
-    expect(afs.addDoc).toHaveBeenCalledWith(expect.anything(), { name: 'Pan' });
+    expect(mockedAfs.addDoc).toHaveBeenCalledWith(expect.anything(), { name: 'Pan' });
   });
 
   it('updateDocument removes id from payload', async () => {
-    (afs.updateDoc as unknown as any).mockResolvedValue(undefined);
-    (afs.doc as unknown as any).mockReturnValue({} as never);
+    mockedAfs.updateDoc.mockResolvedValue(undefined);
+    mockedAfs.doc.mockReturnValue({} as never);
 
     await service.updateDocument('recipes', 'id-1', { id: 'x', name: 'Nuevo' });
 
-    expect(afs.updateDoc).toHaveBeenCalledWith(expect.anything(), { name: 'Nuevo' });
+    expect(mockedAfs.updateDoc).toHaveBeenCalledWith(expect.anything(), { name: 'Nuevo' });
   });
 
   it('applyStockAdjustments avoids negative stock and skips zero delta movement', async () => {
@@ -45,9 +47,9 @@ describe.skip('FirestoreService', () => {
     const set = vi.fn();
     const get = vi.fn().mockResolvedValue({ exists: () => true, data: () => ({ currentStock: 2 }) });
 
-    (afs.runTransaction as unknown as any).mockImplementation(async (_db: unknown, cb: any) => cb({ get, update, set } as never));
-    (afs.doc as unknown as any).mockReturnValue({} as never);
-    (afs.collection as unknown as any).mockReturnValue({} as never);
+    mockedAfs.runTransaction.mockImplementation(async (_db: unknown, cb: unknown) => (cb as (ctx: unknown) => Promise<void>)({ get, update, set } as never));
+    mockedAfs.doc.mockReturnValue({} as never);
+    mockedAfs.collection.mockReturnValue({} as never);
 
     await service.applyStockAdjustments('sale-1', 'sale_deduction', [
       { ingredientId: 'ing-1', ingredientName: 'Harina', delta: -5 },
