@@ -1,9 +1,19 @@
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 
 const minLines = Number(process.env.COVERAGE_MIN_LINES ?? 70);
 const minBranches = Number(process.env.COVERAGE_MIN_BRANCHES ?? 60);
 
-const lcov = await readFile('coverage/lcov.info', 'utf8');
+
+const lcovPath = 'coverage/lcov.info';
+
+try {
+  await access(lcovPath);
+} catch {
+  console.error('Coverage file not found at coverage/lcov.info. Run tests with coverage enabled (e.g. `pnpm test:ci -- --coverage`) before running coverage:check.');
+  process.exit(1);
+}
+
+const lcov = await readFile(lcovPath, 'utf8');
 
 let lf = 0;
 let lh = 0;
