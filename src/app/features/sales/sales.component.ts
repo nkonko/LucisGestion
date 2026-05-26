@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, SecurityContext, signal } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { NotificationService } from '../../core/services/notification.service';
 import { SalesStore } from '../../core/store/sales.store';
 import { CustomersStore } from '../../core/store/customers.store';
@@ -23,6 +24,7 @@ export class SalesComponent {
   private whatsApp = inject(WhatsAppService);
   private bottomSheet = inject(BottomSheetService);
   private notify = inject(NotificationService);
+  private sanitizer = inject(DomSanitizer);
 
   statusDisplay: Record<SaleStatus, string> = SALE_STATUS_DISPLAY;
 
@@ -116,17 +118,23 @@ export class SalesComponent {
 
   onStatusFilterChange(event: Event): void {
     const htmlTarget = event.target as HTMLSelectElement | null;
-    const selectValue = htmlTarget?.value ?? '';
-    const validStatuses: SaleStatus[] = ['pending', 'production', 'delivered', 'cancelled'];
-    const statusValue = validStatuses.includes(selectValue as SaleStatus) ? (selectValue as SaleStatus) : null;
-    this.selectedStatus.set(statusValue);
+    this.selectedStatus.set(this.validateStatus(htmlTarget?.value ?? ''));
   }
 
   onPaymentStatusFilterChange(event: Event): void {
     const htmlTarget = event.target as HTMLSelectElement | null;
-    const selectValue = htmlTarget?.value ?? '';
-    const paymentStatusValue = selectValue === 'paid' ? 'paid' : selectValue === 'unpaid' ? 'unpaid' : null;
-    this.selectedPaymentStatus.set(paymentStatusValue);
+    this.selectedPaymentStatus.set(this.validatePaymentStatus(htmlTarget?.value ?? ''));
+  }
+
+  private validateStatus(rawValue: string): SaleStatus | null {
+    const sanitized = this.sanitizer.sanitize(SecurityContext.HTML, rawValue) || '';
+    const validStatuses: SaleStatus[] = ['pending', 'production', 'delivered', 'cancelled'];
+    return validStatuses.includes(sanitized as SaleStatus) ? (sanitized as SaleStatus) : null;
+  }
+
+  private validatePaymentStatus(rawValue: string): 'paid' | 'unpaid' | null {
+    const sanitized = this.sanitizer.sanitize(SecurityContext.HTML, rawValue) || '';
+    return sanitized === 'paid' ? 'paid' : sanitized === 'unpaid' ? 'unpaid' : null;
   }
 
   clearFilters(): void {

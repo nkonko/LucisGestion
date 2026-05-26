@@ -33,6 +33,11 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 - **Validate inputs:** Avoid storing raw user-provided HTML or untrusted input in plain variables that might be inserted into the DOM. When required, use documented justification, explicit sanitization or whitelisting, and tests that validate safety.
 - **Prefer safe rendering:** Use Angular interpolation (which auto-escapes) or bind to properties such as `textContent` instead of `innerHTML`. If rendering trusted HTML, document the reason, sanitize at the boundary (e.g., with `DomSanitizer`), and include tests.
+- **Handling DOM values:** When extracting values from HTML elements (e.g., `input.value`, `select.value`):
+  1. Sanitize immediately using `DomSanitizer.sanitize(SecurityContext.HTML, value)` in a dedicated private method
+  2. Pass the sanitized result to a validation method
+  3. Never store the raw DOM value in a variable, even temporarily
+  4. Example: `validateStatus(rawValue: string) -> const sanitized = this.sanitizer.sanitize(SecurityContext.HTML, rawValue)`
 - **Variable naming for form inputs:** Use descriptive, specific names that clarify the content type and intent:
   - Form input values: `selectValue`, `statusInput`, `userInput`, `emailValue`
   - HTML content: `htmlContent`, `sanitizedHtml`, `trustedHtml`
