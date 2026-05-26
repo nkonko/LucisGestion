@@ -31,9 +31,9 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 ## Security
 
-- **Validate inputs:** Never store raw user-provided HTML or untrusted input in plain variables that might later be inserted into the DOM. Validate values against a whitelist and coerce to known-safe types before storing or using.
-- **Prefer safe rendering:** Use Angular interpolation (which auto-escapes) or bind to properties such as `textContent` instead of assigning to `innerHTML`. If you must render trusted HTML, use `DomSanitizer` and document the reason.
-- **PR checks:** Flag any use of `innerHTML`, direct DOM insertion, or assignments that place unvalidated user input into variables named like `html`, `raw`, or `value`. Require a short justification and tests when these patterns are present.
+- **Validate inputs:** Avoid storing raw user-provided HTML or other untrusted input in plain variables that might later be inserted into the DOM (Document Object Model). When storing such values is required, demand a documented justification, explicit sanitization or whitelisting, and accompanying tests that demonstrate the safety of the approach.
+- **Prefer safe rendering:** Use Angular interpolation (which auto-escapes) or bind to properties such as `textContent` instead of assigning to `innerHTML`. If rendering trusted HTML is necessary, document the reason, sanitize at the boundary (for example with `DomSanitizer`), and include reviewer sign-off and tests.
+- **PR checks:** Flag uses of `innerHTML`, direct DOM insertion, or assignments that place unvalidated user input into variables named like `html`, `raw`, or `value`. Allow documented exceptions only when they include a clear justification, the sanitization steps taken, and tests that validate the behaviour.
 
 ## Accessibility Requirements
 
