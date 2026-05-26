@@ -15,10 +15,21 @@ describe('IngredientsStore', () => {
 
   beforeEach(() => {
     firestore = {
-      getCollection: vi
-        .fn()
-        .mockReturnValueOnce(of([{ id: 'ing-1', name: 'Azúcar', currentStock: 10, minimumStock: 2, unitPrice: 5 }]))
-        .mockReturnValueOnce(of([])),
+      getCollection: vi.fn().mockReturnValue(
+        of([
+          {
+            id: 'ing-1',
+            name: 'Azúcar',
+            category: 'sugars',
+            unit: 'kg',
+            unitPrice: 5,
+            currentStock: 10,
+            minimumStock: 2,
+            lastPurchase: null,
+            active: true,
+          },
+        ]),
+      ),
       addDocument: vi.fn().mockResolvedValue('new-id'),
       updateDocument: vi.fn().mockResolvedValue(undefined),
       softDelete: vi.fn().mockResolvedValue(undefined),
@@ -35,13 +46,12 @@ describe('IngredientsStore', () => {
     await store.createIngredient({
       name: 'Leche',
       category: 'dairy',
-      unit: 'l',
+      unit: 'lt',
       unitPrice: 10,
       currentStock: 2,
       minimumStock: 1,
-      supplier: 'S1',
-      notes: '',
       lastPurchase: Timestamp.now(),
+      active: false,
     });
 
     expect(firestore.addDocument).toHaveBeenCalledWith('ingredients', expect.objectContaining({ active: true }));
@@ -68,20 +78,13 @@ describe('IngredientsStore', () => {
       description: 'Compra semanal',
       supplier: 'Proveedor',
       total: 120,
-      items: [{ ingredientId: 'ing-1', quantity: 3, unitPrice: 8 }],
+      items: [{ ingredientId: 'ing-1', name: 'Azúcar', quantity: 3, unitPrice: 8, totalPrice: 24 }],
     };
 
     await store.registerSupplyPurchase(expense);
 
     expect(firestore.addDocument).toHaveBeenCalledWith('supplyExpenses', expense);
-    expect(firestore.updateDocument).toHaveBeenCalledWith(
-      'ingredients',
-      'ing-1',
-      expect.objectContaining({ currentStock: 13, unitPrice: 8 }),
-    );
-    expect(firestore.addDocument).toHaveBeenCalledWith(
-      'stockMovements',
-      expect.objectContaining({ ingredientId: 'ing-1', type: 'purchase', quantity: 3 }),
-    );
+    expect(firestore.updateDocument).toHaveBeenCalledWith('ingredients', 'ing-1', expect.objectContaining({ currentStock: 13, unitPrice: 8 }));
+    expect(firestore.addDocument).toHaveBeenCalledWith('stockMovements', expect.objectContaining({ ingredientId: 'ing-1', type: 'purchase', quantity: 3 }));
   });
 });

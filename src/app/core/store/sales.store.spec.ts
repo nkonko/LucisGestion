@@ -1,14 +1,15 @@
 import { TestBed } from '@angular/core/testing';
-import { signal } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { Timestamp } from 'firebase/firestore';
 import { SalesStore } from './sales.store';
 import { FirestoreService } from '../services/firestore.service';
 import { IngredientsStore } from './ingredients.store';
 import { RecipesStore } from './recipes.store';
-import { SaleInput } from '../models/sale';
+import { Sale, SaleInput } from '../models/sale';
 
 describe('SalesStore', () => {
   let store: InstanceType<typeof SalesStore>;
+  let sales$: BehaviorSubject<Sale[]>;
   let firestore: {
     getCollection: ReturnType<typeof vi.fn>;
     addDocument: ReturnType<typeof vi.fn>;
@@ -17,8 +18,9 @@ describe('SalesStore', () => {
   };
 
   beforeEach(() => {
+    sales$ = new BehaviorSubject<Sale[]>([]);
     firestore = {
-      getCollection: vi.fn().mockReturnValue(signal([])),
+      getCollection: vi.fn().mockReturnValue(sales$.asObservable()),
       addDocument: vi.fn().mockResolvedValue('sale-1'),
       updateDocument: vi.fn().mockResolvedValue(undefined),
       applyStockAdjustments: vi.fn().mockResolvedValue(undefined),
@@ -28,23 +30,8 @@ describe('SalesStore', () => {
       providers: [
         SalesStore,
         { provide: FirestoreService, useValue: firestore },
-        {
-          provide: IngredientsStore,
-          useValue: {
-            ingredients: signal([{ id: 'ing-1', name: 'Harina' }]),
-          },
-        },
-        {
-          provide: RecipesStore,
-          useValue: {
-            recipes: signal([
-              {
-                id: 'rec-1',
-                ingredients: [{ ingredientId: 'ing-1', name: 'Harina', quantity: 2, unit: 'kg' }],
-              },
-            ]),
-          },
-        },
+        { provide: IngredientsStore, useValue: { ingredients: () => [{ id: 'ing-1', name: 'Harina' }] } },
+        { provide: RecipesStore, useValue: { recipes: () => [{ id: 'rec-1', ingredients: [{ ingredientId: 'ing-1', name: 'Harina', quantity: 2, unit: 'kg' }] }] } },
       ],
     });
 
@@ -75,25 +62,22 @@ describe('SalesStore', () => {
   });
 
   it('cancels a sale and restores stock', async () => {
-    firestore.getCollection.mockReturnValue(
-      signal([
-        {
-          id: 'sale-1',
-          date: Timestamp.now(),
-          customerId: null,
-          customerName: 'CF',
-          items: [{ recipeId: 'rec-1', name: 'Torta', quantity: 2, unitPrice: 100, unitCost: 40 }],
-          total: 200,
-          totalCost: 80,
-          profit: 120,
-          paymentMethod: 'cash',
-          status: 'pending',
-          notes: '',
-        },
-      ]),
-    );
+    sales$.next([
+      {
+        id: 'sale-1',
+        date: Timestamp.now(),
+        customerId: null,
+        customerName: 'CF',
+        items: [{ recipeId: 'rec-1', name: 'Torta', quantity: 2, unitPrice: 100, unitCost: 40 }],
+        total: 200,
+        totalCost: 80,
+        profit: 120,
+        paymentMethod: 'cash',
+        status: 'pending',
+        notes: '',
+      },
+    ]);
 
-    store = TestBed.inject(SalesStore);
     await store.updateSaleStatus('sale-1', 'cancelled');
 
     expect(firestore.updateDocument).toHaveBeenCalledWith('sales', 'sale-1', { status: 'cancelled' });
