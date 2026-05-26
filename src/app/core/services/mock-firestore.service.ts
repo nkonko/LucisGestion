@@ -348,22 +348,20 @@ export class MockFirestoreService {
     // Taxes:   Feb 30000 → Mar 32000 → Apr 33000 → May 55000   (+74% vs avg → critical)
     // Other:   Feb 10000 → Mar 11000 → Apr 12000 → May 18000   (+64% vs avg → critical)
 
-    const fcMonths = ['2026-02', '2026-03', '2026-04', '2026-05'];
-    const fcAmounts: Record<string, { rent: number; utilities: number; taxes: number; other: number }> = {
-      '2026-02': { rent: 130000, utilities: 40000, taxes: 30000, other: 10000 },
-      '2026-03': { rent: 130000, utilities: 42000, taxes: 32000, other: 11000 },
-      '2026-04': { rent: 140000, utilities: 45000, taxes: 33000, other: 12000 },
-      '2026-05': { rent: 150000, utilities: 65000, taxes: 55000, other: 18000 },
-    };
+    const fcData = [
+      { monthKey: '2026-02', rent: 130000, utilities: 40000, taxes: 30000, other: 10000 },
+      { monthKey: '2026-03', rent: 130000, utilities: 42000, taxes: 32000, other: 11000 },
+      { monthKey: '2026-04', rent: 140000, utilities: 45000, taxes: 33000, other: 12000 },
+      { monthKey: '2026-05', rent: 150000, utilities: 65000, taxes: 55000, other: 18000 },
+    ];
 
     const fixedCostsByMonth: FixedCostMonthDoc[] = [];
-    for (const monthKey of fcMonths) {
-      const amounts = fcAmounts[monthKey];
-      fixedCostsByMonth.push({ id: `cfm-anchor-${monthKey}`, monthKey, isAnchor: true });
-      fixedCostsByMonth.push({ id: `cfm-${monthKey}-rent`, monthKey, lineageId: 'lin-rent', name: 'Alquiler del local', description: 'Pago el 1 de cada mes', amount: amounts.rent, category: 'rent' });
-      fixedCostsByMonth.push({ id: `cfm-${monthKey}-util`, monthKey, lineageId: 'lin-util', name: 'Luz, gas e internet', description: 'Servicios', amount: amounts.utilities, category: 'utilities' });
-      fixedCostsByMonth.push({ id: `cfm-${monthKey}-tax`, monthKey, lineageId: 'lin-tax', name: 'Monotributo', description: 'Categoría D', amount: amounts.taxes, category: 'taxes' });
-      fixedCostsByMonth.push({ id: `cfm-${monthKey}-other`, monthKey, lineageId: 'lin-other', name: 'Seguro de comercio', description: '', amount: amounts.other, category: 'other' });
+    for (const fc of fcData) {
+      fixedCostsByMonth.push({ id: `cfm-anchor-${fc.monthKey}`, monthKey: fc.monthKey, isAnchor: true });
+      fixedCostsByMonth.push({ id: `cfm-${fc.monthKey}-rent`, monthKey: fc.monthKey, lineageId: 'lin-rent', name: 'Alquiler del local', description: 'Pago el 1 de cada mes', amount: fc.rent, category: 'rent' });
+      fixedCostsByMonth.push({ id: `cfm-${fc.monthKey}-util`, monthKey: fc.monthKey, lineageId: 'lin-util', name: 'Luz, gas e internet', description: 'Servicios', amount: fc.utilities, category: 'utilities' });
+      fixedCostsByMonth.push({ id: `cfm-${fc.monthKey}-tax`, monthKey: fc.monthKey, lineageId: 'lin-tax', name: 'Monotributo', description: 'Categoría D', amount: fc.taxes, category: 'taxes' });
+      fixedCostsByMonth.push({ id: `cfm-${fc.monthKey}-other`, monthKey: fc.monthKey, lineageId: 'lin-other', name: 'Seguro de comercio', description: '', amount: fc.other, category: 'other' });
     }
     this.getOrCreate('fixedCostsByMonth').next(fixedCostsByMonth);
   }

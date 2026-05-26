@@ -145,16 +145,10 @@ describe('FinancialInsightsService', () => {
       const result = service.customerImportance();
 
       expect(result).toHaveLength(2);
-
-      const a = result.find((c) => c.customerId === 'cust-1')!;
-      expect(a.customerName).toBe('Cliente A');
-      expect(a.revenue).toBe(150000);
-      expect(a.ordersCount).toBe(2);
-
-      const b = result.find((c) => c.customerId === 'cust-2')!;
-      expect(b.customerName).toBe('Cliente B');
-      expect(b.revenue).toBe(30000);
-      expect(b.ordersCount).toBe(1);
+      expect(result).toMatchObject([
+        expect.objectContaining({ customerId: 'cust-1', customerName: 'Cliente A', revenue: 150000, ordersCount: 2 }),
+        expect.objectContaining({ customerId: 'cust-2', customerName: 'Cliente B', revenue: 30000, ordersCount: 1 }),
+      ]);
     });
 
     it('sorts customers by revenue descending', () => {
@@ -267,7 +261,7 @@ describe('FinancialInsightsService', () => {
       ]);
 
       const result = service.customerImportance();
-      expect(result[0].lastPurchaseAt!.getDate()).toBe(20);
+      expect(result[0]?.lastPurchaseAt?.getDate()).toBe(20);
     });
   });
 
@@ -375,14 +369,6 @@ describe('FinancialInsightsService', () => {
 
     function baselineEntries(monthKey: string, amount: number, category: CostCategory = 'utilities', name = 'Electricidad'): FixedCostEntry[] {
       return [makeEntry(monthKey, name, amount, category)];
-    }
-
-    function monthKeyToYear(mk: string): number {
-      return Number(mk.split('-')[0]);
-    }
-
-    function monthKeyToMonth(mk: string): number {
-      return Number(mk.split('-')[1]) - 1;
     }
 
     function setupAnomalyTest(monthKey: string, current: { name: string; amount: number; category: CostCategory }[], baselineAmountPerCategory: { amount: number; category: CostCategory }[]): void {

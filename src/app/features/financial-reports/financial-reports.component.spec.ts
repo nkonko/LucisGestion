@@ -6,7 +6,6 @@ import type { CustomerImportance, ProductOpportunity, ExpenseAnomaly, PriorityCu
 
 describe('FinancialReportsComponent', () => {
   let fixture: ComponentFixture<FinancialReportsComponent>;
-  let component: FinancialReportsComponent;
   let customerImportanceSignal: ReturnType<typeof signal<CustomerImportance[]>>;
   let productOpportunitiesSignal: ReturnType<typeof signal<ProductOpportunity[]>>;
   let expenseAnomaliesSignal: ReturnType<typeof signal<ExpenseAnomaly[]>>;
@@ -35,7 +34,6 @@ describe('FinancialReportsComponent', () => {
     });
 
     fixture = TestBed.createComponent(FinancialReportsComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
