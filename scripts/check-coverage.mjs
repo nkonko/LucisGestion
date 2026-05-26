@@ -2,10 +2,7 @@ import { access, readFile } from 'node:fs/promises';
 
 const minLines = Number(process.env.COVERAGE_MIN_LINES ?? 70);
 const minBranches = Number(process.env.COVERAGE_MIN_BRANCHES ?? 60);
-const possibleLcovPaths = [
-  'coverage/lucis-gestion/lcov.info',
-  'coverage/lcov.info',
-];
+
 
 let lcov;
 try {
