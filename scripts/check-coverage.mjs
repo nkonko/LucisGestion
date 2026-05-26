@@ -1,33 +1,21 @@
-import { access, readFile, readdir } from 'node:fs/promises';
-import { join } from 'node:path';
+import { access, readFile } from 'node:fs/promises';
 
 const minLines = Number(process.env.COVERAGE_MIN_LINES ?? 70);
 const minBranches = Number(process.env.COVERAGE_MIN_BRANCHES ?? 60);
+const possibleLcovPaths = [
+  'coverage/lucis-gestion/lcov.info',
+  'coverage/lcov.info',
+];
 
-async function findLcovInfo(dir) {
-  for (const entry of await readdir(dir, { withFileTypes: true })) {
-    const entryPath = join(dir, entry.name);
-
-    if (entry.isFile() && entry.name === 'lcov.info') {
-      return entryPath;
-    }
-
-    if (entry.isDirectory()) {
-      const nested = await findLcovInfo(entryPath);
-      if (nested) {
-        return nested;
-      }
-    }
+let lcovPath;
+for (const path of possibleLcovPaths) {
+  try {
+    await access(path);
+    lcovPath = path;
+    break;
+  } catch {
+    // Continue to the next possible path.
   }
-  return undefined;
-}
-
-let lcovPath = 'coverage/lcov.info';
-
-try {
-  await access(lcovPath);
-} catch {
-  lcovPath = await findLcovInfo('coverage');
 }
 
 if (!lcovPath) {
