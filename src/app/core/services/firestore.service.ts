@@ -72,11 +72,6 @@ export class FirestoreService {
         ingredientEntries.map(({ ref }) => transaction.get(ref)),
       );
 
-      const ingredientData = ingredientEntries.map((entry, idx) => ({
-        ...entry,
-        snap: ingredientSnaps[idx],
-      }));
-
       transaction.set(expenseRef as DocumentReference, {
         date: input.date,
         description: input.description,
@@ -91,7 +86,9 @@ export class FirestoreService {
         })),
       });
 
-      for (const { item, ref: ingredientRef, snap: ingredientSnap } of ingredientData) {
+      const snapIterator = ingredientSnaps[Symbol.iterator]();
+      for (const { item, ref: ingredientRef } of ingredientEntries) {
+        const ingredientSnap = snapIterator.next().value!;
         if (!ingredientSnap.exists()) {
           continue;
         }
