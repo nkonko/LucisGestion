@@ -19,11 +19,29 @@ export class SalesCardComponent {
   readonly editRequested = output<Sale>();
 
   get statusLabel(): string {
-    return SALE_STATUS_DISPLAY[this.sale().status];
+    switch (this.sale().status) {
+      case 'pending':
+        return SALE_STATUS_DISPLAY.pending;
+      case 'production':
+        return SALE_STATUS_DISPLAY.production;
+      case 'delivered':
+        return SALE_STATUS_DISPLAY.delivered;
+      case 'cancelled':
+        return SALE_STATUS_DISPLAY.cancelled;
+    }
   }
 
   get statusClass(): string {
-    return SALE_STATUS_CLASS[this.sale().status];
+    switch (this.sale().status) {
+      case 'pending':
+        return SALE_STATUS_CLASS.pending;
+      case 'production':
+        return SALE_STATUS_CLASS.production;
+      case 'delivered':
+        return SALE_STATUS_CLASS.delivered;
+      case 'cancelled':
+        return SALE_STATUS_CLASS.cancelled;
+    }
   }
 
   get displayDate(): string {
