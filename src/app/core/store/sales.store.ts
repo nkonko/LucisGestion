@@ -112,7 +112,9 @@ export const SalesStore = signalStore(
           .ingredients()
           .find((candidate) => candidate.id === ingredientId);
 
-        const currentStock = ingredient?.currentStock ?? 0;
+        const currentStock = ingredient?.currentStock;
+        if (currentStock == null) continue;
+
         if (currentStock >= required.required) continue;
 
         const missing = required.required - currentStock;
@@ -146,7 +148,10 @@ export const SalesStore = signalStore(
           .ingredients()
           .find((candidate) => candidate.id === ingredientId);
 
-        const currentStock = ingredient?.currentStock ?? 0;
+        const currentStock = ingredient?.currentStock;
+        // If current stock is not provided (untracked), assume it's not limiting and skip shortage checks.
+        if (currentStock == null) continue;
+
         if (currentStock >= extraNeeded) continue;
 
         const missing = extraNeeded - currentStock;
