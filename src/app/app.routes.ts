@@ -63,6 +63,11 @@ export const routes: Routes = [
             (m) => m.FixedCostsComponent,
           ),
       },
+      {
+        path: 'reportes',
+        loadComponent: () =>
+          import('./features/reports/reports.component').then((m) => m.ReportsComponent),
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },
