@@ -9,13 +9,13 @@ import { CustomersStore } from '../../core/store/customers.store';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 import { UiIconComponent } from '../../shared/ui/components';
 import { NetProfitCardComponent } from './net-profit-card/net-profit-card.component';
-import { PeriodNavComponent } from './period-nav/period-nav.component';
-import { SelectedDate } from '../../core/models/dashboard';
+import { MonthNavComponent } from '../../shared/month-nav/month-nav.component';
+import { fromMonthInputValue } from '../../core/utils/dashboard.utils';
 import { SALE_STATUS_CLASS, SALE_STATUS_DISPLAY, SaleStatus } from '../../core/models/sale';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, ArsPipe, UiIconComponent, NetProfitCardComponent, PeriodNavComponent],
+  imports: [RouterLink, ArsPipe, UiIconComponent, NetProfitCardComponent, MonthNavComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -99,8 +99,11 @@ export class DashboardComponent {
     }
   }
 
-  onMonthInputChange(date: SelectedDate) {
-    this.store.setSelectedDate(date);
+  onMonthInputChange(event: Event): void {
+    const monthText = (event.target as HTMLInputElement).value.trim();
+    if (!/^\d{4}-\d{2}$/.test(monthText)) return;
+    const selectedDate = fromMonthInputValue(monthText);
+    if (selectedDate) this.store.setSelectedDate(selectedDate);
   }
 }
 

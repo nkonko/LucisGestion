@@ -1,0 +1,15 @@
+<div class="ui-bottom-sheet-backdrop" (click)="onBackdropClick($event)">
+  <div
+    #panel
+    [class]="panelClasses()"
+    role="dialog"
+    aria-modal="true"
+    tabindex="-1"
+    [style.width]="width()"
+    [style.height]="maxHeight()"
+    [style.max-width]="maxWidth()"
+    [style.max-height]="maxHeight()"
+  >
+    <ng-container *ngComponentOutlet="contentComponent(); injector: contentInjector()"></ng-container>
+  </div>
+</div>

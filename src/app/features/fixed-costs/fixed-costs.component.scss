@@ -2,56 +2,6 @@
   display: block;
 }
 
-.month-nav {
-  padding: var(--space-3) var(--space-4);
-}
-
-.month-nav__row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.month-nav__arrow {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 9999px;
-  background: transparent;
-  border: var(--border-width-thin) solid transparent;
-  color: var(--color-on-surface-variant);
-  cursor: pointer;
-  transition: background var(--transition-standard);
-}
-
-.month-nav__arrow:hover {
-  background: var(--color-surface-container);
-}
-
-.month-nav__center {
-  flex: 1;
-  text-align: center;
-  min-width: 0;
-}
-
-.month-nav__title {
-  font-family: var(--font-display, inherit);
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--color-on-surface);
-}
-
-.month-nav__caption {
-  margin-top: var(--space-1);
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-on-surface-variant);
-}
-
 .month-nav__revert {
   display: inline-flex;
   align-items: center;

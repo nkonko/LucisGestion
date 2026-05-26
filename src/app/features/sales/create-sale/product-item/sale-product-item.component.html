@@ -1,0 +1,27 @@
+<div class="recipe-row ui-row-picker" [class.ui-row-picker--selected]="quantity() > 0">
+  <div class="recipe-row-avatar" aria-hidden="true">{{ recipe().name.charAt(0) }}</div>
+  <div class="recipe-row-main">
+    <div class="recipe-row-name">{{ recipe().name }}</div>
+    <div class="recipe-row-price">{{ recipe().salePrice | ars }} c/u</div>
+  </div>
+  <div class="recipe-row-controls" [attr.aria-label]="'Cantidad para ' + recipe().name">
+    <button
+      class="recipe-row-btn ui-stepper-btn"
+      type="button"
+      (click)="onDecrement()"
+      [disabled]="quantity() === 0"
+      [attr.aria-label]="'Quitar unidad de ' + recipe().name"
+    >
+      −
+    </button>
+    <span class="recipe-row-qty">{{ quantity() }}</span>
+    <button
+      class="recipe-row-btn ui-stepper-btn ui-stepper-btn--primary"
+      type="button"
+      (click)="onIncrement()"
+      [attr.aria-label]="'Agregar unidad de ' + recipe().name"
+    >
+      +
+    </button>
+  </div>
+</div>

@@ -1,0 +1,59 @@
+:host {
+  display: block;
+}
+
+.month-nav {
+  padding: var(--space-3) var(--space-4);
+}
+
+.month-nav__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.month-nav__arrow {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-month-nav-arrow);
+  height: var(--size-month-nav-arrow);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  border: var(--border-width-thin) solid transparent;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  transition: background var(--transition-standard);
+}
+
+.month-nav__arrow:hover:not(:disabled) {
+  background: var(--color-surface-container);
+}
+
+.month-nav__arrow:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.month-nav__center {
+  position: relative;
+  flex: 1;
+  text-align: center;
+  min-width: 0;
+}
+
+.month-nav__title {
+  font-family: var(--font-display, inherit);
+  font-size: var(--size-font-xl);
+  font-weight: 600;
+  color: var(--color-on-surface);
+}
+
+.month-nav__caption {
+  margin-top: var(--space-1);
+  font-size: var(--size-font-2xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant);
+}

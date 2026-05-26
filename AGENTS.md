@@ -6,6 +6,7 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Prefer type inference when the type is obvious
 - Avoid the `any` type; use `unknown` when type is uncertain
 - Do NOT add comments to code you write unless the logic is genuinely non-obvious. Never add comments that just restate what the code does.
+- `void` is only valid as a return type or generic type argument. Do NOT use `void` as a property, parameter, or variable type. It IS valid (and expected) as a generic type argument for Angular APIs such as `output<void>()`, `EventEmitter<void>`, `Observable<void>`, `Promise<void>`, etc.
 
 ## Angular Best Practices
 
@@ -19,6 +20,29 @@ You are an expert in TypeScript, Angular, and scalable web application developme
   - `NgOptimizedImage` does not work for inline base64 images.
 - Always use separated files for models/types, do not introduce models inside services or components, one interface for file
 - Put models/types on a separate folder called models
+
+## PR Review Verification
+
+- When reviewing PRs, verify recurring static-analysis patterns frequently seen in this repo:
+  - avoid `output<void>()`; use `output()`
+  - avoid generic object injection sinks such as dynamic record lookup objects in component logic
+  - avoid generic variable names like `value`, `targetValue` when storing form input; use domain-specific names like `selectValue`, `statusInput`, or `paymentStatus`
+  - avoid non-null assertions such as `foo!` in component or service code
+
+## Security
+
+- **Validate inputs:** Avoid storing raw user-provided HTML or untrusted input in plain variables that might be inserted into the DOM. When required, use documented justification, explicit sanitization or whitelisting, and tests that validate safety.
+- **Prefer safe rendering:** Use Angular interpolation (which auto-escapes) or bind to properties such as `textContent` instead of `innerHTML`. If rendering trusted HTML, document the reason, sanitize at the boundary (e.g., with `DomSanitizer`), and include tests.
+- **Handling DOM values:** When extracting values from HTML elements (e.g., `input.value`, `select.value`):
+  1. Sanitize immediately using `DomSanitizer.sanitize(SecurityContext.HTML, value)` in a dedicated private method
+  2. Pass the sanitized result to a validation method
+  3. Never store the raw DOM value in a variable, even temporarily
+  4. Example: `validateStatus(rawValue: string) -> const sanitized = this.sanitizer.sanitize(SecurityContext.HTML, rawValue)`
+- **Variable naming for form inputs:** Use descriptive, specific names that clarify the content type and intent:
+  - Form input values: `selectValue`, `statusInput`, `userInput`, `emailValue`
+  - HTML content: `htmlContent`, `sanitizedHtml`, `trustedHtml`
+  - Avoid ambiguous names: `value`, `targetValue`, `data`, `raw`, `input`
+- **PR checks:** Flag uses of `innerHTML`, direct DOM insertion, or assignments that place unvalidated user input into variables with generic names. Allow exceptions only with clear justification, documented sanitization steps, and tests.
 
 ## Accessibility Requirements
 
