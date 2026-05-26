@@ -46,6 +46,8 @@ export class BottomNavComponent {
   navigateToFinancialReports(): void {
     this.menuOpen.set(false);
     this.router.navigate(['/reportes-financieros']);
+  }
+
   onMoreMenuClick(event: Event): void {
     event.stopPropagation();
   }
