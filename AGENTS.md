@@ -26,14 +26,18 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - When reviewing PRs, verify recurring static-analysis patterns frequently seen in this repo:
   - avoid `output<void>()`; use `output()`
   - avoid generic object injection sinks such as dynamic record lookup objects in component logic
-  - avoid raw HTML variable names like `value` when holding non-HTML content
+  - avoid generic variable names like `value`, `targetValue` when storing form input; use domain-specific names like `selectValue`, `statusInput`, or `paymentStatus`
   - avoid non-null assertions such as `foo!` in component or service code
 
 ## Security
 
-- **Validate inputs:** Avoid storing raw user-provided HTML or other untrusted input in plain variables that might later be inserted into the DOM (Document Object Model). When storing such values is required, demand a documented justification, explicit sanitization or whitelisting, and accompanying tests that demonstrate the safety of the approach.
-- **Prefer safe rendering:** Use Angular interpolation (which auto-escapes) or bind to properties such as `textContent` instead of assigning to `innerHTML`. If rendering trusted HTML is necessary, document the reason, sanitize at the boundary (for example with `DomSanitizer`), and include reviewer sign-off and tests.
-- **PR checks:** Flag uses of `innerHTML`, direct DOM insertion, or assignments that place unvalidated user input into variables named like `html`, `raw`, or `value`. Allow documented exceptions only when they include a clear justification, the sanitization steps taken, and tests that validate the behaviour.
+- **Validate inputs:** Avoid storing raw user-provided HTML or untrusted input in plain variables that might be inserted into the DOM. When required, use documented justification, explicit sanitization or whitelisting, and tests that validate safety.
+- **Prefer safe rendering:** Use Angular interpolation (which auto-escapes) or bind to properties such as `textContent` instead of `innerHTML`. If rendering trusted HTML, document the reason, sanitize at the boundary (e.g., with `DomSanitizer`), and include tests.
+- **Variable naming for form inputs:** Use descriptive, specific names that clarify the content type and intent:
+  - Form input values: `selectValue`, `statusInput`, `userInput`, `emailValue`
+  - HTML content: `htmlContent`, `sanitizedHtml`, `trustedHtml`
+  - Avoid ambiguous names: `value`, `targetValue`, `data`, `raw`, `input`
+- **PR checks:** Flag uses of `innerHTML`, direct DOM insertion, or assignments that place unvalidated user input into variables with generic names. Allow exceptions only with clear justification, documented sanitization steps, and tests.
 
 ## Accessibility Requirements
 
