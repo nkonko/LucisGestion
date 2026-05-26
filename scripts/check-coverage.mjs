@@ -1,15 +1,37 @@
-import { access, readFile } from 'node:fs/promises';
+import { access, readFile, readdir } from 'node:fs/promises';
+import { join } from 'node:path';
 
 const minLines = Number(process.env.COVERAGE_MIN_LINES ?? 70);
 const minBranches = Number(process.env.COVERAGE_MIN_BRANCHES ?? 60);
 
+async function findLcovInfo(dir) {
+  for (const entry of await readdir(dir, { withFileTypes: true })) {
+    const entryPath = join(dir, entry.name);
 
-const lcovPath = 'coverage/lcov.info';
+    if (entry.isFile() && entry.name === 'lcov.info') {
+      return entryPath;
+    }
+
+    if (entry.isDirectory()) {
+      const nested = await findLcovInfo(entryPath);
+      if (nested) {
+        return nested;
+      }
+    }
+  }
+  return undefined;
+}
+
+let lcovPath = 'coverage/lcov.info';
 
 try {
   await access(lcovPath);
 } catch {
-  console.error('Coverage file not found at coverage/lcov.info. Run tests with coverage enabled (e.g. `pnpm test:ci -- --coverage`) before running coverage:check.');
+  lcovPath = await findLcovInfo('coverage');
+}
+
+if (!lcovPath) {
+  console.error('Coverage file not found. Run tests with coverage enabled (e.g. `pnpm test:ci -- --coverage`) before running coverage:check.');
   process.exit(1);
 }
 
