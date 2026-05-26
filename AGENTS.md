@@ -24,11 +24,16 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 ## PR Review Verification
 
 - When reviewing PRs, verify recurring static-analysis patterns frequently seen in this repo:
-  - non-serializable expressions in signal store helpers must be wrapped with `$()`
-  - avoid `output<void>()`; use `output<undefined>()`
+  - avoid `output<void>()`; use `output()`
   - avoid generic object injection sinks such as dynamic record lookup objects in component logic
   - avoid raw HTML variable names like `value` when holding non-HTML content
   - avoid non-null assertions such as `foo!` in component or service code
+
+## Security
+
+- **Validate inputs:** Never store raw user-provided HTML or untrusted input in plain variables that might later be inserted into the DOM. Validate values against a whitelist and coerce to known-safe types before storing or using.
+- **Prefer safe rendering:** Use Angular interpolation (which auto-escapes) or bind to properties such as `textContent` instead of assigning to `innerHTML`. If you must render trusted HTML, use `DomSanitizer` and document the reason.
+- **PR checks:** Flag any use of `innerHTML`, direct DOM insertion, or assignments that place unvalidated user input into variables named like `html`, `raw`, or `value`. Require a short justification and tests when these patterns are present.
 
 ## Accessibility Requirements
 

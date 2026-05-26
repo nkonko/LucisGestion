@@ -116,18 +116,17 @@ export class SalesComponent {
 
   onStatusFilterChange(event: Event): void {
     const htmlTarget = event.target as HTMLSelectElement | null;
-    const rawValue = htmlTarget?.value ?? '';
+    const input = String(htmlTarget?.value ?? '');
     const validStatuses: SaleStatus[] = ['pending', 'production', 'delivered', 'cancelled'];
-    const statusValue = validStatuses.includes(rawValue as SaleStatus) ? (rawValue as SaleStatus) : '';
-    this.selectedStatus.set(statusValue ? statusValue : null);
+    const statusValue = validStatuses.includes(input as SaleStatus) ? (input as SaleStatus) : null;
+    this.selectedStatus.set(statusValue);
   }
 
   onPaymentStatusFilterChange(event: Event): void {
     const htmlTarget = event.target as HTMLSelectElement | null;
-    const rawValue = htmlTarget?.value ?? '';
-    const validPaymentStatuses = ['paid', 'unpaid'];
-    const paymentStatusValue = validPaymentStatuses.includes(rawValue) ? (rawValue as 'paid' | 'unpaid') : '';
-    this.selectedPaymentStatus.set(paymentStatusValue ? paymentStatusValue : null);
+    const input = String(htmlTarget?.value ?? '');
+    const paymentStatusValue = input === 'paid' ? 'paid' : input === 'unpaid' ? 'unpaid' : null;
+    this.selectedPaymentStatus.set(paymentStatusValue);
   }
 
   clearFilters(): void {
