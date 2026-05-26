@@ -1,9 +1,9 @@
-import type { FinancialInsight } from './financial-insight.model';
+import type { FinancialInsightBase } from './financial-insight-base.model';
 
-export interface PriorityCustomer extends FinancialInsight {
+export interface PriorityCustomer extends FinancialInsightBase {
   type: 'priority-customer';
   customerId: string;
   customerName: string;
-  purchasesCount: number;
   billedAmount: number;
+  purchasesCount: number;
 }

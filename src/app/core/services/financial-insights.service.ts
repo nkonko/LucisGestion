@@ -13,6 +13,8 @@ import { FixedCostsStore } from '../store/fixed-costs.store';
 import { IngredientsStore } from '../store/ingredients.store';
 import { RecipesStore } from '../store/recipes.store';
 import { SalesStore } from '../store/sales.store';
+import { CustomerImportance, ImportanceTier } from '../models/financial-report/customer-importance.model';
+import { getPeriodEnd, getPeriodStart } from '../utils/dashboard.utils';
 
 const FINANCIAL_THRESHOLDS: FinancialThresholds = {
   highRotationUnits: 20,
@@ -31,6 +33,23 @@ export class FinancialInsightsService {
   private dashboardStore = inject(DashboardStore);
 
   readonly thresholds = FINANCIAL_THRESHOLDS;
+
+  private customersById = computed(
+    () => new Map(this.customersStore.customers().map((customer) => [customer.id, customer.name] as const)),
+  );
+
+  private periodSales = computed(() => {
+    const period = this.dashboardStore.selectedPeriod();
+    const selectedDate = this.dashboardStore.selectedDate();
+    const start = getPeriodStart(period, selectedDate);
+    const end = getPeriodEnd(period, selectedDate);
+
+    return this.salesStore.sales().filter((sale) => {
+      const saleDate = sale.date.toDate();
+      return saleDate >= start && saleDate < end;
+    });
+  });
+
   readonly selectedMonthKey = computed(() => {
     const { year, month } = this.dashboardStore.selectedDate();
     return `${year}-${String(month + 1).padStart(2, '0')}`;
@@ -44,6 +63,44 @@ export class FinancialInsightsService {
       const saleMonthKey = `${saleDate.getFullYear()}-${String(saleDate.getMonth() + 1).padStart(2, '0')}`;
       return saleMonthKey === monthKey;
     });
+  });
+
+  readonly customerImportance = computed<CustomerImportance[]>(() => {
+    const grouped = new Map<string, CustomerImportance>();
+
+    for (const sale of this.periodSales()) {
+      const key = this.normalizeCustomerId(sale.customerId);
+      const current = grouped.get(key);
+      const saleDate = sale.date.toDate();
+
+      if (current) {
+        current.revenue += sale.total;
+        current.ordersCount += 1;
+        current.lastPurchaseAt = !current.lastPurchaseAt || saleDate > current.lastPurchaseAt ? saleDate : current.lastPurchaseAt;
+        continue;
+      }
+
+      grouped.set(key, {
+        customerId: sale.customerId,
+        customerName: this.getCustomerName(sale.customerId),
+        revenue: sale.total,
+        ordersCount: 1,
+        lastPurchaseAt: saleDate,
+        importanceTier: 'bajo',
+        retentionHint: '',
+      });
+    }
+
+    return [...grouped.values()]
+      .map((customer) => {
+        const importanceTier = this.resolveTier(customer.revenue, customer.ordersCount);
+        return {
+          ...customer,
+          importanceTier,
+          retentionHint: this.resolveRetentionHint(importanceTier),
+        };
+      })
+      .sort((a, b) => b.revenue - a.revenue || b.ordersCount - a.ordersCount);
   });
 
   readonly productOpportunities = computed((): ProductOpportunity[] => {
@@ -177,6 +234,43 @@ export class FinancialInsightsService {
     ...this.expenseAnomalies(),
     ...this.priorityCustomers(),
   ]);
+
+  private getCustomerName(customerId: string | null): string {
+    if (typeof customerId !== 'string' || !customerId.trim() || !this.customersById().has(customerId)) {
+      return 'Cliente eliminado';
+    }
+    return this.customersById().get(customerId) ?? 'Cliente eliminado';
+  }
+
+  private normalizeCustomerId(customerId: string | null): string {
+    if (typeof customerId !== 'string' || !customerId.trim()) {
+      return '__deleted_or_anonymous__';
+    }
+    return customerId;
+  }
+
+  private resolveTier(revenue: number, ordersCount: number): ImportanceTier {
+    if (revenue >= 150000 || ordersCount >= 6) {
+      return 'alto';
+    }
+
+    if (revenue >= 60000 || ordersCount >= 3) {
+      return 'medio';
+    }
+
+    return 'bajo';
+  }
+
+  private resolveRetentionHint(tier: ImportanceTier): string {
+    switch (tier) {
+      case 'alto':
+        return 'Seguimiento personalizado y contacto preventivo.';
+      case 'medio':
+        return 'Promociones segmentadas para subir frecuencia.';
+      default:
+        return 'Contacto de reactivación con oferta puntual.';
+    }
+  }
 
   private previousMonths(year: number, month: number, count: number): string[] {
     const out: string[] = [];

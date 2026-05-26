@@ -1,6 +1,6 @@
-import type { FinancialInsight } from './financial-insight.model';
+import type { FinancialInsightBase } from './financial-insight-base.model';
 
-export interface ProductOpportunity extends FinancialInsight {
+export interface ProductOpportunity extends FinancialInsightBase {
   type: 'product-opportunity';
   recipeId: string;
   recipeName: string;

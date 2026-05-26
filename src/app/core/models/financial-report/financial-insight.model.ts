@@ -1,13 +1,5 @@
-export type FinancialInsightType = 'product-opportunity' | 'expense-anomaly' | 'priority-customer';
+import type { ExpenseAnomaly } from './expense-anomaly.model';
+import type { PriorityCustomer } from './priority-customer.model';
+import type { ProductOpportunity } from './product-opportunity.model';
 
-export type FinancialInsightSeverity = 'info' | 'warning' | 'critical';
-
-export interface FinancialInsight {
-  id: string;
-  type: FinancialInsightType;
-  severity: FinancialInsightSeverity;
-  title: string;
-  description: string;
-  impact: string;
-  recommendation: string;
-}
+export type FinancialInsight = ProductOpportunity | ExpenseAnomaly | PriorityCustomer;
