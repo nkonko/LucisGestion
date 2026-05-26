@@ -115,7 +115,7 @@ export class FirestoreService {
 
   async applyStockAdjustments(
     saleId: string,
-    movementType: 'sale_deduction' | 'cancellation_restock',
+    movementType: 'sale_deduction' | 'cancellation_restock' | 'edit_restock' | 'edit_deduction',
     adjustments: StockAdjustmentInput[],
   ): Promise<void> {
     if (adjustments.length === 0) return;

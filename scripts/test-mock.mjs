@@ -20,7 +20,15 @@ async function run() {
   }
 
   const ngCliPath = resolve('node_modules/@angular/cli/bin/ng.js');
-  const testArgs = [ngCliPath, 'test', '--watch=false'];
+  const shouldCollectCoverage = process.argv.includes('--coverage');
+  const testArgs = [
+    ngCliPath,
+    'test',
+    '--watch=false',
+    ...(shouldCollectCoverage
+      ? ['--coverage', '--coverage-reporters=lcov', '--coverage-reporters=html']
+      : []),
+  ];
   const child = spawn(process.execPath, testArgs, {
     cwd: resolve('.'),
     stdio: 'inherit',
