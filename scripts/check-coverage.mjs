@@ -7,23 +7,19 @@ const possibleLcovPaths = [
   'coverage/lcov.info',
 ];
 
-let lcovPath;
-for (const path of possibleLcovPaths) {
+let lcov;
+try {
+  await access('coverage/lucis-gestion/lcov.info');
+  lcov = await readFile('coverage/lucis-gestion/lcov.info', 'utf8');
+} catch {
   try {
-    await access(path);
-    lcovPath = path;
-    break;
+    await access('coverage/lcov.info');
+    lcov = await readFile('coverage/lcov.info', 'utf8');
   } catch {
-    // Continue to the next possible path.
+    console.error('Coverage file not found. Run tests with coverage enabled (e.g. `pnpm test:ci -- --coverage`) before running coverage:check.');
+    process.exit(1);
   }
 }
-
-if (!lcovPath) {
-  console.error('Coverage file not found. Run tests with coverage enabled (e.g. `pnpm test:ci -- --coverage`) before running coverage:check.');
-  process.exit(1);
-}
-
-const lcov = await readFile(lcovPath, 'utf8');
 
 let lf = 0;
 let lh = 0;
