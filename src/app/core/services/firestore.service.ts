@@ -63,6 +63,15 @@ export class FirestoreService {
         return { expenseId: input.expenseId, alreadyApplied: true };
       }
 
+      const ingredientRefs = input.items.map((item) => ({
+        item,
+        ref: doc(this.firestore, 'ingredients', item.ingredientId),
+      }));
+
+      const ingredientSnaps = await Promise.all(
+        ingredientRefs.map(({ ref }) => transaction.get(ref)),
+      );
+
       transaction.set(expenseRef as DocumentReference, {
         date: input.date,
         description: input.description,
@@ -77,13 +86,13 @@ export class FirestoreService {
         })),
       });
 
-      for (const item of input.items) {
-        const ingredientRef = doc(this.firestore, 'ingredients', item.ingredientId);
-        const ingredientSnap = await transaction.get(ingredientRef);
+      for (let i = 0; i < input.items.length; i++) {
+        const ingredientSnap = ingredientSnaps[i];
         if (!ingredientSnap.exists()) {
           continue;
         }
 
+        const { item, ref: ingredientRef } = ingredientRefs[i];
         const currentStock = Number(ingredientSnap.data()['currentStock'] ?? 0);
         transaction.update(ingredientRef, {
           currentStock: currentStock + item.quantity,
