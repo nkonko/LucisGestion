@@ -28,6 +28,8 @@ export class SalesCardComponent {
         return SALE_STATUS_DISPLAY.delivered;
       case 'cancelled':
         return SALE_STATUS_DISPLAY.cancelled;
+      default:
+        return '';
     }
   }
 
@@ -41,6 +43,8 @@ export class SalesCardComponent {
         return SALE_STATUS_CLASS.delivered;
       case 'cancelled':
         return SALE_STATUS_CLASS.cancelled;
+      default:
+        return '';
     }
   }
 
