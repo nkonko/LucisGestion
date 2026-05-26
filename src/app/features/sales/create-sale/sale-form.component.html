@@ -1,0 +1,84 @@
+<div class="sale-form-container">
+  <div class="sale-form-header">
+    <h2 class="sale-form-title">{{ pageTitle() }}</h2>
+    <button class="sale-form-close ui-modal-close-btn" type="button" (click)="cancel()" aria-label="Cerrar formulario">
+      ×
+    </button>
+  </div>
+
+  <div class="sale-form-content">
+    <section class="sale-form-section">
+      <h3 class="sale-form-section-title">Cliente</h3>
+      <label class="ui-field">
+        <span>Cliente</span>
+        <select class="ui-select" [ngModel]="selectedCustomerId" (ngModelChange)="selectCustomerById($event)" [disabled]="isEdit()">
+          <option value="">Seleccionar cliente</option>
+          @for (c of customers(); track c.id) {
+            <option [value]="c.id">{{ c.name }} · {{ c.phone }}</option>
+          }
+        </select>
+      </label>
+    </section>
+
+    <section class="sale-form-section">
+      <h3 class="sale-form-section-title">Productos</h3>
+      <div class="recipe-rows" role="list" aria-label="Listado de productos para la venta">
+        @for (recipe of recipesStore.recipes(); track recipe.id) {
+          <app-sale-product-item
+            [recipe]="recipe"
+            [quantity]="getItemQuantity(recipe.id!)"
+            (increment)="addItem(recipe)"
+            (decrement)="decrementItem(recipe.id!)"
+          />
+        }
+      </div>
+    </section>
+
+    <section class="sale-form-section">
+      <h3 class="sale-form-section-title">Pago</h3>
+      <div class="sale-form-inline-grid">
+        <label class="ui-field">
+          <span>Medio de pago</span>
+          <select class="ui-select" [(ngModel)]="paymentMethod">
+            @for (mp of paymentMethods; track mp.key) {
+              <option [value]="mp.key">{{ mp.label }}</option>
+            }
+          </select>
+        </label>
+        <label class="ui-field">
+          <span>Pago</span>
+          <button
+            class="payment-toggle ui-payment-toggle"
+            type="button"
+            [class.ui-payment-toggle--paid]="isPaid"
+            (click)="isPaid = !isPaid"
+            [attr.aria-pressed]="isPaid"
+            [attr.aria-label]="isPaid ? 'Marcar como no pagado' : 'Marcar como pagado'"
+          >
+            {{ isPaid ? 'Pagado' : 'No pagado' }}
+          </button>
+        </label>
+      </div>
+    </section> 
+
+    <section class="sale-form-section">
+      <h3 class="sale-form-section-title">Entrega y notas</h3>
+      <label class="ui-field">
+        <span>Fecha de entrega</span>
+        <input class="ui-input" [(ngModel)]="deliveryDateInput" type="date" />
+      </label>
+      <label class="ui-field">
+        <span>Notas</span>
+        <textarea class="ui-textarea" [(ngModel)]="notes" placeholder="Detalles adicionales..." rows="2"></textarea>
+      </label>
+    </section>
+  </div>
+
+  <div class="sale-form-summary">
+    <div class="sale-form-actions">
+      <button class="sale-submit-btn ui-primary-cta-btn" type="button" (click)="confirm()" [disabled]="!canSubmit()">
+        {{ buttonLabel() }}
+      </button>
+    </div>
+  </div>
+</div>

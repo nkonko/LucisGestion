@@ -1,0 +1,36 @@
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-toast);
+}
+
+.ui-bottom-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in srgb, var(--color-on-surface) 38%, transparent);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.ui-bottom-sheet-panel {
+  background: var(--color-surface);
+  border: var(--border-width-thin) solid var(--color-outline-variant);
+  border-bottom: none;
+  border-top-left-radius: var(--space-6);
+  border-top-right-radius: var(--space-6);
+  box-shadow: var(--shadow-modal);
+  overflow: hidden;
+  animation: bottom-sheet-enter var(--transition-standard) ease-out;
+}
+
+@keyframes bottom-sheet-enter {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}

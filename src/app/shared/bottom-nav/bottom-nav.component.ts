@@ -22,9 +22,11 @@ export class BottomNavComponent {
   private router = inject(Router);
 
   readonly menuOpen = signal(false);
+  readonly moreMenuOpen = signal(false);
 
   closeMenu(): void {
     this.menuOpen.set(false);
+    this.moreMenuOpen.set(false);
   }
 
   toggleMenu(event: Event): void {
@@ -32,11 +34,26 @@ export class BottomNavComponent {
     this.menuOpen.update((value) => !value);
   }
 
+  toggleMoreMenu(event: Event): void {
+    event.stopPropagation();
+    this.moreMenuOpen.update((value) => !value);
+  }
+
   onMenuClick(event: Event): void {
     event.stopPropagation();
   }
 
+  navigateToFinancialReports(): void {
+    this.menuOpen.set(false);
+    this.router.navigate(['/reportes-financieros']);
+  }
+
+  onMoreMenuClick(event: Event): void {
+    event.stopPropagation();
+  }
+
   async logout(): Promise<void> {
+    this.menuOpen.set(false);
     await this.authService.logout();
     this.router.navigate(['/login']);
   }

@@ -2,14 +2,14 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { NotificationService } from '../../core/services/notification.service';
 import { CustomersStore } from '../../core/store/customers.store';
 import { WhatsAppService } from '../../core/services/whatsapp.service';
-import { Customer } from '../../core/models/customer';
+import { Customer, CustomerInput } from '../../core/models/customer';
 import { CustomerFormComponent } from './customer-form.component';
 import { DialogService } from '../../core/services/dialog.service';
-import { UiIconComponent } from '../../shared/ui/components';
+import { UiCardComponent, UiIconComponent } from '../../shared/ui/components';
 
 @Component({
   selector: 'app-customers',
-  imports: [UiIconComponent],
+  imports: [UiCardComponent, UiIconComponent],
   templateUrl: './customers.component.html',
   styleUrl: './customers.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -37,7 +37,7 @@ export class CustomersComponent {
   }
 
   create(): void {
-    const dialogRef = this.dialog.open<null, Customer>(CustomerFormComponent, {
+    const dialogRef = this.dialog.open<null, CustomerInput>(CustomerFormComponent, {
       maxWidth: '500px',
       data: null,
     });
@@ -55,7 +55,7 @@ export class CustomersComponent {
   }
 
   edit(customer: Customer): void {
-    const dialogRef = this.dialog.open<Customer, Customer | 'delete'>(CustomerFormComponent, {
+    const dialogRef = this.dialog.open<Customer, CustomerInput | 'delete'>(CustomerFormComponent, {
       maxWidth: '500px',
       data: customer,
     });
@@ -63,10 +63,10 @@ export class CustomersComponent {
     dialogRef.afterClosed.subscribe(async (result) => {
       try {
         if (result === 'delete') {
-          await this.store.deleteCustomer(customer.id!);
+          await this.store.deleteCustomer(customer.id);
           this.notify.success('Cliente eliminado');
         } else if (result) {
-          await this.store.updateCustomer(customer.id!, result);
+          await this.store.updateCustomer(customer.id, result);
           this.notify.success('Cliente actualizado');
         }
       } catch (error) {
