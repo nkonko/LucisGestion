@@ -43,11 +43,17 @@ export class BottomNavComponent {
     event.stopPropagation();
   }
 
+  navigateToFinancialReports(): void {
+    this.menuOpen.set(false);
+    this.router.navigate(['/reportes-financieros']);
+  }
+
   onMoreMenuClick(event: Event): void {
     event.stopPropagation();
   }
 
   async logout(): Promise<void> {
+    this.menuOpen.set(false);
     await this.authService.logout();
     this.router.navigate(['/login']);
   }
