@@ -12,10 +12,11 @@ import {
   Timestamp,
   CollectionReference,
   QueryConstraint,
+  DocumentReference,
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import { StockAdjustmentInput } from '../models/stock';
-export type { StockAdjustmentInput };
+import { StockAdjustmentInput, SupplyPurchaseAtomicInput } from '../models/stock';
+export type { StockAdjustmentInput, SupplyPurchaseAtomicInput };
 
 @Injectable({ providedIn: 'root' })
 export class FirestoreService {
@@ -49,9 +50,72 @@ export class FirestoreService {
     await this.updateDocument(path, id, { active: false });
   }
 
+  createDocumentId(path: string): string {
+    return doc(collection(this.firestore, path)).id;
+  }
+
+  async registerSupplyPurchaseAtomic(input: SupplyPurchaseAtomicInput): Promise<{ expenseId: string; alreadyApplied: boolean }> {
+    const expenseRef = doc(this.firestore, 'supplyExpenses', input.expenseId);
+
+    return runTransaction(this.firestore, async (transaction) => {
+      const existingExpense = await transaction.get(expenseRef);
+      if (existingExpense.exists()) {
+        return { expenseId: input.expenseId, alreadyApplied: true };
+      }
+
+      const entries = await Promise.all(
+        input.items.map(async (item) => {
+          const ref = doc(this.firestore, 'ingredients', item.ingredientId);
+          const snap = await transaction.get(ref);
+          return { item, ref, snap };
+        }),
+      );
+
+      transaction.set(expenseRef as DocumentReference, {
+        date: input.date,
+        description: input.description,
+        supplier: input.supplier,
+        total: input.total,
+        items: input.items.map((item) => ({
+          ingredientId: item.ingredientId,
+          name: item.ingredientName,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          totalPrice: item.quantity * item.unitPrice,
+        })),
+      });
+
+      for (const { item, ref, snap } of entries) {
+        if (!snap.exists()) {
+          continue;
+        }
+
+        const currentStock = Number(snap.data()['currentStock'] ?? 0);
+        transaction.update(ref, {
+          currentStock: currentStock + item.quantity,
+          unitPrice: item.unitPrice,
+          lastPurchase: input.date,
+        });
+
+        const movementRef = doc(collection(this.firestore, 'stockMovements'));
+        transaction.set(movementRef as DocumentReference, {
+          ingredientId: item.ingredientId,
+          ingredientName: item.ingredientName,
+          type: 'purchase',
+          quantity: item.quantity,
+          date: input.date,
+          saleId: null,
+          expenseId: input.expenseId,
+        });
+      }
+
+      return { expenseId: input.expenseId, alreadyApplied: false };
+    });
+  }
+
   async applyStockAdjustments(
     saleId: string,
-    movementType: 'sale_deduction' | 'cancellation_restock',
+    movementType: 'sale_deduction' | 'cancellation_restock' | 'edit_restock' | 'edit_deduction',
     adjustments: StockAdjustmentInput[],
   ): Promise<void> {
     if (adjustments.length === 0) return;

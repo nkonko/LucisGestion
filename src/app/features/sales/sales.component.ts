@@ -1,20 +1,19 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { DatePipe, NgTemplateOutlet } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, inject, SecurityContext, signal } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { NotificationService } from '../../core/services/notification.service';
 import { SalesStore } from '../../core/store/sales.store';
 import { CustomersStore } from '../../core/store/customers.store';
 import { WhatsAppService } from '../../core/services/whatsapp.service';
-import { SALE_STATUS_CLASS } from '../../core/models/sale/sale-status.model';
 import type { SaleStatus } from '../../core/models/sale/sale-status.model';
-import { Sale, SALE_STATUS_DISPLAY } from '../../core/models/sale';
-import { ArsPipe } from '../../shared/pipes/ars.pipe';
-import { SaleFormComponent } from './sale-form.component';
-import { DialogService } from '../../core/services/dialog.service';
+import { Sale, SaleInput, SALE_STATUS_DISPLAY } from '../../core/models/sale';
+import { SaleFormComponent } from './create-sale/sale-form.component';
+import { BottomSheetService } from '../../core/services/bottom-sheet.service';
 import { UiIconComponent } from '../../shared/ui/components';
+import { SalesCardComponent } from './sales-card/sales-card.component';
 
 @Component({
   selector: 'app-sales',
-  imports: [NgTemplateOutlet, DatePipe, ArsPipe, UiIconComponent],
+  imports: [UiIconComponent, SalesCardComponent],
   templateUrl: './sales.component.html',
   styleUrl: './sales.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,20 +22,44 @@ export class SalesComponent {
   readonly store = inject(SalesStore);
   private customersStore = inject(CustomersStore);
   private whatsApp = inject(WhatsAppService);
-  private dialog = inject(DialogService);
+  private bottomSheet = inject(BottomSheetService);
   private notify = inject(NotificationService);
+  private sanitizer = inject(DomSanitizer);
 
-  readonly selectedTab = signal<'pending' | 'history'>('pending');
   statusDisplay: Record<SaleStatus, string> = SALE_STATUS_DISPLAY;
-  pending = this.store.pendingOrders;
 
   searchTerm = signal('');
   dateFrom = signal<Date | null>(null);
+  selectedCustomerId = signal<string | null>(null);
+  selectedStatus = signal<SaleStatus | null>(null);
+  selectedPaymentStatus = signal<'paid' | 'unpaid' | null>(null);
 
-  filteredHistory = computed(() => {
+  readonly customers = computed(() => this.customersStore.customers());
+  readonly dateFromValue = computed(() => {
+    const date = this.dateFrom();
+    if (!date) return '';
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${day}-${month}-${year}`;
+  });
+
+  readonly hasActiveFilters = computed(
+    () =>
+      Boolean(this.searchTerm().trim()) ||
+      this.dateFrom() !== null ||
+      this.selectedCustomerId() !== null ||
+        this.selectedStatus() !== null ||
+        this.selectedPaymentStatus() !== null,
+  );
+
+  filteredSales = computed(() => {
     let items = this.store.sales();
     const term = this.searchTerm().toLowerCase().trim();
     const from = this.dateFrom();
+    const customerId = this.selectedCustomerId();
+    const status = this.selectedStatus();
+    const paymentStatus = this.selectedPaymentStatus();
 
     if (term) {
       items = items.filter(
@@ -48,6 +71,31 @@ export class SalesComponent {
     if (from) {
       items = items.filter((v) => v.date?.toDate() >= from);
     }
+    if (customerId) {
+      items = items.filter((v) => v.customerId === customerId);
+    }
+    if (status) {
+      items = items.filter((v) => v.status === status);
+    }
+    if (paymentStatus) {
+      items = items.filter((v) => (paymentStatus === 'paid' ? v.isPaid === true : v.isPaid !== true));
+    }
+
+    if (!this.hasActiveFilters()) {
+      const statusPriority: Record<SaleStatus, number> = {
+        pending: 0,
+        production: 1,
+        delivered: 2,
+        cancelled: 3,
+      };
+
+      return [...items].sort((a, b) => {
+        const statusDiff = statusPriority[a.status] - statusPriority[b.status];
+        if (statusDiff !== 0) return statusDiff;
+        return b.date.toMillis() - a.date.toMillis();
+      });
+    }
+
     return items;
   });
 
@@ -62,32 +110,108 @@ export class SalesComponent {
     this.dateFrom.set(value ? new Date(`${value}T00:00:00`) : null);
   }
 
-  getStatusClass(status: SaleStatus): string {
-    return SALE_STATUS_CLASS[status];
+  onCustomerFilterChange(event: Event): void {
+    const htmlTarget = event.target as HTMLSelectElement | null;
+    const value = htmlTarget?.value ?? '';
+    this.selectedCustomerId.set(value ? value : null);
   }
 
-  getStatusLabel(status: SaleStatus): string {
-    return SALE_STATUS_DISPLAY[status];
+  onStatusFilterChange(event: Event): void {
+    const htmlTarget = event.target as HTMLSelectElement | null;
+    this.selectedStatus.set(this.validateStatus(htmlTarget?.value ?? ''));
+  }
+
+  onPaymentStatusFilterChange(event: Event): void {
+    const htmlTarget = event.target as HTMLSelectElement | null;
+    this.selectedPaymentStatus.set(this.validatePaymentStatus(htmlTarget?.value ?? ''));
+  }
+
+  private validateStatus(rawValue: string): SaleStatus | null {
+    const sanitized = this.sanitizer.sanitize(SecurityContext.HTML, rawValue) || '';
+    const validStatuses: SaleStatus[] = ['pending', 'production', 'delivered', 'cancelled'];
+    return validStatuses.includes(sanitized as SaleStatus) ? (sanitized as SaleStatus) : null;
+  }
+
+  private validatePaymentStatus(rawValue: string): 'paid' | 'unpaid' | null {
+    const sanitized = this.sanitizer.sanitize(SecurityContext.HTML, rawValue) || '';
+    return sanitized === 'paid' ? 'paid' : sanitized === 'unpaid' ? 'unpaid' : null;
+  }
+
+  clearFilters(): void {
+    this.searchTerm.set('');
+    this.dateFrom.set(null);
+    this.selectedCustomerId.set(null);
+    this.selectedStatus.set(null);
+    this.selectedPaymentStatus.set(null);
   }
 
   newSale(): void {
-    const dialogRef = this.dialog.open<null, Sale>(SaleFormComponent, {
-      maxWidth: '560px',
+    const dialogRef = this.bottomSheet.open<null, SaleInput>(SaleFormComponent, {
+      maxWidth: '760px',
       maxHeight: '90vh',
       data: null,
     });
 
     dialogRef.afterClosed.subscribe(async (result) => {
       if (result) {
-        await this.store.registerSale(result);
-        this.notify.success('Venta registrada. Stock actualizado.', 3000);
+        try {
+          await this.store.registerSale(result);
+          this.notify.success('Venta registrada. Stock actualizado.', 3000);
+        } catch (error) {
+          this.notify.errorFrom(error, 'No se pudo registrar la venta por stock insuficiente.');
+        }
+      }
+    });
+  }
+
+  editSale(sale: Sale): void {
+    const saleId = sale.id;
+    if (!saleId) {
+      this.notify.error('Venta inválida.');
+      return;
+    }
+
+    const dialogRef = this.bottomSheet.open<Sale, SaleInput>(SaleFormComponent, {
+      maxWidth: '760px',
+      maxHeight: '90vh',
+      data: sale,
+    });
+
+    dialogRef.afterClosed.subscribe(async (result) => {
+      if (result) {
+        try {
+          await this.store.updateSale(saleId, result);
+          this.notify.success('Venta actualizada.', 3000);
+        } catch (error) {
+          this.notify.errorFrom(error, 'No se pudo actualizar la venta por stock insuficiente.');
+        }
       }
     });
   }
 
   async changeStatus(sale: Sale, newStatus: Sale['status']): Promise<void> {
-    await this.store.updateSaleStatus(sale.id!, newStatus);
-    this.notify.success(`Pedido marcado como ${this.getStatusLabel(newStatus).toLowerCase()}`);
+    const saleId = sale.id;
+    if (!saleId) {
+      this.notify.error('Venta inválida.');
+      return;
+    }
+
+    await this.store.updateSaleStatus(saleId, newStatus);
+
+    const statusLabel = (() => {
+      switch (newStatus) {
+        case 'pending':
+          return 'Pendiente';
+        case 'production':
+          return 'En Producción';
+        case 'delivered':
+          return 'Entregado';
+        case 'cancelled':
+          return 'Cancelado';
+      }
+    })();
+
+    this.notify.success(`Pedido marcado como ${statusLabel.toLowerCase()}`);
   }
 
   sendWhatsApp(sale: Sale): void {
@@ -95,5 +219,18 @@ export class SalesComponent {
     const items = sale.items.map((i) => `${i.quantity}x ${i.name}`).join('\n');
     const msg = `Hola ${sale.customerName}! 🧁\n\nTu pedido de Lucis Pastelería:\n${items}\n\nTotal: $${sale.total}\n\n¡Gracias!`;
     this.whatsApp.sendMessage(customer?.phone ?? '', msg);
+  }
+
+  onStatusChange(event: { sale: Sale; status: SaleStatus }): void {
+    void this.changeStatus(event.sale, event.status);
+  }
+
+  onEditRequested(sale: Sale): void {
+    if (sale.status !== 'pending' && sale.status !== 'production') {
+      this.notify.error('Solo se pueden modificar ventas pendientes o en producción.');
+      return;
+    }
+
+    this.editSale(sale);
   }
 }

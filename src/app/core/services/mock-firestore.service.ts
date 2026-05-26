@@ -6,7 +6,7 @@ import type { Recipe } from '../models/recipe';
 import type { Sale } from '../models/sale';
 import type { Customer } from '../models/customer';
 import type { FixedCostMonthDoc } from '../models/fixed-cost';
-import type { StockAdjustmentInput } from '../models/stock';
+import type { StockAdjustmentInput, SupplyPurchaseAtomicInput } from '../models/stock';
 
 type MockDocument = Record<string, unknown> & { id?: string; active?: boolean; endDate?: Timestamp };
 
@@ -53,6 +53,72 @@ export class MockFirestoreService {
         return doc.id === id ? { ...doc, active: false, endDate: Timestamp.now() } : doc;
       }),
     );
+  }
+
+  createDocumentId(_path: string): string {
+    return 'mock-' + crypto.randomUUID().slice(0, 8);
+  }
+
+  async registerSupplyPurchaseAtomic(input: SupplyPurchaseAtomicInput): Promise<{ expenseId: string; alreadyApplied: boolean }> {
+    const expensesCol = this.getOrCreate('supplyExpenses');
+
+    const exists = expensesCol.value.some(
+      (item) => (item as MockDocument).id === input.expenseId,
+    );
+    if (exists) {
+      return { expenseId: input.expenseId, alreadyApplied: true };
+    }
+
+    const ingredientsCol = this.getOrCreate('ingredients');
+    const movementsCol = this.getOrCreate('stockMovements');
+
+    const ingredients = ingredientsCol.value.map((item) => ({ ...(item as Record<string, unknown>) }));
+    const movements = [...movementsCol.value];
+
+    const expense = {
+      id: input.expenseId,
+      date: input.date,
+      description: input.description,
+      supplier: input.supplier,
+      total: input.total,
+      items: input.items.map((item) => ({
+        ingredientId: item.ingredientId,
+        name: item.ingredientName,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        totalPrice: item.quantity * item.unitPrice,
+      })),
+    };
+
+    for (const item of input.items) {
+      const idx = ingredients.findIndex((i) => i['id'] === item.ingredientId);
+      if (idx === -1) continue;
+
+      const currentStock = Number(ingredients[idx]['currentStock'] ?? 0);
+      ingredients[idx] = {
+        ...ingredients[idx],
+        currentStock: currentStock + item.quantity,
+        unitPrice: item.unitPrice,
+        lastPurchase: input.date,
+      };
+
+      movements.push({
+        id: 'mock-' + crypto.randomUUID().slice(0, 8),
+        ingredientId: item.ingredientId,
+        ingredientName: item.ingredientName,
+        type: 'purchase',
+        quantity: item.quantity,
+        date: input.date,
+        saleId: null,
+        expenseId: input.expenseId,
+      });
+    }
+
+    expensesCol.next([...expensesCol.value, expense]);
+    ingredientsCol.next(ingredients);
+    movementsCol.next(movements);
+
+    return { expenseId: input.expenseId, alreadyApplied: false };
   }
 
   async applyStockAdjustments(

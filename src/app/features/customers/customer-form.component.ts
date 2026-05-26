@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Customer } from '../../core/models/customer';
+import { Customer, CustomerInput } from '../../core/models/customer';
 import { DIALOG_DATA, DIALOG_REF } from '../../core/models/dialog/dialog-tokens.model';
 import { DialogRef } from '../../core/models/dialog/dialog-ref.model';
 
@@ -13,7 +13,7 @@ import { DialogRef } from '../../core/models/dialog/dialog-ref.model';
 })
 export class CustomerFormComponent {
   private fb = inject(FormBuilder);
-  private dialogRef = inject(DIALOG_REF) as DialogRef<Customer | 'delete'>;
+  private dialogRef = inject(DIALOG_REF) as DialogRef<CustomerInput | 'delete'>;
   data = inject(DIALOG_DATA) as Customer | null;
 
   form = this.fb.nonNullable.group({

@@ -1,0 +1,66 @@
+:host {
+  display: block;
+}
+
+.recipe-row {
+  min-height: calc(var(--space-8) + var(--space-4));
+}
+
+.recipe-row-avatar {
+  width: calc(var(--size-icon-button) - var(--space-2));
+  height: calc(var(--size-icon-button) - var(--space-2));
+  border-radius: var(--space-3);
+  background: color-mix(in srgb, var(--color-surface-container) 75%, var(--color-surface));
+  color: var(--color-on-surface-variant);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--size-font-sm);
+  font-weight: 500;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.recipe-row-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.recipe-row-name {
+  font-size: var(--size-font-sm);
+  font-weight: 700;
+  color: var(--color-on-surface);
+  line-height: 1.2;
+}
+
+.recipe-row-price {
+  margin-top: var(--space-1);
+  color: var(--color-on-surface-variant);
+  font-size: var(--size-font-sm);
+}
+
+.recipe-row-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.recipe-row-btn {
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: var(--border-width-medium) solid var(--color-primary);
+    outline-offset: var(--space-1);
+  }
+}
+
+.recipe-row-qty {
+  min-width: var(--space-6);
+  text-align: center;
+  font-size: var(--size-font-sm);
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
