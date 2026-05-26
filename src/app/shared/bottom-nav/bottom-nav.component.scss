@@ -4,12 +4,36 @@
   left: 0;
   right: 0;
   display: flex;
-  justify-content: space-around;
+  justify-content: flex-start;
   align-items: center;
   height: var(--size-nav-height);
   background: var(--color-surface-container);
   border-top: var(--border-width-thin) solid var(--color-outline-variant);
   z-index: var(--z-nav);
+  gap: var(--space-4);
+  padding: 0 var(--space-4);
+}
+
+// Desktop: tighter spacing with auto margin on last item
+@media (min-width: 641px) {
+  .bottom-nav {
+    justify-content: flex-start;
+    gap: var(--space-4);
+    
+    // Push account menu to the right
+    .nav-menu {
+      margin-left: auto;
+    }
+  }
+}
+
+// Mobile: space around for distributed layout
+@media (max-width: 640px) {
+  .bottom-nav {
+    justify-content: space-around;
+    gap: var(--space-1);
+    padding: 0;
+  }
 }
 
 .nav-item {
@@ -26,6 +50,7 @@
   transition: all var(--transition-standard);
   gap: var(--space-1);
   position: relative;
+  flex: 0 1 auto;
 
   &.active {
     color: var(--color-primary);
@@ -33,7 +58,25 @@
   }
 }
 
+.nav-item__label {
+  display: block;
+}
+
+// Hide secondary items on mobile (Costos, Clientes)
+.nav-item--secondary {
+  display: none;
+}
+
+// Show "Más" button on mobile
+.nav-item--more {
+  display: flex;
+}
+
 .nav-item--badge {
+  position: relative;
+}
+
+.nav-more-menu {
   position: relative;
 }
 
@@ -47,9 +90,68 @@
   }
 }
 
+.nav-more-menu {
+  .ui-menu--nav {
+    top: auto;
+    bottom: calc(100% + var(--space-1));
+    right: 0;
+  }
+}
+
 .badge {
   position: absolute;
   top: 2px;
   right: 8px;
   border-radius: 999px;
+}
+
+// Menu link style for secondary items
+.ui-menu-link {
+  text-decoration: none;
+  color: inherit;
+  display: inline-flex;
+  width: 100%;
+
+  &.active {
+    background: var(--color-primary-container);
+    color: var(--color-primary);
+  }
+
+  &:hover:not(.active) {
+    background: var(--color-surface-hover);
+  }
+}
+
+// Desktop layout (>= 641px)
+@media (min-width: 641px) {
+  .nav-item__label {
+    display: block;
+  }
+
+  // Hide secondary items on desktop
+  .nav-item--secondary {
+    display: flex;
+  }
+
+  // Hide "Más" button on desktop
+  .nav-item--more {
+    display: none;
+  }
+}
+
+// Mobile layout (< 641px)
+@media (max-width: 640px) {
+  .nav-item__label {
+    display: none;
+  }
+
+  // Hide secondary items on mobile (Costos, Clientes)
+  .nav-item--secondary {
+    display: none;
+  }
+
+  // Show "Más" button on mobile
+  .nav-item--more {
+    display: flex;
+  }
 }

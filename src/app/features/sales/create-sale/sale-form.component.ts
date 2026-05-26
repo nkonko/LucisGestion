@@ -1,36 +1,43 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RecipesStore } from '../../core/store/recipes.store';
-import { CustomersStore } from '../../core/store/customers.store';
+import { RecipesStore } from '../../../core/store/recipes.store';
+import { CustomersStore } from '../../../core/store/customers.store';
 import {
   Sale,
   SaleItem,
   PaymentMethod,
   PAYMENT_METHOD_DISPLAY,
   SaleInput,
-} from '../../core/models/sale';
+} from '../../../core/models/sale';
 import { Timestamp } from '@angular/fire/firestore';
-import { ArsPipe } from '../../shared/pipes/ars.pipe';
-import { DIALOG_REF } from '../../core/models/dialog/dialog-tokens.model';
-import { DialogRef } from '../../core/models/dialog/dialog-ref.model';
-import { Customer } from '../../core/models/customer';
-import { Recipe } from '../../core/models/recipe';
+import { DIALOG_REF, DIALOG_DATA } from '../../../core/models/dialog/dialog-tokens.model';
+import { DialogRef } from '../../../core/models/dialog/dialog-ref.model';
+import { Customer } from '../../../core/models/customer';
+import { Recipe } from '../../../core/models/recipe';
+import { SaleProductItemComponent } from './product-item/sale-product-item.component';
 
 @Component({
   selector: 'app-sale-form',
-  imports: [FormsModule, ArsPipe],
+  imports: [FormsModule, SaleProductItemComponent],
   templateUrl: './sale-form.component.html',
   styleUrl: './sale-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SaleFormComponent {
-  private dialogRef = inject(DIALOG_REF) as DialogRef<Sale>;
+  private dialogRef = inject(DIALOG_REF) as DialogRef<SaleInput>;
+  private dialogData = inject(DIALOG_DATA) as Sale | null;
   readonly recipesStore = inject(RecipesStore);
   private customersStore = inject(CustomersStore);
 
+  private readonly existingSale = signal<Sale | null>(this.dialogData);
+  readonly isEdit = computed(() => this.existingSale() !== null);
+  readonly pageTitle = computed(() => (this.isEdit() ? 'Editar Venta' : 'Nueva Venta'));
+  readonly buttonLabel = computed(() => (this.isEdit() ? 'Modificar' : 'Crear orden'));
+
   items = signal<SaleItem[]>([]);
-  customerSearch = '';
   selectedCustomerId = '';
+  deliveryDateInput = '';
+  isPaid = false;
   paymentMethod: PaymentMethod = 'cash';
   notes = '';
 
@@ -44,6 +51,35 @@ export class SaleFormComponent {
   total = computed(() => this.items().reduce((sum, i) => sum + i.quantity * i.unitPrice, 0));
   totalCost = computed(() => this.items().reduce((sum, i) => sum + i.quantity * i.unitCost, 0));
   profit = computed(() => this.total() - this.totalCost());
+  readonly canSubmit = computed(
+    () => this.items().length > 0 && (this.isEdit() || Boolean(this.selectedCustomerId)),
+  );
+
+  constructor() {
+    effect(() => {
+      const sale = this.existingSale();
+      if (sale) {
+        this.items.set(sale.items);
+        this.selectedCustomerId = sale.customerId ?? '';
+        this.deliveryDateInput = sale.deliveryDate ? this.formatDateForInput(sale.deliveryDate.toDate()) : '';
+        this.isPaid = sale.isPaid ?? false;
+        this.paymentMethod = sale.paymentMethod;
+        this.notes = sale.notes;
+      }
+    });
+  }
+
+  private formatDateForInput(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private toTimestampFromDateInput(dateInput: string): Timestamp | null {
+    if (!dateInput) return null;
+    return Timestamp.fromDate(new Date(`${dateInput}T12:00:00`));
+  }
 
   private getSelectedCustomer(): Customer | null {
     return this.customers().find((customer) => customer.id === this.selectedCustomerId) ?? null;
@@ -82,27 +118,7 @@ export class SaleFormComponent {
   }
 
   selectCustomerById(customerId: string): void {
-    const previousSelectedCustomer = this.getSelectedCustomer();
     this.selectedCustomerId = customerId;
-    const selectedCustomer = this.getSelectedCustomer();
-
-    if (selectedCustomer) {
-      this.customerSearch = selectedCustomer.name;
-      return;
-    }
-
-    if (previousSelectedCustomer && this.customerSearch === previousSelectedCustomer.name) {
-      this.customerSearch = '';
-    }
-  }
-
-  handleCustomerSearchChange(name: string): void {
-    this.customerSearch = name;
-    const selectedCustomer = this.getSelectedCustomer();
-
-    if (!name || name !== selectedCustomer?.name) {
-      this.selectedCustomerId = '';
-    }
   }
 
   cancel(): void {
@@ -110,20 +126,24 @@ export class SaleFormComponent {
   }
 
   confirm(): void {
-    if (this.items().length === 0) return;
+    if (!this.canSubmit()) return;
 
+    const existingSale = this.existingSale();
     const selectedCustomer = this.getSelectedCustomer();
+    if (!existingSale && !selectedCustomer) return;
 
     const sale: SaleInput = {
-      date: Timestamp.now(),
-      customerId: selectedCustomer?.id ?? null,
-      customerName: selectedCustomer?.name ?? this.customerSearch,
+      date: existingSale?.date ?? Timestamp.now(),
+      deliveryDate: this.toTimestampFromDateInput(this.deliveryDateInput),
+      customerId: existingSale?.customerId ?? selectedCustomer?.id ?? null,
+      customerName: existingSale?.customerName ?? selectedCustomer?.name ?? '',
       items: this.items(),
       total: this.total(),
       totalCost: this.totalCost(),
       profit: this.profit(),
+      isPaid: this.isPaid,
       paymentMethod: this.paymentMethod,
-      status: 'pending',
+      status: existingSale?.status ?? 'pending',
       notes: this.notes,
     };
 
