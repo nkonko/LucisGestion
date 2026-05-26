@@ -50,6 +50,13 @@ export const routes: Routes = [
           import('./features/customers/customers.component').then((m) => m.CustomersComponent),
       },
       {
+        path: 'reportes-financieros',
+        loadComponent: () =>
+          import('./features/financial-reports/financial-reports.component').then(
+            (m) => m.FinancialReportsComponent,
+          ),
+      },
+      {
         path: 'costos',
         loadComponent: () =>
           import('./features/fixed-costs/fixed-costs.component').then(

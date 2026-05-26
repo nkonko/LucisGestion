@@ -5,3 +5,16 @@
   vertical-align: middle;
   margin-right: var(--space-1);
 }
+
+.customer-name {
+  font-size: var(--size-font-md);
+  font-weight: 600;
+  color: var(--color-on-surface);
+}
+
+.customer-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
