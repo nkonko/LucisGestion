@@ -5,7 +5,7 @@
 Para ejecutar los casos de prueba sin necesidad de Firebase configurado:
 
 ```bash
-npm run start:mock
+pnpm start:mock
 ```
 
 La app se levanta con datos de ejemplo precargados (ingredientes, recetas, clientes y ventas). El usuario queda auto-logueado como owner. Los datos se pierden al refrescar.

@@ -1,0 +1,72 @@
+<section class="page-container py-4">
+  <h1 class="text-xl font-semibold mb-1">Reportes financieros</h1>
+  <p class="text-sm text-gray-600 mb-4">Período analizado: {{ selectedMonthKey() }}</p>
+
+  @if (!hasInsights()) {
+    <p class="ui-card p-4">No se detectaron insights para el período seleccionado.</p>
+  }
+
+  @if (hasCustomersToCare()) {
+    <section class="ui-card-surface p-4 mb-4" aria-labelledby="clientes-a-cuidar-title">
+      <div class="flex items-center justify-between gap-2 mb-3">
+        <h2 id="clientes-a-cuidar-title" class="text-lg font-semibold">Clientes a cuidar</h2>
+        <span class="text-xs text-gray-500">Ordenado por impacto y frecuencia</span>
+      </div>
+
+      <ul class="space-y-2">
+        @for (customer of customersToCare(); track customer.customerId ?? customer.customerName) {
+          <li class="border rounded-lg p-3">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="font-medium">{{ customer.customerName }}</p>
+                <p class="text-sm text-gray-600">{{ customer.revenue | ars }} · {{ customer.ordersCount }} compras</p>
+                <p class="text-sm text-gray-600">Última compra: {{ customer.lastPurchaseAt | date: 'dd/MM/yyyy' }}</p>
+              </div>
+              <span class="text-xs px-2 py-1 rounded-full border">{{ customer.importanceTier }}</span>
+            </div>
+            <p class="text-sm mt-2">{{ customer.retentionHint }}</p>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  @if (hasProductOpportunities()) {
+    <section class="ui-card p-4 mb-4" aria-label="Oportunidades de producto">
+      <h2 class="text-lg font-medium mb-3">Oportunidades de producto</h2>
+      @for (insight of productOpportunities(); track insight.id) {
+        <article class="mb-3 last:mb-0">
+          <h3 class="font-medium">{{ insight.title }}</h3>
+          <p class="text-sm">{{ insight.description }}</p>
+          <p class="text-sm">{{ insight.impact }}</p>
+        </article>
+      }
+    </section>
+  }
+
+  @if (hasExpenseAnomalies()) {
+    <section class="ui-card p-4 mb-4" aria-label="Alertas de gastos fijos">
+      <h2 class="text-lg font-medium mb-3">Alertas de gastos fijos</h2>
+      @for (insight of expenseAnomalies(); track insight.id) {
+        <article class="mb-3 last:mb-0">
+          <h3 class="font-medium">{{ insight.title }}</h3>
+          <p class="text-sm">{{ insight.description }}</p>
+          <p class="text-sm">{{ insight.impact }}</p>
+        </article>
+      }
+    </section>
+  }
+
+  @if (hasPriorityCustomers()) {
+    <section class="ui-card p-4" aria-label="Clientes prioritarios">
+      <h2 class="text-lg font-medium mb-3">Clientes prioritarios</h2>
+      @for (insight of priorityCustomers(); track insight.id) {
+        <article class="mb-3 last:mb-0">
+          <h3 class="font-medium">{{ insight.customerName }}</h3>
+          <p class="text-sm">Compras: {{ insight.purchasesCount }} · Facturación: {{ insight.billedAmount | ars }}</p>
+          <p class="text-sm">{{ insight.recommendation }}</p>
+        </article>
+      }
+    </section>
+  }
+</section>

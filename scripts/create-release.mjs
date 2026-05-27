@@ -8,7 +8,7 @@ const version = args[0];
 // Validar que se pasó versión
 if (!version) {
   console.error('❌ Error: Debes pasar la versión como argumento');
-  console.error('Uso: npm run release -- v0.1.0');
+  console.error('Uso: pnpm release -- v0.1.0');
   process.exit(1);
 }
 

@@ -1,0 +1,11 @@
+:host {
+  display: block;
+}
+.financial-reports {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.financial-reports__description {
+  color: var(--color-muted-foreground);
+}

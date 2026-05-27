@@ -1,0 +1,81 @@
+<ui-card class="sale-card">
+  <div class="sale-card-header">
+    <div class="sale-customer-name">{{ sale().customerName || 'Sin cliente' }}</div>
+    <div class="sale-card-header-actions">
+      <span class="sale-status" [class]="statusClass">
+        {{ statusLabel }}
+      </span>
+      @if (sale().status === 'pending' || sale().status === 'production') {
+        <button
+          class="ui-icon-btn sale-edit-btn"
+          type="button"
+          (click)="requestEdit()"
+          aria-label="Editar venta"
+          title="Editar venta"
+        >
+          <ui-icon name="edit" [decorative]="true" />
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="sale-card-items">
+    <div class="sale-items-list">
+      @for (item of sale().items; track item.recipeId) {
+        <div class="sale-item">
+          <span class="sale-item-qty">{{ item.quantity }}×</span>
+          <span class="sale-item-name">{{ item.name }}</span>
+        </div>
+      }
+    </div>
+    <div class="sale-card-items-total">
+      <div class="sale-total">{{ sale().total | ars }}</div>
+    </div>
+  </div>
+
+  @if (displayDeliveryDate || hasNotes) {
+    <div class="sale-card-extra">
+      @if (displayDeliveryDate) {
+        <div class="sale-extra-row">
+          <span class="sale-extra-label">Entrega:</span>
+          <span class="sale-extra-value">{{ displayDeliveryDate }}</span>
+        </div>
+      }
+      @if (hasNotes) {
+        <div class="sale-extra-row">
+          <span class="sale-extra-label">Notas:</span>
+          <span class="sale-extra-value">{{ sale().notes }}</span>
+        </div>
+      }
+    </div>
+  }
+
+  <div class="sale-card-meta">
+    <div class="sale-date">{{ displayDate }}</div>
+    @if (sale().status !== 'delivered' && sale().status !== 'cancelled') {
+      <div class="sale-card-actions">
+        @if (sale().status === 'pending' && sale().customerName) {
+          <button
+            class="ui-icon-btn"
+            (click)="requestWhatsApp()"
+            aria-label="Enviar por WhatsApp"
+            title="Enviar por WhatsApp"
+            type="button"
+          >
+            <ui-icon name="chat" [decorative]="true" />
+          </button>
+        }
+        @if (sale().status === 'pending') {
+          <button class="ui-btn ui-btn-sm sale-btn-production" (click)="requestStatusChange('production')" type="button">
+            Producción
+          </button>
+          <button class="ui-btn ui-btn-sm ui-btn-primary" (click)="requestStatusChange('cancelled')" type="button">Cancelar</button>
+        }
+        @if (sale().status === 'production') {
+          <button class="ui-btn ui-btn-sm sale-btn-deliver" (click)="requestStatusChange('delivered')" type="button">Entregar</button>
+          <button class="ui-btn ui-btn-sm ui-btn-primary" (click)="requestStatusChange('cancelled')" type="button">Cancelar</button>
+        }
+      </div>
+    }
+  </div>
+</ui-card>

@@ -8,32 +8,15 @@
   }
 </div>
 
-<section class="month-nav ui-card-surface mb-3" aria-label="Selector de mes">
-  <div class="month-nav__row">
-    <button
-      type="button"
-      class="month-nav__arrow"
-      aria-label="Mes anterior"
-      (click)="previousMonth()"
-    >
-      <ui-icon name="chevron_left" [size]="22" [decorative]="true" />
-    </button>
-
-    <div class="month-nav__center">
-      <div class="month-nav__title">{{ monthLabel() }}</div>
-      <div class="month-nav__caption">{{ statusCaption() }}</div>
-    </div>
-
-    <button
-      type="button"
-      class="month-nav__arrow"
-      aria-label="Mes siguiente"
-      (click)="nextMonth()"
-    >
-      <ui-icon name="chevron_right" [size]="22" [decorative]="true" />
-    </button>
-  </div>
-</section>
+<app-month-nav
+  class="mb-3 block"
+  [label]="monthLabel()"
+  [caption]="statusCaption()"
+  previousLabel="Mes anterior"
+  nextLabel="Mes siguiente"
+  (previous)="previousMonth()"
+  (next)="nextMonth()"
+/>
 
 @if (canRevert() && auth.isOwner()) {
   <button

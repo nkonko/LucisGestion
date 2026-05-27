@@ -6,12 +6,14 @@ import { PaymentMethod } from './payment-method.model';
 export interface Sale {
   id?: string;
   date: Timestamp;
+  deliveryDate?: Timestamp | null;
   customerId: string | null;
   customerName: string;
   items: SaleItem[];
   total: number;
   totalCost: number;
   profit: number;
+  isPaid?: boolean;
   paymentMethod: PaymentMethod;
   status: SaleStatus;
   notes: string;
