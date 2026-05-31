@@ -32,6 +32,7 @@ describe('FinancialReportsComponent', () => {
   let netProfitSignal: ReturnType<typeof signal<number>>;
   let periodLabelSignal: ReturnType<typeof signal<string>>;
   let isCurrentMonthSignal: ReturnType<typeof signal<boolean>>;
+  let selectedPeriodSignal: ReturnType<typeof signal<string>>;
   let salesSignal: ReturnType<typeof signal<object[]>>;
   let lowStockSignal: ReturnType<typeof signal<object[]>>;
 
@@ -47,6 +48,7 @@ describe('FinancialReportsComponent', () => {
     netProfitSignal = signal(0);
     periodLabelSignal = signal('Enero 2026');
     isCurrentMonthSignal = signal(true);
+    selectedPeriodSignal = signal<string>('month');
     salesSignal = signal<object[]>([]);
     lowStockSignal = signal<object[]>([]);
 
@@ -78,6 +80,8 @@ describe('FinancialReportsComponent', () => {
           useValue: {
             periodLabel: periodLabelSignal,
             isCurrentMonth: isCurrentMonthSignal,
+            selectedPeriod: selectedPeriodSignal,
+            setPeriod: vi.fn(),
             goToPreviousMonth: vi.fn(),
             goToNextMonth: vi.fn(),
             goToCurrentMonth: vi.fn(),
@@ -305,6 +309,22 @@ describe('FinancialReportsComponent', () => {
       expect(fixture.nativeElement.textContent).toContain('Semana');
       expect(fixture.nativeElement.textContent).toContain('Mes');
       expect(fixture.nativeElement.textContent).toContain('Año');
+    });
+
+    it('calls setPeriod on store when a period button is clicked', () => {
+      const store = TestBed.inject(DashboardStore) as unknown as { setPeriod: ReturnType<typeof vi.fn> };
+      const buttons = fixture.nativeElement.querySelectorAll('.period-btn');
+      const hoyBtn = Array.from(buttons).find((b: HTMLElement) => b.textContent === 'Hoy');
+      hoyBtn.click();
+      expect(store.setPeriod).toHaveBeenCalledWith('today');
+    });
+
+    it('highlights the active period button', () => {
+      selectedPeriodSignal.set('year');
+      fixture.detectChanges();
+      const buttons = fixture.nativeElement.querySelectorAll('.period-btn');
+      const activeBtn = Array.from(buttons).find((b: HTMLElement) => b.classList.contains('period-btn--active'));
+      expect(activeBtn?.textContent).toContain('Año');
     });
   });
 

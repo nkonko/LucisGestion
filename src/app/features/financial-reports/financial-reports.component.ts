@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { PercentPipe } from '@angular/common';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 import { UiIconComponent, KpiCardComponent, InsightCardComponent } from '../../shared/ui/components';
@@ -8,8 +8,7 @@ import { DashboardMetricsService } from '../../core/services/dashboard-metrics.s
 import { DashboardStore } from '../../core/store/dashboard.store';
 import { SalesStore } from '../../core/store/sales.store';
 import { IngredientsStore } from '../../core/store/ingredients.store';
-
-type PeriodOption = 'today' | 'week' | 'month' | 'year';
+import { Period } from '../../core/models/dashboard';
 
 @Component({
   selector: 'app-financial-reports',
@@ -25,14 +24,14 @@ export class FinancialReportsComponent {
   private salesStore = inject(SalesStore);
   private ingredientsStore = inject(IngredientsStore);
 
-  readonly periodOptions: { value: PeriodOption; label: string }[] = [
+  readonly periodOptions: { value: Period; label: string }[] = [
     { value: 'today', label: 'Hoy' },
     { value: 'week', label: 'Semana' },
     { value: 'month', label: 'Mes' },
     { value: 'year', label: 'Año' },
   ];
 
-  readonly selectedPeriod = signal<PeriodOption>('month');
+  readonly selectedPeriod = this.dashboardStore.selectedPeriod;
   readonly periodLabel = this.dashboardStore.periodLabel;
   readonly isCurrentPeriod = this.dashboardStore.isCurrentMonth;
 
@@ -125,6 +124,7 @@ export class FinancialReportsComponent {
   readonly hasLowStock = computed(() => this.lowStockItems().length > 0);
 
   readonly hasSalesData = computed(() => this.monthlySales() > 0);
+  readonly hasAnySales = computed(() => this.salesStore.sales().length > 0);
 
   goToPreviousMonth(): void {
     this.dashboardStore.goToPreviousMonth();
@@ -138,7 +138,7 @@ export class FinancialReportsComponent {
     this.dashboardStore.goToCurrentMonth();
   }
 
-  setPeriod(period: PeriodOption): void {
-    this.selectedPeriod.set(period);
+  setPeriod(period: Period): void {
+    this.dashboardStore.setPeriod(period);
   }
 }

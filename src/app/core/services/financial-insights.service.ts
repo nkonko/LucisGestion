@@ -45,6 +45,7 @@ export class FinancialInsightsService {
     const end = getPeriodEnd(period, selectedDate);
 
     return this.salesStore.sales().filter((sale) => {
+      if (sale.status === 'cancelled') return false;
       const saleDate = sale.date.toDate();
       return saleDate >= start && saleDate < end;
     });
@@ -105,7 +106,7 @@ export class FinancialInsightsService {
 
   readonly productOpportunities = computed((): ProductOpportunity[] => {
     const quantitiesByRecipe = new Map<string, number>();
-    for (const sale of this.salesForSelectedMonth()) {
+    for (const sale of this.periodSales()) {
       for (const item of sale.items) {
         const current = quantitiesByRecipe.get(item.recipeId) ?? 0;
         quantitiesByRecipe.set(item.recipeId, current + item.quantity);
@@ -189,7 +190,7 @@ export class FinancialInsightsService {
   readonly priorityCustomers = computed((): PriorityCustomer[] => {
     const customerSummary = new Map<string, { customerName: string; billedAmount: number; purchasesCount: number }>();
 
-    for (const sale of this.salesForSelectedMonth()) {
+    for (const sale of this.periodSales()) {
       if (!sale.customerId) continue;
       const current = customerSummary.get(sale.customerId) ?? {
         customerName: sale.customerName,

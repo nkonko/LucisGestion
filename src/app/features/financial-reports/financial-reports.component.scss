@@ -11,13 +11,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
-
-  @media (min-width: 1024px) {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    column-gap: var(--space-6);
-    row-gap: var(--space-8);
-  }
 }
 
 .report-section {
@@ -62,6 +55,14 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    gap: var(--space-4) var(--space-6);
+  }
+
+  @media (min-width: 1024px) {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: var(--space-6);
   }
 }
 
@@ -121,7 +122,7 @@
   }
 
   @media (min-width: 1024px) {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--space-6);
   }
 }
@@ -148,29 +149,7 @@
   width: fit-content;
 }
 
-// ── Desktop: all elements participate in the 4-column page grid ──────────────
-@media (min-width: 1024px) {
-  .report-header {
-    grid-column: 1 / -1;
-  }
 
-  .report-section {
-    display: contents;
-  }
-
-  .report-section__title {
-    grid-column: 1 / -1;
-    margin: 0;
-  }
-
-  .report-page .ui-card-surface {
-    grid-column: 1 / -1;
-  }
-
-  .actions-bar {
-    grid-column: 1 / -1;
-  }
-}
 
 // ── Customer list ────────────────────────────────────────────────────────────
 .customer-list {
@@ -302,6 +281,31 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
+}
+
+// ── Empty state ──────────────────────────────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-16) var(--space-4);
+  text-align: center;
+}
+
+.empty-state__icon {
+  color: var(--color-on-surface-variant);
+  opacity: 0.5;
+}
+
+.empty-state__text {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--color-on-surface-variant);
+  max-width: 320px;
+  margin: 0;
+  line-height: 1.5;
 }
 
 // ── Shared text utilities ────────────────────────────────────────────────────
