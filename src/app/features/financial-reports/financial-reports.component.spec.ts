@@ -36,6 +36,22 @@ describe('FinancialReportsComponent', () => {
   let salesSignal: ReturnType<typeof signal<object[]>>;
   let lowStockSignal: ReturnType<typeof signal<object[]>>;
 
+  const defaultSale = {
+    id: 's0',
+    date: mockTimestamp(),
+    deliveryDate: null,
+    customerId: null,
+    customerName: 'Test',
+    items: [{ recipeId: 'r0', name: 'Producto', quantity: 1, unitPrice: 100, unitCost: 50 }],
+    total: 100,
+    totalCost: 50,
+    profit: 50,
+    isPaid: true,
+    paymentMethod: 'cash' as const,
+    status: 'delivered' as const,
+    notes: '',
+  };
+
   beforeEach(async () => {
     customerImportanceSignal = signal<CustomerImportance[]>([]);
     productOpportunitiesSignal = signal<ProductOpportunity[]>([]);
@@ -49,7 +65,7 @@ describe('FinancialReportsComponent', () => {
     periodLabelSignal = signal('Enero 2026');
     isCurrentMonthSignal = signal(true);
     selectedPeriodSignal = signal<string>('month');
-    salesSignal = signal<object[]>([]);
+    salesSignal = signal<object[]>([defaultSale]);
     lowStockSignal = signal<object[]>([]);
 
     TestBed.configureTestingModule({
@@ -103,6 +119,11 @@ describe('FinancialReportsComponent', () => {
   });
 
   describe('empty state', () => {
+    beforeEach(() => {
+      salesSignal.set([]);
+      fixture.detectChanges();
+    });
+
     it('shows heading', () => {
       expect(fixture.nativeElement.textContent).toContain('Reportes financieros');
     });
@@ -314,7 +335,7 @@ describe('FinancialReportsComponent', () => {
     it('calls setPeriod on store when a period button is clicked', () => {
       const store = TestBed.inject(DashboardStore) as unknown as { setPeriod: ReturnType<typeof vi.fn> };
       const buttons = fixture.nativeElement.querySelectorAll('.period-btn');
-      const hoyBtn = Array.from(buttons).find((b: HTMLElement) => b.textContent === 'Hoy');
+      const hoyBtn = Array.from(buttons as NodeListOf<HTMLElement>).find(b => b.textContent?.includes('Hoy')) as HTMLElement;
       hoyBtn.click();
       expect(store.setPeriod).toHaveBeenCalledWith('today');
     });
@@ -323,7 +344,7 @@ describe('FinancialReportsComponent', () => {
       selectedPeriodSignal.set('year');
       fixture.detectChanges();
       const buttons = fixture.nativeElement.querySelectorAll('.period-btn');
-      const activeBtn = Array.from(buttons).find((b: HTMLElement) => b.classList.contains('period-btn--active'));
+      const activeBtn = Array.from(buttons as NodeListOf<HTMLElement>).find(b => b.classList.contains('period-btn--active'));
       expect(activeBtn?.textContent).toContain('Año');
     });
   });
