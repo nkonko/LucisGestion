@@ -1,26 +1,43 @@
 import { TestBed } from '@angular/core/testing';
-import { FirestoreService } from './firestore.service';
-import { Firestore } from '@angular/fire/firestore';
-vi.mock('@angular/fire/firestore', () => ({
-  Firestore: {} as never,
-  Timestamp: { now: vi.fn() } as never,
-  addDoc: vi.fn(),
-  collection: vi.fn(),
-  updateDoc: vi.fn(),
-  doc: vi.fn(),
-  runTransaction: vi.fn(),
-  getDoc: vi.fn(),
-  getDocs: vi.fn(),
-  setDoc: vi.fn(),
-}));
-import * as afs from '@angular/fire/firestore';
+import type { Type } from '@angular/core';
+import type { FirestoreService as FirestoreServiceType } from './firestore.service';
+import type * as FirestoreApi from '@angular/fire/firestore';
 
-const mockedAfs = vi.mocked(afs);
+let FirestoreService: Type<FirestoreServiceType>;
+let Firestore: unknown;
+let mockedAfs: ReturnType<typeof vi.mocked<typeof FirestoreApi>>;
+
+beforeAll(async () => {
+  const actual = await vi.importActual<typeof FirestoreApi>('@angular/fire/firestore');
+
+  vi.doMock('@angular/fire/firestore', () => ({
+    ...actual,
+    Timestamp: { ...actual.Timestamp, now: vi.fn() } as never,
+    addDoc: vi.fn(),
+    collection: vi.fn(),
+    collectionData: vi.fn(),
+    deleteDoc: vi.fn(),
+    updateDoc: vi.fn(),
+    query: vi.fn(),
+    doc: vi.fn(),
+    runTransaction: vi.fn(),
+    getDoc: vi.fn(),
+    getDocs: vi.fn(),
+    setDoc: vi.fn(),
+  }));
+
+  const serviceModule = await import('./firestore.service');
+  const afs = await import('@angular/fire/firestore');
+  FirestoreService = serviceModule.FirestoreService;
+  Firestore = afs.Firestore;
+  mockedAfs = vi.mocked(afs);
+});
 
 describe('FirestoreService', () => {
-  let service: FirestoreService;
+  let service: FirestoreServiceType;
 
   beforeEach(() => {
+    vi.clearAllMocks();
     TestBed.configureTestingModule({ providers: [FirestoreService, { provide: Firestore, useValue: {} }] });
     service = TestBed.inject(FirestoreService);
   });
@@ -49,7 +66,9 @@ describe('FirestoreService', () => {
     const set = vi.fn();
     const get = vi.fn().mockResolvedValue({ exists: () => true, data: () => ({ currentStock: 2 }) });
 
-    mockedAfs.runTransaction.mockImplementation(async (_db: unknown, cb: unknown) => (cb as (ctx: unknown) => Promise<void>)({ get, update, set } as never));
+    mockedAfs.runTransaction.mockImplementation(async (_db: unknown, cb: unknown) =>
+      (cb as (ctx: unknown) => Promise<void>)({ get, update, set } as never),
+    );
     mockedAfs.doc.mockReturnValue({} as never);
     mockedAfs.collection.mockReturnValue({} as never);
 
