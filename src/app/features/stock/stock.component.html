@@ -1,54 +1,93 @@
-<div class="flex items-center justify-between mb-4">
-  <h2 class="text-xl font-semibold">Stock de Ingredientes</h2>
-  <a class="ui-btn" routerLink="/ingredientes">
-    <ui-icon name="list" [size]="18" [decorative]="true" />
-    Ver todos
-  </a>
-</div>
-
-@if (store.lowStock().length > 0) {
-  <div class="mb-4 p-3 bg-red-50 rounded-lg">
-    <div class="text-sm font-medium text-red-700 mb-1 flex items-center gap-1">
-      <ui-icon name="warning" [size]="18" [decorative]="true" />
-      {{ store.lowStock().length }} ingrediente(s) con stock bajo
+<section class="stock-page">
+  <header class="stock-hero">
+    <div>
+      <p class="stock-hero__eyebrow">Inventario</p>
+      <h1>Stock</h1>
+      <p>{{ sortedIngredients().length }} ingrediente(s)</p>
     </div>
-  </div>
-}
+    <a class="stock-hero__link" routerLink="/ingredientes">
+      <ui-icon name="list" [size]="18" [decorative]="true" />
+      Ver todos
+    </a>
+  </header>
 
-@for (item of sortedIngredients(); track item.id) {
-  <article class="ui-card-surface touch-card mb-3" (click)="auth.isOwner() ? edit(item) : null">
-    <div class="py-2">
-      <div class="flex items-center justify-between mb-1">
-        <div>
-          <div class="font-medium">{{ item.name }}</div>
-          <div class="text-xs text-gray-500">{{ item.category }}</div>
-        </div>
-        <div class="text-right">
-          <div [class]="getStockClass(item)" class="text-lg font-bold">{{ item.currentStock }}</div>
-          <div class="text-xs text-gray-400">{{ item.unit }}</div>
-        </div>
-      </div>
-
-      <div class="ui-progress"><div class="ui-progress__bar" [class]="getStockBarClass(item)" [style.width.%]="getStockPercent(item)"></div></div>
-
-      <div class="flex justify-between text-xs text-gray-400 mt-1">
-        <span>Mínimo: {{ item.minimumStock }} {{ item.unit }}</span>
-        <span [class]="getStockClass(item)">{{ getStockLabel(item) }}</span>
-      </div>
+  @if (store.lowStock().length > 0) {
+    <div class="stock-alert">
+      <ui-icon name="warning" [size]="20" [decorative]="true" />
+      <span>{{ store.lowStock().length }} ingrediente(s) necesitan atención</span>
     </div>
-  </article>
-}
+  }
 
-@if (sortedIngredients().length === 0) {
-  <div class="text-center py-8 text-gray-400">
-    <ui-icon name="inventory_2" [size]="48" [decorative]="true" />
-    <p>No hay ingredientes cargados aún</p>
-    <p class="text-sm">Tocá el botón + para agregar el primero</p>
+  <label class="stock-search" aria-label="Buscar ingrediente">
+    <ui-icon name="search" [size]="24" [decorative]="true" />
+    <input (input)="onSearchInput($event)" [value]="searchTerm()" placeholder="Buscar ingrediente..." />
+  </label>
+
+  <div class="stock-filter-tabs" aria-label="Filtros de stock">
+    <button type="button" [class.active]="selectedFilter() === 'all'" (click)="selectFilter('all')">
+      Todos <strong>{{ sortedIngredients().length }}</strong>
+    </button>
+    <button type="button" [class.active]="selectedFilter() === 'low'" (click)="selectFilter('low')">
+      Bajo stock <strong>{{ lowStockCount() }}</strong>
+    </button>
+    <button type="button" [class.active]="selectedFilter() === 'empty'" (click)="selectFilter('empty')">
+      Sin stock <strong>{{ emptyStockCount() }}</strong>
+    </button>
   </div>
-}
+
+  <div class="stock-list">
+    @for (item of filteredIngredients(); track item.id) {
+      <article class="stock-card" [class.stock-card--readonly]="!auth.isOwner()" (click)="auth.isOwner() ? edit(item) : null">
+        <div class="stock-card__icon" aria-hidden="true">
+          {{ getIngredientIcon(item) }}
+        </div>
+
+        <div class="stock-card__content">
+          <div class="stock-card__topline">
+            <div>
+              <h2>{{ item.name }}</h2>
+              <p>Min {{ item.minimumStock }} {{ item.unit }}</p>
+            </div>
+            <div class="stock-card__quantity" [class]="getStockClass(item)">
+              <strong>{{ item.currentStock }}</strong>
+              <span>{{ item.unit }}</span>
+            </div>
+          </div>
+
+          <div class="stock-card__progress" aria-hidden="true">
+            <span [class]="getStockClass(item)" [style.width.%]="getStockPercent(item)"></span>
+          </div>
+
+          <div class="stock-card__meta">
+            <span>{{ getStockLabel(item) }}</span>
+            <span>{{ item.unitPrice | number: '1.2-2' }} / {{ item.unit }}</span>
+          </div>
+        </div>
+
+        @if (auth.isOwner()) {
+          <button class="stock-card__edit" type="button" aria-label="Editar ingrediente" (click)="edit(item); $event.stopPropagation()">
+            <ui-icon name="edit" [size]="22" [decorative]="true" />
+          </button>
+        }
+      </article>
+    }
+  </div>
+
+  @if (filteredIngredients().length === 0) {
+    <div class="stock-empty">
+      <ui-icon name="inventory_2" [size]="48" [decorative]="true" />
+      @if (searchTerm() || selectedFilter() !== 'all') {
+        <p>No se encontraron ingredientes con esos filtros</p>
+      } @else {
+        <p>No hay ingredientes cargados aún</p>
+        <span>Tocá el botón + para agregar el primero</span>
+      }
+    </div>
+  }
+</section>
 
 @if (auth.isOwner()) {
-  <button class="fab-bottom-right ui-fab" (click)="create()" type="button" aria-label="Agregar ingrediente">
+  <button class="fab-bottom-right ui-fab stock-fab" (click)="create()" type="button" aria-label="Agregar ingrediente">
     <ui-icon name="add" [decorative]="true" />
   </button>
 }

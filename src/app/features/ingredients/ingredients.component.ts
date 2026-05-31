@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { NotificationService } from '../../core/services/notification.service';
 import { IngredientsStore } from '../../core/store/ingredients.store';
-import { Ingredient } from '../../core/models/ingredient';
+import { DEFAULT_INGREDIENT_ICON, Ingredient } from '../../core/models/ingredient';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 import { IngredientFormComponent } from './ingredient-form.component';
 import { PriceHistoryComponent } from './price-history.component';
@@ -34,6 +34,11 @@ export class IngredientsComponent {
   onSearchInput(event: Event): void {
     const htmlTarget = event.target as HTMLInputElement | null;
     this.searchTerm.set(htmlTarget?.value ?? '');
+  }
+
+
+  getIngredientIcon(ingredient: Ingredient): string {
+    return ingredient.icon || DEFAULT_INGREDIENT_ICON;
   }
 
   getStockClass(i: Ingredient): string {

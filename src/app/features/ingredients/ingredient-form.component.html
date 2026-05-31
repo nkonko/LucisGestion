@@ -1,18 +1,83 @@
-<h2 class="text-xl font-semibold mb-3">{{ isEdit ? 'Editar' : 'Nuevo' }} Ingrediente</h2>
-<div class="flex flex-col gap-3">
-  <label class="ui-field"><span>Nombre</span><input data-initial-focus class="ui-input" [(ngModel)]="form.name" required /></label>
-  <div class="grid grid-cols-2 gap-3">
-    <label class="ui-field"><span>Unidad</span><select class="ui-select" [(ngModel)]="form.unit" required>@for (u of units; track u.key) {<option [value]="u.key">{{ u.label }}</option>}</select></label>
-    <label class="ui-field"><span>Categoría</span><select class="ui-select" [(ngModel)]="form.category" required>@for (c of categories; track c.key) {<option [value]="c.key">{{ c.label }}</option>}</select></label>
+<section class="ingredient-sheet" aria-labelledby="ingredient-form-title">
+  <header class="ingredient-sheet__header">
+    <div>
+      <p class="ingredient-sheet__eyebrow">Ingrediente</p>
+      <h2 id="ingredient-form-title">{{ isEdit ? 'Editar ingrediente' : 'Nuevo ingrediente' }}</h2>
+    </div>
+    <button class="ui-icon-btn ingredient-sheet__close" type="button" (click)="cancel()" aria-label="Cerrar formulario">
+      <ui-icon name="close" [decorative]="true" />
+    </button>
+  </header>
+
+  <div class="ingredient-sheet__body">
+    <fieldset class="ingredient-icon-picker">
+      <legend>Icono</legend>
+      <div class="ingredient-icon-picker__grid">
+        @for (icon of icons; track icon.value) {
+          <button
+            class="ingredient-icon-option"
+            [class.ingredient-icon-option--active]="form.icon === icon.value"
+            [attr.data-tone]="icon.tone"
+            type="button"
+            (click)="selectIcon(icon.value)"
+            [attr.aria-label]="'Usar icono de ' + icon.label"
+            [attr.aria-pressed]="form.icon === icon.value"
+          >
+            <span aria-hidden="true">{{ icon.value }}</span>
+          </button>
+        }
+      </div>
+    </fieldset>
+
+    <label class="ui-field ingredient-field ingredient-field--full">
+      <span>Nombre</span>
+      <input data-initial-focus class="ui-input" [(ngModel)]="form.name" required placeholder="Ej: Harina" />
+    </label>
+
+    <div class="ingredient-form-grid">
+      <label class="ui-field ingredient-field">
+        <span>Unidad</span>
+        <select class="ui-select" [(ngModel)]="form.unit" required>
+          @for (u of units; track u.key) {
+            <option [value]="u.key">{{ u.label }}</option>
+          }
+        </select>
+      </label>
+      <label class="ui-field ingredient-field">
+        <span>Categoría</span>
+        <select class="ui-select" [(ngModel)]="form.category" required>
+          @for (c of categories; track c.key) {
+            <option [value]="c.key">{{ c.label }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    <label class="ui-field ingredient-field ingredient-field--full">
+      <span>Costo / {{ form.unit || 'unidad' }}</span>
+      <input class="ui-input" type="number" [(ngModel)]="form.unitPrice" min="0" step="0.01" required />
+    </label>
+
+    <div class="ingredient-form-grid">
+      <label class="ui-field ingredient-field">
+        <span>Stock</span>
+        <input class="ui-input" type="number" [(ngModel)]="form.currentStock" min="0" step="0.01" required />
+      </label>
+      <label class="ui-field ingredient-field">
+        <span>Stock mínimo</span>
+        <input class="ui-input" type="number" [(ngModel)]="form.minimumStock" min="0" step="0.01" required />
+      </label>
+    </div>
   </div>
-  <label class="ui-field"><span>Precio por {{ form.unit || 'unidad' }}</span><input class="ui-input" type="number" [(ngModel)]="form.unitPrice" min="0" required /></label>
-  <div class="grid grid-cols-2 gap-3">
-    <label class="ui-field"><span>Stock actual</span><input class="ui-input" type="number" [(ngModel)]="form.currentStock" min="0" required /></label>
-    <label class="ui-field"><span>Stock mínimo</span><input class="ui-input" type="number" [(ngModel)]="form.minimumStock" min="0" required /></label>
-  </div>
-</div>
-<div class="flex justify-end gap-2 mt-4">
-  @if (isEdit) { <button class="ui-btn ui-btn-danger" type="button" (click)="remove()">Eliminar</button> }
-  <button class="ui-btn" type="button" (click)="cancel()">Cancelar</button>
-  <button class="ui-btn ui-btn-primary" type="button" (click)="save()" [disabled]="!isValid()">{{ isEdit ? 'Guardar' : 'Crear' }}</button>
-</div>
+
+  <footer class="ingredient-sheet__actions">
+    @if (isEdit) {
+      <button class="ingredient-delete-btn" type="button" (click)="remove()" aria-label="Eliminar ingrediente">
+        <ui-icon name="delete" [decorative]="true" />
+      </button>
+    }
+    <button class="ingredient-save-btn" type="button" (click)="save()" [disabled]="!isValid()">
+      {{ isEdit ? 'Guardar cambios' : 'Crear ingrediente' }}
+    </button>
+  </footer>
+</section>

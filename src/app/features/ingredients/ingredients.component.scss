@@ -1,3 +1,18 @@
-:host {
-  display: block;
+.ingredient-list-main {
+  align-items: center;
+  display: flex;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.ingredient-list-icon {
+  align-items: center;
+  background: color-mix(in srgb, var(--color-secondary) 68%, var(--color-surface));
+  border-radius: 16px;
+  display: inline-flex;
+  flex: 0 0 48px;
+  font-size: 1.45rem;
+  height: 48px;
+  justify-content: center;
+  width: 48px;
 }
