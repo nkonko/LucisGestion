@@ -1,0 +1,10 @@
+<div class="kpi-card" [class]="cardClass()">
+  <div class="kpi-icon">
+    <ui-icon [name]="icon()" [size]="20" [decorative]="true" />
+  </div>
+  <p class="kpi-value">{{ value() }}</p>
+  <p class="kpi-label">{{ label() }}</p>
+  @if (subtitle(); as sub) {
+    <span class="kpi-subtitle">{{ sub }}</span>
+  }
+</div>
