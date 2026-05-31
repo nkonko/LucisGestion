@@ -3,10 +3,17 @@ import { AuthService } from './auth.service';
 import { Auth } from '@angular/fire/auth';
 import { Firestore } from '@angular/fire/firestore';
 vi.mock('@angular/fire/auth', () => ({
+  Auth: {} as never,
   onAuthStateChanged: vi.fn(),
   signOut: vi.fn(),
 }));
 vi.mock('@angular/fire/firestore', () => ({
+  Firestore: {} as never,
+  Timestamp: {} as never,
+  doc: vi.fn(),
+  collection: vi.fn(),
+  limit: vi.fn(),
+  query: vi.fn(),
   getDoc: vi.fn(),
   getDocs: vi.fn(),
   setDoc: vi.fn(),
@@ -17,7 +24,7 @@ import { AuthStore } from '../store/auth.store';
 
 const mockedAuthApi = vi.mocked(authApi);
 
-describe.skip('AuthService', () => {
+describe('AuthService', () => {
   let service: AuthService;
   const authStoreMock = { appUser: vi.fn(), setAuthState: vi.fn() };
 

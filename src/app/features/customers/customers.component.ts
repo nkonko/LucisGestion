@@ -47,7 +47,7 @@ export class CustomersComponent {
         try {
           await this.store.createCustomer(result);
           this.notify.success('Cliente creado');
-        } catch (error) {
+        } catch (error: unknown) {
           this.notify.errorFrom(error, 'No se pudo crear el cliente');
         }
       }
@@ -69,7 +69,7 @@ export class CustomersComponent {
           await this.store.updateCustomer(customer.id, result);
           this.notify.success('Cliente actualizado');
         }
-      } catch (error) {
+      } catch (error: unknown) {
         this.notify.errorFrom(error, 'No se pudo guardar el cliente');
       }
     });

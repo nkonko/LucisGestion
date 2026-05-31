@@ -2,6 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import { FirestoreService } from './firestore.service';
 import { Firestore } from '@angular/fire/firestore';
 vi.mock('@angular/fire/firestore', () => ({
+  Firestore: {} as never,
+  Timestamp: { now: vi.fn() } as never,
   addDoc: vi.fn(),
   collection: vi.fn(),
   updateDoc: vi.fn(),
@@ -15,7 +17,7 @@ import * as afs from '@angular/fire/firestore';
 
 const mockedAfs = vi.mocked(afs);
 
-describe.skip('FirestoreService', () => {
+describe('FirestoreService', () => {
   let service: FirestoreService;
 
   beforeEach(() => {

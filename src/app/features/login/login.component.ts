@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { getErrorMessage } from '../../core/utils/error.utils';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
@@ -23,7 +24,7 @@ export class LoginComponent {
       await this.auth.loginWithGoogle();
       await this.router.navigate(['/dashboard']);
     } catch (error: unknown) {
-      this.error.set(error instanceof Error ? error.message : 'Error al iniciar sesión');
+      this.error.set(getErrorMessage(error, 'Error al iniciar sesión'));
       this.loading.set(false);
     }
   }

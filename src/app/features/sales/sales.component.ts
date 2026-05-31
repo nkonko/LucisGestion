@@ -157,7 +157,7 @@ export class SalesComponent {
         try {
           await this.store.registerSale(result);
           this.notify.success('Venta registrada. Stock actualizado.', 3000);
-        } catch (error) {
+        } catch (error: unknown) {
           this.notify.errorFrom(error, 'No se pudo registrar la venta por stock insuficiente.');
         }
       }
@@ -182,7 +182,7 @@ export class SalesComponent {
         try {
           await this.store.updateSale(saleId, result);
           this.notify.success('Venta actualizada.', 3000);
-        } catch (error) {
+        } catch (error: unknown) {
           this.notify.errorFrom(error, 'No se pudo actualizar la venta por stock insuficiente.');
         }
       }

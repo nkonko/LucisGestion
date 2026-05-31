@@ -32,6 +32,7 @@ import {
   LucideTrophy,
   LucideUserRound,
   LucideUsers,
+  LucideBanknote,
   type LucideIconData,
 } from '@lucide/angular';
 
@@ -40,6 +41,7 @@ export const UI_ICON_FALLBACK = LucideCircleAlert.icon;
 export const UI_ICON_MAP: Record<string, LucideIconData> = {
   account_circle: LucideUserRound.icon,
   add: LucidePlus.icon,
+  banknote: LucideBanknote.icon,
   calendar_month: LucideCalendarDays.icon,
   calculate: LucideCalculator.icon,
   chat: LucideMessageCircle.icon,
