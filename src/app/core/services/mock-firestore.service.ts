@@ -50,6 +50,7 @@ export class MockFirestoreService {
   }
 
   async restoreBackup(backup: AppBackupFile, onProgress?: BackupProgressCallback): Promise<void> {
+    this.assertBackupFile(backup);
     onProgress?.(0);
     for (const [index, collectionName] of APP_DATA_COLLECTIONS.entries()) {
       const documents = backup.collections[collectionName] ?? [];
@@ -61,6 +62,18 @@ export class MockFirestoreService {
       );
       onProgress?.(Math.round(((index + 1) / APP_DATA_COLLECTIONS.length) * 100));
     }
+  }
+
+  parseBackupJson(content: string): AppBackupFile {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(content);
+    } catch {
+      throw new Error('El archivo seleccionado no es un JSON válido.');
+    }
+
+    this.assertBackupFile(parsed);
+    return parsed;
   }
 
   getCollection<T>(path: string, ..._constraints: unknown[]): Observable<T[]> {
@@ -290,6 +303,38 @@ export class MockFirestoreService {
       }
     }
     return this.deserializeRecord(value);
+  }
+
+  private assertBackupFile(value: unknown): asserts value is AppBackupFile {
+    if (
+      !this.isRecord(value) ||
+      value['schema'] !== 'lucis-gestion-backup' ||
+      value['version'] !== 1
+    ) {
+      throw new Error('El archivo de backup no tiene un formato válido.');
+    }
+
+    const collections = value['collections'];
+    if (!this.isRecord(collections)) {
+      throw new Error('El archivo de backup no contiene colecciones válidas.');
+    }
+
+    for (const collectionName of APP_DATA_COLLECTIONS) {
+      const documents = collections[collectionName];
+      if (!Array.isArray(documents)) {
+        throw new Error(`El backup no contiene la colección ${collectionName}.`);
+      }
+
+      for (const backupDocument of documents) {
+        if (
+          !this.isRecord(backupDocument) ||
+          typeof backupDocument['id'] !== 'string' ||
+          !this.isRecord(backupDocument['data'])
+        ) {
+          throw new Error(`La colección ${collectionName} contiene documentos inválidos.`);
+        }
+      }
+    }
   }
 
   private isRecord(value: unknown): value is Record<string, BackupJsonValue> {

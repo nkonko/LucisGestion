@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LayoutComponent } from './shared/layout/layout.component';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
+import { ownerGuard } from './core/guards/owner.guard';
 
 export const routes: Routes = [
   {
@@ -60,6 +61,7 @@ export const routes: Routes = [
       },
       {
         path: 'backup-restore',
+        canActivate: [ownerGuard],
         loadComponent: () =>
           import('./features/backup-restore/backup-restore.component').then(
             (m) => m.BackupRestoreComponent,

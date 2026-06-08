@@ -115,15 +115,17 @@
           <ui-icon name="banknote" [decorative]="true" [size]="18" />
           <span>Reportes financieros</span>
         </button>
-        <button
-          class="ui-menu-item"
-          type="button"
-          role="menuitem"
-          (click)="navigateToBackupRestore()"
-        >
-          <ui-icon name="database_backup" [decorative]="true" [size]="18" />
-          <span>Backup y restore</span>
-        </button>
+        @if (auth.isOwner()) {
+          <button
+            class="ui-menu-item"
+            type="button"
+            role="menuitem"
+            (click)="navigateToBackupRestore()"
+          >
+            <ui-icon name="database_backup" [decorative]="true" [size]="18" />
+            <span>Backup y restore</span>
+          </button>
+        }
         <button class="ui-menu-item" type="button" role="menuitem" (click)="logout()">
           <ui-icon name="logout" [decorative]="true" [size]="18" />
           <span>Cerrar sesión</span>

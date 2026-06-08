@@ -6,6 +6,7 @@ import { NotificationService } from '../../core/services/notification.service';
 import { ConfirmDialogComponent } from '../../shared/ui-modal/confirm-dialog.component';
 import { UiIconComponent } from '../../shared/ui/components';
 import { AppBackupFile } from '../../core/models/backup';
+import { AuthStore } from '../../core/store/auth.store';
 
 @Component({
   selector: 'app-backup-restore',
@@ -18,6 +19,7 @@ export class BackupRestoreComponent {
   private firestoreService = inject(FirestoreService);
   private dialogService = inject(DialogService);
   private notificationService = inject(NotificationService);
+  readonly auth = inject(AuthStore);
 
   readonly backupProgress = signal(0);
   readonly restoreProgress = signal(0);
@@ -34,6 +36,11 @@ export class BackupRestoreComponent {
   readonly canRestore = computed(() => this.selectedBackup() !== null && !this.restoreInProgress());
 
   async createBackup(): Promise<void> {
+    if (!this.auth.isOwner()) {
+      this.notificationService.error('Solo la dueña puede generar backups.');
+      return;
+    }
+
     const confirmed = await this.confirmAction(
       'Crear backup',
       'Se va a leer el estado actual de todas las colecciones y preparar un archivo descargable. ¿Querés continuar?',
@@ -83,21 +90,26 @@ export class BackupRestoreComponent {
 
     try {
       const text = await file.text();
-      const parsed = JSON.parse(text) as AppBackupFile;
+      const parsed = this.firestoreService.parseBackupJson(text);
       this.selectedBackup.set(parsed);
       this.restoreFileName.set(file.name);
       this.restoreProgress.set(0);
       this.notificationService.success('Archivo de backup cargado');
-    } catch {
+    } catch (error) {
       this.selectedBackup.set(null);
       this.restoreFileName.set(null);
-      this.notificationService.error('El archivo seleccionado no es un JSON válido');
+      this.notificationService.error(this.getErrorMessage(error, 'El archivo seleccionado no es válido'));
     } finally {
       input.value = '';
     }
   }
 
   async restoreBackup(): Promise<void> {
+    if (!this.auth.isOwner()) {
+      this.notificationService.error('Solo la dueña puede restaurar backups.');
+      return;
+    }
+
     const backup = this.selectedBackup();
     if (!backup) return;
 

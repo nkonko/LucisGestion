@@ -106,15 +106,17 @@ export class FirestoreService {
     this.assertBackupFile(backup);
     onProgress?.(0);
 
-    const existingDocuments = new Map<string, string[]>();
+    const staleDocuments = new Map<string, string[]>();
     let operationCount = 0;
 
     for (const collectionName of APP_DATA_COLLECTIONS) {
       const ref = this.firestoreApi.collection(this.firestore, collectionName);
       const snapshot = await this.firestoreApi.getDocs(ref);
       const ids = snapshot.docs.map((docSnapshot) => docSnapshot.id);
-      existingDocuments.set(collectionName, ids);
-      operationCount += ids.length + (backup.collections[collectionName]?.length ?? 0);
+      const backupIds = new Set((backup.collections[collectionName] ?? []).map((doc) => doc.id));
+      const staleIds = ids.filter((id) => !backupIds.has(id));
+      staleDocuments.set(collectionName, staleIds);
+      operationCount += staleIds.length + (backup.collections[collectionName]?.length ?? 0);
     }
 
     if (operationCount === 0) {
@@ -129,19 +131,6 @@ export class FirestoreService {
     };
 
     for (const collectionName of APP_DATA_COLLECTIONS) {
-      const ids = existingDocuments.get(collectionName) ?? [];
-      for (const chunk of this.chunk(ids, 450)) {
-        const batch = this.firestoreApi.writeBatch(this.firestore);
-        for (const id of chunk) {
-          const ref = this.firestoreApi.doc(this.firestore, collectionName, id);
-          batch.delete(ref);
-        }
-        await batch.commit();
-        updateProgress(chunk.length);
-      }
-    }
-
-    for (const collectionName of APP_DATA_COLLECTIONS) {
       const documents = backup.collections[collectionName] ?? [];
       for (const chunk of this.chunk(documents, 450)) {
         const batch = this.firestoreApi.writeBatch(this.firestore);
@@ -154,7 +143,32 @@ export class FirestoreService {
       }
     }
 
+    for (const collectionName of APP_DATA_COLLECTIONS) {
+      const ids = staleDocuments.get(collectionName) ?? [];
+      for (const chunk of this.chunk(ids, 450)) {
+        const batch = this.firestoreApi.writeBatch(this.firestore);
+        for (const id of chunk) {
+          const ref = this.firestoreApi.doc(this.firestore, collectionName, id);
+          batch.delete(ref);
+        }
+        await batch.commit();
+        updateProgress(chunk.length);
+      }
+    }
+
     onProgress?.(100);
+  }
+
+  parseBackupJson(content: string): AppBackupFile {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(content);
+    } catch {
+      throw new Error('El archivo seleccionado no es un JSON válido.');
+    }
+
+    this.assertBackupFile(parsed);
+    return parsed;
   }
 
   async addDocument<T extends object>(path: string, data: T): Promise<string> {
