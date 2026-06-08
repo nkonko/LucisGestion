@@ -32,7 +32,7 @@ export class CustomersComponent {
   });
 
   onSearchInput(event: Event): void {
-    const value = (event.target as HTMLInputElement)?.value?.trim() ?? '';
+    const value = (event.target as HTMLInputElement).value.trim();
     this.searchTerm.set(value);
   }
 
