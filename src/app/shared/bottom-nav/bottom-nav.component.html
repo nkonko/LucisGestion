@@ -15,17 +15,27 @@
   <a routerLink="/stock" routerLinkActive="active" class="nav-item ui-nav-item nav-item--badge">
     <ui-icon name="inventory_2" [decorative]="true" [size]="20" />
     @if (lowStockCount() > 0) {
-      <span class="badge" aria-label="{{ lowStockCount() }} ingredientes con stock bajo">{{ lowStockCount() }}</span>
+      <span class="badge" aria-label="{{ lowStockCount() }} ingredientes con stock bajo">{{
+        lowStockCount()
+      }}</span>
     }
     <span class="nav-item__label">Stock</span>
   </a>
 
   <!-- Secondary navigation items (hidden on mobile, in dropdown) -->
-  <a routerLink="/costos" routerLinkActive="active" class="nav-item ui-nav-item nav-item--secondary">
+  <a
+    routerLink="/costos"
+    routerLinkActive="active"
+    class="nav-item ui-nav-item nav-item--secondary"
+  >
     <ui-icon name="receipt_long" [decorative]="true" [size]="20" />
     <span class="nav-item__label">Costos</span>
   </a>
-  <a routerLink="/clientes" routerLinkActive="active" class="nav-item ui-nav-item nav-item--secondary">
+  <a
+    routerLink="/clientes"
+    routerLinkActive="active"
+    class="nav-item ui-nav-item nav-item--secondary"
+  >
     <ui-icon name="people" [decorative]="true" [size]="20" />
     <span class="nav-item__label">Clientes</span>
   </a>
@@ -88,14 +98,31 @@
           <div class="font-medium">{{ auth.appUser()?.displayName }}</div>
           <div class="text-xs text-gray-500">{{ auth.appUser()?.email }}</div>
           <div class="text-xs mt-1">
-            <span class="inline-block px-2 py-0.5 rounded-full text-white" [class]="auth.isOwner() ? 'bg-rose-500' : 'bg-blue-500'">
+            <span
+              class="inline-block px-2 py-0.5 rounded-full text-white"
+              [class]="auth.isOwner() ? 'bg-rose-500' : 'bg-blue-500'"
+            >
               {{ auth.isOwner() ? 'Dueña' : 'Ayudante' }}
             </span>
           </div>
         </div>
-        <button class="ui-menu-item" type="button" role="menuitem" (click)="navigateToFinancialReports()">
+        <button
+          class="ui-menu-item"
+          type="button"
+          role="menuitem"
+          (click)="navigateToFinancialReports()"
+        >
           <ui-icon name="banknote" [decorative]="true" [size]="18" />
           <span>Reportes financieros</span>
+        </button>
+        <button
+          class="ui-menu-item"
+          type="button"
+          role="menuitem"
+          (click)="navigateToBackupRestore()"
+        >
+          <ui-icon name="database_backup" [decorative]="true" [size]="18" />
+          <span>Backup y restore</span>
         </button>
         <button class="ui-menu-item" type="button" role="menuitem" (click)="logout()">
           <ui-icon name="logout" [decorative]="true" [size]="18" />

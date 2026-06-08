@@ -1,0 +1,133 @@
+<section class="backup-page">
+  <header class="backup-hero">
+    <div class="backup-hero__icon" aria-hidden="true">
+      <ui-icon name="database_backup" [size]="28" [decorative]="true" />
+    </div>
+    <div>
+      <p class="backup-eyebrow">Administración de datos</p>
+      <h1 class="section-heading">Backup y restore</h1>
+      <p class="backup-hero__text">
+        Guardá una copia completa de Firebase o restaurá el estado de la app desde un archivo.
+      </p>
+    </div>
+  </header>
+
+  <article class="backup-card ui-card-surface">
+    <div class="backup-card__header">
+      <span class="backup-card__icon backup-card__icon--backup" aria-hidden="true">
+        <ui-icon name="download" [size]="22" [decorative]="true" />
+      </span>
+      <div>
+        <h2>Crear backup</h2>
+        <p>
+          Genera un JSON con usuarios, ingredientes, recetas, clientes, ventas, stock, costos y
+          gastos.
+        </p>
+      </div>
+    </div>
+
+    <div class="backup-progress" aria-label="Progreso de backup">
+      <div class="backup-progress__topline">
+        <span>Proceso de backup</span>
+        <strong>{{ backupProgress() }}%</strong>
+      </div>
+      <div class="ui-progress">
+        <div class="ui-progress__bar backup-progress__bar" [style.width.%]="backupProgress()"></div>
+      </div>
+    </div>
+
+    @if (backupFileName()) {
+      <div class="backup-file">
+        <ui-icon name="check_circle" [size]="18" [decorative]="true" />
+        <span>{{ backupFileName() }}</span>
+      </div>
+    }
+
+    <div class="backup-actions">
+      <button
+        class="ui-btn ui-btn-primary"
+        type="button"
+        [disabled]="backupInProgress() || restoreInProgress()"
+        (click)="createBackup()"
+      >
+        @if (backupInProgress()) {
+          <span class="ui-spinner backup-spinner" aria-hidden="true"></span>
+          Procesando
+        } @else {
+          <ui-icon name="database_backup" [size]="18" [decorative]="true" />
+          Hacer backup
+        }
+      </button>
+      <button class="ui-btn" type="button" [disabled]="!canDownload()" (click)="downloadBackup()">
+        <ui-icon name="download" [size]="18" [decorative]="true" />
+        Descargar
+      </button>
+    </div>
+  </article>
+
+  <article class="backup-card ui-card-surface backup-card--restore">
+    <div class="backup-card__header">
+      <span class="backup-card__icon backup-card__icon--restore" aria-hidden="true">
+        <ui-icon name="upload" [size]="22" [decorative]="true" />
+      </span>
+      <div>
+        <h2>Restaurar datos</h2>
+        <p>Cargá un archivo de backup desde tu equipo y reemplazá el estado actual de Firebase.</p>
+      </div>
+    </div>
+
+    <label class="backup-upload">
+      <input
+        type="file"
+        accept="application/json,.json"
+        [disabled]="backupInProgress() || restoreInProgress()"
+        (change)="onFileSelected($event)"
+      />
+      <span class="backup-upload__icon" aria-hidden="true">
+        <ui-icon name="upload" [size]="22" [decorative]="true" />
+      </span>
+      <span>
+        <strong>Seleccionar archivo</strong>
+        <small>{{ restoreFileName() ?? 'Ningún archivo cargado' }}</small>
+      </span>
+    </label>
+
+    <div class="backup-progress" aria-label="Progreso de restore">
+      <div class="backup-progress__topline">
+        <span>Proceso de restore</span>
+        <strong>{{ restoreProgress() }}%</strong>
+      </div>
+      <div class="ui-progress">
+        <div
+          class="ui-progress__bar backup-progress__bar backup-progress__bar--restore"
+          [style.width.%]="restoreProgress()"
+        ></div>
+      </div>
+    </div>
+
+    <div class="backup-warning">
+      <ui-icon name="warning" [size]="18" [decorative]="true" />
+      <span
+        >Antes de restaurar, la app siempre pedirá confirmación para evitar cambios
+        accidentales.</span
+      >
+    </div>
+
+    <div class="backup-actions">
+      <button
+        class="ui-btn ui-btn-danger"
+        type="button"
+        [disabled]="!canRestore() || backupInProgress()"
+        (click)="restoreBackup()"
+      >
+        @if (restoreInProgress()) {
+          <span class="ui-spinner backup-spinner" aria-hidden="true"></span>
+          Restaurando
+        } @else {
+          <ui-icon name="restore" [size]="18" [decorative]="true" />
+          Restore
+        }
+      </button>
+    </div>
+  </article>
+</section>

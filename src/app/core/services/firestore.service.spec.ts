@@ -2,7 +2,6 @@ import { TestBed } from '@angular/core/testing';
 import { Firestore } from '@angular/fire/firestore';
 import { FIRESTORE_API, FirestoreService } from './firestore.service';
 
-
 describe('FirestoreService', () => {
   let service: FirestoreService;
   let firestoreApi: {
@@ -11,25 +10,31 @@ describe('FirestoreService', () => {
     collectionData: ReturnType<typeof vi.fn>;
     deleteDoc: ReturnType<typeof vi.fn>;
     doc: ReturnType<typeof vi.fn>;
+    getDocs: ReturnType<typeof vi.fn>;
     query: ReturnType<typeof vi.fn>;
     runTransaction: ReturnType<typeof vi.fn>;
     timestampNow: ReturnType<typeof vi.fn>;
     updateDoc: ReturnType<typeof vi.fn>;
+    writeBatch: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
     vi.restoreAllMocks();
-    TestBed.configureTestingModule({ providers: [FirestoreService, { provide: Firestore, useValue: {} }] });
+    TestBed.configureTestingModule({
+      providers: [FirestoreService, { provide: Firestore, useValue: {} }],
+    });
     firestoreApi = {
       addDoc: vi.fn(),
       collection: vi.fn(),
       collectionData: vi.fn(),
       deleteDoc: vi.fn(),
       doc: vi.fn(),
+      getDocs: vi.fn(),
       query: vi.fn(),
       runTransaction: vi.fn(),
       timestampNow: vi.fn().mockReturnValue({}),
       updateDoc: vi.fn(),
+      writeBatch: vi.fn(),
     };
     TestBed.configureTestingModule({
       providers: [
@@ -63,7 +68,9 @@ describe('FirestoreService', () => {
   it('applyStockAdjustments avoids negative stock and skips zero delta movement', async () => {
     const update = vi.fn();
     const set = vi.fn();
-    const get = vi.fn().mockResolvedValue({ exists: () => true, data: () => ({ currentStock: 2 }) });
+    const get = vi
+      .fn()
+      .mockResolvedValue({ exists: () => true, data: () => ({ currentStock: 2 }) });
 
     firestoreApi.runTransaction.mockImplementation(async (_db: unknown, cb: unknown) =>
       (cb as (ctx: unknown) => Promise<void>)({ get, update, set } as never),
@@ -78,6 +85,8 @@ describe('FirestoreService', () => {
 
     expect(update).toHaveBeenCalled();
     expect(set).toHaveBeenCalledTimes(1);
-    expect(set.mock.calls[0][1]).toEqual(expect.objectContaining({ ingredientId: 'ing-1', quantity: -2 }));
+    expect(set.mock.calls[0][1]).toEqual(
+      expect.objectContaining({ ingredientId: 'ing-1', quantity: -2 }),
+    );
   });
 });

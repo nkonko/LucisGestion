@@ -48,6 +48,11 @@ export class BottomNavComponent {
     this.router.navigate(['/reportes-financieros']);
   }
 
+  navigateToBackupRestore(): void {
+    this.menuOpen.set(false);
+    this.router.navigate(['/backup-restore']);
+  }
+
   onMoreMenuClick(event: Event): void {
     event.stopPropagation();
   }

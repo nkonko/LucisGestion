@@ -7,8 +7,7 @@ export const routes: Routes = [
   {
     path: 'login',
     canActivate: [guestGuard],
-    loadComponent: () =>
-      import('./features/login/login.component').then((m) => m.LoginComponent),
+    loadComponent: () => import('./features/login/login.component').then((m) => m.LoginComponent),
   },
   {
     path: '',
@@ -18,9 +17,7 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         loadComponent: () =>
-          import('./features/dashboard/dashboard.component').then(
-            (m) => m.DashboardComponent,
-          ),
+          import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent),
       },
       {
         path: 'ingredientes',
@@ -59,8 +56,13 @@ export const routes: Routes = [
       {
         path: 'costos',
         loadComponent: () =>
-          import('./features/fixed-costs/fixed-costs.component').then(
-            (m) => m.FixedCostsComponent,
+          import('./features/fixed-costs/fixed-costs.component').then((m) => m.FixedCostsComponent),
+      },
+      {
+        path: 'backup-restore',
+        loadComponent: () =>
+          import('./features/backup-restore/backup-restore.component').then(
+            (m) => m.BackupRestoreComponent,
           ),
       },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
