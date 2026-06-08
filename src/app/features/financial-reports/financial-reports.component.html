@@ -1,0 +1,251 @@
+<section class="report-page">
+
+  <!-- ==================== HEADER ==================== -->
+  <header class="report-header">
+    <div class="report-header__top">
+      <h1 class="report-header__title">Reportes financieros</h1>
+    </div>
+
+    @if (hasAnySales()) {
+      <div class="report-header__controls">
+        <div class="period-selector">
+          @for (opt of periodOptions; track opt.value) {
+            <button
+              type="button"
+              class="period-btn"
+              [class.period-btn--active]="selectedPeriod() === opt.value"
+              (click)="setPeriod(opt.value)"
+            >
+              {{ opt.label }}
+            </button>
+          }
+        </div>
+
+        <app-month-nav
+          [label]="periodLabel()"
+          [disableNext]="isCurrentPeriod()"
+          (previous)="goToPreviousMonth()"
+          (next)="goToNextMonth()"
+        >
+          @if (!isCurrentPeriod()) {
+            <button
+              type="button"
+              class="report-header__back-today"
+              mn-trailing
+              (click)="goToCurrentMonth()"
+            >
+              Volver al mes actual
+            </button>
+          }
+        </app-month-nav>
+      </div>
+    }
+  </header>
+
+  @if (hasAnySales()) {
+
+  <!-- ==================== KPI CARDS ==================== -->
+  <section class="report-section" aria-label="Resumen financiero">
+    <div class="kpi-grid">
+      <app-kpi-card
+        icon="trending_up"
+        label="Ingresos totales"
+        [value]="monthlySales() | ars"
+        variant="primary"
+      />
+
+      <app-kpi-card
+        icon="receipt"
+        label="Costos variables"
+        [value]="periodVariableExpenses() | ars"
+        variant="warning"
+        [subtitle]="hasSalesData() ? variableCostRate() + '% de ingresos' : null"
+      />
+
+      <app-kpi-card
+        icon="banknote"
+        label="Gastos fijos"
+        [value]="periodFixedCosts() | ars"
+        variant="warning"
+        [subtitle]="hasSalesData() ? fixedCostRate() + '% de ingresos' : null"
+      />
+
+      <app-kpi-card
+        [icon]="isProfitable() ? 'savings' : 'error'"
+        label="Beneficio neto"
+        [value]="netProfit() | ars"
+        [variant]="isProfitable() ? 'success' : 'danger'"
+        [subtitle]="hasSalesData() ? (isProfitable() ? '+' : '') + profitRate() + '%' : null"
+      />
+    </div>
+  </section>
+
+  <!-- ==================== INSIGHTS ==================== -->
+  @if (hasInsights()) {
+    <section class="report-section" aria-label="Insights automáticos">
+      <h2 class="report-section__title">Insights automáticos</h2>
+      <div class="insight-grid">
+
+        @for (op of productOpportunities(); track op.id) {
+          <app-insight-card
+            icon="trending_up"
+            badge="OPORTUNIDAD"
+            [title]="op.recipeName"
+            variant="opportunity"
+          >
+            <p>{{ op.soldUnits }} unidades · {{ op.estimatedRevenue | ars }}</p>
+            <p class="text-muted">{{ op.recommendation }}</p>
+            <button type="button" class="ui-btn insight-action">
+              <ui-icon name="inventory_2" [size]="14" [decorative]="true" />
+              Ver producto
+            </button>
+          </app-insight-card>
+        }
+
+        @for (anomaly of expenseAnomalies(); track anomaly.id) {
+          <app-insight-card
+            [icon]="anomaly.severity === 'critical' ? 'error' : 'warning'"
+            [badge]="anomaly.severity === 'critical' ? 'CRÍTICO' : 'ALERTA'"
+            [title]="anomaly.title"
+            [variant]="anomaly.severity === 'critical' ? 'critical' : 'warning'"
+          >
+            <p>Actual: {{ anomaly.currentAmount | ars }} · Base: {{ anomaly.baselineAmount | ars }}</p>
+            <p class="font-semibold" [class.text-danger]="anomaly.severity === 'critical'" [class.text-warning]="anomaly.severity === 'warning'">
+              +{{ anomaly.increaseRatio | percent }} vs. promedio
+            </p>
+            <button type="button" class="ui-btn insight-action">
+              <ui-icon name="receipt" [size]="14" [decorative]="true" />
+              Analizar gastos
+            </button>
+          </app-insight-card>
+        }
+
+        @for (pc of priorityCustomers(); track pc.id) {
+          <app-insight-card
+            icon="emoji_events"
+            badge="ALTO IMPACTO"
+            [title]="pc.customerName"
+            variant="impact"
+          >
+            <p>{{ pc.purchasesCount }} compras · {{ pc.billedAmount | ars }} facturados</p>
+            <p class="text-muted">{{ pc.recommendation }}</p>
+            <button type="button" class="ui-btn insight-action">
+              <ui-icon name="people" [size]="14" [decorative]="true" />
+              Ver cliente
+            </button>
+          </app-insight-card>
+        }
+
+      </div>
+    </section>
+  }
+
+  <!-- ==================== TOP CUSTOMERS ==================== -->
+  @if (hasCustomerShare()) {
+    <section class="report-section" aria-label="Clientes destacados">
+      <h2 class="report-section__title">Top clientes</h2>
+      <div class="ui-card-surface">
+        <div class="customer-list">
+          @for (c of topCustomerShare(); track c.name) {
+            <div class="customer-row">
+              <div class="customer-row__info">
+                <span class="customer-row__name">{{ c.name }}</span>
+                <span class="customer-row__revenue">{{ c.revenue | ars }} · {{ c.share }}%</span>
+              </div>
+              <div class="ui-progress">
+                <div
+                  class="ui-progress__bar"
+                  [style.width.%]="c.share"
+                  style="background: var(--color-primary)"
+                ></div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- ==================== TOP PRODUCTS ==================== -->
+  @if (hasTopProducts()) {
+    <section class="report-section" aria-label="Productos más vendidos">
+      <h2 class="report-section__title">Productos más vendidos</h2>
+      <div class="ui-card-surface" style="padding: 0;">
+        <table class="product-table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th class="text-right">Unidades</th>
+              <th class="text-right">Ingresos</th>
+              <th class="text-right">Margen</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of topProducts(); track p.name) {
+              <tr>
+                <td class="product-table__name">{{ p.name }}</td>
+                <td class="text-right text-muted">{{ p.quantity }}</td>
+                <td class="text-right font-semibold">{{ p.revenue | ars }}</td>
+                <td class="text-right">
+                  <span class="margin-badge" [class.margin-badge--high]="p.margin >= 40" [class.margin-badge--mid]="p.margin >= 20 && p.margin < 40" [class.margin-badge--low]="p.margin < 20">
+                    {{ p.margin }}%
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+
+  <!-- ==================== LOW STOCK ==================== -->
+  @if (hasLowStock()) {
+    <section class="report-section" aria-label="Alertas de stock">
+      <h2 class="report-section__title">Alertas de stock</h2>
+      <div class="ui-card-surface">
+        <div class="stock-list">
+          @for (item of lowStockItems(); track item.id) {
+            <div class="stock-item">
+              <div class="stock-item__info">
+                <ui-icon name="inventory_2" [size]="18" class="stock-item__icon" />
+                <span>{{ item.name }}</span>
+              </div>
+              <span class="stock-item__count">{{ item.currentStock }}/{{ item.minimumStock }} {{ item.unit }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- ==================== QUICK ACTIONS ==================== -->
+  <section class="report-section" aria-label="Acciones rápidas">
+    <div class="actions-bar">
+      <button type="button" class="ui-btn">
+        <ui-icon name="print" [size]="16" [decorative]="true" />
+        Exportar PDF
+      </button>
+      <button type="button" class="ui-btn">
+        <ui-icon name="receipt_long" [size]="16" [decorative]="true" />
+        Exportar Excel
+      </button>
+      <button type="button" class="ui-btn">
+        <ui-icon name="share" [size]="16" [decorative]="true" />
+        Compartir reporte
+      </button>
+      <button type="button" class="ui-btn ui-btn-primary">
+        <ui-icon name="history" [size]="16" [decorative]="true" />
+        Recomendaciones IA
+      </button>
+    </div>
+  </section>
+
+  } @else {
+    <div class="empty-state">
+      <ui-icon name="bar_chart" [size]="48" class="empty-state__icon" />
+      <p class="empty-state__text">Cargue algunas ventas y comenzaremos a generar reportes para usted.</p>
+    </div>
+  }
+
+</section>

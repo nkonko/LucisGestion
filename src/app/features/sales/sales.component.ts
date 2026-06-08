@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, SecurityContext, signal } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { NotificationService } from '../../core/services/notification.service';
 import { SalesStore } from '../../core/store/sales.store';
 import { CustomersStore } from '../../core/store/customers.store';
@@ -24,7 +23,6 @@ export class SalesComponent {
   private whatsApp = inject(WhatsAppService);
   private bottomSheet = inject(BottomSheetService);
   private notify = inject(NotificationService);
-  private sanitizer = inject(DomSanitizer);
 
   statusDisplay: Record<SaleStatus, string> = SALE_STATUS_DISPLAY;
 
@@ -100,8 +98,8 @@ export class SalesComponent {
   });
 
   onSearchInput(event: Event): void {
-    const htmlTarget = event.target as HTMLInputElement | null;
-    this.searchTerm.set(htmlTarget?.value ?? '');
+    const value = (event.target as HTMLInputElement).value.trim();
+    this.searchTerm.set(value);
   }
 
   onDateFromInput(event: Event): void {
@@ -127,14 +125,14 @@ export class SalesComponent {
   }
 
   private validateStatus(rawValue: string): SaleStatus | null {
-    const sanitized = this.sanitizer.sanitize(SecurityContext.HTML, rawValue) || '';
+    const value = rawValue.trim();
     const validStatuses: SaleStatus[] = ['pending', 'production', 'delivered', 'cancelled'];
-    return validStatuses.includes(sanitized as SaleStatus) ? (sanitized as SaleStatus) : null;
+    return validStatuses.includes(value as SaleStatus) ? (value as SaleStatus) : null;
   }
 
   private validatePaymentStatus(rawValue: string): 'paid' | 'unpaid' | null {
-    const sanitized = this.sanitizer.sanitize(SecurityContext.HTML, rawValue) || '';
-    return sanitized === 'paid' ? 'paid' : sanitized === 'unpaid' ? 'unpaid' : null;
+    const value = rawValue.trim();
+    return value === 'paid' ? 'paid' : value === 'unpaid' ? 'unpaid' : null;
   }
 
   clearFilters(): void {
@@ -157,7 +155,7 @@ export class SalesComponent {
         try {
           await this.store.registerSale(result);
           this.notify.success('Venta registrada. Stock actualizado.', 3000);
-        } catch (error) {
+        } catch (error: unknown) {
           this.notify.errorFrom(error, 'No se pudo registrar la venta por stock insuficiente.');
         }
       }
@@ -182,7 +180,7 @@ export class SalesComponent {
         try {
           await this.store.updateSale(saleId, result);
           this.notify.success('Venta actualizada.', 3000);
-        } catch (error) {
+        } catch (error: unknown) {
           this.notify.errorFrom(error, 'No se pudo actualizar la venta por stock insuficiente.');
         }
       }

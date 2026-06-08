@@ -1,0 +1,86 @@
+:host {
+  display: block;
+}
+
+.insight-card {
+  border-radius: var(--space-4);
+  padding: var(--space-4);
+  border: var(--border-width-thin) solid;
+}
+
+.insight-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.insight-card__badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-chip);
+}
+
+.insight-card__icon {
+  flex-shrink: 0;
+}
+
+.insight-card__title {
+  font-weight: 600;
+  color: var(--color-on-surface);
+  margin: 0;
+}
+
+.insight-card__body {
+  font-size: 0.875rem;
+  color: var(--color-on-surface-variant);
+  margin-top: var(--space-1);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.insight-card--opportunity {
+  background: color-mix(in srgb, var(--color-status-ok) 8%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-status-ok) 20%, var(--color-surface));
+
+  .insight-card__icon { color: var(--color-status-ok); }
+  .insight-card__badge {
+    background: color-mix(in srgb, var(--color-status-ok) 15%, var(--color-surface));
+    color: var(--color-status-ok);
+  }
+}
+
+.insight-card--warning {
+  background: color-mix(in srgb, var(--color-status-warning) 8%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-status-warning) 20%, var(--color-surface));
+
+  .insight-card__icon { color: var(--color-status-warning); }
+  .insight-card__badge {
+    background: color-mix(in srgb, var(--color-status-warning) 15%, var(--color-surface));
+    color: var(--color-status-warning);
+  }
+}
+
+.insight-card--critical {
+  background: color-mix(in srgb, var(--color-status-danger) 8%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-status-danger) 20%, var(--color-surface));
+
+  .insight-card__icon { color: var(--color-status-danger); }
+  .insight-card__badge {
+    background: color-mix(in srgb, var(--color-status-danger) 15%, var(--color-surface));
+    color: var(--color-status-danger);
+  }
+}
+
+.insight-card--impact {
+  background: var(--color-primary-container);
+  border-color: color-mix(in srgb, var(--color-primary) 20%, var(--color-surface));
+
+  .insight-card__icon { color: var(--color-primary); }
+  .insight-card__badge {
+    background: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
+    color: var(--color-primary);
+  }
+}

@@ -1,4 +1,4 @@
-<h2 class="text-xl font-semibold mb-4">Ingredientes</h2>
+<h2 class="section-heading mb-4">Ingredientes</h2>
 
 <div class="w-full mb-2">
   <label class="ui-field">
@@ -22,9 +22,12 @@
 @for (ingredient of filteredIngredients(); track ingredient.id) {
   <article class="ui-card-surface touch-card mb-3" (click)="auth.isOwner() ? edit(ingredient) : null">
     <div class="flex items-center justify-between py-2">
-      <div>
-        <div class="font-medium">{{ ingredient.name }}</div>
-        <div class="text-sm text-gray-500">{{ ingredient.unitPrice | ars }} / {{ ingredient.unit }}</div>
+      <div class="ingredient-list-main">
+        <span class="ingredient-list-icon" aria-hidden="true">{{ getIngredientIcon(ingredient) }}</span>
+        <div>
+          <div class="font-medium">{{ ingredient.name }}</div>
+          <div class="text-sm text-gray-500">{{ ingredient.unitPrice | ars }} / {{ ingredient.unit }}</div>
+        </div>
       </div>
       <div class="text-right flex items-center gap-1">
         <div>

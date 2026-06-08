@@ -1,4 +1,4 @@
-<h2 class="text-xl font-semibold mb-4">Hola! 👋</h2>
+<h2 class="section-heading mb-4">Hola! 👋</h2>
 
 <app-month-nav
   class="mb-4 block"
@@ -114,7 +114,7 @@
 }
 
 @if (recentSales().length > 0) {
-  <h3 class="text-base font-medium mb-2">Últimos pedidos</h3>
+  <h3 class="text-base font-medium mb-2">Últimas ventas</h3>
   <section class="ui-card-surface ui-list">
     @for (sale of recentSales(); track sale.id) {
       <article class="ui-list-item">

@@ -5,7 +5,6 @@ import {
   Ingredient,
   PriceHistory,
   IngredientInput,
-  StockMovementInput,
 } from '../models/ingredient';
 import { SupplyExpense, SupplyExpenseInput } from '../models/supply-expense';
 import { where, orderBy, Timestamp } from '@angular/fire/firestore';
@@ -106,28 +105,33 @@ export const IngredientsStore = signalStore(
       async registerSupplyPurchase(expense: SupplyExpenseInput) {
         patchState(store, { loading: true, error: null });
         try {
-          const expenseId = await fs.addDocument('supplyExpenses', expense as SupplyExpenseInput);
+          const expenseId = fs.createDocumentId('supplyExpenses');
+          const purchaseDate = expense.date ?? Timestamp.now();
 
-          for (const item of expense.items) {
-            const ingredient = store.ingredients().find((candidate) => candidate.id === item.ingredientId);
-            if (!ingredient) continue;
+          const purchaseItems = expense.items
+            .map((item) => {
+              const ingredient = store.ingredients().find((candidate) => candidate.id === item.ingredientId);
+              if (!ingredient) {
+                return null;
+              }
 
-            const newStock = ingredient.currentStock + item.quantity;
-            await fs.updateDocument('ingredients', item.ingredientId, {
-              currentStock: newStock,
-              unitPrice: item.unitPrice,
-              lastPurchase: Timestamp.now(),
-            });
+              return {
+                ingredientId: item.ingredientId,
+                ingredientName: ingredient.name,
+                quantity: item.quantity,
+                unitPrice: item.unitPrice,
+              };
+            })
+            .filter((item): item is NonNullable<typeof item> => item !== null);
 
-            await fs.addDocument<StockMovementInput>('stockMovements', {
-              ingredientId: item.ingredientId,
-              ingredientName: ingredient.name,
-              type: 'purchase',
-              quantity: item.quantity,
-              date: Timestamp.now(),
-              saleId: null,
-            });
-          }
+          await fs.registerSupplyPurchaseAtomic({
+            expenseId,
+            date: purchaseDate,
+            description: expense.description,
+            supplier: expense.supplier,
+            total: expense.total,
+            items: purchaseItems,
+          });
 
           patchState(store, { loading: false });
           return expenseId;

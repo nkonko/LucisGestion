@@ -1,137 +1,78 @@
-You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
 
-## TypeScript Best Practices
+# AGENTS.md
 
-- Use strict type checking
-- Prefer type inference when the type is obvious
-- Avoid the `any` type; use `unknown` when type is uncertain
-- Do NOT add comments to code you write unless the logic is genuinely non-obvious. Never add comments that just restate what the code does.
-- `void` is only valid as a return type or generic type argument. Do NOT use `void` as a property, parameter, or variable type. It IS valid (and expected) as a generic type argument for Angular APIs such as `output<void>()`, `EventEmitter<void>`, `Observable<void>`, `Promise<void>`, etc.
+## Purpose
 
-## Angular Best Practices
+This file describes the repository structure, technology stack, workflow expectations, and installed agent skills for `LucisGestion`.
 
-- Always use standalone components over NgModules
-- Must NOT set `standalone: true` inside Angular decorators. It's the default in Angular v20+.
-- Use signals for state management
-- Implement lazy loading for feature routes
-- This repository must remain free of Angular Material/CDK/Material Icons dependencies. Do NOT introduce `@angular/material`, `@angular/cdk`, `@angular/animations`, `mat-*` APIs, or Material Icons font usage.
-- Do NOT use the `@HostBinding` and `@HostListener` decorators. Put host bindings inside the `host` object of the `@Component` or `@Directive` decorator instead
-- Use `NgOptimizedImage` for all static images.
-  - `NgOptimizedImage` does not work for inline base64 images.
-- Always use separated files for models/types, do not introduce models inside services or components, one interface for file
-- Put models/types on a separate folder called models
+It is not a development styleguide for Angular implementation details. Instead, it should help contributors and automation agents understand:
 
-## PR Review Verification
+- the project architecture
+- the main technologies in use
+- the recommended workflow for this repository
+- which skill should handle Angular-specific implementation questions
+- optional sections that improve agent guidance
 
-- When reviewing PRs, verify recurring static-analysis patterns frequently seen in this repo:
-  - avoid `output<void>()`; use `output()`
-  - avoid generic object injection sinks such as dynamic record lookup objects in component logic
-  - avoid generic variable names like `value`, `targetValue` when storing form input; use domain-specific names like `selectValue`, `statusInput`, or `paymentStatus`
-  - avoid non-null assertions such as `foo!` in component or service code
+## Project Architecture
 
-## Security
+This repository is an Angular workspace built around a single application.
 
-- **Validate inputs:** Avoid storing raw user-provided HTML or untrusted input in plain variables that might be inserted into the DOM. When required, use documented justification, explicit sanitization or whitelisting, and tests that validate safety.
-- **Prefer safe rendering:** Use Angular interpolation (which auto-escapes) or bind to properties such as `textContent` instead of `innerHTML`. If rendering trusted HTML, document the reason, sanitize at the boundary (e.g., with `DomSanitizer`), and include tests.
-- **Handling DOM values:** When extracting values from HTML elements (e.g., `input.value`, `select.value`):
-  1. Sanitize immediately using `DomSanitizer.sanitize(SecurityContext.HTML, value)` in a dedicated private method
-  2. Pass the sanitized result to a validation method
-  3. Never store the raw DOM value in a variable, even temporarily
-  4. Example: `validateStatus(rawValue: string) -> const sanitized = this.sanitizer.sanitize(SecurityContext.HTML, rawValue)`
-- **Variable naming for form inputs:** Use descriptive, specific names that clarify the content type and intent:
-  - Form input values: `selectValue`, `statusInput`, `userInput`, `emailValue`
-  - HTML content: `htmlContent`, `sanitizedHtml`, `trustedHtml`
-  - Avoid ambiguous names: `value`, `targetValue`, `data`, `raw`, `input`
-- **PR checks:** Flag uses of `innerHTML`, direct DOM insertion, or assignments that place unvalidated user input into variables with generic names. Allow exceptions only with clear justification, documented sanitization steps, and tests.
+Key directories:
 
-## Accessibility Requirements
+- `src/app/` — application source code
+- `src/app/features/` — feature modules and feature-related components
+- `src/app/shared/` — shared UI components, pipes, and utilities
+- `src/app/core/` — core services, models, guards, and app-wide utilities
+- `src/styles/` — design tokens, layout helpers, and reusable style utilities
+- `src/environments/` — runtime environment configuration
 
-- It MUST pass all AXE checks.
-- It MUST follow all WCAG AA minimums, including focus management, color contrast, and ARIA attributes.
+Important files:
 
-### Components
+- `angular.json` — workspace configuration
+- `package.json` — dependency and script definitions
+- `tsconfig.json` — TypeScript compiler settings
+- `src/main.ts` — app bootstrap
+- `src/index.html` — application shell
 
-- Keep components small and focused on a single responsibility
-- Use `input()` and `output()` functions instead of decorators
-- Use `computed()` for derived state
-- Set `changeDetection: ChangeDetectionStrategy.OnPush` in `@Component` decorator
-- Prefer inline templates for small components
-- Prefer Reactive forms instead of Template-driven ones
-- Do NOT use `ngClass`, use `class` bindings instead
-- Do NOT use `ngStyle`, use `style` bindings instead
-- When using external templates/styles, use paths relative to the component TS file.
+## Technologies
 
-## State Management
+This repository uses the following technology stack as declared in `package.json`:
 
-- Use signals for local component state
-- Use `computed()` for derived state
-- Keep state transformations pure and predictable
-- Do NOT use `mutate` on signals, use `update` or `set` instead
+- Angular `^21.2.x`
+- Firebase / AngularFire
+- NgRx Signals for reactive state support
+- Tailwind CSS v4
+- ESLint with `angular-eslint`
+- Vitest for unit testing
+- Playwright for browser automation and visual tests
+- PNPM package manager
 
-## Templates
+The repository is a private workspace and does not use Angular Material or CDK as part of the shipped dependencies.
 
-- Keep templates simple and avoid complex logic
-- Use native control flow (`@if`, `@for`, `@switch`) instead of `*ngIf`, `*ngFor`, `*ngSwitch`
-- Use the async pipe to handle observables
-- Do not assume globals like (`new Date()`) are available.
+## Workflow
 
-## Services
+Primary commands:
 
-- Design services around a single responsibility
-- Use the `providedIn: 'root'` option for singleton services
-- Use the `inject()` function instead of constructor injection
+- `pnpm start` — serve the application locally
+- `pnpm test` — run test suite
+- `pnpm lint` — run lint checks
+- `pnpm build` — build the application
+- `pnpm release` — create a release package or deployment bundle
 
-## Styles Architecture
+Guidance for contributors:
 
-### Folder structure
+- Focus on the existing `src/app/` structure and keep new code within the appropriate feature or shared area.
+- Keep changes aligned with the repository's architecture rather than introducing new application-wide patterns without review.
+- Use `pnpm` for installs and scripts to stay consistent with the workspace.
 
-```
-src/
-  styles.scss          <- Global entry point. Import order: external deps, tokens, layout, utilities.
-  styles/
-    _tokens.scss       <- All CSS custom properties (design tokens). Single source of truth for raw values.
-    _layout.scss       <- Page-framing utilities: .page-container, .fab-bottom-right.
-    _utilities.scss    <- Shared presentational helpers: .stock-ok/warning/danger, .touch-card.
-  app/
-    features/
-      component.component.scss   <- Component-scoped styles (one file per component).
-```
+## Don'ts
 
-### Design tokens (`src/styles/_tokens.scss`)
+- No usar nombres de dos letras para inyecciones ni variables. Usa nombres descriptivos.
+- No agregar comentarios inline. El código debe ser autoexplicativo.
+- No tipar con `any`. Si se necesita un tipo, crearlo en `src/app/models/`.
 
-All raw values MUST be defined as CSS custom properties in `_tokens.scss`. Never use hard-coded values (colours, sizes, z-indices, spacing, transitions) directly in component or global stylesheets — always reference a token.
+## Installed Skills
 
-Token naming convention:
+This workspace includes an Angular-focused skill path for implementation support.
 
-- `--color-*` — Semantic colours (wrapping `--mat-sys-*` or brand/status colours). Examples: `--color-primary`, `--color-status-ok`.
-- `--space-*` — 4-pt spacing scale. `--space-1` = 4px, `--space-2` = 8px, `--space-4` = 16px, `--space-6` = 24px.
-- `--size-*` — Named dimensions. Examples: `--size-nav-height`, `--size-page-max-width`.
-- `--z-*` — Z-index scale. `--z-nav` = 1000, `--z-fab` = 100.
-- `--radius-*`— Border radius. `--radius-chip`, `--radius-avatar`.
-- `--transition-*` — Transition durations. `--transition-standard`.
-
-Rules:
-
-- Prefer `--color-*` tokens over `--mat-sys-*` directly in components. `_tokens.scss` wraps Material tokens so all colour decisions live in one file.
-- When adding a new colour, size, or spacing value add it to `_tokens.scss` first, then reference it everywhere.
-
-### Component styles
-
-- Always use `styleUrl` with a separate `.scss` file. Never use the `styles: [...]` inline array.
-- The `.scss` file must sit next to the `.ts` file with a relative path: `styleUrl: './my.component.scss'`
-- Component stylesheets can reference global tokens directly (CSS custom properties are global by nature, no import needed).
-- Do NOT duplicate styles already in `_utilities.scss` or `_layout.scss`. Apply those global classes in the template instead.
-
-### Global vs. component styles decision guide
-
-- Raw value (colour hex, px size, z-index number) -> `_tokens.scss`
-- Page-level structural helper used in multiple features -> `_layout.scss`
-- Presentational helper used across 2 or more components -> `_utilities.scss`
-- Styles exclusively used by one component -> `component.component.scss`
-
-### Tailwind CSS
-
-- Tailwind utility classes are available globally via `@use 'tailwindcss'` in `styles.scss`.
-- Prefer Tailwind classes for spacing, flex/grid, typography, and colour utilities in templates.
-- When a Tailwind class is not sufficient (e.g. must override Angular Material, needs a CSS variable, or requires a pseudo-selector), use a scoped component `.scss` file.
-- Do NOT redefine Tailwind utility names (like `.w-20`, `.flex`) as custom CSS rules unless overriding Angular Material within a component.
+- `angular-developer` — use this skill for Angular-specific development guidance and code generation.[see](.agents/skills/angular-developer)

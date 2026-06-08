@@ -16,14 +16,10 @@
 }
 
 .ui-modal-panel {
-  background: var(--color-surface);
-  color: var(--color-on-surface);
-  border: var(--border-width-thin) solid color-mix(in srgb, var(--color-outline-variant) 70%, transparent);
-  border-radius: var(--space-3);
   padding: 0;
   overflow: auto;
-  box-shadow: var(--shadow-modal);
   width: min(100%, 560px);
+  max-height: 90vh;
 }
 
 @media (max-width: 640px) {
