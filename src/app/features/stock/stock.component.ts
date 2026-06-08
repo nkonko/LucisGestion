@@ -1,17 +1,20 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NotificationService } from '../../core/services/notification.service';
 import { IngredientsStore } from '../../core/store/ingredients.store';
-import { Ingredient } from '../../core/models/ingredient';
+import { DEFAULT_INGREDIENT_ICON, Ingredient } from '../../core/models/ingredient';
 import { getStockPriority } from '../../core/utils/stock.utils';
 import { IngredientFormComponent } from '../ingredients/ingredient-form.component';
-import { DialogService } from '../../core/services/dialog.service';
 import { UiIconComponent } from '../../shared/ui/components';
 import { AuthStore } from '../../core/store/auth.store';
+import { BottomSheetService } from '../../core/services/bottom-sheet.service';
+
+type StockFilter = 'all' | 'low' | 'empty';
 
 @Component({
   selector: 'app-stock',
-  imports: [RouterLink, UiIconComponent],
+  imports: [DecimalPipe, RouterLink, UiIconComponent],
   templateUrl: './stock.component.html',
   styleUrl: './stock.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -19,10 +22,41 @@ import { AuthStore } from '../../core/store/auth.store';
 export class StockComponent {
   readonly store = inject(IngredientsStore);
   readonly auth = inject(AuthStore);
-  private dialog = inject(DialogService);
+  private bottomSheet = inject(BottomSheetService);
   private notify = inject(NotificationService);
 
+  searchTerm = signal('');
+  selectedFilter = signal<StockFilter>('all');
+
   sortedIngredients = this.store.ingredientsSortedByStock;
+  lowStockCount = computed(() => this.sortedIngredients().filter((item) => getStockPriority(item) === 1).length);
+  emptyStockCount = computed(() => this.sortedIngredients().filter((item) => getStockPriority(item) === 0).length);
+
+  filteredIngredients = computed(() => {
+    const term = this.searchTerm().toLowerCase().trim();
+    const filter = this.selectedFilter();
+
+    return this.sortedIngredients().filter((item) => {
+      const matchesTerm = !term || item.name.toLowerCase().includes(term) || item.category.toLowerCase().includes(term);
+      if (!matchesTerm) return false;
+      if (filter === 'low') return getStockPriority(item) === 1;
+      if (filter === 'empty') return getStockPriority(item) === 0;
+      return true;
+    });
+  });
+
+  onSearchInput(event: Event): void {
+    const value = (event.target as HTMLInputElement).value.trim();
+    this.searchTerm.set(value);
+  }
+
+  selectFilter(filter: StockFilter): void {
+    this.selectedFilter.set(filter);
+  }
+
+  getIngredientIcon(item: Ingredient): string {
+    return item.icon || DEFAULT_INGREDIENT_ICON;
+  }
 
   getStockClass(item: Ingredient): string {
     switch (getStockPriority(item)) {
@@ -38,9 +72,9 @@ export class StockComponent {
   getStockLabel(item: Ingredient): string {
     switch (getStockPriority(item)) {
       case 0:
-        return 'SIN STOCK';
+        return 'Sin stock';
       case 1:
-        return 'REPONER';
+        return 'Reponer';
       default:
         return 'OK';
     }
@@ -49,23 +83,13 @@ export class StockComponent {
   getStockPercent(item: Ingredient): number {
     if (item.minimumStock <= 0) return 100;
     const percent = (item.currentStock / (item.minimumStock * 3)) * 100;
-    return Math.min(percent, 100);
-  }
-
-  getStockBarClass(item: Ingredient): string {
-    switch (getStockPriority(item)) {
-      case 0:
-        return 'bg-red-500';
-      case 1:
-        return 'bg-orange-400';
-      default:
-        return 'bg-green-500';
-    }
+    return Math.min(Math.max(percent, 0), 100);
   }
 
   create(): void {
-    const dialogRef = this.dialog.open<null, Ingredient>(IngredientFormComponent, {
-      maxWidth: '500px',
+    const dialogRef = this.bottomSheet.open<null, Ingredient>(IngredientFormComponent, {
+      maxWidth: '760px',
+      maxHeight: '90vh',
       data: null,
     });
 
@@ -78,8 +102,9 @@ export class StockComponent {
   }
 
   edit(ingredient: Ingredient): void {
-    const dialogRef = this.dialog.open<Ingredient, Ingredient | 'delete'>(IngredientFormComponent, {
-      maxWidth: '500px',
+    const dialogRef = this.bottomSheet.open<Ingredient, Ingredient | 'delete'>(IngredientFormComponent, {
+      maxWidth: '760px',
+      maxHeight: '90vh',
       data: ingredient,
     });
 

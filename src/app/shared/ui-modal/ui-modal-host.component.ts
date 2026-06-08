@@ -37,7 +37,8 @@ export class UiModalHostComponent implements AfterViewInit {
 
   readonly panelClasses = computed(() => {
     const customClass = this.panelClass();
-    return customClass ? `ui-modal-panel ${customClass}` : 'ui-modal-panel';
+    const baseClasses = 'ui-modal-panel ui-card-surface';
+    return customClass ? `${baseClasses} ${customClass}` : baseClasses;
   });
 
   ngAfterViewInit(): void {

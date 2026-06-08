@@ -8,3 +8,5 @@ export type { RecipeIngredient } from './recipe-ingredient.model';
 export type { MovementType } from './movement-type.model';
 export { UNIT_DISPLAY } from './measurement-unit.model';
 export type { MeasurementUnit } from './measurement-unit.model';
+export { DEFAULT_INGREDIENT_ICON, INGREDIENT_ICON_OPTIONS } from './ingredient-icon.model';
+export type { IngredientIcon, IngredientIconOption } from './ingredient-icon.model';
