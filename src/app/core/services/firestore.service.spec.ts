@@ -21,6 +21,7 @@ describe('FirestoreService', () => {
   let service: FirestoreService;
 
   beforeEach(() => {
+    vi.restoreAllMocks();
     TestBed.configureTestingModule({ providers: [FirestoreService, { provide: Firestore, useValue: {} }] });
     service = TestBed.inject(FirestoreService);
   });
@@ -52,6 +53,7 @@ describe('FirestoreService', () => {
     mockedAfs.runTransaction.mockImplementation(async (_db: unknown, cb: unknown) => (cb as (ctx: unknown) => Promise<void>)({ get, update, set } as never));
     mockedAfs.doc.mockReturnValue({} as never);
     mockedAfs.collection.mockReturnValue({} as never);
+    mockedAfs.Timestamp.now = vi.fn().mockReturnValue({} as never);
 
     await service.applyStockAdjustments('sale-1', 'sale_deduction', [
       { ingredientId: 'ing-1', ingredientName: 'Harina', delta: -5 },
