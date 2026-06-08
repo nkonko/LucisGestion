@@ -1,5 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { DomSanitizer, SecurityContext } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { NotificationService } from '../../core/services/notification.service';
 import { IngredientsStore } from '../../core/store/ingredients.store';
@@ -22,6 +23,7 @@ type StockFilter = 'all' | 'low' | 'empty';
 export class StockComponent {
   readonly store = inject(IngredientsStore);
   readonly auth = inject(AuthStore);
+  private sanitizer = inject(DomSanitizer);
   private bottomSheet = inject(BottomSheetService);
   private notify = inject(NotificationService);
 
@@ -47,7 +49,9 @@ export class StockComponent {
 
   onSearchInput(event: Event): void {
     const htmlTarget = event.target as HTMLInputElement | null;
-    this.searchTerm.set(htmlTarget?.value ?? '');
+    const raw = htmlTarget?.value ?? '';
+    const sanitized = this.sanitizer.sanitize(SecurityContext.HTML, raw) ?? '';
+    this.searchTerm.set(sanitized);
   }
 
   selectFilter(filter: StockFilter): void {

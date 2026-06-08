@@ -101,7 +101,9 @@ export class SalesComponent {
 
   onSearchInput(event: Event): void {
     const htmlTarget = event.target as HTMLInputElement | null;
-    this.searchTerm.set(htmlTarget?.value ?? '');
+    const raw = htmlTarget?.value ?? '';
+    const sanitized = this.sanitizer.sanitize(SecurityContext.HTML, raw) ?? '';
+    this.searchTerm.set(sanitized);
   }
 
   onDateFromInput(event: Event): void {
