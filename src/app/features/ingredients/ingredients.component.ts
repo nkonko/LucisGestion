@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, SecurityContext, signal } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { NotificationService } from '../../core/services/notification.service';
 import { IngredientsStore } from '../../core/store/ingredients.store';
 import { DEFAULT_INGREDIENT_ICON, Ingredient } from '../../core/models/ingredient';
@@ -22,7 +21,6 @@ export class IngredientsComponent {
   readonly auth = inject(AuthStore);
   private dialog = inject(DialogService);
   private notify = inject(NotificationService);
-  private sanitizer = inject(DomSanitizer);
 
   searchTerm = signal('');
 
@@ -35,9 +33,8 @@ export class IngredientsComponent {
 
   onSearchInput(event: Event): void {
     const htmlTarget = event.target as HTMLInputElement | null;
-    const raw = htmlTarget?.value ?? '';
-    const sanitized = this.sanitizer.sanitize(SecurityContext.HTML, raw) ?? '';
-    this.searchTerm.set(sanitized);
+    const userInput = htmlTarget?.value ?? '';
+    this.searchTerm.set(userInput);
   }
 
 

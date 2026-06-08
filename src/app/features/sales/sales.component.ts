@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, SecurityContext, signal } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { NotificationService } from '../../core/services/notification.service';
 import { SalesStore } from '../../core/store/sales.store';
 import { CustomersStore } from '../../core/store/customers.store';
@@ -24,7 +23,6 @@ export class SalesComponent {
   private whatsApp = inject(WhatsAppService);
   private bottomSheet = inject(BottomSheetService);
   private notify = inject(NotificationService);
-  private sanitizer = inject(DomSanitizer);
 
   statusDisplay: Record<SaleStatus, string> = SALE_STATUS_DISPLAY;
 
@@ -101,9 +99,8 @@ export class SalesComponent {
 
   onSearchInput(event: Event): void {
     const htmlTarget = event.target as HTMLInputElement | null;
-    const raw = htmlTarget?.value ?? '';
-    const sanitized = this.sanitizer.sanitize(SecurityContext.HTML, raw) ?? '';
-    this.searchTerm.set(sanitized);
+    const userInput = htmlTarget?.value ?? '';
+    this.searchTerm.set(userInput);
   }
 
   onDateFromInput(event: Event): void {
@@ -129,14 +126,14 @@ export class SalesComponent {
   }
 
   private validateStatus(rawValue: string): SaleStatus | null {
-    const sanitized = this.sanitizer.sanitize(SecurityContext.HTML, rawValue) || '';
+    const userInput = rawValue.trim();
     const validStatuses: SaleStatus[] = ['pending', 'production', 'delivered', 'cancelled'];
-    return validStatuses.includes(sanitized as SaleStatus) ? (sanitized as SaleStatus) : null;
+    return validStatuses.includes(userInput as SaleStatus) ? (userInput as SaleStatus) : null;
   }
 
   private validatePaymentStatus(rawValue: string): 'paid' | 'unpaid' | null {
-    const sanitized = this.sanitizer.sanitize(SecurityContext.HTML, rawValue) || '';
-    return sanitized === 'paid' ? 'paid' : sanitized === 'unpaid' ? 'unpaid' : null;
+    const userInput = rawValue.trim();
+    return userInput === 'paid' ? 'paid' : userInput === 'unpaid' ? 'unpaid' : null;
   }
 
   clearFilters(): void {
