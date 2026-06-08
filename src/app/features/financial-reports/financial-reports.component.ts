@@ -81,7 +81,7 @@ export class FinancialReportsComponent {
   );
 
   readonly topProducts = computed(() => {
-    const sales = this.salesStore.sales();
+    const sales = this.financialInsights.periodSales();
     const productMap = new Map<string, { name: string; quantity: number; revenue: number; cost: number }>();
 
     for (const sale of sales) {

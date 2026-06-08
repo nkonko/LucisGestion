@@ -4,7 +4,6 @@ import { IngredientsStore } from '../store/ingredients.store';
 import { RecipesStore } from '../store/recipes.store';
 import { Ingredient } from '../models/ingredient';
 import { Recipe } from '../models/recipe';
-import type { RecipeCategory } from '../models/recipe';
 import type { MeasurementUnit } from '../models/ingredient';
 import type { IngredientCategory } from '../models/ingredient';
 
@@ -171,7 +170,7 @@ describe('StockService', () => {
         ],
       );
 
-      expect(() => service.validateStockForCreation([{ recipeId: 'rec-1', quantity: 3 }])).not.toThrow();
+      expect(() => { service.validateStockForCreation([{ recipeId: 'rec-1', quantity: 3 }]); }).not.toThrow();
     });
 
     it('throws when stock is insufficient', () => {
@@ -190,7 +189,7 @@ describe('StockService', () => {
         ],
       );
 
-      expect(() => service.validateStockForCreation([{ recipeId: 'rec-1', quantity: 3 }]))
+      expect(() => { service.validateStockForCreation([{ recipeId: 'rec-1', quantity: 3 }]); })
         .toThrow('Stock insuficiente para registrar la venta: Harina (faltan 3.00 kg)');
     });
 
@@ -210,13 +209,13 @@ describe('StockService', () => {
         ],
       );
 
-      expect(() => service.validateStockForCreation([{ recipeId: 'rec-1', quantity: 3 }]))
+      expect(() => { service.validateStockForCreation([{ recipeId: 'rec-1', quantity: 3 }]); })
         .toThrow('faltan 6.00');
     });
 
     it('passes with no items', () => {
       configure([], []);
-      expect(() => service.validateStockForCreation([])).not.toThrow();
+      expect(() => { service.validateStockForCreation([]); }).not.toThrow();
     });
   });
 
@@ -237,12 +236,12 @@ describe('StockService', () => {
         ],
       );
 
-      expect(() =>
+      expect(() => {
         service.validateStockForEdition(
           [{ recipeId: 'rec-1', quantity: 1 }],
           [{ recipeId: 'rec-1', quantity: 5 }],
-        ),
-      ).not.toThrow();
+        );
+      }).not.toThrow();
     });
 
     it('throws when extra needed exceeds stock', () => {
@@ -261,12 +260,12 @@ describe('StockService', () => {
         ],
       );
 
-      expect(() =>
+      expect(() => {
         service.validateStockForEdition(
           [{ recipeId: 'rec-1', quantity: 1 }],
           [{ recipeId: 'rec-1', quantity: 10 }],
-        ),
-      ).toThrow('Stock insuficiente para modificar la venta');
+        );
+      }).toThrow('Stock insuficiente para modificar la venta');
     });
 
     it('passes when quantity decreases', () => {
@@ -285,12 +284,12 @@ describe('StockService', () => {
         ],
       );
 
-      expect(() =>
+      expect(() => {
         service.validateStockForEdition(
           [{ recipeId: 'rec-1', quantity: 5 }],
           [{ recipeId: 'rec-1', quantity: 1 }],
-        ),
-      ).not.toThrow();
+        );
+      }).not.toThrow();
     });
   });
 });

@@ -38,7 +38,7 @@ export class FinancialInsightsService {
     () => new Map(this.customersStore.customers().map((customer) => [customer.id, customer.name] as const)),
   );
 
-  private periodSales = computed(() => {
+  readonly periodSales = computed(() => {
     const period = this.dashboardStore.selectedPeriod();
     const selectedDate = this.dashboardStore.selectedDate();
     const start = getPeriodStart(period, selectedDate);

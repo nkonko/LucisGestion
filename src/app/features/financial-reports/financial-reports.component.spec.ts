@@ -79,6 +79,7 @@ describe('FinancialReportsComponent', () => {
             expenseAnomalies: expenseAnomaliesSignal,
             priorityCustomers: priorityCustomersSignal,
             selectedMonthKey: () => '2026-01',
+            periodSales: salesSignal,
           },
         },
         {
@@ -335,8 +336,8 @@ describe('FinancialReportsComponent', () => {
     it('calls setPeriod on store when a period button is clicked', () => {
       const store = TestBed.inject(DashboardStore) as unknown as { setPeriod: ReturnType<typeof vi.fn> };
       const buttons = fixture.nativeElement.querySelectorAll('.period-btn');
-      const hoyBtn = Array.from(buttons as NodeListOf<HTMLElement>).find(b => b.textContent?.includes('Hoy')) as HTMLElement;
-      hoyBtn.click();
+      const hoyButton = Array.from(buttons as NodeListOf<HTMLElement>).find((b) => { return Boolean(b.textContent?.includes('Hoy')); }) as HTMLElement;
+      hoyButton.click();
       expect(store.setPeriod).toHaveBeenCalledWith('today');
     });
 
@@ -344,8 +345,8 @@ describe('FinancialReportsComponent', () => {
       selectedPeriodSignal.set('year');
       fixture.detectChanges();
       const buttons = fixture.nativeElement.querySelectorAll('.period-btn');
-      const activeBtn = Array.from(buttons as NodeListOf<HTMLElement>).find(b => b.classList.contains('period-btn--active'));
-      expect(activeBtn?.textContent).toContain('Año');
+      const activeButton = Array.from(buttons as NodeListOf<HTMLElement>).find((b) => { return b.classList.contains('period-btn--active'); });
+      expect(activeButton?.textContent).toContain('Año');
     });
   });
 
