@@ -335,8 +335,8 @@ describe('FinancialReportsComponent', () => {
 
     it('calls setPeriod on store when a period button is clicked', () => {
       const store = TestBed.inject(DashboardStore) as unknown as { setPeriod: ReturnType<typeof vi.fn> };
-      const buttons = fixture.nativeElement.querySelectorAll('.period-btn') as NodeListOf<HTMLButtonElement>;
-      const hoyButton = buttons[0];
+      const buttons = fixture.nativeElement.querySelectorAll('.period-btn') as NodeListOf<HTMLElement>;
+      const hoyButton = buttons[0] as HTMLElement;
       hoyButton.click();
       expect(store.setPeriod).toHaveBeenCalledWith('today');
     });
@@ -344,9 +344,9 @@ describe('FinancialReportsComponent', () => {
     it('highlights the active period button', () => {
       selectedPeriodSignal.set('year');
       fixture.detectChanges();
-      const buttons = fixture.nativeElement.querySelectorAll('.period-btn') as NodeListOf<HTMLButtonElement>;
-      const activeButton = buttons[3];
-      expect(activeButton?.textContent).toContain('Año');
+      const buttons = fixture.nativeElement.querySelectorAll('.period-btn') as NodeListOf<HTMLElement>;
+      const activeButton = buttons[3] as HTMLElement;
+      expect(activeButton.textContent).toContain('Año');
     });
   });
 
