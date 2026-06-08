@@ -103,6 +103,23 @@ export class MockFirestoreService {
     col.next(col.value.filter((item) => (item as MockDocument).id !== id));
   }
 
+  async clearCustomerReferencesInSales(customerId: string): Promise<void> {
+    const salesCol = this.getOrCreate('sales');
+    salesCol.next(
+      salesCol.value.map((item) => {
+        const sale = item as MockDocument;
+        if (sale['customerId'] !== customerId) {
+          return sale;
+        }
+        return {
+          ...sale,
+          customerId: null,
+          customerName: '',
+        };
+      }),
+    );
+  }
+
   async softDelete(path: string, id: string): Promise<void> {
     const col = this.getOrCreate(path);
     col.next(

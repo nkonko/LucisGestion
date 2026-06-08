@@ -9,6 +9,7 @@ import {
   getDocs,
   updateDoc,
   query,
+  where,
   runTransaction,
   Timestamp,
   writeBatch,
@@ -43,6 +44,7 @@ interface FirestoreApi {
   doc: typeof doc;
   getDocs: typeof getDocs;
   query: typeof query;
+  where: typeof where;
   runTransaction: typeof runTransaction;
   timestampNow: typeof Timestamp.now;
   updateDoc: typeof updateDoc;
@@ -59,6 +61,7 @@ export const FIRESTORE_API = new InjectionToken<FirestoreApi>('Firestore API', {
     doc,
     getDocs,
     query,
+    where,
     runTransaction,
     timestampNow: Timestamp.now,
     updateDoc,
@@ -187,6 +190,25 @@ export class FirestoreService {
   async deleteDocument(path: string, id: string): Promise<void> {
     const ref = this.firestoreApi.doc(this.firestore, path, id);
     await this.firestoreApi.deleteDoc(ref);
+  }
+
+  async clearCustomerReferencesInSales(customerId: string): Promise<void> {
+    const salesRef = this.firestoreApi.collection(this.firestore, 'sales');
+    const salesQuery = this.firestoreApi.query(
+      salesRef,
+      this.firestoreApi.where('customerId', '==', customerId),
+    );
+    const salesSnapshot = await this.firestoreApi.getDocs(salesQuery);
+
+    const salesIds = salesSnapshot.docs.map((docSnapshot) => docSnapshot.id);
+    for (const chunk of this.chunk(salesIds, 450)) {
+      const batch = this.firestoreApi.writeBatch(this.firestore);
+      for (const saleId of chunk) {
+        const saleRef = this.firestoreApi.doc(this.firestore, 'sales', saleId);
+        batch.update(saleRef, { customerId: null, customerName: '' });
+      }
+      await batch.commit();
+    }
   }
 
   async softDelete(path: string, id: string): Promise<void> {

@@ -18,6 +18,8 @@ import { SalesCardComponent } from './sales-card/sales-card.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SalesComponent {
+  private static readonly DELETED_CUSTOMER_NAME = '[eliminado]';
+
   readonly store = inject(SalesStore);
   private customersStore = inject(CustomersStore);
   private whatsApp = inject(WhatsAppService);
@@ -32,7 +34,12 @@ export class SalesComponent {
   selectedStatus = signal<SaleStatus | null>(null);
   selectedPaymentStatus = signal<'paid' | 'unpaid' | null>(null);
 
-  readonly customers = computed(() => this.customersStore.customers());
+  readonly customers = computed(() =>
+    this.customersStore
+      .customers()
+      .filter((customer) => customer.name !== SalesComponent.DELETED_CUSTOMER_NAME),
+  );
+  private readonly customersById = computed(() => new Map(this.customers().map((customer) => [customer.id, customer])));
   readonly dateFromValue = computed(() => {
     const date = this.dateFrom();
     if (!date) return '';
@@ -78,6 +85,15 @@ export class SalesComponent {
     if (paymentStatus) {
       items = items.filter((v) => (paymentStatus === 'paid' ? v.isPaid === true : v.isPaid !== true));
     }
+
+    items = items.map((sale) => {
+      const customerFromStore = sale.customerId ? this.customersById().get(sale.customerId) : undefined;
+      const normalizedCustomerName =
+        customerFromStore?.name ??
+        (sale.customerName === SalesComponent.DELETED_CUSTOMER_NAME ? '' : sale.customerName);
+
+      return { ...sale, customerName: normalizedCustomerName };
+    });
 
     if (!this.hasActiveFilters()) {
       const statusPriority: Record<SaleStatus, number> = {
@@ -215,7 +231,8 @@ export class SalesComponent {
   sendWhatsApp(sale: Sale): void {
     const customer = this.customersStore.customers().find((c) => c.id === sale.customerId);
     const items = sale.items.map((i) => `${i.quantity}x ${i.name}`).join('\n');
-    const msg = `Hola ${sale.customerName}! 🧁\n\nTu pedido de Lucis Pastelería:\n${items}\n\nTotal: $${sale.total}\n\n¡Gracias!`;
+    const customerName = sale.customerName.trim() || customer?.name || 'cliente';
+    const msg = `Hola ${customerName}! 🧁\n\nTu pedido de Lucis Pastelería:\n${items}\n\nTotal: $${sale.total}\n\n¡Gracias!`;
     this.whatsApp.sendMessage(customer?.phone ?? '', msg);
   }
 

@@ -16,6 +16,7 @@ describe('FirestoreService', () => {
     doc: ReturnType<typeof vi.fn>;
     getDocs: ReturnType<typeof vi.fn>;
     query: ReturnType<typeof vi.fn>;
+    where: ReturnType<typeof vi.fn>;
     runTransaction: ReturnType<typeof vi.fn>;
     timestampNow: ReturnType<typeof vi.fn>;
     updateDoc: ReturnType<typeof vi.fn>;
@@ -35,6 +36,7 @@ describe('FirestoreService', () => {
       doc: vi.fn(),
       getDocs: vi.fn(),
       query: vi.fn(),
+      where: vi.fn(),
       runTransaction: vi.fn(),
       timestampNow: vi.fn().mockReturnValue({}),
       updateDoc: vi.fn(),
@@ -149,5 +151,33 @@ describe('FirestoreService', () => {
     expect(set).toHaveBeenCalled();
     expect(del).toHaveBeenCalled();
     expect(del).not.toHaveBeenCalledWith(expect.objectContaining({ path: expect.stringContaining('existing-1') }));
+  });
+
+  it('clearCustomerReferencesInSales nulls customer fields in matching sales', async () => {
+    firestoreApi.collection.mockReturnValue({} as never);
+    firestoreApi.where.mockReturnValue({} as never);
+    firestoreApi.query.mockReturnValue({} as never);
+    firestoreApi.getDocs.mockResolvedValue(buildQuerySnapshot(['sale-1', 'sale-2']) as never);
+    firestoreApi.doc.mockImplementation((...args: unknown[]) => ({ path: args.join('/') }) as never);
+
+    const update = vi.fn();
+    const commit = vi.fn().mockResolvedValue(undefined);
+    firestoreApi.writeBatch.mockImplementation(() => ({ update, commit }) as never);
+
+    await service.clearCustomerReferencesInSales('customer-1');
+
+    expect(firestoreApi.where).toHaveBeenCalledWith('customerId', '==', 'customer-1');
+    expect(update).toHaveBeenCalledTimes(2);
+    expect(update).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ path: expect.stringContaining('sales/sale-1') }),
+      { customerId: null, customerName: '' },
+    );
+    expect(update).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ path: expect.stringContaining('sales/sale-2') }),
+      { customerId: null, customerName: '' },
+    );
+    expect(commit).toHaveBeenCalled();
   });
 });
