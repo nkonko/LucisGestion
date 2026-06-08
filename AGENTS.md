@@ -65,6 +65,12 @@ Guidance for contributors:
 - Keep changes aligned with the repository's architecture rather than introducing new application-wide patterns without review.
 - Use `pnpm` for installs and scripts to stay consistent with the workspace.
 
+## Don'ts
+
+- No usar nombres de dos letras para inyecciones ni variables. Usa nombres descriptivos.
+- No agregar comentarios inline. El código debe ser autoexplicativo.
+- No tipar con `any`. Si se necesita un tipo, crearlo en `src/app/models/`.
+
 ## Installed Skills
 
 This workspace includes an Angular-focused skill path for implementation support.

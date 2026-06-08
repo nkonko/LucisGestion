@@ -7,3 +7,9 @@ export { UiSelectComponent } from './ui-select/ui-select.component';
 export { UiToastComponent } from './ui-toast/ui-toast.component';
 
 export { UiIconComponent } from './ui-icon/ui-icon.component';
+
+export { KpiCardComponent } from './kpi-card/kpi-card.component';
+export type { KpiVariant } from './kpi-card/kpi-card.component';
+
+export { InsightCardComponent } from './insight-card/insight-card.component';
+export type { InsightVariant } from './insight-card/insight-card.component';

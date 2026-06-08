@@ -78,9 +78,19 @@ export class DashboardMetricsService {
 
   readonly periodVariableExpenses = computed(() => this.monthlyExpenses());
 
-  readonly periodFixedCosts = computed(() =>
-    this.fixedCostsStore.totalForMonth(this.selectedMonthKey()),
-  );
+  readonly periodFixedCosts = computed(() => {
+    const period = this.dashboardStore.selectedPeriod();
+    if (period === 'year') {
+      const { year } = this.dashboardStore.selectedDate();
+      let total = 0;
+      for (let m = 0; m < 12; m++) {
+        const key = `${year}-${String(m + 1).padStart(2, '0')}`;
+        total += this.fixedCostsStore.totalForMonth(key);
+      }
+      return total;
+    }
+    return this.fixedCostsStore.totalForMonth(this.selectedMonthKey());
+  });
 
   readonly totalPeriodExpenses = computed(
     () => this.periodVariableExpenses() + this.periodFixedCosts(),

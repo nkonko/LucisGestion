@@ -18,6 +18,8 @@ describe('FirestoreService', () => {
   };
 
   beforeEach(() => {
+    vi.restoreAllMocks();
+    TestBed.configureTestingModule({ providers: [FirestoreService, { provide: Firestore, useValue: {} }] });
     firestoreApi = {
       addDoc: vi.fn(),
       collection: vi.fn(),
