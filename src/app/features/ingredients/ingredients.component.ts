@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { DomSanitizer, SecurityContext } from '@angular/platform-browser';
+import { ChangeDetectionStrategy, Component, computed, inject, SecurityContext, signal } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { NotificationService } from '../../core/services/notification.service';
 import { IngredientsStore } from '../../core/store/ingredients.store';
 import { DEFAULT_INGREDIENT_ICON, Ingredient } from '../../core/models/ingredient';

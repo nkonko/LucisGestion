@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { DomSanitizer, SecurityContext } from '@angular/platform-browser';
+import { ChangeDetectionStrategy, Component, computed, inject, SecurityContext, signal } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { NotificationService } from '../../core/services/notification.service';
 import { CustomersStore } from '../../core/store/customers.store';
 import { WhatsAppService } from '../../core/services/whatsapp.service';
