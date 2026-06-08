@@ -1,5 +1,6 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { FinancialReportsComponent } from './financial-reports.component';
 import { FinancialInsightsService } from '../../core/services/financial-insights.service';
 import { DashboardMetricsService } from '../../core/services/dashboard-metrics.service';
@@ -335,18 +336,18 @@ describe('FinancialReportsComponent', () => {
 
     it('calls setPeriod on store when a period button is clicked', () => {
       const store = TestBed.inject(DashboardStore) as unknown as { setPeriod: ReturnType<typeof vi.fn> };
-      const buttonElements = fixture.nativeElement.querySelectorAll('.period-btn') as NodeListOf<HTMLElement>;
-      const hoyButtonElement = buttonElements[0] as HTMLElement;
-      hoyButtonElement.click();
+      const debugButtons = fixture.debugElement.queryAll(By.css('.period-btn'));
+      const hoyDebug = debugButtons[0];
+      hoyDebug.triggerEventHandler('click', null);
       expect(store.setPeriod).toHaveBeenCalledWith('today');
     });
 
     it('highlights the active period button', () => {
       selectedPeriodSignal.set('year');
       fixture.detectChanges();
-      const buttonElements = fixture.nativeElement.querySelectorAll('.period-btn') as NodeListOf<HTMLElement>;
-      const activeButtonElement = buttonElements[3] as HTMLElement;
-      expect(activeButtonElement.textContent).toContain('Año');
+      const debugButtons = fixture.debugElement.queryAll(By.css('.period-btn'));
+      const activeDebug = debugButtons.find((db) => db.nativeElement.classList.contains('period-btn--active'));
+      expect(activeDebug?.nativeElement.textContent).toContain('Año');
     });
   });
 
