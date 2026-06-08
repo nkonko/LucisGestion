@@ -46,9 +46,8 @@ export class StockComponent {
   });
 
   onSearchInput(event: Event): void {
-    const htmlTarget = event.target as HTMLInputElement | null;
-    const userInput = htmlTarget?.value ?? '';
-    this.searchTerm.set(userInput);
+    const value = (event.target as HTMLInputElement)?.value?.trim() ?? '';
+    this.searchTerm.set(value);
   }
 
   selectFilter(filter: StockFilter): void {

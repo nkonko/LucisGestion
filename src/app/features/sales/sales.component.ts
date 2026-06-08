@@ -98,9 +98,8 @@ export class SalesComponent {
   });
 
   onSearchInput(event: Event): void {
-    const htmlTarget = event.target as HTMLInputElement | null;
-    const userInput = htmlTarget?.value ?? '';
-    this.searchTerm.set(userInput);
+    const value = (event.target as HTMLInputElement)?.value?.trim() ?? '';
+    this.searchTerm.set(value);
   }
 
   onDateFromInput(event: Event): void {
@@ -126,14 +125,14 @@ export class SalesComponent {
   }
 
   private validateStatus(rawValue: string): SaleStatus | null {
-    const userInput = rawValue.trim();
+    const value = rawValue.trim();
     const validStatuses: SaleStatus[] = ['pending', 'production', 'delivered', 'cancelled'];
-    return validStatuses.includes(userInput as SaleStatus) ? (userInput as SaleStatus) : null;
+    return validStatuses.includes(value as SaleStatus) ? (value as SaleStatus) : null;
   }
 
   private validatePaymentStatus(rawValue: string): 'paid' | 'unpaid' | null {
-    const userInput = rawValue.trim();
-    return userInput === 'paid' ? 'paid' : userInput === 'unpaid' ? 'unpaid' : null;
+    const value = rawValue.trim();
+    return value === 'paid' ? 'paid' : value === 'unpaid' ? 'unpaid' : null;
   }
 
   clearFilters(): void {
