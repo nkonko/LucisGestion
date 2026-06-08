@@ -1,8 +1,7 @@
 <section class="stock-page">
   <header class="stock-hero">
     <div>
-      <p class="stock-hero__eyebrow">Inventario</p>
-      <h1>Stock</h1>
+      <h1 class="section-heading">Stock</h1>
       <p>{{ sortedIngredients().length }} ingrediente(s)</p>
     </div>
     <a class="stock-hero__link" routerLink="/ingredientes">
@@ -37,7 +36,7 @@
 
   <div class="stock-list">
     @for (item of filteredIngredients(); track item.id) {
-      <article class="stock-card" [class.stock-card--readonly]="!auth.isOwner()" (click)="auth.isOwner() ? edit(item) : null">
+      <article class="stock-card ui-card-surface touch-card" [class.stock-card--readonly]="!auth.isOwner()" (click)="auth.isOwner() ? edit(item) : null">
         <div class="stock-card__icon" aria-hidden="true">
           {{ getIngredientIcon(item) }}
         </div>

@@ -50,6 +50,7 @@ export class IngredientsComponent {
   create(): void {
     const dialogRef = this.dialog.open<null, Ingredient>(IngredientFormComponent, {
       maxWidth: '500px',
+      maxHeight: '90vh',
       data: null,
     });
 
@@ -64,6 +65,7 @@ export class IngredientsComponent {
   edit(ingredient: Ingredient): void {
     const dialogRef = this.dialog.open<Ingredient, Ingredient | 'delete'>(IngredientFormComponent, {
       maxWidth: '500px',
+      maxHeight: '90vh',
       data: ingredient,
     });
 

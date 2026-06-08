@@ -22,14 +22,6 @@
     margin: 0;
   }
 
-  h1 {
-    color: var(--color-on-surface);
-    font-size: clamp(2.25rem, 8vw, 3.75rem);
-    font-weight: 900;
-    letter-spacing: -0.06em;
-    line-height: 0.95;
-  }
-
   p:not(.stock-hero__eyebrow) {
     color: var(--color-on-surface-variant);
     font-size: clamp(1.05rem, 4vw, 1.45rem);
@@ -113,7 +105,7 @@
     cursor: pointer;
     display: inline-flex;
     flex: 0 0 auto;
-    font-weight: 800;
+    font-weight: 700;
     gap: var(--space-2);
     padding: var(--space-2) var(--space-4);
     transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
@@ -147,9 +139,6 @@
 
 .stock-card {
   align-items: stretch;
-  background: var(--color-surface);
-  border: var(--border-width-thin) solid var(--color-outline-variant);
-  border-radius: 26px;
   box-shadow: 0 12px 28px color-mix(in srgb, var(--color-on-surface) 8%, transparent);
   cursor: pointer;
   display: grid;
@@ -200,9 +189,9 @@
 .stock-card__topline {
   h2 {
     color: var(--color-on-surface);
-    font-size: clamp(1.35rem, 5vw, 1.8rem);
-    font-weight: 900;
-    letter-spacing: -0.04em;
+    font-size: var(--size-font-md);
+    font-weight: 700;
+    letter-spacing: normal;
     margin: 0;
   }
 
@@ -221,15 +210,15 @@
   white-space: nowrap;
 
   strong {
-    font-size: clamp(1.6rem, 6vw, 2.35rem);
-    font-weight: 900;
+    font-size: var(--size-font-xl);
+    font-weight: 700;
     line-height: 1;
   }
 
   span {
     color: var(--color-on-surface-variant);
     font-size: var(--size-font-lg);
-    font-weight: 800;
+    font-weight: 600;
   }
 }
 
@@ -253,7 +242,7 @@
   font-size: var(--size-font-sm);
 
   span:first-child {
-    font-weight: 800;
+    font-weight: 700;
   }
 }
 
