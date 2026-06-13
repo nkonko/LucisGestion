@@ -3,9 +3,9 @@ import { NotificationService } from '../../core/services/notification.service';
 import { IngredientsStore } from '../../core/store/ingredients.store';
 import { DEFAULT_INGREDIENT_ICON, Ingredient } from '../../core/models/ingredient';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
-import { IngredientFormComponent } from './ingredient-form.component';
+import { IngredientFormComponent } from './ingredient-form/ingredient-form.component';
 import { PriceHistoryComponent } from './price-history.component';
-import { DialogService } from '../../core/services/dialog.service';
+import { BottomSheetService } from '../../core/services/bottom-sheet.service';
 import { UiIconComponent } from '../../shared/ui/components';
 import { AuthStore } from '../../core/store/auth.store';
 
@@ -19,7 +19,7 @@ import { AuthStore } from '../../core/store/auth.store';
 export class IngredientsComponent {
   readonly store = inject(IngredientsStore);
   readonly auth = inject(AuthStore);
-  private dialog = inject(DialogService);
+  private dialog = inject(BottomSheetService);
   private notify = inject(NotificationService);
 
   searchTerm = signal('');

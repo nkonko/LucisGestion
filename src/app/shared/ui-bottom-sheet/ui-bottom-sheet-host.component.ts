@@ -2,14 +2,12 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
+  computed,
   ElementRef,
   Injector,
-  OnDestroy,
   Type,
-  computed,
   input,
   output,
-  signal,
   viewChild,
 } from '@angular/core';
 import { NgComponentOutlet } from '@angular/common';
@@ -25,9 +23,10 @@ import { UI_BOTTOM_SHEET_DEFAULTS } from './ui-bottom-sheet.constants';
     '(keydown)': 'onKeydown($event)',
   },
 })
-export class UiBottomSheetHostComponent implements AfterViewInit, OnDestroy {
+export class UiBottomSheetHostComponent implements AfterViewInit {
   readonly contentComponent = input.required<Type<unknown>>();
   readonly contentInjector = input.required<Injector>();
+  readonly title = input<string | null>(null);
   readonly maxWidth = input(UI_BOTTOM_SHEET_DEFAULTS.maxWidth);
   readonly width = input(UI_BOTTOM_SHEET_DEFAULTS.width);
   readonly maxHeight = input(UI_BOTTOM_SHEET_DEFAULTS.maxHeight);
@@ -37,14 +36,6 @@ export class UiBottomSheetHostComponent implements AfterViewInit, OnDestroy {
   readonly closeRequested = output<undefined>();
 
   private readonly panel = viewChild.required<ElementRef<HTMLElement>>('panel');
-  private readonly contentRoot = viewChild.required<ElementRef<HTMLElement>>('contentRoot');
-  private readonly contentHeightPx = signal(0);
-  private resizeObserver?: ResizeObserver;
-
-  readonly panelHeight = computed(() => {
-    const height = this.contentHeightPx();
-    return height > 0 ? `min(${height}px, ${this.maxHeight()})` : 'auto';
-  })
 
 
   readonly panelClasses = computed(() => {
@@ -55,16 +46,7 @@ export class UiBottomSheetHostComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     queueMicrotask(() => {
       this.focusInitialElement();
-      this.recalculatePanelHeight();
-      this.installResizeObserver();
     });
-  }
-
-  ngOnDestroy(): void {
-    if (this.resizeObserver) {
-      this.resizeObserver.disconnect();
-      this.resizeObserver = undefined;  
-    }
   }
 
   requestClose(): void {
@@ -140,23 +122,6 @@ export class UiBottomSheetHostComponent implements AfterViewInit, OnDestroy {
     return Array.from(panelElement.querySelectorAll<HTMLElement>(selector)).filter(
       (element) => !element.hasAttribute('aria-hidden'),
     );
-  }
-
-  private recalculatePanelHeight(): void {
-    const contentRootElement = this.contentRoot().nativeElement;
-    const next = Math.ceil(contentRootElement.scrollHeight)
-    
-    if (next !== this.contentHeightPx()) {
-      this.contentHeightPx.set(next);
-    }
-  }
-
-  private installResizeObserver(): void {
-    const contentRootElement = this.contentRoot().nativeElement;
-    this.resizeObserver = new ResizeObserver(() => {
-      this.recalculatePanelHeight();
-    });
-    this.resizeObserver.observe(contentRootElement);
   }
 
 }

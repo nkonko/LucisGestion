@@ -6,12 +6,24 @@
     aria-modal="true"
     tabindex="-1"
     [style.width]="width()"
-    [style.height]="panelHeight()"
     [style.max-width]="maxWidth()"
     [style.max-height]="maxHeight()"
   >
-  <div #contentRoot class="ui-bottom-sheet-content">
-    <ng-container *ngComponentOutlet="contentComponent(); injector: contentInjector()"></ng-container>
-  </div>
+    @if (title()) {
+      <div class="ui-bottom-sheet-header">
+        <h2 class="ui-bottom-sheet-title">{{ title() }}</h2>
+        <button 
+          class="ui-bottom-sheet-close ui-modal-close-btn" 
+          type="button" 
+          (click)="requestClose()" 
+          [attr.aria-label]="'Cerrar ' + title()"
+        >
+          ×
+        </button>
+      </div>
+    }
+    <div class="ui-bottom-sheet-content">
+      <ng-container *ngComponentOutlet="contentComponent(); injector: contentInjector()"></ng-container>
+    </div>
   </div>
 </div>

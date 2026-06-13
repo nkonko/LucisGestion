@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { firstValueFrom } from 'rxjs';
 import { FirestoreService } from '../../core/services/firestore.service';
 import { NotificationService } from '../../core/services/notification.service';
-import { ConfirmBottomSheetDialogComponent } from '../../shared/ui-bottom-sheet/confirm-bottom-sheet-dialog.component';
+import { ConfirmBottomSheetDialogComponent } from '../../shared/ui-bottom-sheet/confirm-dialog/confirm-bottom-sheet-dialog.component';
 import { UiIconComponent } from '../../shared/ui/components';
 import { AppBackupFile } from '../../core/models/backup';
 import { AuthStore } from '../../core/store/auth.store';
@@ -147,6 +147,7 @@ export class BackupRestoreComponent {
     const dialogRef = this.bottomSheetService.open<unknown, boolean>(
       ConfirmBottomSheetDialogComponent,
       {
+        title,
         data: {
           title,
           message,
