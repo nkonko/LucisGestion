@@ -25,6 +25,10 @@
   animation: bottom-sheet-enter var(--transition-standard) ease-out;
 }
 
+.ui-bottom-sheet-content {
+  width: 100%;
+}
+
 @keyframes bottom-sheet-enter {
   from {
     transform: translateY(100%);

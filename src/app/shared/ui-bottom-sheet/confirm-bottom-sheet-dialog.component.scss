@@ -1,0 +1,101 @@
+:host {
+  display: block;
+}
+
+.confirm-sheet-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.confirm-sheet-header {
+  padding: var(--space-4);
+  border-bottom: var(--border-width-thin) solid var(--color-outline-variant);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.confirm-sheet-title {
+  margin: 0;
+  font-size: var(--size-font-lg);
+  font-weight: 600;
+  color: var(--color-on-surface);
+}
+
+.confirm-sheet-close {
+  &:focus-visible {
+    outline: var(--border-width-medium) solid var(--color-primary);
+    outline-offset: var(--space-1);
+  }
+}
+
+.confirm-sheet-content {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.confirm-sheet-section-title {
+  margin: 0;
+  font-size: var(--size-font-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--color-on-surface-variant);
+}
+
+.confirm-sheet-message {
+  margin: 0;
+  color: var(--color-on-surface);
+  line-height: 1.45;
+}
+
+.confirm-sheet-summary {
+  padding: var(--space-4);
+  border-top: var(--border-width-thin) solid var(--color-outline-variant);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+
+  @media (max-width: 640px) {
+    padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+  }
+}
+
+.confirm-sheet-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-3);
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.confirm-sheet-cancel-btn {
+  min-height: calc(var(--space-8) + var(--space-4));
+  font-size: var(--size-font-md);
+}
+
+.confirm-sheet-confirm-btn {
+  min-height: calc(var(--space-8) + var(--space-4));
+  font-size: var(--size-font-md);
+
+  &:focus-visible {
+    outline: var(--border-width-medium) solid var(--color-on-primary);
+    outline-offset: var(--space-1);
+  }
+}
+
+.confirm-sheet-confirm-btn--destructive {
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--color-status-danger) 86%, #7f1d1d) 0%,
+    color-mix(in srgb, var(--color-status-danger) 62%, #451a03) 100%
+  );
+}

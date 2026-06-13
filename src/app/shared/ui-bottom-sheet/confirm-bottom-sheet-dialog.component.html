@@ -1,0 +1,34 @@
+<div class="confirm-sheet-container">
+  <header class="confirm-sheet-header">
+    <h2 class="confirm-sheet-title">{{ data.title }}</h2>
+    <button
+      class="confirm-sheet-close ui-modal-close-btn"
+      type="button"
+      (click)="cancel()"
+      aria-label="Cerrar confirmación"
+    >
+      ×
+    </button>
+  </header>
+
+  <div class="confirm-sheet-content">
+    <h3 class="confirm-sheet-section-title">Confirmación</h3>
+    <p class="confirm-sheet-message">{{ data.message }}</p>
+  </div>
+
+  <footer class="confirm-sheet-summary">
+    <div class="confirm-sheet-actions">
+      <button class="ui-btn confirm-sheet-cancel-btn" type="button" (click)="cancel()" data-initial-focus>
+        {{ data.cancelLabel ?? 'Cancelar' }}
+      </button>
+      <button
+        type="button"
+        class="ui-primary-cta-btn confirm-sheet-confirm-btn"
+        [class.confirm-sheet-confirm-btn--destructive]="data.destructive"
+        (click)="confirm()"
+      >
+        {{ data.confirmLabel ?? 'Confirmar' }}
+      </button>
+    </div>
+  </footer>
+</div>

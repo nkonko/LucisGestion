@@ -4,7 +4,7 @@ import { vi } from 'vitest';
 
 import { BackupRestoreComponent } from './backup-restore.component';
 import { FirestoreService } from '../../core/services/firestore.service';
-import { DialogService } from '../../core/services/dialog.service';
+import { BottomSheetService } from '../../core/services/bottom-sheet.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { AuthStore } from '../../core/store/auth.store';
 import type { AppBackupFile } from '../../core/models/backup';
@@ -35,7 +35,7 @@ describe('BackupRestoreComponent', () => {
     restoreBackup: ReturnType<typeof vi.fn>;
     parseBackupJson: ReturnType<typeof vi.fn>;
   };
-  let dialogMock: { open: ReturnType<typeof vi.fn> };
+  let bottomSheetMock: { open: ReturnType<typeof vi.fn> };
   let notificationMock: { success: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn> };
   let authMock: { isOwner: ReturnType<typeof vi.fn> };
 
@@ -46,7 +46,7 @@ describe('BackupRestoreComponent', () => {
       parseBackupJson: vi.fn().mockReturnValue(createBackupPayload()),
     };
 
-    dialogMock = {
+    bottomSheetMock = {
       open: vi.fn().mockReturnValue({ afterClosed: of(true) }),
     };
 
@@ -66,7 +66,7 @@ describe('BackupRestoreComponent', () => {
       imports: [BackupRestoreComponent],
       providers: [
         { provide: FirestoreService, useValue: firestoreMock },
-        { provide: DialogService, useValue: dialogMock },
+        { provide: BottomSheetService, useValue: bottomSheetMock },
         { provide: NotificationService, useValue: notificationMock },
         { provide: AuthStore, useValue: authMock },
       ],
@@ -93,7 +93,7 @@ describe('BackupRestoreComponent', () => {
   it('creates backup for owner user and exposes a download URL', async () => {
     await component.createBackup();
 
-    expect(dialogMock.open).toHaveBeenCalledTimes(1);
+    expect(bottomSheetMock.open).toHaveBeenCalledTimes(1);
     expect(firestoreMock.createBackup).toHaveBeenCalledTimes(1);
     expect(component.backupDownloadUrl()).toBe('blob:backup-url');
     expect(component.backupFileName()).toContain('lucis-gestion-backup-');
@@ -150,7 +150,7 @@ describe('BackupRestoreComponent', () => {
 
     await component.restoreBackup();
 
-    expect(dialogMock.open).toHaveBeenCalledTimes(1);
+    expect(bottomSheetMock.open).toHaveBeenCalledTimes(1);
     expect(firestoreMock.restoreBackup).toHaveBeenCalledTimes(1);
     expect(notificationMock.success).toHaveBeenCalledWith('Restore completado');
   });

@@ -6,10 +6,12 @@
     aria-modal="true"
     tabindex="-1"
     [style.width]="width()"
-    [style.height]="maxHeight()"
+    [style.height]="panelHeight()"
     [style.max-width]="maxWidth()"
     [style.max-height]="maxHeight()"
   >
+  <div #contentRoot class="ui-bottom-sheet-content">
     <ng-container *ngComponentOutlet="contentComponent(); injector: contentInjector()"></ng-container>
+  </div>
   </div>
 </div>

@@ -1,23 +1,23 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { FirestoreService } from '../../core/services/firestore.service';
-import { DialogService } from '../../core/services/dialog.service';
 import { NotificationService } from '../../core/services/notification.service';
-import { ConfirmDialogComponent } from '../../shared/ui-modal/confirm-dialog.component';
+import { ConfirmBottomSheetDialogComponent } from '../../shared/ui-bottom-sheet/confirm-bottom-sheet-dialog.component';
 import { UiIconComponent } from '../../shared/ui/components';
 import { AppBackupFile } from '../../core/models/backup';
 import { AuthStore } from '../../core/store/auth.store';
+import { BottomSheetService } from '../../core/services/bottom-sheet.service';
 
 @Component({
   selector: 'app-backup-restore',
   imports: [UiIconComponent],
   templateUrl: './backup-restore.component.html',
-  styleUrl: './backup-restore.component.scss',
+  styleUrls: ['./backup-restore.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BackupRestoreComponent {
   private firestoreService = inject(FirestoreService);
-  private dialogService = inject(DialogService);
+  private bottomSheetService = inject(BottomSheetService);
   private notificationService = inject(NotificationService);
   readonly auth = inject(AuthStore);
 
@@ -144,15 +144,18 @@ export class BackupRestoreComponent {
     confirmLabel: string,
     destructive = false,
   ): Promise<boolean> {
-    const dialogRef = this.dialogService.open<unknown, boolean>(ConfirmDialogComponent, {
-      data: {
-        title,
-        message,
-        confirmLabel,
-        cancelLabel: 'Cancelar',
-        destructive,
+    const dialogRef = this.bottomSheetService.open<unknown, boolean>(
+      ConfirmBottomSheetDialogComponent,
+      {
+        data: {
+          title,
+          message,
+          confirmLabel,
+          cancelLabel: 'Cancelar',
+          destructive,
+        },
       },
-    });
+    );
     return (await firstValueFrom(dialogRef.afterClosed)) === true;
   }
 
