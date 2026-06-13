@@ -78,10 +78,11 @@
 
     <label class="backup-upload">
       <input
+        #backupFilePicker
         type="file"
         accept="application/json,.json"
         [disabled]="backupInProgress() || restoreInProgress()"
-        (change)="onFileSelected($event)"
+        (change)="onFileSelected(backupFilePicker)"
       />
       <span class="backup-upload__icon" aria-hidden="true">
         <ui-icon name="upload" [size]="22" [decorative]="true" />

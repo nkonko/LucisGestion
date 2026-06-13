@@ -83,16 +83,15 @@ export class BackupRestoreComponent {
     anchor.click();
   }
 
-  async onFileSelected(event: Event): Promise<void> {
-    const htmlInputElement = event.target as HTMLInputElement | null;
-    const file = htmlInputElement?.files?.[0];
-    if (!file) return;
+  async onFileSelected(filePickerElement: HTMLInputElement): Promise<void> {
+    const selectedBackupResource = filePickerElement.files?.[0];
+    if (!selectedBackupResource) return;
 
     try {
-      const text = await file.text();
+      const text = await selectedBackupResource.text();
       const parsed = this.firestoreService.parseBackupJson(text);
       this.selectedBackup.set(parsed);
-      this.restoreFileName.set(file.name);
+      this.restoreFileName.set(selectedBackupResource.name);
       this.restoreProgress.set(0);
       this.notificationService.success('Archivo de backup cargado');
     } catch (error) {
@@ -100,9 +99,7 @@ export class BackupRestoreComponent {
       this.restoreFileName.set(null);
       this.notificationService.error(this.getErrorMessage(error, 'El archivo seleccionado no es válido'));
     } finally {
-      if (htmlInputElement) {
-        htmlInputElement.value = '';
-      }
+      filePickerElement.value = '';
     }
   }
 
