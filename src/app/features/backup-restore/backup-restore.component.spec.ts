@@ -104,17 +104,17 @@ describe('BackupRestoreComponent', () => {
     const payload = createBackupPayload();
     firestoreMock.parseBackupJson.mockReturnValue(payload);
 
-    const input = {
+    const fileInputElement = {
       files: [{ name: 'backup.json', text: () => Promise.resolve('{"ok":true}') }],
       value: 'filled',
     } as unknown as HTMLInputElement;
 
-    await component.onFileSelected({ target: input } as unknown as Event);
+    await component.onFileSelected({ target: fileInputElement } as unknown as Event);
 
     expect(firestoreMock.parseBackupJson).toHaveBeenCalledWith('{"ok":true}');
     expect(component.selectedBackup()).toEqual(payload);
     expect(component.restoreFileName()).toBe('backup.json');
-    expect(input.value).toBe('');
+    expect(fileInputElement.value).toBe('');
     expect(notificationMock.success).toHaveBeenCalledWith('Archivo de backup cargado');
   });
 
@@ -123,12 +123,12 @@ describe('BackupRestoreComponent', () => {
       throw new Error('Formato inválido');
     });
 
-    const input = {
+    const fileInputElement = {
       files: [{ name: 'bad.json', text: () => Promise.resolve('invalid') }],
       value: 'filled',
     } as unknown as HTMLInputElement;
 
-    await component.onFileSelected({ target: input } as unknown as Event);
+    await component.onFileSelected({ target: fileInputElement } as unknown as Event);
 
     expect(component.selectedBackup()).toBeNull();
     expect(component.restoreFileName()).toBeNull();

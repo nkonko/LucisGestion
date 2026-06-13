@@ -35,6 +35,29 @@ export const APP_DATA_COLLECTIONS = [
 ] as const;
 
 type FirestoreData = Record<string, unknown>;
+type BackupDocumentList = AppBackupFile['collections'][string];
+type BackupCollections = {
+  users: BackupDocumentList;
+  ingredients: BackupDocumentList;
+  recipes: BackupDocumentList;
+  customers: BackupDocumentList;
+  sales: BackupDocumentList;
+  priceHistory: BackupDocumentList;
+  stockMovements: BackupDocumentList;
+  supplyExpenses: BackupDocumentList;
+  fixedCostsByMonth: BackupDocumentList;
+};
+type UnknownBackupCollections = {
+  users?: unknown;
+  ingredients?: unknown;
+  recipes?: unknown;
+  customers?: unknown;
+  sales?: unknown;
+  priceHistory?: unknown;
+  stockMovements?: unknown;
+  supplyExpenses?: unknown;
+  fixedCostsByMonth?: unknown;
+};
 
 interface FirestoreApi {
   addDoc: typeof addDoc;
@@ -85,15 +108,19 @@ export class FirestoreService {
 
   async createBackup(onProgress?: BackupProgressCallback): Promise<AppBackupFile> {
     onProgress?.(0);
-    const collections: Record<string, AppBackupFile['collections'][string]> = {};
+    const collections = this.createEmptyBackupCollections();
 
     for (const [index, collectionName] of APP_DATA_COLLECTIONS.entries()) {
       const ref = this.firestoreApi.collection(this.firestore, collectionName);
       const snapshot = await this.firestoreApi.getDocs(ref);
-      collections[collectionName] = snapshot.docs.map((docSnapshot) => ({
-        id: docSnapshot.id,
-        data: this.serializeRecord(docSnapshot.data() as FirestoreData),
-      }));
+      this.setBackupDocuments(
+        collections,
+        collectionName,
+        snapshot.docs.map((docSnapshot) => ({
+          id: docSnapshot.id,
+          data: this.serializeRecord(docSnapshot.data() as FirestoreData),
+        })),
+      );
       onProgress?.(Math.round(((index + 1) / APP_DATA_COLLECTIONS.length) * 100));
     }
 
@@ -116,10 +143,11 @@ export class FirestoreService {
       const ref = this.firestoreApi.collection(this.firestore, collectionName);
       const snapshot = await this.firestoreApi.getDocs(ref);
       const ids = snapshot.docs.map((docSnapshot) => docSnapshot.id);
-      const backupIds = new Set((backup.collections[collectionName] ?? []).map((doc) => doc.id));
+      const backupDocuments = this.getBackupDocuments(backup.collections, collectionName);
+      const backupIds = new Set(backupDocuments.map((document) => document.id));
       const staleIds = ids.filter((id) => !backupIds.has(id));
       staleDocuments.set(collectionName, staleIds);
-      operationCount += staleIds.length + (backup.collections[collectionName]?.length ?? 0);
+      operationCount += staleIds.length + backupDocuments.length;
     }
 
     if (operationCount === 0) {
@@ -134,7 +162,7 @@ export class FirestoreService {
     };
 
     for (const collectionName of APP_DATA_COLLECTIONS) {
-      const documents = backup.collections[collectionName] ?? [];
+      const documents = this.getBackupDocuments(backup.collections, collectionName);
       for (const chunk of this.chunk(documents, 450)) {
         const batch = this.firestoreApi.writeBatch(this.firestore);
         for (const backupDocument of chunk) {
@@ -325,14 +353,17 @@ export class FirestoreService {
   }
 
   private serializeRecord(data: FirestoreData): Record<string, BackupJsonValue> {
-    const serialized: Record<string, BackupJsonValue> = {};
+    const entries: Array<[string, BackupJsonValue]> = [];
     for (const [key, value] of Object.entries(data)) {
+      if (!this.isSafeObjectKey(key)) {
+        continue;
+      }
       const nextValue = this.serializeValue(value);
       if (nextValue !== undefined) {
-        serialized[key] = nextValue;
+        entries.push([key, nextValue]);
       }
     }
-    return serialized;
+    return Object.fromEntries(entries) as Record<string, BackupJsonValue>;
   }
 
   private serializeValue(value: unknown): BackupJsonValue | undefined {
@@ -365,11 +396,14 @@ export class FirestoreService {
   }
 
   private deserializeRecord(data: Record<string, BackupJsonValue>): FirestoreData {
-    const deserialized: FirestoreData = {};
+    const entries: Array<[string, unknown]> = [];
     for (const [key, value] of Object.entries(data)) {
-      deserialized[key] = this.deserializeValue(value);
+      if (!this.isSafeObjectKey(key)) {
+        continue;
+      }
+      entries.push([key, this.deserializeValue(value)]);
     }
-    return deserialized;
+    return Object.fromEntries(entries) as FirestoreData;
   }
 
   private deserializeValue(value: BackupJsonValue): unknown {
@@ -415,8 +449,9 @@ export class FirestoreService {
     if (!this.isRecord(collections)) {
       throw new Error('El archivo de backup no contiene colecciones válidas.');
     }
+    const typedCollections = collections as UnknownBackupCollections;
     for (const collectionName of APP_DATA_COLLECTIONS) {
-      const documents = collections[collectionName];
+      const documents = this.getUnknownBackupDocuments(typedCollections, collectionName);
       if (!Array.isArray(documents)) {
         throw new Error(`El backup no contiene la colección ${collectionName}.`);
       }
@@ -442,5 +477,112 @@ export class FirestoreService {
 
   private isRecord(value: unknown): value is Record<string, BackupJsonValue> {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
+  }
+
+  private createEmptyBackupCollections(): BackupCollections {
+    return {
+      users: [],
+      ingredients: [],
+      recipes: [],
+      customers: [],
+      sales: [],
+      priceHistory: [],
+      stockMovements: [],
+      supplyExpenses: [],
+      fixedCostsByMonth: [],
+    };
+  }
+
+  private setBackupDocuments(
+    collections: BackupCollections,
+    collectionName: (typeof APP_DATA_COLLECTIONS)[number],
+    documents: BackupDocumentList,
+  ): void {
+    switch (collectionName) {
+      case 'users':
+        collections.users = documents;
+        return;
+      case 'ingredients':
+        collections.ingredients = documents;
+        return;
+      case 'recipes':
+        collections.recipes = documents;
+        return;
+      case 'customers':
+        collections.customers = documents;
+        return;
+      case 'sales':
+        collections.sales = documents;
+        return;
+      case 'priceHistory':
+        collections.priceHistory = documents;
+        return;
+      case 'stockMovements':
+        collections.stockMovements = documents;
+        return;
+      case 'supplyExpenses':
+        collections.supplyExpenses = documents;
+        return;
+      case 'fixedCostsByMonth':
+        collections.fixedCostsByMonth = documents;
+        return;
+    }
+  }
+
+  private getBackupDocuments(
+    collections: AppBackupFile['collections'],
+    collectionName: (typeof APP_DATA_COLLECTIONS)[number],
+  ): BackupDocumentList {
+    const typedCollections = collections as BackupCollections;
+    switch (collectionName) {
+      case 'users':
+        return typedCollections.users;
+      case 'ingredients':
+        return typedCollections.ingredients;
+      case 'recipes':
+        return typedCollections.recipes;
+      case 'customers':
+        return typedCollections.customers;
+      case 'sales':
+        return typedCollections.sales;
+      case 'priceHistory':
+        return typedCollections.priceHistory;
+      case 'stockMovements':
+        return typedCollections.stockMovements;
+      case 'supplyExpenses':
+        return typedCollections.supplyExpenses;
+      case 'fixedCostsByMonth':
+        return typedCollections.fixedCostsByMonth;
+    }
+  }
+
+  private getUnknownBackupDocuments(
+    collections: UnknownBackupCollections,
+    collectionName: (typeof APP_DATA_COLLECTIONS)[number],
+  ): unknown {
+    switch (collectionName) {
+      case 'users':
+        return collections.users;
+      case 'ingredients':
+        return collections.ingredients;
+      case 'recipes':
+        return collections.recipes;
+      case 'customers':
+        return collections.customers;
+      case 'sales':
+        return collections.sales;
+      case 'priceHistory':
+        return collections.priceHistory;
+      case 'stockMovements':
+        return collections.stockMovements;
+      case 'supplyExpenses':
+        return collections.supplyExpenses;
+      case 'fixedCostsByMonth':
+        return collections.fixedCostsByMonth;
+    }
+  }
+
+  private isSafeObjectKey(key: string): boolean {
+    return key !== '__proto__' && key !== 'prototype' && key !== 'constructor';
   }
 }

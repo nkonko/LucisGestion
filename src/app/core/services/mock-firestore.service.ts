@@ -15,6 +15,29 @@ type MockDocument = Record<string, unknown> & {
   active?: boolean;
   endDate?: Timestamp;
 };
+type BackupDocumentList = AppBackupFile['collections'][string];
+type BackupCollections = {
+  users: BackupDocumentList;
+  ingredients: BackupDocumentList;
+  recipes: BackupDocumentList;
+  customers: BackupDocumentList;
+  sales: BackupDocumentList;
+  priceHistory: BackupDocumentList;
+  stockMovements: BackupDocumentList;
+  supplyExpenses: BackupDocumentList;
+  fixedCostsByMonth: BackupDocumentList;
+};
+type UnknownBackupCollections = {
+  users?: unknown;
+  ingredients?: unknown;
+  recipes?: unknown;
+  customers?: unknown;
+  sales?: unknown;
+  priceHistory?: unknown;
+  stockMovements?: unknown;
+  supplyExpenses?: unknown;
+  fixedCostsByMonth?: unknown;
+};
 
 @Injectable()
 export class MockFirestoreService {
@@ -26,18 +49,22 @@ export class MockFirestoreService {
 
   async createBackup(onProgress?: BackupProgressCallback): Promise<AppBackupFile> {
     onProgress?.(0);
-    const collections: Record<string, AppBackupFile['collections'][string]> = {};
+    const collections = this.createEmptyBackupCollections();
 
     for (const [index, collectionName] of APP_DATA_COLLECTIONS.entries()) {
       const collection = this.getOrCreate(collectionName).value;
-      collections[collectionName] = collection.map((item) => {
-        const document = item as MockDocument;
-        const { id, ...data } = document;
-        return {
-          id: id ?? this.createDocumentId(collectionName),
-          data: this.serializeRecord(data),
-        };
-      });
+      this.setBackupDocuments(
+        collections,
+        collectionName,
+        collection.map((item) => {
+          const document = item as MockDocument;
+          const { id, ...data } = document;
+          return {
+            id: id ?? this.createDocumentId(collectionName),
+            data: this.serializeRecord(data),
+          };
+        }),
+      );
       onProgress?.(Math.round(((index + 1) / APP_DATA_COLLECTIONS.length) * 100));
     }
 
@@ -53,7 +80,7 @@ export class MockFirestoreService {
     this.assertBackupFile(backup);
     onProgress?.(0);
     for (const [index, collectionName] of APP_DATA_COLLECTIONS.entries()) {
-      const documents = backup.collections[collectionName] ?? [];
+      const documents = this.getBackupDocuments(backup.collections, collectionName);
       this.getOrCreate(collectionName).next(
         documents.map((document) => ({
           id: document.id,
@@ -244,14 +271,17 @@ export class MockFirestoreService {
   }
 
   private serializeRecord(data: Record<string, unknown>): Record<string, BackupJsonValue> {
-    const serialized: Record<string, BackupJsonValue> = {};
+    const entries: Array<[string, BackupJsonValue]> = [];
     for (const [key, value] of Object.entries(data)) {
+      if (!this.isSafeObjectKey(key)) {
+        continue;
+      }
       const nextValue = this.serializeValue(value);
       if (nextValue !== undefined) {
-        serialized[key] = nextValue;
+        entries.push([key, nextValue]);
       }
     }
-    return serialized;
+    return Object.fromEntries(entries) as Record<string, BackupJsonValue>;
   }
 
   private serializeValue(value: unknown): BackupJsonValue | undefined {
@@ -284,11 +314,14 @@ export class MockFirestoreService {
   }
 
   private deserializeRecord(data: Record<string, BackupJsonValue>): Record<string, unknown> {
-    const deserialized: Record<string, unknown> = {};
+    const entries: Array<[string, unknown]> = [];
     for (const [key, value] of Object.entries(data)) {
-      deserialized[key] = this.deserializeValue(value);
+      if (!this.isSafeObjectKey(key)) {
+        continue;
+      }
+      entries.push([key, this.deserializeValue(value)]);
     }
-    return deserialized;
+    return Object.fromEntries(entries) as Record<string, unknown>;
   }
 
   private deserializeValue(value: BackupJsonValue): unknown {
@@ -335,9 +368,10 @@ export class MockFirestoreService {
     if (!this.isRecord(collections)) {
       throw new Error('El archivo de backup no contiene colecciones válidas.');
     }
+    const typedCollections = collections as UnknownBackupCollections;
 
     for (const collectionName of APP_DATA_COLLECTIONS) {
-      const documents = collections[collectionName];
+      const documents = this.getUnknownBackupDocuments(typedCollections, collectionName);
       if (!Array.isArray(documents)) {
         throw new Error(`El backup no contiene la colección ${collectionName}.`);
       }
@@ -356,6 +390,113 @@ export class MockFirestoreService {
 
   private isRecord(value: unknown): value is Record<string, BackupJsonValue> {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
+  }
+
+  private createEmptyBackupCollections(): BackupCollections {
+    return {
+      users: [],
+      ingredients: [],
+      recipes: [],
+      customers: [],
+      sales: [],
+      priceHistory: [],
+      stockMovements: [],
+      supplyExpenses: [],
+      fixedCostsByMonth: [],
+    };
+  }
+
+  private setBackupDocuments(
+    collections: BackupCollections,
+    collectionName: (typeof APP_DATA_COLLECTIONS)[number],
+    documents: BackupDocumentList,
+  ): void {
+    switch (collectionName) {
+      case 'users':
+        collections.users = documents;
+        return;
+      case 'ingredients':
+        collections.ingredients = documents;
+        return;
+      case 'recipes':
+        collections.recipes = documents;
+        return;
+      case 'customers':
+        collections.customers = documents;
+        return;
+      case 'sales':
+        collections.sales = documents;
+        return;
+      case 'priceHistory':
+        collections.priceHistory = documents;
+        return;
+      case 'stockMovements':
+        collections.stockMovements = documents;
+        return;
+      case 'supplyExpenses':
+        collections.supplyExpenses = documents;
+        return;
+      case 'fixedCostsByMonth':
+        collections.fixedCostsByMonth = documents;
+        return;
+    }
+  }
+
+  private getBackupDocuments(
+    collections: AppBackupFile['collections'],
+    collectionName: (typeof APP_DATA_COLLECTIONS)[number],
+  ): BackupDocumentList {
+    const typedCollections = collections as BackupCollections;
+    switch (collectionName) {
+      case 'users':
+        return typedCollections.users;
+      case 'ingredients':
+        return typedCollections.ingredients;
+      case 'recipes':
+        return typedCollections.recipes;
+      case 'customers':
+        return typedCollections.customers;
+      case 'sales':
+        return typedCollections.sales;
+      case 'priceHistory':
+        return typedCollections.priceHistory;
+      case 'stockMovements':
+        return typedCollections.stockMovements;
+      case 'supplyExpenses':
+        return typedCollections.supplyExpenses;
+      case 'fixedCostsByMonth':
+        return typedCollections.fixedCostsByMonth;
+    }
+  }
+
+  private getUnknownBackupDocuments(
+    collections: UnknownBackupCollections,
+    collectionName: (typeof APP_DATA_COLLECTIONS)[number],
+  ): unknown {
+    switch (collectionName) {
+      case 'users':
+        return collections.users;
+      case 'ingredients':
+        return collections.ingredients;
+      case 'recipes':
+        return collections.recipes;
+      case 'customers':
+        return collections.customers;
+      case 'sales':
+        return collections.sales;
+      case 'priceHistory':
+        return collections.priceHistory;
+      case 'stockMovements':
+        return collections.stockMovements;
+      case 'supplyExpenses':
+        return collections.supplyExpenses;
+      case 'fixedCostsByMonth':
+        return collections.fixedCostsByMonth;
+    }
+  }
+
+  private isSafeObjectKey(key: string): boolean {
+    return key !== '__proto__' && key !== 'prototype' && key !== 'constructor';
   }
 
   private getOrCreate(path: string): BehaviorSubject<unknown[]> {
