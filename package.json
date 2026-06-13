@@ -43,7 +43,7 @@
     "angular-eslint": "22.0.0",
     "eslint": "^10.4.0",
     "eslint-plugin-unused-imports": "^4.4.1",
-    "firebase-tools": "^15.16.0",
+    "firebase-tools": "^15.20.0",
     "jsdom": "^29.1.1",
     "playwright": "^1.55.0",
     "postcss": "^8.5.15",
