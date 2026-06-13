@@ -4,7 +4,7 @@ import { CustomersStore } from '../../core/store/customers.store';
 import { WhatsAppService } from '../../core/services/whatsapp.service';
 import { Customer, CustomerInput } from '../../core/models/customer';
 import { CustomerFormComponent } from './customer-form.component';
-import { DialogService } from '../../core/services/dialog.service';
+import { BottomSheetService } from '../../core/services/bottom-sheet.service';
 import { UiCardComponent, UiIconComponent } from '../../shared/ui/components';
 
 @Component({
@@ -17,7 +17,7 @@ import { UiCardComponent, UiIconComponent } from '../../shared/ui/components';
 export class CustomersComponent {
   readonly store = inject(CustomersStore);
   private whatsApp = inject(WhatsAppService);
-  private dialog = inject(DialogService);
+  private dialog = inject(BottomSheetService);
   private notify = inject(NotificationService);
 
   searchTerm = signal('');

@@ -69,5 +69,8 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
+      - name: Deploy Firestore rules and indexes (preview project)
+        run: pnpm exec firebase deploy --only firestore:rules,firestore:indexes --project "${{ vars.FIREBASE_PROJECT_ID }}" --non-interactive
+
       - name: Deploy to Firebase Hosting preview channel
         run: pnpm exec firebase hosting:channel:deploy pr${{ github.event.pull_request.number }} --expires 7d --project "${{ vars.FIREBASE_PROJECT_ID }}" --non-interactive

@@ -13,29 +13,6 @@
   overflow: hidden;
 }
 
-.sale-form-header {
-  padding: var(--space-4);
-  border-bottom: var(--border-width-thin) solid var(--color-outline-variant);
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.sale-form-title {
-  margin: 0;
-  font-size: var(--size-font-lg);
-  font-weight: 600;
-  color: var(--color-on-surface);
-}
-
-.sale-form-close {
-  &:focus-visible {
-    outline: var(--border-width-medium) solid var(--color-primary);
-    outline-offset: var(--space-1);
-  }
-}
-
 .sale-form-content {
   flex: 1;
   min-height: 0;

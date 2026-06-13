@@ -24,6 +24,8 @@ import { SaleProductItemComponent } from './product-item/sale-product-item.compo
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SaleFormComponent {
+  private static readonly DELETED_CUSTOMER_NAME = '[eliminado]';
+
   private dialogRef = inject(DIALOG_REF) as DialogRef<SaleInput>;
   private dialogData = inject(DIALOG_DATA) as Sale | null;
   readonly recipesStore = inject(RecipesStore);
@@ -46,7 +48,11 @@ export class SaleFormComponent {
     label,
   }));
 
-  customers = computed(() => this.customersStore.customers());
+  customers = computed(() =>
+    this.customersStore
+      .customers()
+      .filter((customer) => customer.name !== SaleFormComponent.DELETED_CUSTOMER_NAME),
+  );
 
   total = computed(() => this.items().reduce((sum, i) => sum + i.quantity * i.unitPrice, 0));
   totalCost = computed(() => this.items().reduce((sum, i) => sum + i.quantity * i.unitCost, 0));

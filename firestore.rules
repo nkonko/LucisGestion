@@ -60,6 +60,7 @@ service cloud.firestore {
     match /stockMovements/{docId} {
       allow read: if isTeamMember();
       allow create: if isTeamMember();
+      allow update, delete: if isOwner();
     }
 
     // Supply expenses: owner only
@@ -72,17 +73,18 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn() && request.auth.uid == userId;
-      allow update: if isOwner();
+      allow update, delete: if isOwner();
     }
 
     // Price history: read for team, created by system on price changes
     match /priceHistory/{docId} {
       allow read: if isTeamMember();
       allow create: if isTeamMember();
+      allow update, delete: if isOwner();
     }
 
     // Fixed costs: owner only
-    match /fixedCosts/{docId} {
+    match /fixedCostsByMonth/{docId} {
       allow read: if isTeamMember();
       allow write: if isOwner();
     }
