@@ -84,8 +84,8 @@ export class BackupRestoreComponent {
   }
 
   async onFileSelected(event: Event): Promise<void> {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
+    const htmlInputElement = event.target as HTMLInputElement | null;
+    const file = htmlInputElement?.files?.[0];
     if (!file) return;
 
     try {
@@ -100,7 +100,9 @@ export class BackupRestoreComponent {
       this.restoreFileName.set(null);
       this.notificationService.error(this.getErrorMessage(error, 'El archivo seleccionado no es válido'));
     } finally {
-      input.value = '';
+      if (htmlInputElement) {
+        htmlInputElement.value = '';
+      }
     }
   }
 
