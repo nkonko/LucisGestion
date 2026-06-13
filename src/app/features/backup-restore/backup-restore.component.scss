@@ -1,0 +1,207 @@
+.backup-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.backup-hero {
+  align-items: center;
+  background: var(--bg-gradient-warm);
+  border: var(--border-width-thin) solid
+    color-mix(in srgb, var(--color-primary) 12%, var(--color-outline-variant));
+  border-radius: 28px;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-6);
+}
+
+.backup-hero__icon {
+  align-items: center;
+  background: color-mix(in srgb, var(--color-primary) 16%, var(--color-surface));
+  border-radius: 22px;
+  color: var(--color-primary);
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 64px;
+  justify-content: center;
+  width: 64px;
+}
+
+.backup-eyebrow {
+  color: var(--color-primary);
+  font-size: var(--size-font-2xs);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin: 0 0 var(--space-1);
+  text-transform: uppercase;
+}
+
+.backup-hero__text {
+  color: var(--color-on-surface-variant);
+  font-size: var(--size-font-sm);
+  margin: var(--space-2) 0 0;
+}
+
+.backup-card {
+  border-radius: 24px;
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--color-on-surface) 8%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+}
+
+.backup-card__header {
+  align-items: flex-start;
+  display: flex;
+  gap: var(--space-3);
+
+  h2 {
+    color: var(--color-on-surface);
+    font-size: var(--size-font-xl);
+    font-weight: 800;
+    margin: 0;
+  }
+
+  p {
+    color: var(--color-on-surface-variant);
+    font-size: var(--size-font-sm);
+    margin: var(--space-1) 0 0;
+  }
+}
+
+.backup-card__icon,
+.backup-upload__icon {
+  align-items: center;
+  border-radius: 18px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 44px;
+  justify-content: center;
+  width: 44px;
+}
+
+.backup-card__icon--backup {
+  background: color-mix(in srgb, var(--color-primary) 14%, var(--color-surface));
+  color: var(--color-primary);
+}
+
+.backup-card__icon--restore {
+  background: color-mix(in srgb, var(--color-warning) 18%, var(--color-surface));
+  color: color-mix(in srgb, var(--color-warning) 82%, var(--color-on-surface));
+}
+
+.backup-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.backup-progress__topline {
+  align-items: center;
+  color: var(--color-on-surface-variant);
+  display: flex;
+  font-size: var(--size-font-sm);
+  justify-content: space-between;
+
+  strong {
+    color: var(--color-on-surface);
+  }
+}
+
+.backup-progress__bar {
+  background: var(--color-primary);
+}
+
+.backup-progress__bar--restore {
+  background: var(--color-warning);
+}
+
+.backup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.backup-spinner {
+  height: 18px;
+  width: 18px;
+}
+
+.backup-file,
+.backup-warning {
+  align-items: center;
+  border-radius: var(--space-3);
+  display: flex;
+  font-size: var(--size-font-sm);
+  gap: var(--space-2);
+  padding: var(--space-3);
+}
+
+.backup-file {
+  background: color-mix(in srgb, var(--color-success) 10%, var(--color-surface));
+  color: color-mix(in srgb, var(--color-success) 76%, var(--color-on-surface));
+  font-weight: 700;
+}
+
+.backup-upload {
+  align-items: center;
+  background: var(--color-surface-container);
+  border: var(--border-width-medium) dashed var(--color-outline-variant);
+  border-radius: 20px;
+  color: var(--color-on-surface);
+  cursor: pointer;
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  transition:
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
+
+  input {
+    inline-size: 1px;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+  }
+
+  strong,
+  small {
+    display: block;
+  }
+
+  small {
+    color: var(--color-on-surface-variant);
+    margin-top: var(--space-1);
+  }
+
+  &:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-1px);
+  }
+}
+
+.backup-upload__icon {
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
+  color: var(--color-primary);
+}
+
+.backup-warning {
+  background: color-mix(in srgb, var(--color-warning) 12%, var(--color-surface));
+  border: var(--border-width-thin) solid
+    color-mix(in srgb, var(--color-warning) 32%, var(--color-outline-variant));
+  color: color-mix(in srgb, var(--color-warning) 74%, var(--color-on-surface));
+}
+
+@media (max-width: 520px) {
+  .backup-hero,
+  .backup-card__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .backup-actions .ui-btn {
+    width: 100%;
+  }
+}

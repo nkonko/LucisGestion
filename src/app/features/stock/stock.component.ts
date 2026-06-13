@@ -5,7 +5,7 @@ import { NotificationService } from '../../core/services/notification.service';
 import { IngredientsStore } from '../../core/store/ingredients.store';
 import { DEFAULT_INGREDIENT_ICON, Ingredient } from '../../core/models/ingredient';
 import { getStockPriority } from '../../core/utils/stock.utils';
-import { IngredientFormComponent } from '../ingredients/ingredient-form.component';
+import { IngredientFormComponent } from '../ingredients/ingredient-form/ingredient-form.component';
 import { UiIconComponent } from '../../shared/ui/components';
 import { AuthStore } from '../../core/store/auth.store';
 import { BottomSheetService } from '../../core/services/bottom-sheet.service';

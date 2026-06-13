@@ -9,10 +9,10 @@ import {
   UNIT_DISPLAY,
   INGREDIENT_CATEGORY_DISPLAY,
   IngredientInputForm,
-} from '../../core/models/ingredient';
-import { DIALOG_DATA, DIALOG_REF } from '../../core/models/dialog/dialog-tokens.model';
-import { DialogRef } from '../../core/models/dialog/dialog-ref.model';
-import { UiIconComponent } from '../../shared/ui/components';
+} from '../../../core/models/ingredient';
+import { DIALOG_DATA, DIALOG_REF } from '../../../core/models/dialog/dialog-tokens.model';
+import { DialogRef } from '../../../core/models/dialog/dialog-ref.model';
+import { UiIconComponent } from '../../../shared/ui/components';
 
 @Component({
   selector: 'app-ingredient-form',

@@ -5,7 +5,7 @@ import { Recipe } from '../../core/models/recipe';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 import { RecipeFormComponent } from './recipe-form.component';
 import { CatalogDialogComponent } from './catalog-dialog.component';
-import { DialogService } from '../../core/services/dialog.service';
+import { BottomSheetService } from '../../core/services/bottom-sheet.service';
 import { UiIconComponent } from '../../shared/ui/components';
 import { AuthStore } from '../../core/store/auth.store';
 
@@ -22,7 +22,7 @@ import { AuthStore } from '../../core/store/auth.store';
 export class RecipesComponent {
   readonly store = inject(RecipesStore);
   readonly auth = inject(AuthStore);
-  private dialog = inject(DialogService);
+  private dialog = inject(BottomSheetService);
   private notify = inject(NotificationService);
 
   readonly openMenuRecipeId = signal<string | null>(null);
