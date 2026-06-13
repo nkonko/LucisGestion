@@ -3,16 +3,12 @@ import { FormsModule } from '@angular/forms';
 import {
   CostCategory,
   COST_CATEGORY_DISPLAY,
-  FixedCostEntry,
   FixedCostEntryInput,
-} from '../../core/models/fixed-cost';
-import { DIALOG_DATA, DIALOG_REF } from '../../core/models/dialog/dialog-tokens.model';
-import { DialogRef } from '../../core/models/dialog/dialog-ref.model';
+} from '../../../core/models/fixed-cost';
+import { DIALOG_DATA, DIALOG_REF } from '../../../core/models/dialog/dialog-tokens.model';
+import { DialogRef } from '../../../core/models/dialog/dialog-ref.model';
+import { FixedCostFormData } from '../../../core/models/fixed-cost/fixed-cost-form-data';
 
-export interface FixedCostFormData {
-  monthLabel: string;
-  entry: FixedCostEntry | null;
-}
 
 @Component({
   selector: 'app-fixed-cost-form',
