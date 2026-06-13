@@ -40,6 +40,7 @@ export class BottomSheetService {
     hostRef.setInput('contentComponent', component);
     hostRef.setInput('contentInjector', contentInjector);
     hostRef.setInput('title', config.title ?? null);
+    hostRef.setInput('section', config.section ?? null);
     hostRef.setInput('maxWidth', config.maxWidth ?? '720px');
     hostRef.setInput('width', config.width ?? '100%');
     hostRef.setInput('maxHeight', config.maxHeight ?? '92vh');

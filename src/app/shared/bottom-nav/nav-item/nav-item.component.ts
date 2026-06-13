@@ -6,6 +6,7 @@ import { UiIconComponent } from '../../ui/components';
   selector: 'nav-item',
   imports: [RouterLink, RouterLinkActive, UiIconComponent],
   templateUrl: './nav-item.component.html',
+  styleUrls: ['./nav-item.component.scss'],
 })
 export class NavItemComponent {
   route = input.required<string>();

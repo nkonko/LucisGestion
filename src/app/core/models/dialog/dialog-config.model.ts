@@ -1,6 +1,7 @@
 export interface DialogConfig<TData> {
   data: TData;
   title?: string;
+  section?: string;
   width?: string;
   maxWidth?: string;
   maxHeight?: string;

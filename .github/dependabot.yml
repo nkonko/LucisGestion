@@ -1,6 +1,6 @@
 version: 2
 updates:
-  # Monitor npm dependencies
+  # Monitor JavaScript dependencies (pnpm projects still use package-ecosystem: npm)
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
@@ -14,13 +14,26 @@ updates:
       - "nkonko"
     labels:
       - "dependencies"
-      - "npm"
+      - "pnpm"
     commit-message:
       prefix: "chore(deps):"
       include: "scope"
     pull-request-branch-name:
       separator: "/"
     rebase-strategy: "auto"
+    groups:
+      angular-stack:
+        patterns:
+          - "@angular/*"
+          - "@ngrx/*"
+          - "angular-eslint"
+          - "@angular-eslint/*"
+          - "@angular/fire"
+    ignore:
+      # Avoid isolated Angular major bumps; do framework major upgrades in a coordinated PR.
+      - dependency-name: "@angular/*"
+        update-types:
+          - "version-update:semver-major"
     allow:
       - dependency-type: "all"
 

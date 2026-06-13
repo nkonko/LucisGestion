@@ -88,6 +88,8 @@ export class StockComponent {
 
   create(): void {
     const dialogRef = this.bottomSheet.open<null, Ingredient>(IngredientFormComponent, {
+      title: 'Nuevo Ingrediente',
+      section: 'Ingrediente',
       maxWidth: '760px',
       maxHeight: '90vh',
       data: null,
@@ -103,6 +105,8 @@ export class StockComponent {
 
   edit(ingredient: Ingredient): void {
     const dialogRef = this.bottomSheet.open<Ingredient, Ingredient | 'delete'>(IngredientFormComponent, {
+      title: 'Editar Ingrediente',
+      section: 'Ingrediente',
       maxWidth: '760px',
       maxHeight: '90vh',
       data: ingredient,

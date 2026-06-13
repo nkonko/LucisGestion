@@ -11,11 +11,16 @@
   >
     @if (title()) {
       <div class="ui-bottom-sheet-header">
-        <h2 class="ui-bottom-sheet-title">{{ title() }}</h2>
-        <button 
-          class="ui-bottom-sheet-close ui-modal-close-btn" 
-          type="button" 
-          (click)="requestClose()" 
+        <div class="ui-bottom-sheet-heading">
+          @if (section()) {
+            <p class="ui-bottom-sheet-eyebrow">{{ section() }}</p>
+          }
+          <h2 class="ui-bottom-sheet-title">{{ title() }}</h2>
+        </div>
+        <button
+          class="ui-bottom-sheet-close ui-modal-close-btn"
+          type="button"
+          (click)="requestClose()"
           [attr.aria-label]="'Cerrar ' + title()"
         >
           ×
