@@ -2,8 +2,8 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 
-import type { Ingredient, RecipeIngredient } from '../../../core/models/ingredient';
-import { IngredientsStore } from '../../../core/store/ingredients.store';
+import type { Ingredient, RecipeIngredient } from '../../../../core/models/ingredient';
+import { IngredientsStore } from '../../../../core/store/ingredients.store';
 import { IngredientFormComponent } from './ingredient-form.component';
 
 describe('IngredientFormComponent', () => {

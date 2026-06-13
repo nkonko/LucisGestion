@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { RECIPE_CATEGORY_DISPLAY, RecipeCategory } from '../../../core/models/recipe';
+import { RECIPE_CATEGORY_DISPLAY, RecipeCategory } from '../../../../core/models/recipe';
 
 @Component({
   selector: 'app-category-form',

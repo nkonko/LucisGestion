@@ -9,9 +9,9 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { Ingredient, RecipeIngredient } from '../../../core/models/ingredient';
-import { IngredientsStore } from '../../../core/store/ingredients.store';
-import { ArsPipe } from '../../../shared/pipes/ars.pipe';
+import { Ingredient, RecipeIngredient } from '../../../../core/models/ingredient';
+import { IngredientsStore } from '../../../../core/store/ingredients.store';
+import { ArsPipe } from '../../../../shared/pipes/ars.pipe';
 
 @Component({
   selector: 'app-ingredient-form',

@@ -1,9 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { NotificationService } from '../../core/services/notification.service';
 import { RecipesStore } from '../../core/store/recipes.store';
-import { Recipe } from '../../core/models/recipe';
+import { Recipe, RECIPE_CATEGORY_DISPLAY, RECIPE_CATEGORY_ICON } from '../../core/models/recipe';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
-import { RecipeFormComponent } from './recipe-form.component';
+import { RecipeFormComponent } from './recipe-form/recipe-form.component';
 import { CatalogDialogComponent } from './catalog-dialog.component';
 import { BottomSheetService } from '../../core/services/bottom-sheet.service';
 import { UiIconComponent } from '../../shared/ui/components';
@@ -15,23 +15,20 @@ import { AuthStore } from '../../core/store/auth.store';
   templateUrl: './recipes.component.html',
   styleUrl: './recipes.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: {
-    '(document:click)': 'openMenuRecipeId.set(null)',
-  },
 })
 export class RecipesComponent {
   readonly store = inject(RecipesStore);
   readonly auth = inject(AuthStore);
+  readonly categoryDisplay = RECIPE_CATEGORY_DISPLAY;
+  readonly categoryIcon = RECIPE_CATEGORY_ICON;
   private dialog = inject(BottomSheetService);
   private notify = inject(NotificationService);
 
-  readonly openMenuRecipeId = signal<string | null>(null);
-
   create(): void {
     const dialogRef = this.dialog.open<null, Recipe>(RecipeFormComponent, {
-      maxWidth: '560px',
-      maxHeight: '90vh',
-      panelClass: 'recipe-dialog',
+      title: 'Nueva receta',
+      section: 'Receta',
+      maxWidth: '500px',
       data: null,
     });
 
@@ -45,9 +42,9 @@ export class RecipesComponent {
 
   edit(recipe: Recipe): void {
     const dialogRef = this.dialog.open<Recipe, Recipe | 'delete'>(RecipeFormComponent, {
-      maxWidth: '560px',
-      maxHeight: '90vh',
-      panelClass: 'recipe-dialog',
+      title: 'Editar receta',
+      section: 'Receta',
+      maxWidth: '500px',
       data: recipe,
     });
 
@@ -62,25 +59,11 @@ export class RecipesComponent {
     });
   }
 
-  async duplicate(recipe: Recipe): Promise<void> {
-    await this.store.duplicateRecipe(recipe);
-    this.notify.success('Receta duplicada');
-  }
-
   viewCatalog(): void {
     this.dialog.open<null, never>(CatalogDialogComponent, {
       maxWidth: '600px',
       maxHeight: '90vh',
       data: null,
     });
-  }
-
-  toggleMenu(recipeId: string, event: Event): void {
-    event.stopPropagation();
-    this.openMenuRecipeId.update((current) => (current === recipeId ? null : recipeId));
-  }
-
-  onMenuClick(event: Event): void {
-    event.stopPropagation();
   }
 }

@@ -1,0 +1,110 @@
+:host {
+  display: flex;
+  min-height: 0;
+}
+
+.recipe-sheet {
+  background: var(--color-surface);
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.recipe-sheet__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-4);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.recipe-field {
+  span {
+    color: var(--color-on-surface-variant);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .ui-input,
+  .ui-textarea {
+    border-radius: 18px;
+  }
+
+  .ui-input {
+    min-height: 52px;
+  }
+
+  .ui-textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+}
+
+.recipe-sheet__actions {
+  align-items: center;
+  background: var(--color-surface);
+  border-top: var(--border-width-thin) solid var(--color-outline-variant);
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  box-shadow: var(--shadow-soft);
+}
+
+.recipe-delete-btn,
+.recipe-save-btn {
+  align-items: center;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 700;
+  justify-content: center;
+  min-height: calc(var(--space-8) + var(--space-2));
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast);
+}
+
+.recipe-delete-btn {
+  background: color-mix(in srgb, var(--color-destructive) 8%, var(--color-surface));
+  border-radius: 50%;
+  color: var(--color-destructive);
+  padding: var(--space-3);
+  position: relative;
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--color-destructive) 12%, var(--color-surface));
+    transform: scale(1.05);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+}
+
+.recipe-save-btn {
+  background: var(--color-primary);
+  border-radius: 18px;
+  color: var(--color-on-primary);
+  flex: 1 1 auto;
+  padding: var(--space-3) var(--space-4);
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--color-primary) 110%, white);
+    box-shadow: var(--shadow-medium);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

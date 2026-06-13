@@ -3,10 +3,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 
 import { RecipeFormComponent } from './recipe-form.component';
-import { IngredientsStore } from '../../core/store/ingredients.store';
-import { DIALOG_DATA, DIALOG_REF } from '../../core/models/dialog/dialog-tokens.model';
-import { DialogRef } from '../../core/models/dialog/dialog-ref.model';
-import type { Ingredient, RecipeIngredient } from '../../core/models/ingredient';
+import { IngredientsStore } from '../../../core/store/ingredients.store';
+import { DIALOG_DATA, DIALOG_REF } from '../../../core/models/dialog/dialog-tokens.model';
+import { DialogRef } from '../../../core/models/dialog/dialog-ref.model';
+import type { Ingredient, RecipeIngredient } from '../../../core/models/ingredient';
 
 describe('RecipeFormComponent', () => {
   let fixture: ComponentFixture<RecipeFormComponent>;

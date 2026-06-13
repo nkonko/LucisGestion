@@ -1,18 +1,19 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IngredientsStore } from '../../core/store/ingredients.store';
-import { calculateRecipeCost, calculateSuggestedPrice } from '../../core/utils/pricing.utils';
-import { Recipe, RecipeCategory } from '../../core/models/recipe';
-import { RecipeIngredient } from '../../core/models/ingredient';
-import { DIALOG_DATA, DIALOG_REF } from '../../core/models/dialog/dialog-tokens.model';
-import { DialogRef } from '../../core/models/dialog/dialog-ref.model';
-import { CategoriaFormComponent } from './recipe-form/category-form.component';
-import { IngredientFormComponent } from './recipe-form/ingredient-form.component';
-import { CostFormComponent } from './recipe-form/cost-form.component';
+import { IngredientsStore } from '../../../core/store/ingredients.store';
+import { calculateRecipeCost, calculateSuggestedPrice } from '../../../core/utils/pricing.utils';
+import { Recipe, RecipeCategory } from '../../../core/models/recipe';
+import { RecipeIngredient } from '../../../core/models/ingredient';
+import { DIALOG_DATA, DIALOG_REF } from '../../../core/models/dialog/dialog-tokens.model';
+import { DialogRef } from '../../../core/models/dialog/dialog-ref.model';
+import { CategoriaFormComponent } from './category-form/category-form.component';
+import { IngredientFormComponent } from './ingredient-form/ingredient-form.component';
+import { CostFormComponent } from './cost-form/cost-form.component';
+import { UiIconComponent } from '../../../shared/ui/components';
 
 @Component({
   selector: 'app-recipe-form',
-  imports: [FormsModule, CategoriaFormComponent, IngredientFormComponent, CostFormComponent],
+  imports: [FormsModule, CategoriaFormComponent, IngredientFormComponent, CostFormComponent, UiIconComponent],
   templateUrl: './recipe-form.component.html',
   styleUrl: './recipe-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

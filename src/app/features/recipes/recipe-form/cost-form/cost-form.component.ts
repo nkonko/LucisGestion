@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ArsPipe } from '../../../shared/pipes/ars.pipe';
+import { ArsPipe } from '../../../../shared/pipes/ars.pipe';
 
 @Component({
   selector: 'app-cost-form',
