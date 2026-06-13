@@ -26,6 +26,20 @@ const createBackupPayload = (): AppBackupFile => ({
   },
 });
 
+const createUploadControlWithFile = (fileName: string, content: string): HTMLInputElement => {
+  const uploadControl = document.createElement('input');
+  const selectedFile = {
+    name: fileName,
+    text: () => Promise.resolve(content),
+  };
+  Object.defineProperty(uploadControl, 'files', {
+    value: [selectedFile],
+    configurable: true,
+  });
+  uploadControl.value = 'filled';
+  return uploadControl;
+};
+
 describe('BackupRestoreComponent', () => {
   let fixture: ComponentFixture<BackupRestoreComponent>;
   let component: BackupRestoreComponent;
@@ -104,17 +118,14 @@ describe('BackupRestoreComponent', () => {
     const payload = createBackupPayload();
     firestoreMock.parseBackupJson.mockReturnValue(payload);
 
-    const pickerElementStub = {
-      files: [{ name: 'backup.json', text: () => Promise.resolve('{"ok":true}') }],
-      value: 'filled',
-    } as unknown as HTMLInputElement;
+    const uploadControl = createUploadControlWithFile('backup.json', '{"ok":true}');
 
-    await component.onFileSelected(pickerElementStub);
+    await component.onFileSelected(uploadControl);
 
     expect(firestoreMock.parseBackupJson).toHaveBeenCalledWith('{"ok":true}');
     expect(component.selectedBackup()).toEqual(payload);
     expect(component.restoreFileName()).toBe('backup.json');
-    const valueAfterSelection = pickerElementStub.value;
+    const valueAfterSelection = uploadControl.value;
     expect(valueAfterSelection).toBe('');
     expect(notificationMock.success).toHaveBeenCalledWith('Archivo de backup cargado');
   });
@@ -124,12 +135,9 @@ describe('BackupRestoreComponent', () => {
       throw new Error('Formato inválido');
     });
 
-    const pickerElementStub = {
-      files: [{ name: 'bad.json', text: () => Promise.resolve('invalid') }],
-      value: 'filled',
-    } as unknown as HTMLInputElement;
+    const uploadControl = createUploadControlWithFile('bad.json', 'invalid');
 
-    await component.onFileSelected(pickerElementStub);
+    await component.onFileSelected(uploadControl);
 
     expect(component.selectedBackup()).toBeNull();
     expect(component.restoreFileName()).toBeNull();
