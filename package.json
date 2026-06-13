@@ -46,7 +46,7 @@
     "firebase-tools": "^15.16.0",
     "jsdom": "^29.1.1",
     "playwright": "^1.55.0",
-    "postcss": "^8.5.8",
+    "postcss": "^8.5.15",
     "prettier": "^3.8.1",
     "tailwindcss": "^4.3.0",
     "typescript": "~6.0.3",
