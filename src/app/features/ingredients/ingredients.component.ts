@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { NotificationService } from '../../core/services/notification.service';
 import { IngredientsStore } from '../../core/store/ingredients.store';
-import { Ingredient } from '../../core/models/ingredient';
+import { DEFAULT_INGREDIENT_ICON, Ingredient } from '../../core/models/ingredient';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
-import { IngredientFormComponent } from './ingredient-form.component';
+import { IngredientFormComponent } from './ingredient-form/ingredient-form.component';
 import { PriceHistoryComponent } from './price-history.component';
-import { DialogService } from '../../core/services/dialog.service';
+import { BottomSheetService } from '../../core/services/bottom-sheet.service';
 import { UiIconComponent } from '../../shared/ui/components';
 import { AuthStore } from '../../core/store/auth.store';
 
@@ -19,7 +19,7 @@ import { AuthStore } from '../../core/store/auth.store';
 export class IngredientsComponent {
   readonly store = inject(IngredientsStore);
   readonly auth = inject(AuthStore);
-  private dialog = inject(DialogService);
+  private dialog = inject(BottomSheetService);
   private notify = inject(NotificationService);
 
   searchTerm = signal('');
@@ -32,8 +32,13 @@ export class IngredientsComponent {
   });
 
   onSearchInput(event: Event): void {
-    const htmlTarget = event.target as HTMLInputElement | null;
-    this.searchTerm.set(htmlTarget?.value ?? '');
+    const value = (event.target as HTMLInputElement).value.trim();
+    this.searchTerm.set(value);
+  }
+
+
+  getIngredientIcon(ingredient: Ingredient): string {
+    return ingredient.icon || DEFAULT_INGREDIENT_ICON;
   }
 
   getStockClass(i: Ingredient): string {
@@ -45,6 +50,7 @@ export class IngredientsComponent {
   create(): void {
     const dialogRef = this.dialog.open<null, Ingredient>(IngredientFormComponent, {
       maxWidth: '500px',
+      maxHeight: '90vh',
       data: null,
     });
 
@@ -59,6 +65,7 @@ export class IngredientsComponent {
   edit(ingredient: Ingredient): void {
     const dialogRef = this.dialog.open<Ingredient, Ingredient | 'delete'>(IngredientFormComponent, {
       maxWidth: '500px',
+      maxHeight: '90vh',
       data: ingredient,
     });
 

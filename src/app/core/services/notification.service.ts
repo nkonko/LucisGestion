@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 
+import { getErrorMessage } from '../utils/error.utils';
 import { UiToastService } from '../../shared/ui/services/ui-toast.service';
 
 @Injectable({ providedIn: 'root' })
@@ -15,7 +16,7 @@ export class NotificationService {
   }
 
   errorFrom(error: unknown, fallbackMessage: string, duration = 5000): void {
-    const message = error instanceof Error ? error.message : fallbackMessage;
+    const message = getErrorMessage(error, fallbackMessage);
     this.error(message, duration);
   }
 }

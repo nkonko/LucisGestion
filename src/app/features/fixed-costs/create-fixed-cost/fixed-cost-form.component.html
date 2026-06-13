@@ -1,0 +1,64 @@
+<section class="fixed-cost-sheet ui-card-surface">
+  <form class="fixed-cost-sheet__body">
+    <label class="ui-field fixed-cost-field fixed-cost-field--full">
+      <span>Nombre</span>
+      <input
+        id="fixed-cost-name"
+        name="name"
+        data-initial-focus
+        class="ui-input"
+        type="text"
+        [(ngModel)]="form.name"
+        required
+        autocomplete="off"
+      />
+    </label>
+
+    <div class="fixed-cost-form-grid">
+      <label class="ui-field fixed-cost-field">
+        <span>Categoría</span>
+        <select class="ui-select" [(ngModel)]="form.category" required>
+          @for (c of categories; track c.key) {
+            <option [value]="c.key">{{ c.label }}</option>
+          }
+        </select>
+      </label>
+      <label class="ui-field fixed-cost-field">
+        <span>Monto (mensual)</span>
+        <input
+          id="fixed-cost-amount"
+          name="amount"
+          class="ui-input"
+          type="number"
+          inputmode="decimal"
+          min="0"
+          step="1"
+          [(ngModel)]="form.amount"
+          required
+        />
+      </label>
+    </div>
+
+    <label class="ui-field fixed-cost-field fixed-cost-field--full">
+      <span>Descripción (opcional)</span>
+      <textarea
+        id="fixed-cost-description"
+        name="description"
+        class="ui-textarea"
+        [(ngModel)]="form.description"
+        rows="3"
+      ></textarea>
+    </label>
+  </form>
+
+  <footer class="fixed-cost-sheet__actions">
+    <button
+      class="fixed-cost-save-btn"
+      type="button"
+      (click)="save()"
+      [disabled]="!isValid()"
+    >
+      {{ isEdit ? 'Actualizar' : 'Crear' }}
+    </button>
+  </footer>
+</section>

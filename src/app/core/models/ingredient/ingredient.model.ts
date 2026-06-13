@@ -1,6 +1,7 @@
 import { Timestamp } from 'firebase/firestore';
 import type { MeasurementUnit } from './measurement-unit.model';
 import type { IngredientCategory } from './ingredient-category.model';
+import type { IngredientIcon } from './ingredient-icon.model';
 
 export interface Ingredient {
   id?: string;
@@ -10,6 +11,7 @@ export interface Ingredient {
   currentStock: number;
   minimumStock: number;
   category: IngredientCategory;
+  icon?: IngredientIcon;
   lastPurchase: Timestamp | null;
   active: boolean;
 }

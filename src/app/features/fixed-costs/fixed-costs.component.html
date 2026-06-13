@@ -1,11 +1,5 @@
 <div class="flex items-center justify-between mb-4">
-  <h2 class="text-xl font-semibold">Costos fijos</h2>
-  @if (auth.isOwner()) {
-    <button class="ui-btn ui-btn-primary" type="button" (click)="create()">
-      <ui-icon name="add" [size]="18" [decorative]="true" />
-      <span>Agregar costo</span>
-    </button>
-  }
+  <h2 class="section-heading">Costos fijos</h2>
 </div>
 
 <app-month-nav
@@ -51,7 +45,7 @@
           <span class="cost-row__name">{{ entry.name }}</span>
           <span class="cost-row__amount">{{ entry.amount | ars }}</span>
         </button>
-
+        
         @if (auth.isOwner()) {
           <button
             type="button"
@@ -78,4 +72,10 @@
       <span class="cost-row__amount">{{ total() | ars }}</span>
     </li>
   </ul>
+}
+
+@if (auth.isOwner()) {
+<button class="fab-bottom-right ui-fab stock-fab" (click)="create()" type="button" aria-label="Agregar costo fijo">
+  <ui-icon name="add" [decorative]="true" />
+</button>
 }

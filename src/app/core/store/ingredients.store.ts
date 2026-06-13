@@ -106,7 +106,7 @@ export const IngredientsStore = signalStore(
         patchState(store, { loading: true, error: null });
         try {
           const expenseId = fs.createDocumentId('supplyExpenses');
-          const purchaseDate = Timestamp.now();
+          const purchaseDate = expense.date ?? Timestamp.now();
 
           const purchaseItems = expense.items
             .map((item) => {

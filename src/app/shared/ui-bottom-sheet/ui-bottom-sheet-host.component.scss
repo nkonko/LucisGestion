@@ -23,6 +23,54 @@
   box-shadow: var(--shadow-modal);
   overflow: hidden;
   animation: bottom-sheet-enter var(--transition-standard) ease-out;
+  display: flex;
+  flex-direction: column;
+}
+
+.ui-bottom-sheet-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-bottom: var(--border-width-thin) solid var(--color-outline-variant);
+  flex-shrink: 0;
+}
+
+.ui-bottom-sheet-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+
+.ui-bottom-sheet-eyebrow {
+  margin: 0 0 var(--space-1);
+  color: var(--color-on-surface-variant);
+  font-size: var(--size-font-2xs);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ui-bottom-sheet-title {
+  margin: 0;
+  font-size: var(--size-font-lg);
+  font-weight: 600;
+  letter-spacing: normal;
+  color: var(--color-on-surface);
+}
+
+.ui-bottom-sheet-close {
+  flex: 0 0 auto;
+  color: var(--color-on-surface-variant);
+}
+
+.ui-bottom-sheet-content {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 @keyframes bottom-sheet-enter {

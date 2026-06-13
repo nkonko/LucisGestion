@@ -2,10 +2,10 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
+  computed,
   ElementRef,
   Injector,
   Type,
-  computed,
   input,
   output,
   viewChild,
@@ -26,6 +26,8 @@ import { UI_BOTTOM_SHEET_DEFAULTS } from './ui-bottom-sheet.constants';
 export class UiBottomSheetHostComponent implements AfterViewInit {
   readonly contentComponent = input.required<Type<unknown>>();
   readonly contentInjector = input.required<Injector>();
+  readonly title = input<string | null>(null);
+  readonly section = input<string | null>(null);
   readonly maxWidth = input(UI_BOTTOM_SHEET_DEFAULTS.maxWidth);
   readonly width = input(UI_BOTTOM_SHEET_DEFAULTS.width);
   readonly maxHeight = input(UI_BOTTOM_SHEET_DEFAULTS.maxHeight);
@@ -35,6 +37,7 @@ export class UiBottomSheetHostComponent implements AfterViewInit {
   readonly closeRequested = output<undefined>();
 
   private readonly panel = viewChild.required<ElementRef<HTMLElement>>('panel');
+
 
   readonly panelClasses = computed(() => {
     const customClass = this.panelClass();
@@ -121,4 +124,5 @@ export class UiBottomSheetHostComponent implements AfterViewInit {
       (element) => !element.hasAttribute('aria-hidden'),
     );
   }
+
 }

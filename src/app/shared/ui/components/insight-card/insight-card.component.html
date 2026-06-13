@@ -1,0 +1,10 @@
+<div class="insight-card" [class]="cardClass()">
+  <div class="insight-card__header">
+    <ui-icon [name]="icon()" [size]="20" class="insight-card__icon" />
+    <span class="insight-card__badge">{{ badge() }}</span>
+  </div>
+  <p class="insight-card__title">{{ title() }}</p>
+  <div class="insight-card__body">
+    <ng-content />
+  </div>
+</div>

@@ -4,17 +4,17 @@ import { UiIconComponent } from '../../shared/ui/components';
 import { MonthNavComponent } from '../../shared/month-nav/month-nav.component';
 import { FixedCostsStore } from '../../core/store/fixed-costs.store';
 import { AuthStore } from '../../core/store/auth.store';
-import { DialogService } from '../../core/services/dialog.service';
+import { BottomSheetService } from '../../core/services/bottom-sheet.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { FixedCostEntry, FixedCostEntryInput } from '../../core/models/fixed-cost';
 import {
   FixedCostFormComponent,
-  FixedCostFormData,
-} from './fixed-cost-form.component';
-import { ConfirmDialogComponent } from '../../shared/ui-modal/confirm-dialog.component';
-import { ConfirmDialogData } from '../../shared/ui-modal/confirm-dialog.model';
+} from './create-fixed-cost/fixed-cost-form.component';
+import { ConfirmBottomSheetDialogComponent } from '../../shared/ui-bottom-sheet/confirm-dialog/confirm-bottom-sheet-dialog.component';
+import { ConfirmDialogData } from '../../shared/ui-bottom-sheet/confirm-dialog/confirm-dialog-data.model';
 import { formatPeriodLabel } from '../../core/utils/dashboard.utils';
 import { SelectedDate } from '../../core/models/dashboard';
+import { FixedCostFormData } from '../../core/models/fixed-cost/fixed-cost-form-data';
 
 function monthKeyOf(date: SelectedDate): string {
   return `${date.year}-${String(date.month + 1).padStart(2, '0')}`;
@@ -35,7 +35,7 @@ function labelFromMonthKey(monthKey: string): string {
 export class FixedCostsComponent {
   private readonly store = inject(FixedCostsStore);
   readonly auth = inject(AuthStore);
-  private readonly dialog = inject(DialogService);
+  private readonly dialog = inject(BottomSheetService);
   private readonly notify = inject(NotificationService);
 
   private readonly today = new Date();
@@ -74,7 +74,8 @@ export class FixedCostsComponent {
   create(): void {
     const ref = this.dialog.open<FixedCostFormData, FixedCostEntryInput>(
       FixedCostFormComponent,
-      { maxWidth: '480px', data: { monthLabel: this.monthLabel(), entry: null } },
+      { title: 'Nuevo costo fijo', section: 'Costos fijos',
+        maxWidth: '480px', data: { monthLabel: this.monthLabel(), entry: null } },
     );
     ref.afterClosed.subscribe(async (input) => {
       if (!input) return;
@@ -86,7 +87,7 @@ export class FixedCostsComponent {
   edit(entry: FixedCostEntry): void {
     const ref = this.dialog.open<FixedCostFormData, FixedCostEntryInput>(
       FixedCostFormComponent,
-      { maxWidth: '480px', data: { monthLabel: this.monthLabel(), entry } },
+      { title: 'Editar costo fijo', section: 'Costos fijos', maxWidth: '480px', data: { monthLabel: this.monthLabel(), entry } },
     );
     ref.afterClosed.subscribe(async (input) => {
       if (!input) return;
@@ -97,7 +98,7 @@ export class FixedCostsComponent {
 
   confirmDelete(entry: FixedCostEntry, event: Event): void {
     event.stopPropagation();
-    const ref = this.dialog.open<ConfirmDialogData, boolean>(ConfirmDialogComponent, {
+    const ref = this.dialog.open<ConfirmDialogData, boolean>(ConfirmBottomSheetDialogComponent, {
       maxWidth: '420px',
       data: {
         title: 'Borrar costo fijo',
@@ -119,14 +120,16 @@ export class FixedCostsComponent {
   }
 
   confirmRevert(): void {
-    const ref = this.dialog.open<ConfirmDialogData, boolean>(ConfirmDialogComponent, {
+    const dialogData = {
+      title: 'Volver al mes anterior',
+      message: `Se descartarán los cambios de ${this.monthLabel()} y se heredarán los costos del mes previo.`,
+      confirmLabel: 'Volver',
+      destructive: true,
+    };
+    const ref = this.dialog.open<ConfirmDialogData, boolean>(ConfirmBottomSheetDialogComponent, {
+      title: dialogData.title,
       maxWidth: '420px',
-      data: {
-        title: 'Volver al mes anterior',
-        message: `Se descartarán los cambios de ${this.monthLabel()} y se heredarán los costos del mes previo.`,
-        confirmLabel: 'Volver',
-        destructive: true,
-      },
+      data: dialogData,
     });
     ref.afterClosed.subscribe(async (confirmed) => {
       if (!confirmed) return;

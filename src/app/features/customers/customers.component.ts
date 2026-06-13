@@ -3,8 +3,8 @@ import { NotificationService } from '../../core/services/notification.service';
 import { CustomersStore } from '../../core/store/customers.store';
 import { WhatsAppService } from '../../core/services/whatsapp.service';
 import { Customer, CustomerInput } from '../../core/models/customer';
-import { CustomerFormComponent } from './customer-form.component';
-import { DialogService } from '../../core/services/dialog.service';
+import { CustomerFormComponent } from './create customer/customer-form.component';
+import { BottomSheetService } from '../../core/services/bottom-sheet.service';
 import { UiCardComponent, UiIconComponent } from '../../shared/ui/components';
 
 @Component({
@@ -17,7 +17,7 @@ import { UiCardComponent, UiIconComponent } from '../../shared/ui/components';
 export class CustomersComponent {
   readonly store = inject(CustomersStore);
   private whatsApp = inject(WhatsAppService);
-  private dialog = inject(DialogService);
+  private dialog = inject(BottomSheetService);
   private notify = inject(NotificationService);
 
   searchTerm = signal('');
@@ -32,12 +32,14 @@ export class CustomersComponent {
   });
 
   onSearchInput(event: Event): void {
-    const htmlTarget = event.target as HTMLInputElement | null;
-    this.searchTerm.set(htmlTarget?.value ?? '');
+    const value = (event.target as HTMLInputElement).value.trim();
+    this.searchTerm.set(value);
   }
 
   create(): void {
     const dialogRef = this.dialog.open<null, CustomerInput>(CustomerFormComponent, {
+      title: 'Nuevo cliente',
+      section: 'Cliente',
       maxWidth: '500px',
       data: null,
     });
@@ -47,7 +49,7 @@ export class CustomersComponent {
         try {
           await this.store.createCustomer(result);
           this.notify.success('Cliente creado');
-        } catch (error) {
+        } catch (error: unknown) {
           this.notify.errorFrom(error, 'No se pudo crear el cliente');
         }
       }
@@ -56,6 +58,8 @@ export class CustomersComponent {
 
   edit(customer: Customer): void {
     const dialogRef = this.dialog.open<Customer, CustomerInput | 'delete'>(CustomerFormComponent, {
+      title: 'Editar cliente',
+      section: 'Cliente',
       maxWidth: '500px',
       data: customer,
     });
@@ -69,7 +73,7 @@ export class CustomersComponent {
           await this.store.updateCustomer(customer.id, result);
           this.notify.success('Cliente actualizado');
         }
-      } catch (error) {
+      } catch (error: unknown) {
         this.notify.errorFrom(error, 'No se pudo guardar el cliente');
       }
     });

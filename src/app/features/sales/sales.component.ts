@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, SecurityContext, signal } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { NotificationService } from '../../core/services/notification.service';
 import { SalesStore } from '../../core/store/sales.store';
 import { CustomersStore } from '../../core/store/customers.store';
@@ -19,12 +18,13 @@ import { SalesCardComponent } from './sales-card/sales-card.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SalesComponent {
+  private static readonly DELETED_CUSTOMER_NAME = '[eliminado]';
+
   readonly store = inject(SalesStore);
   private customersStore = inject(CustomersStore);
   private whatsApp = inject(WhatsAppService);
   private bottomSheet = inject(BottomSheetService);
   private notify = inject(NotificationService);
-  private sanitizer = inject(DomSanitizer);
 
   statusDisplay: Record<SaleStatus, string> = SALE_STATUS_DISPLAY;
 
@@ -34,7 +34,12 @@ export class SalesComponent {
   selectedStatus = signal<SaleStatus | null>(null);
   selectedPaymentStatus = signal<'paid' | 'unpaid' | null>(null);
 
-  readonly customers = computed(() => this.customersStore.customers());
+  readonly customers = computed(() =>
+    this.customersStore
+      .customers()
+      .filter((customer) => customer.name !== SalesComponent.DELETED_CUSTOMER_NAME),
+  );
+  private readonly customersById = computed(() => new Map(this.customers().map((customer) => [customer.id, customer])));
   readonly dateFromValue = computed(() => {
     const date = this.dateFrom();
     if (!date) return '';
@@ -81,6 +86,15 @@ export class SalesComponent {
       items = items.filter((v) => (paymentStatus === 'paid' ? v.isPaid === true : v.isPaid !== true));
     }
 
+    items = items.map((sale) => {
+      const customerFromStore = sale.customerId ? this.customersById().get(sale.customerId) : undefined;
+      const normalizedCustomerName =
+        customerFromStore?.name ??
+        (sale.customerName === SalesComponent.DELETED_CUSTOMER_NAME ? '' : sale.customerName);
+
+      return { ...sale, customerName: normalizedCustomerName };
+    });
+
     if (!this.hasActiveFilters()) {
       const statusPriority: Record<SaleStatus, number> = {
         pending: 0,
@@ -100,8 +114,8 @@ export class SalesComponent {
   });
 
   onSearchInput(event: Event): void {
-    const htmlTarget = event.target as HTMLInputElement | null;
-    this.searchTerm.set(htmlTarget?.value ?? '');
+    const value = (event.target as HTMLInputElement).value.trim();
+    this.searchTerm.set(value);
   }
 
   onDateFromInput(event: Event): void {
@@ -127,14 +141,14 @@ export class SalesComponent {
   }
 
   private validateStatus(rawValue: string): SaleStatus | null {
-    const sanitized = this.sanitizer.sanitize(SecurityContext.HTML, rawValue) || '';
+    const value = rawValue.trim();
     const validStatuses: SaleStatus[] = ['pending', 'production', 'delivered', 'cancelled'];
-    return validStatuses.includes(sanitized as SaleStatus) ? (sanitized as SaleStatus) : null;
+    return validStatuses.includes(value as SaleStatus) ? (value as SaleStatus) : null;
   }
 
   private validatePaymentStatus(rawValue: string): 'paid' | 'unpaid' | null {
-    const sanitized = this.sanitizer.sanitize(SecurityContext.HTML, rawValue) || '';
-    return sanitized === 'paid' ? 'paid' : sanitized === 'unpaid' ? 'unpaid' : null;
+    const value = rawValue.trim();
+    return value === 'paid' ? 'paid' : value === 'unpaid' ? 'unpaid' : null;
   }
 
   clearFilters(): void {
@@ -147,6 +161,8 @@ export class SalesComponent {
 
   newSale(): void {
     const dialogRef = this.bottomSheet.open<null, SaleInput>(SaleFormComponent, {
+      title: 'Nueva Venta',
+      section: 'Venta',
       maxWidth: '760px',
       maxHeight: '90vh',
       data: null,
@@ -157,7 +173,7 @@ export class SalesComponent {
         try {
           await this.store.registerSale(result);
           this.notify.success('Venta registrada. Stock actualizado.', 3000);
-        } catch (error) {
+        } catch (error: unknown) {
           this.notify.errorFrom(error, 'No se pudo registrar la venta por stock insuficiente.');
         }
       }
@@ -172,6 +188,8 @@ export class SalesComponent {
     }
 
     const dialogRef = this.bottomSheet.open<Sale, SaleInput>(SaleFormComponent, {
+      title: 'Editar Venta',
+      section: 'Venta',
       maxWidth: '760px',
       maxHeight: '90vh',
       data: sale,
@@ -182,7 +200,7 @@ export class SalesComponent {
         try {
           await this.store.updateSale(saleId, result);
           this.notify.success('Venta actualizada.', 3000);
-        } catch (error) {
+        } catch (error: unknown) {
           this.notify.errorFrom(error, 'No se pudo actualizar la venta por stock insuficiente.');
         }
       }
@@ -217,7 +235,8 @@ export class SalesComponent {
   sendWhatsApp(sale: Sale): void {
     const customer = this.customersStore.customers().find((c) => c.id === sale.customerId);
     const items = sale.items.map((i) => `${i.quantity}x ${i.name}`).join('\n');
-    const msg = `Hola ${sale.customerName}! 🧁\n\nTu pedido de Lucis Pastelería:\n${items}\n\nTotal: $${sale.total}\n\n¡Gracias!`;
+    const customerName = sale.customerName.trim() || customer?.name || 'cliente';
+    const msg = `Hola ${customerName}! 🧁\n\nTu pedido de Lucis Pastelería:\n${items}\n\nTotal: $${sale.total}\n\n¡Gracias!`;
     this.whatsApp.sendMessage(customer?.phone ?? '', msg);
   }
 

@@ -1,0 +1,14 @@
+<a
+  [routerLink]="route()"
+  routerLinkActive="active"
+  [routerLinkActiveOptions]="{ exact: exact() }"
+  class="nav-item ui-nav-item"
+  [class.nav-item--secondary]="secondary()"
+  [class.nav-item--badge]="badge() > 0"
+>
+  <ui-icon [name]="icon()" [decorative]="true" [size]="20" />
+  @if (badge() > 0) {
+    <span class="badge" [attr.aria-label]="badge() + ' ingredientes con stock bajo'">{{ badge() }}</span>
+  }
+  <span class="nav-item__label">{{ label() }}</span>
+</a>

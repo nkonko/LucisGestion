@@ -1,0 +1,85 @@
+:host {
+  display: block;
+}
+
+.kpi-card {
+  border-radius: var(--space-4);
+  border: var(--border-width-thin) solid rgba(255, 255, 255, 0.15);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-soft);
+  height: 100%;
+  color: var(--color-surface);
+
+  &--primary {
+    background:
+      radial-gradient(circle at top right, color-mix(in srgb, var(--color-primary) 90%, white) 0%, transparent 60%),
+      linear-gradient(135deg,
+        color-mix(in srgb, var(--color-primary) 85%, black) 0%,
+        color-mix(in srgb, var(--color-primary) 65%, var(--color-status-warning) 35%) 100%
+      );
+  }
+
+  &--success {
+    background:
+      radial-gradient(circle at top right, color-mix(in srgb, var(--color-status-ok) 85%, white) 0%, transparent 60%),
+      linear-gradient(135deg,
+        color-mix(in srgb, var(--color-status-ok) 90%, black) 0%,
+        color-mix(in srgb, var(--color-status-ok) 70%, #8bc34a) 100%
+      );
+  }
+
+  &--warning {
+    background:
+      radial-gradient(circle at top right, color-mix(in srgb, var(--color-status-warning) 85%, white) 0%, transparent 60%),
+      linear-gradient(135deg,
+        color-mix(in srgb, var(--color-status-warning) 90%, black) 0%,
+        color-mix(in srgb, var(--color-status-warning) 70%, var(--color-status-ok) 30%) 100%
+      );
+  }
+
+  &--danger {
+    background:
+      radial-gradient(circle at top right, color-mix(in srgb, var(--color-status-danger) 85%, white) 0%, transparent 60%),
+      linear-gradient(135deg,
+        color-mix(in srgb, var(--color-status-danger) 90%, black) 0%,
+        color-mix(in srgb, var(--color-status-danger) 65%, var(--color-status-warning) 35%) 100%
+      );
+  }
+}
+
+.kpi-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-4);
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--color-surface);
+}
+
+.kpi-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: inherit;
+  margin: 0;
+}
+
+.kpi-label {
+  font-size: 0.875rem;
+  color: inherit;
+  opacity: 0.85;
+  margin: var(--space-1) 0 0;
+}
+
+.kpi-subtitle {
+  display: inline-block;
+  margin-top: var(--space-3);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: var(--radius-chip);
+  background: rgba(255, 255, 255, 0.2);
+  color: inherit;
+}

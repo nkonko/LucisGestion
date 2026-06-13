@@ -14,11 +14,14 @@ export const DashboardStore = signalStore(
   }),
 
   withComputed((store) => ({
-    periodLabel: computed(() => formatPeriodLabel(store.selectedDate())),
+    periodLabel: computed(() => formatPeriodLabel(store.selectedDate(), store.selectedPeriod())),
     monthInputValue: computed(() => toMonthInputValue(store.selectedDate())),
     isCurrentMonth: computed(() => {
       const today = new Date();
       const selected = store.selectedDate();
+      const period = store.selectedPeriod();
+      if (period === 'today' || period === 'week') return true;
+      if (period === 'year') return selected.year === today.getFullYear();
       return selected.year === today.getFullYear() && selected.month === today.getMonth();
     }),
   })),

@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, isDevMode } from '@angular/core';
 import {
   Auth,
   GoogleAuthProvider,
@@ -79,8 +79,8 @@ export class AuthService {
     try {
       const appUser = await this.loadOrCreateProfile(user);
       this.authStore.setAuthState(appUser, true);
-    } catch (error) {
-      console.error('Login failed - unable to load user profile:', error);
+    } catch (error: unknown) {
+      if (isDevMode()) console.error('Login failed - unable to load user profile:', error);
       this.authStore.setAuthState(null, true);
     }
   }

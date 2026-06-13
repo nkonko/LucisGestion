@@ -4,10 +4,11 @@ import { IngredientsStore } from '../../core/store/ingredients.store';
 import { UiIconComponent } from '../ui/components';
 import { AuthService } from '../../core/services/auth.service';
 import { AuthStore } from '../../core/store/auth.store';
+import { NavItemComponent } from './nav-item/nav-item.component';
 
 @Component({
   selector: 'app-bottom-nav',
-  imports: [RouterLink, RouterLinkActive, UiIconComponent],
+  imports: [RouterLink, RouterLinkActive, UiIconComponent, NavItemComponent],
   templateUrl: './bottom-nav.component.html',
   styleUrl: './bottom-nav.component.scss',
   host: {
@@ -46,6 +47,11 @@ export class BottomNavComponent {
   navigateToFinancialReports(): void {
     this.menuOpen.set(false);
     this.router.navigate(['/reportes-financieros']);
+  }
+
+  navigateToBackupRestore(): void {
+    this.menuOpen.set(false);
+    this.router.navigate(['/backup-restore']);
   }
 
   onMoreMenuClick(event: Event): void {
