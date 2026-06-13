@@ -16,7 +16,7 @@ type MockDocument = Record<string, unknown> & {
   endDate?: Timestamp;
 };
 type BackupDocumentList = AppBackupFile['collections'][string];
-type BackupCollections = {
+interface BackupCollections extends Record<string, BackupDocumentList> {
   users: BackupDocumentList;
   ingredients: BackupDocumentList;
   recipes: BackupDocumentList;
@@ -26,8 +26,8 @@ type BackupCollections = {
   stockMovements: BackupDocumentList;
   supplyExpenses: BackupDocumentList;
   fixedCostsByMonth: BackupDocumentList;
-};
-type UnknownBackupCollections = {
+}
+interface UnknownBackupCollections {
   users?: unknown;
   ingredients?: unknown;
   recipes?: unknown;
@@ -37,7 +37,7 @@ type UnknownBackupCollections = {
   stockMovements?: unknown;
   supplyExpenses?: unknown;
   fixedCostsByMonth?: unknown;
-};
+}
 
 @Injectable()
 export class MockFirestoreService {
@@ -271,7 +271,7 @@ export class MockFirestoreService {
   }
 
   private serializeRecord(data: Record<string, unknown>): Record<string, BackupJsonValue> {
-    const entries: Array<[string, BackupJsonValue]> = [];
+    const entries: [string, BackupJsonValue][] = [];
     for (const [key, value] of Object.entries(data)) {
       if (!this.isSafeObjectKey(key)) {
         continue;
@@ -314,7 +314,7 @@ export class MockFirestoreService {
   }
 
   private deserializeRecord(data: Record<string, BackupJsonValue>): Record<string, unknown> {
-    const entries: Array<[string, unknown]> = [];
+    const entries: [string, unknown][] = [];
     for (const [key, value] of Object.entries(data)) {
       if (!this.isSafeObjectKey(key)) {
         continue;
@@ -446,7 +446,7 @@ export class MockFirestoreService {
     collections: AppBackupFile['collections'],
     collectionName: (typeof APP_DATA_COLLECTIONS)[number],
   ): BackupDocumentList {
-    const typedCollections = collections as BackupCollections;
+    const typedCollections = collections as unknown as BackupCollections;
     switch (collectionName) {
       case 'users':
         return typedCollections.users;

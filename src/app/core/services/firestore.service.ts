@@ -36,7 +36,7 @@ export const APP_DATA_COLLECTIONS = [
 
 type FirestoreData = Record<string, unknown>;
 type BackupDocumentList = AppBackupFile['collections'][string];
-type BackupCollections = {
+interface BackupCollections extends Record<string, BackupDocumentList> {
   users: BackupDocumentList;
   ingredients: BackupDocumentList;
   recipes: BackupDocumentList;
@@ -46,8 +46,8 @@ type BackupCollections = {
   stockMovements: BackupDocumentList;
   supplyExpenses: BackupDocumentList;
   fixedCostsByMonth: BackupDocumentList;
-};
-type UnknownBackupCollections = {
+}
+interface UnknownBackupCollections {
   users?: unknown;
   ingredients?: unknown;
   recipes?: unknown;
@@ -57,7 +57,7 @@ type UnknownBackupCollections = {
   stockMovements?: unknown;
   supplyExpenses?: unknown;
   fixedCostsByMonth?: unknown;
-};
+}
 
 interface FirestoreApi {
   addDoc: typeof addDoc;
@@ -353,7 +353,7 @@ export class FirestoreService {
   }
 
   private serializeRecord(data: FirestoreData): Record<string, BackupJsonValue> {
-    const entries: Array<[string, BackupJsonValue]> = [];
+    const entries: [string, BackupJsonValue][] = [];
     for (const [key, value] of Object.entries(data)) {
       if (!this.isSafeObjectKey(key)) {
         continue;
@@ -396,7 +396,7 @@ export class FirestoreService {
   }
 
   private deserializeRecord(data: Record<string, BackupJsonValue>): FirestoreData {
-    const entries: Array<[string, unknown]> = [];
+    const entries: [string, unknown][] = [];
     for (const [key, value] of Object.entries(data)) {
       if (!this.isSafeObjectKey(key)) {
         continue;
@@ -533,7 +533,7 @@ export class FirestoreService {
     collections: AppBackupFile['collections'],
     collectionName: (typeof APP_DATA_COLLECTIONS)[number],
   ): BackupDocumentList {
-    const typedCollections = collections as BackupCollections;
+    const typedCollections = collections as unknown as BackupCollections;
     switch (collectionName) {
       case 'users':
         return typedCollections.users;
