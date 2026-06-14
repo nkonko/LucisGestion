@@ -3,7 +3,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { UiIconComponent } from '../../ui/components';
 
 @Component({
-  selector: 'nav-item',
+  selector: 'app-nav-item',
   imports: [RouterLink, RouterLinkActive, UiIconComponent],
   templateUrl: './nav-item.component.html',
   styleUrls: ['./nav-item.component.scss'],
