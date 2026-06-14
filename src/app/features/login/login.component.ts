@@ -22,7 +22,7 @@ export class LoginComponent {
     this.error.set('');
     try {
       await this.auth.loginWithGoogle();
-      await this.router.navigate(['/dashboard']);
+      await this.router.navigate(['/app/dashboard']);
     } catch (error: unknown) {
       this.error.set(getErrorMessage(error, 'Error al iniciar sesión'));
       this.loading.set(false);

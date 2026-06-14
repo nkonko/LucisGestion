@@ -1,0 +1,31 @@
+<svg width="960" height="640" viewBox="0 0 960 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="960" y2="640" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0E1A2B"/>
+      <stop offset="1" stop-color="#152B45"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#FFFFFF" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.05"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="640" rx="28" fill="url(#bg)"/>
+  <rect x="42" y="38" width="876" height="564" rx="22" fill="url(#panel)" stroke="#7AB4FF" stroke-opacity="0.25"/>
+  <rect x="76" y="86" width="210" height="34" rx="10" fill="#1E3B5B"/>
+  <rect x="92" y="97" width="130" height="12" rx="6" fill="#9FC8FF"/>
+  <rect x="76" y="146" width="390" height="180" rx="16" fill="#173555"/>
+  <path d="M104 284C132 240 165 216 196 216C238 216 255 278 291 278C324 278 339 232 372 232C406 232 430 258 446 278" stroke="#FFA94D" stroke-width="8" stroke-linecap="round"/>
+  <rect x="486" y="146" width="398" height="180" rx="16" fill="#173555"/>
+  <rect x="516" y="184" width="56" height="110" rx="8" fill="#7AB4FF"/>
+  <rect x="590" y="164" width="56" height="130" rx="8" fill="#4CE0B3"/>
+  <rect x="664" y="202" width="56" height="92" rx="8" fill="#FFD166"/>
+  <rect x="738" y="176" width="56" height="118" rx="8" fill="#FFA94D"/>
+  <rect x="76" y="356" width="808" height="210" rx="16" fill="#173555"/>
+  <rect x="106" y="390" width="360" height="20" rx="10" fill="#8CB9F4" fill-opacity="0.8"/>
+  <rect x="106" y="426" width="300" height="14" rx="7" fill="#8CB9F4" fill-opacity="0.55"/>
+  <rect x="106" y="452" width="330" height="14" rx="7" fill="#8CB9F4" fill-opacity="0.55"/>
+  <rect x="106" y="478" width="260" height="14" rx="7" fill="#8CB9F4" fill-opacity="0.55"/>
+  <circle cx="696" cy="462" r="76" fill="#1E3B5B"/>
+  <circle cx="696" cy="462" r="50" fill="#4CE0B3"/>
+  <path d="M696 462L736 436" stroke="#0E1A2B" stroke-width="8" stroke-linecap="round"/>
+</svg>

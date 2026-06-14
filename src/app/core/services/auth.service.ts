@@ -29,10 +29,20 @@ export class AuthService {
   private authStore = inject(AuthStore);
 
   private pendingAuthChange: Promise<void> | null = null;
+  private authChangeResolver: (() => void) | null = null;
 
   constructor() {
     onAuthStateChanged(this.auth, (user) => {
-      this.pendingAuthChange = this.handleAuthChange(user);
+      this.handleAuthChange(user).then(() => {
+        this.authChangeResolver?.();
+      });
+    });
+  }
+
+  private createAuthChangePromise(): Promise<void> {
+    return new Promise((resolve) => {
+      this.authChangeResolver = resolve;
+      this.pendingAuthChange = Promise.resolve();
     });
   }
 
@@ -46,7 +56,7 @@ export class AuthService {
       throw new Error('Tu cuenta no tiene acceso a esta app.');
     }
 
-    await this.pendingAuthChange;
+    await this.waitForAuthChange();
 
     if (!this.authStore.appUser()) {
       throw new Error('No se pudo cargar el perfil de usuario.');
@@ -54,7 +64,29 @@ export class AuthService {
   }
 
   async logout(): Promise<void> {
+    this.createAuthChangePromise();
     await signOut(this.auth);
+    // Esperar a que Firebase procese completamente el cambio de autenticación
+    await this.waitForAuthChange();
+    // Limpiar explícitamente el sessionStorage para asegurar que no queda rastro
+    try {
+      const keys = Object.keys(sessionStorage);
+      keys.forEach(key => {
+        if (key.includes('firebase') || key.includes('auth')) {
+          sessionStorage.removeItem(key);
+        }
+      });
+    } catch (e) {
+      // Ignorar errores de sessionStorage
+    }
+  }
+
+  private async waitForAuthChange(): Promise<void> {
+    if (this.pendingAuthChange) {
+      await this.pendingAuthChange;
+    }
+    // Espera adicional para asegurar que todo esté sincronizado
+    await new Promise((resolve) => setTimeout(resolve, 50));
   }
 
   /** Owner can change another user's role */
