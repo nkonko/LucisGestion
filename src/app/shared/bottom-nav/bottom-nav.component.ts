@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, Injector, signal } from '@angular/core';
 import { computed } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { IngredientsStore } from '../../core/store/ingredients.store';
@@ -21,7 +21,7 @@ export class BottomNavComponent {
   private ingredientsStore = inject(IngredientsStore);
   readonly lowStockCount = this.ingredientsStore.lowStockCount;
   readonly auth = inject(AuthStore);
-  private authService = inject(AuthService);
+  private injector = inject(Injector);
   private router = inject(Router);
   private demoMode = inject(DemoModeService);
 
@@ -64,8 +64,11 @@ export class BottomNavComponent {
 
   async logout(): Promise<void> {
     this.menuOpen.set(false);
-    if (!this.demoMode.isDemoMode()) {
-      await this.authService.logout();
+    if (this.demoMode.isDemoMode()) {
+      this.auth.setAuthState(null, true);
+    } else {
+      const authService = this.injector.get(AuthService);
+      await authService.logout();
       await new Promise((resolve) => setTimeout(resolve, 200));
     }
     this.demoMode.exitDemoMode();

@@ -25,6 +25,10 @@ import { AuthService } from './core/services/auth.service';
 import { FirestoreService } from './core/services/firestore.service';
 import { DemoAwareFirestoreService } from './core/services/demo-aware-firestore.service';
 
+function isDemoRoute(): boolean {
+  return typeof window !== 'undefined' && window.location.pathname.startsWith('/demo');
+}
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
@@ -38,6 +42,10 @@ export const appConfig: ApplicationConfig = {
     ),
     provideAuth((injector) => getAuth(injector.get(FirebaseApp))),
     provideAppInitializer(() => {
+      if (isDemoRoute()) {
+        return;
+      }
+
       const firebaseApp = inject(FirebaseApp);
       inject(AuthService);
       const auth = getAuth(firebaseApp);
