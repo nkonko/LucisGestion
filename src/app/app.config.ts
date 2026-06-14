@@ -13,7 +13,10 @@ import {
 } from '@angular/fire/app';
 import { provideFirestore, initializeFirestore } from '@angular/fire/firestore';
 import { provideAuth, getAuth } from '@angular/fire/auth';
-import { browserSessionPersistence, setPersistence } from '@angular/fire/auth';
+import {
+  browserSessionPersistence,
+  setPersistence,
+} from 'firebase/auth';
 
 import { routes } from './app.routes';
 import { provideServiceWorker } from '@angular/service-worker';
