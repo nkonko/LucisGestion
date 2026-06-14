@@ -37,11 +37,12 @@ export const appConfig: ApplicationConfig = {
       }),
     ),
     provideAuth((injector) => getAuth(injector.get(FirebaseApp))),
-    provideAppInitializer(async () => {
+    provideAppInitializer(() => {
       const firebaseApp = inject(FirebaseApp);
-      const auth = getAuth(firebaseApp);
-      await setPersistence(auth, browserSessionPersistence);
       inject(AuthService);
+      const auth = getAuth(firebaseApp);
+
+      return setPersistence(auth, browserSessionPersistence);
     }),
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode() && environment.production,
