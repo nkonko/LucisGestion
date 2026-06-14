@@ -24,9 +24,9 @@ describe('CategoryFormComponent', () => {
     const emitSpy = vi.fn();
     component.categoryChange.subscribe(emitSpy);
 
-    const categorySelect = fixture.nativeElement.querySelector('select') as HTMLSelectElement;
-    categorySelect.value = 'pies';
-    categorySelect.dispatchEvent(new Event('change'));
+    const categorySelectElement = fixture.nativeElement.querySelector('select') as HTMLSelectElement;
+    categorySelectElement.value = 'pies';
+    categorySelectElement.dispatchEvent(new Event('change'));
     fixture.detectChanges();
 
     expect(emitSpy).toHaveBeenCalledTimes(1);
