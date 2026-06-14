@@ -1,9 +1,20 @@
 :host {
   display: block;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 8% 0%, color-mix(in srgb, var(--color-primary-container) 45%, transparent) 0, transparent 35%),
+    radial-gradient(circle at 100% 10%, color-mix(in srgb, var(--color-warning) 24%, transparent) 0, transparent 42%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-surface) 92%, white) 0%,
+      color-mix(in srgb, var(--color-primary-container) 22%, var(--color-surface)) 56%,
+      var(--color-surface) 100%
+    );
 }
 
 .layout-content {
   padding-top: var(--size-layout-header-height);
+  min-height: 100vh;
   transition: padding-top var(--transition-layout-brand-collapse) ease;
 }
 

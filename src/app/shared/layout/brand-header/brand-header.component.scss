@@ -29,7 +29,7 @@
   overflow: hidden;
   white-space: nowrap;
   color: var(--color-primary);
-  font-size: var(--size-layout-brand-name-font);
+  font-size: calc(var(--size-layout-brand-name-font) * 0.78);
   font-weight: 600;
   line-height: 0.95;
   opacity: 1;
@@ -53,4 +53,10 @@
   max-width: 0;
   opacity: 0;
   transform: translateX(calc(var(--space-2) * -1));
+}
+
+@media (max-width: 768px) {
+  .layout-brand {
+    display: none;
+  }
 }
