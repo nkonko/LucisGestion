@@ -10,5 +10,5 @@ export const guestGuard: CanActivateFn = async () => {
 
   await firstValueFrom(toObservable(authStore.ready).pipe(filter(Boolean)));
 
-  return authStore.isLoggedIn() ? router.createUrlTree(['/dashboard']) : true;
+  return authStore.isLoggedIn() ? router.createUrlTree(['/app/dashboard']) : true;
 };

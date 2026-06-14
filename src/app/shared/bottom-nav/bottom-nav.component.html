@@ -1,13 +1,13 @@
 <nav class="bottom-nav">
   <!-- Primary navigation items (always visible) -->
-  <ui-nav-item route="/dashboard" icon="home" label="Inicio" [exact]="true" />
-  <ui-nav-item route="/recetas" icon="menu_book" label="Recetas" />
-  <ui-nav-item route="/ventas" icon="point_of_sale" label="Ventas" />
-  <ui-nav-item route="/stock" icon="inventory_2" label="Stock" [badge]="lowStockCount()" />
+  <ui-nav-item route="/app/dashboard" icon="home" label="Inicio" [exact]="true" />
+  <ui-nav-item route="/app/recetas" icon="menu_book" label="Recetas" />
+  <ui-nav-item route="/app/ventas" icon="point_of_sale" label="Ventas" />
+  <ui-nav-item route="/app/stock" icon="inventory_2" label="Stock" [badge]="lowStockCount()" />
 
   <!-- Secondary navigation items (hidden on mobile, in dropdown) -->
-  <ui-nav-item route="/costos" icon="receipt_long" label="Costos" [secondary]="true" />
-  <ui-nav-item route="/clientes" icon="people" label="Clientes" [secondary]="true" />
+  <ui-nav-item route="/app/costos" icon="receipt_long" label="Costos" [secondary]="true" />
+  <ui-nav-item route="/app/clientes" icon="people" label="Clientes" [secondary]="true" />
 
   <!-- More menu button (visible on mobile) -->
   <div class="nav-more-menu" (click)="onMoreMenuClick($event)">
@@ -25,7 +25,7 @@
     @if (moreMenuOpen()) {
       <div class="ui-menu ui-menu--nav" role="menu">
         <a
-          routerLink="/costos"
+          routerLink="/app/costos"
           routerLinkActive="active"
           class="ui-menu-item ui-menu-link"
           role="menuitem"
@@ -35,7 +35,7 @@
           <span>Costos</span>
         </a>
         <a
-          routerLink="/clientes"
+          routerLink="/app/clientes"
           routerLinkActive="active"
           class="ui-menu-item ui-menu-link"
           role="menuitem"

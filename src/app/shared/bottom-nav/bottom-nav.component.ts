@@ -1,10 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
+import { computed } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { IngredientsStore } from '../../core/store/ingredients.store';
 import { UiIconComponent } from '../ui/components';
+import { NavItemComponent } from './nav-item/nav-item.component';
+import { DemoModeService } from '../../core/services/demo-mode.service';
 import { AuthService } from '../../core/services/auth.service';
 import { AuthStore } from '../../core/store/auth.store';
-import { NavItemComponent } from './nav-item/nav-item.component';
 
 @Component({
   selector: 'app-bottom-nav',
@@ -21,9 +23,11 @@ export class BottomNavComponent {
   readonly auth = inject(AuthStore);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private demoMode = inject(DemoModeService);
 
   readonly menuOpen = signal(false);
   readonly moreMenuOpen = signal(false);
+  readonly basePath = computed(() => this.demoMode.isDemoMode() ? '/demo' : '/app');
 
   closeMenu(): void {
     this.menuOpen.set(false);
@@ -46,12 +50,12 @@ export class BottomNavComponent {
 
   navigateToFinancialReports(): void {
     this.menuOpen.set(false);
-    this.router.navigate(['/reportes-financieros']);
+    this.router.navigate([`${this.basePath()}/reportes-financieros`]);
   }
 
   navigateToBackupRestore(): void {
     this.menuOpen.set(false);
-    this.router.navigate(['/backup-restore']);
+    this.router.navigate([`${this.basePath()}/backup-restore`]);
   }
 
   onMoreMenuClick(event: Event): void {
@@ -60,7 +64,11 @@ export class BottomNavComponent {
 
   async logout(): Promise<void> {
     this.menuOpen.set(false);
-    await this.authService.logout();
-    this.router.navigate(['/login']);
+    if (!this.demoMode.isDemoMode()) {
+      await this.authService.logout();
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    }
+    this.demoMode.exitDemoMode();
+    this.router.navigate(['/']);
   }
 }

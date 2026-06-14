@@ -3,15 +3,79 @@ import { LayoutComponent } from './shared/layout/layout.component';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { ownerGuard } from './core/guards/owner.guard';
+import { demoGuard } from './core/guards/demo.guard';
 
 export const routes: Routes = [
+  {
+    path: '',
+    loadComponent: () => import('./features/landing/landing.component').then((m) => m.LandingComponent),
+  },
   {
     path: 'login',
     canActivate: [guestGuard],
     loadComponent: () => import('./features/login/login.component').then((m) => m.LoginComponent),
   },
   {
-    path: '',
+    path: 'demo',
+    component: LayoutComponent,
+    canActivate: [demoGuard],
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent),
+      },
+      {
+        path: 'ingredientes',
+        loadComponent: () =>
+          import('./features/ingredients/ingredients.component').then(
+            (m) => m.IngredientsComponent,
+          ),
+      },
+      {
+        path: 'recetas',
+        loadComponent: () =>
+          import('./features/recipes/recipes.component').then((m) => m.RecipesComponent),
+      },
+      {
+        path: 'ventas',
+        loadComponent: () =>
+          import('./features/sales/sales.component').then((m) => m.SalesComponent),
+      },
+      {
+        path: 'stock',
+        loadComponent: () =>
+          import('./features/stock/stock.component').then((m) => m.StockComponent),
+      },
+      {
+        path: 'clientes',
+        loadComponent: () =>
+          import('./features/customers/customers.component').then((m) => m.CustomersComponent),
+      },
+      {
+        path: 'reportes-financieros',
+        loadComponent: () =>
+          import('./features/financial-reports/financial-reports.component').then(
+            (m) => m.FinancialReportsComponent,
+          ),
+      },
+      {
+        path: 'costos',
+        loadComponent: () =>
+          import('./features/fixed-costs/fixed-costs.component').then((m) => m.FixedCostsComponent),
+      },
+      {
+        path: 'backup-restore',
+        loadComponent: () =>
+          import('./features/backup-restore/backup-restore.component').then(
+            (m) => m.BackupRestoreComponent,
+          ),
+      },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+    ],
+  },
+  {
+    path: 'app',
     component: LayoutComponent,
     canActivate: [authGuard],
     children: [

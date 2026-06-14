@@ -10,5 +10,5 @@ export const ownerGuard: CanActivateFn = async () => {
 
   await firstValueFrom(toObservable(authStore.ready).pipe(filter(Boolean)));
 
-  return authStore.isOwner() ? true : router.createUrlTree(['/dashboard']);
+  return authStore.isOwner() ? true : router.createUrlTree(['/app/dashboard']);
 };
