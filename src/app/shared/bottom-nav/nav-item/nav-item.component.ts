@@ -12,6 +12,7 @@ export class NavItemComponent {
   route = input.required<string>();
   icon = input.required<string>();
   label = input.required<string>();
+  mobileEmoji = input<string>('');
   badge = input<number>(0);
   secondary = input<boolean>(false);
   exact = input<boolean>(false);

@@ -39,7 +39,7 @@ interface UnknownBackupCollections {
   fixedCostsByMonth?: unknown;
 }
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class MockFirestoreService {
   private collections = new Map<string, BehaviorSubject<unknown[]>>();
 
@@ -227,7 +227,7 @@ export class MockFirestoreService {
 
   async applyStockAdjustments(
     saleId: string,
-    movementType: 'sale_deduction' | 'cancellation_restock',
+    movementType: 'sale_deduction' | 'cancellation_restock' | 'edit_restock' | 'edit_deduction',
     adjustments: StockAdjustmentInput[],
   ): Promise<void> {
     if (adjustments.length === 0) return;
