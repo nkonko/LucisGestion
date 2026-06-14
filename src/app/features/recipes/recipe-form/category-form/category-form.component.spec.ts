@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { vi } from 'vitest';
 
 import { CategoryFormComponent } from './category-form.component';
@@ -24,9 +25,8 @@ describe('CategoryFormComponent', () => {
     const emitSpy = vi.fn();
     component.categoryChange.subscribe(emitSpy);
 
-    const categorySelectElement = fixture.nativeElement.querySelector('select') as HTMLSelectElement;
-    categorySelectElement.value = 'pies';
-    categorySelectElement.dispatchEvent(new Event('change'));
+    const categorySelectDebugElement = fixture.debugElement.query(By.css('select'));
+    categorySelectDebugElement.triggerEventHandler('ngModelChange', 'pies');
     fixture.detectChanges();
 
     expect(emitSpy).toHaveBeenCalledTimes(1);
