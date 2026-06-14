@@ -1,0 +1,35 @@
+<section class="customer-sheet ui-card-surface">
+  <form [formGroup]="form" class="customer-sheet__body">
+    <label class="ui-field customer-field customer-field--full">
+      <span>Nombre</span>
+      <input id="customer-name" name="name" data-initial-focus class="ui-input" formControlName="name" />
+    </label>
+
+    <div class="customer-form-grid">
+      <label class="ui-field customer-field">
+        <span>Teléfono</span>
+        <input id="customer-phone" name="phone" class="ui-input" formControlName="phone" type="tel" />
+      </label>
+      <label class="ui-field customer-field">
+        <span>Dirección</span>
+        <input id="customer-address" name="address" class="ui-input" formControlName="address" />
+      </label>
+    </div>
+
+    <label class="ui-field customer-field customer-field--full">
+      <span>Notas</span>
+      <textarea id="customer-notes" name="notes" class="ui-textarea" formControlName="notes" rows="3"></textarea>
+    </label>
+  </form>
+
+  <footer class="customer-sheet__actions">
+    @if (data) {
+      <button class="customer-delete-btn" type="button" (click)="remove()" aria-label="Eliminar cliente">
+        <ui-icon name="delete" [decorative]="true" />
+      </button>
+    }
+    <button class="customer-save-btn" type="button" [disabled]="form.invalid" (click)="save()">
+      {{ data ? 'Guardar cambios' : 'Crear cliente' }}
+    </button>
+  </footer>
+</section>

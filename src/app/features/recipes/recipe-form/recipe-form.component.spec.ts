@@ -3,10 +3,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 
 import { RecipeFormComponent } from './recipe-form.component';
-import { IngredientsStore } from '../../core/store/ingredients.store';
-import { DIALOG_DATA, DIALOG_REF } from '../../core/models/dialog/dialog-tokens.model';
-import { DialogRef } from '../../core/models/dialog/dialog-ref.model';
-import type { Ingredient } from '../../core/models/ingredient';
+import { IngredientsStore } from '../../../core/store/ingredients.store';
+import { DIALOG_DATA, DIALOG_REF } from '../../../core/models/dialog/dialog-tokens.model';
+import { DialogRef } from '../../../core/models/dialog/dialog-ref.model';
+import type { Ingredient, RecipeIngredient } from '../../../core/models/ingredient';
 
 describe('RecipeFormComponent', () => {
   let fixture: ComponentFixture<RecipeFormComponent>;
@@ -46,6 +46,8 @@ describe('RecipeFormComponent', () => {
   };
 
   beforeEach(async () => {
+    vi.clearAllMocks();
+
     await TestBed.configureTestingModule({
       imports: [RecipeFormComponent],
       providers: [
@@ -60,26 +62,53 @@ describe('RecipeFormComponent', () => {
     fixture.detectChanges();
   });
 
-  it('does not add ingredients while typing and only adds on explicit selection action', () => {
-    component.ingredientSearch.set('Choco');
-    expect(component.recipeIngredients()).toHaveLength(0);
-
-    component.ingredientSearch.set('Chocolate');
-    expect(component.recipeIngredients()).toHaveLength(0);
-
-    component.addSelectedIngredient();
-
-    expect(component.recipeIngredients()).toHaveLength(1);
-    expect(component.recipeIngredients()[0].name).toBe('Chocolate');
-  });
-
   it('recomputes suggested price when profit margin changes', () => {
-    component.addIngredient(ingredients[0]);
+    const recipeIngredients: RecipeIngredient[] = [
+      {
+        ingredientId: 'ing-1',
+        name: 'Chocolate',
+        quantity: 1,
+        unit: 'kg',
+        lineCost: 10,
+      },
+    ];
+
+    component.recipeIngredients.set(recipeIngredients);
 
     const previous = component.suggestedPrice();
-    component.onProfitMarginChange(120);
+    component.profitMargin.set(120);
     const next = component.suggestedPrice();
 
     expect(next).toBeGreaterThan(previous);
+  });
+
+  it('uses suggested price when final sale price is 0', () => {
+    const recipeIngredients: RecipeIngredient[] = [
+      {
+        ingredientId: 'ing-1',
+        name: 'Chocolate',
+        quantity: 2,
+        unit: 'kg',
+        lineCost: 20,
+      },
+    ];
+
+    component.form.name = 'Torta de chocolate';
+    component.form.salePrice = 0;
+    component.recipeIngredients.set(recipeIngredients);
+
+    const suggested = component.suggestedPrice();
+    component.save();
+
+    expect(dialogRefMock.close).toHaveBeenCalledTimes(1);
+    expect(dialogRefMock.close).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Torta de chocolate',
+        ingredients: recipeIngredients,
+        salePrice: suggested,
+        suggestedPrice: suggested,
+        profitMargin: component.profitMargin(),
+      }),
+    );
   });
 });

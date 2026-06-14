@@ -9,12 +9,12 @@ import { NotificationService } from '../../core/services/notification.service';
 import { FixedCostEntry, FixedCostEntryInput } from '../../core/models/fixed-cost';
 import {
   FixedCostFormComponent,
-  FixedCostFormData,
-} from './fixed-cost-form.component';
+} from './create-fixed-cost/fixed-cost-form.component';
 import { ConfirmBottomSheetDialogComponent } from '../../shared/ui-bottom-sheet/confirm-dialog/confirm-bottom-sheet-dialog.component';
 import { ConfirmDialogData } from '../../shared/ui-bottom-sheet/confirm-dialog/confirm-dialog-data.model';
 import { formatPeriodLabel } from '../../core/utils/dashboard.utils';
 import { SelectedDate } from '../../core/models/dashboard';
+import { FixedCostFormData } from '../../core/models/fixed-cost/fixed-cost-form-data';
 
 function monthKeyOf(date: SelectedDate): string {
   return `${date.year}-${String(date.month + 1).padStart(2, '0')}`;
@@ -74,7 +74,8 @@ export class FixedCostsComponent {
   create(): void {
     const ref = this.dialog.open<FixedCostFormData, FixedCostEntryInput>(
       FixedCostFormComponent,
-      { maxWidth: '480px', data: { monthLabel: this.monthLabel(), entry: null } },
+      { title: 'Nuevo costo fijo', section: 'Costos fijos',
+        maxWidth: '480px', data: { monthLabel: this.monthLabel(), entry: null } },
     );
     ref.afterClosed.subscribe(async (input) => {
       if (!input) return;
@@ -86,7 +87,7 @@ export class FixedCostsComponent {
   edit(entry: FixedCostEntry): void {
     const ref = this.dialog.open<FixedCostFormData, FixedCostEntryInput>(
       FixedCostFormComponent,
-      { maxWidth: '480px', data: { monthLabel: this.monthLabel(), entry } },
+      { title: 'Editar costo fijo', section: 'Costos fijos', maxWidth: '480px', data: { monthLabel: this.monthLabel(), entry } },
     );
     ref.afterClosed.subscribe(async (input) => {
       if (!input) return;

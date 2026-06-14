@@ -8,3 +8,12 @@ export const RECIPE_CATEGORY_DISPLAY: Record<RecipeCategory, string> = {
   breads: 'Panes',
   other: 'Otros',
 };
+
+export const RECIPE_CATEGORY_ICON: Record<RecipeCategory, string> = {
+  cakes: '🍰',
+  pies: '🥧',
+  cookies: '🍪',
+  desserts: '🍮',
+  breads: '🥖',
+  other: '📦',
+};

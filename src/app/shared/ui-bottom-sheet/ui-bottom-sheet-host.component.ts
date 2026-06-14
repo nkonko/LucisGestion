@@ -27,6 +27,7 @@ export class UiBottomSheetHostComponent implements AfterViewInit {
   readonly contentComponent = input.required<Type<unknown>>();
   readonly contentInjector = input.required<Injector>();
   readonly title = input<string | null>(null);
+  readonly section = input<string | null>(null);
   readonly maxWidth = input(UI_BOTTOM_SHEET_DEFAULTS.maxWidth);
   readonly width = input(UI_BOTTOM_SHEET_DEFAULTS.width);
   readonly maxHeight = input(UI_BOTTOM_SHEET_DEFAULTS.maxHeight);

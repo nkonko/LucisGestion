@@ -15,52 +15,55 @@
 }
 
 @for (recipe of store.recipes(); track recipe.id) {
-  <article class="ui-card-surface touch-card mb-3" (click)="auth.isOwner() ? edit(recipe) : null">
-    <div class="py-2">
-      <div class="flex items-center justify-between mb-1">
-        <div class="font-medium text-base">{{ recipe.name }}</div>
-        <div class="flex items-center gap-1">
-          <span class="ui-chip-static">{{ recipe.category }}</span>
-          @if (auth.isOwner()) {
-            <div class="relative" (click)="onMenuClick($event)">
-              <button class="ui-icon-btn" type="button" aria-label="Abrir opciones" (click)="toggleMenu(recipe.id ?? '', $event)">
-                <ui-icon name="more_vert" [decorative]="true" />
-              </button>
-              @if (openMenuRecipeId() === (recipe.id ?? '')) {
-                <div class="ui-menu" role="menu">
-                  <button class="ui-menu-item" type="button" role="menuitem" (click)="duplicate(recipe)">
-                    <ui-icon name="content_copy" [size]="16" [decorative]="true" />
-                    Duplicar
-                  </button>
-                </div>
-              }
-            </div>
-          }
+  <article class="recipe-card ui-card-surface touch-card mb-3">
+    <div class="recipe-card-content">
+      <div class="recipe-card-header">
+        <div class="recipe-card-name">{{ recipe.name }}</div>
+        <span class="ui-chip-static recipe-category-chip">
+          {{ categoryDisplay[recipe.category] }}
+          <span class="recipe-category-chip__emoji" aria-hidden="true">{{ categoryIcon[recipe.category] }}</span>
+        </span>
+      </div>
+
+      <div class="recipe-card-metrics">
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div>
+            <div class="text-xs text-gray-500">Costo</div>
+            <div class="font-semibold text-red-600">{{ recipe.calculatedCost | ars }}</div>
+          </div>
+          <div>
+            <div class="text-xs text-gray-500">Margen</div>
+            <div class="font-semibold">{{ recipe.profitMargin }}%</div>
+          </div>
+          <div>
+            <div class="text-xs text-gray-500">Precio</div>
+            <div class="font-semibold text-green-600">{{ recipe.salePrice | ars }}</div>
+          </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-3 gap-2 text-center mt-2">
-        <div>
-          <div class="text-xs text-gray-500">Costo</div>
-          <div class="font-semibold text-red-600">{{ recipe.calculatedCost | ars }}</div>
-        </div>
-        <div>
-          <div class="text-xs text-gray-500">Margen</div>
-          <div class="font-semibold">{{ recipe.profitMargin }}%</div>
-        </div>
-        <div>
-          <div class="text-xs text-gray-500">Precio</div>
-          <div class="font-semibold text-green-600">{{ recipe.salePrice | ars }}</div>
+      <div class="recipe-card-meta">
+        <div class="text-xs text-gray-400">
+          {{ recipe.ingredients.length }} ingredientes · rinde {{ recipe.yield }} u.
         </div>
       </div>
-
-      <div class="text-xs text-gray-400 mt-1">{{ recipe.ingredients.length }} ingredientes · rinde {{ recipe.yield }} u.</div>
     </div>
+
+    @if (auth.isOwner()) {
+      <button class="recipe-card-edit" type="button" aria-label="Editar receta" (click)="edit(recipe)">
+        <ui-icon name="edit" [size]="22" [decorative]="true" />
+      </button>
+    }
   </article>
 }
 
 @if (auth.isOwner()) {
-  <button class="fab-bottom-right ui-fab" (click)="create()" type="button" aria-label="Crear receta">
+  <button
+    class="fab-bottom-right ui-fab"
+    (click)="create()"
+    type="button"
+    aria-label="Crear receta"
+  >
     <ui-icon name="add" [decorative]="true" />
   </button>
 }

@@ -162,6 +162,7 @@ export class SalesComponent {
   newSale(): void {
     const dialogRef = this.bottomSheet.open<null, SaleInput>(SaleFormComponent, {
       title: 'Nueva Venta',
+      section: 'Venta',
       maxWidth: '760px',
       maxHeight: '90vh',
       data: null,
@@ -188,6 +189,7 @@ export class SalesComponent {
 
     const dialogRef = this.bottomSheet.open<Sale, SaleInput>(SaleFormComponent, {
       title: 'Editar Venta',
+      section: 'Venta',
       maxWidth: '760px',
       maxHeight: '90vh',
       data: sale,

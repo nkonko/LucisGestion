@@ -1,44 +1,13 @@
 <nav class="bottom-nav">
   <!-- Primary navigation items (always visible) -->
-  <a routerLink="/dashboard" routerLinkActive="active" class="nav-item ui-nav-item">
-    <ui-icon name="home" [decorative]="true" [size]="20" />
-    <span class="nav-item__label">Inicio</span>
-  </a>
-  <a routerLink="/recetas" routerLinkActive="active" class="nav-item ui-nav-item">
-    <ui-icon name="menu_book" [decorative]="true" [size]="20" />
-    <span class="nav-item__label">Recetas</span>
-  </a>
-  <a routerLink="/ventas" routerLinkActive="active" class="nav-item ui-nav-item">
-    <ui-icon name="point_of_sale" [decorative]="true" [size]="20" />
-    <span class="nav-item__label">Ventas</span>
-  </a>
-  <a routerLink="/stock" routerLinkActive="active" class="nav-item ui-nav-item nav-item--badge">
-    <ui-icon name="inventory_2" [decorative]="true" [size]="20" />
-    @if (lowStockCount() > 0) {
-      <span class="badge" aria-label="{{ lowStockCount() }} ingredientes con stock bajo">{{
-        lowStockCount()
-      }}</span>
-    }
-    <span class="nav-item__label">Stock</span>
-  </a>
+  <app-nav-item route="/dashboard" icon="home" label="Inicio" [exact]="true" />
+  <app-nav-item route="/recetas" icon="menu_book" label="Recetas" />
+  <app-nav-item route="/ventas" icon="point_of_sale" label="Ventas" />
+  <app-nav-item route="/stock" icon="inventory_2" label="Stock" [badge]="lowStockCount()" />
 
   <!-- Secondary navigation items (hidden on mobile, in dropdown) -->
-  <a
-    routerLink="/costos"
-    routerLinkActive="active"
-    class="nav-item ui-nav-item nav-item--secondary"
-  >
-    <ui-icon name="receipt_long" [decorative]="true" [size]="20" />
-    <span class="nav-item__label">Costos</span>
-  </a>
-  <a
-    routerLink="/clientes"
-    routerLinkActive="active"
-    class="nav-item ui-nav-item nav-item--secondary"
-  >
-    <ui-icon name="people" [decorative]="true" [size]="20" />
-    <span class="nav-item__label">Clientes</span>
-  </a>
+  <app-nav-item route="/costos" icon="receipt_long" label="Costos" [secondary]="true" />
+  <app-nav-item route="/clientes" icon="people" label="Clientes" [secondary]="true" />
 
   <!-- More menu button (visible on mobile) -->
   <div class="nav-more-menu" (click)="onMoreMenuClick($event)">

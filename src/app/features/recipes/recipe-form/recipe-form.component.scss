@@ -1,0 +1,98 @@
+:host {
+  display: flex;
+  min-height: 0;
+}
+
+.recipe-sheet {
+  background: var(--color-surface);
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.recipe-sheet__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-4);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.recipe-field {
+  span {
+    color: var(--color-on-surface-variant);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .ui-input,
+  .ui-textarea {
+    border-radius: 18px;
+  }
+
+  .ui-input {
+    min-height: 52px;
+  }
+
+  .ui-textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+}
+
+.recipe-sheet__actions {
+  align-items: center;
+  background: var(--color-surface);
+  border-top: var(--border-width-thin) solid var(--color-outline-variant);
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  box-shadow: var(--shadow-soft);
+}
+
+.recipe-delete-btn,
+.recipe-save-btn {
+  align-items: center;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 700;
+  justify-content: center;
+  min-height: calc(var(--space-8) + var(--space-2));
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast);
+}
+
+.recipe-delete-btn {
+  background: color-mix(in srgb, var(--color-destructive) 8%, var(--color-surface));
+  border: var(--border-width-thin) solid color-mix(in srgb, var(--color-destructive) 38%, var(--color-outline-variant));
+  border-radius: var(--radius-pill);
+  color: var(--color-destructive);
+  flex: 0 0 64px;
+}
+
+.recipe-save-btn {
+  background: var(--bg-gradient-cta);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 18px 36px color-mix(in srgb, var(--color-warning) 18%, transparent);
+  color: var(--color-on-primary);
+  flex: 1 1 auto;
+  font-size: var(--size-font-lg);
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.recipe-delete-btn:hover,
+.recipe-save-btn:not(:disabled):hover {
+  transform: translateY(-1px);
+}

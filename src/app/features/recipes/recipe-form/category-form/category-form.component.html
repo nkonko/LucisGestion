@@ -1,0 +1,25 @@
+<div class="grid grid-cols-2 gap-3">
+  <label class="ui-field"
+    ><span>Categoría</span
+    ><select
+      class="ui-select"
+      [ngModel]="category()"
+      (ngModelChange)="categoryChange.emit($event)"
+      required
+    >
+      @for (c of categories; track c.key) {
+        <option [value]="c.key">{{ c.label }}</option>
+      }
+    </select></label
+  >
+  <label class="ui-field"
+    ><span>Rendimiento (unid.)</span
+    ><input
+      class="ui-input"
+      type="number"
+      [ngModel]="yieldValue()"
+      (ngModelChange)="onYieldValueChange($event)"
+      min="1"
+      required
+  /></label>
+</div>

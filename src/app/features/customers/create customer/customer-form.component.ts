@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Customer, CustomerInput } from '../../core/models/customer';
-import { DIALOG_DATA, DIALOG_REF } from '../../core/models/dialog/dialog-tokens.model';
-import { DialogRef } from '../../core/models/dialog/dialog-ref.model';
+import { Customer, CustomerInput } from '../../../core/models/customer';
+import { DIALOG_DATA, DIALOG_REF } from '../../../core/models/dialog/dialog-tokens.model';
+import { DialogRef } from '../../../core/models/dialog/dialog-ref.model';
+import { UiIconComponent } from '../../../shared/ui/components';
 
 @Component({
   selector: 'app-customer-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, UiIconComponent],
   templateUrl: './customer-form.component.html',
   styleUrl: './customer-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

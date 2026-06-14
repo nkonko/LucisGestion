@@ -1,0 +1,117 @@
+:host {
+  display: flex;
+  min-height: 0;
+}
+
+.fixed-cost-sheet {
+  background: var(--color-surface);
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.fixed-cost-sheet__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-4);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.fixed-cost-form-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.fixed-cost-field {
+  span {
+    color: var(--color-on-surface-variant);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .ui-input,
+  .ui-textarea {
+    border-radius: 18px;
+  }
+
+  .ui-input {
+    min-height: 52px;
+  }
+
+  .ui-textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+}
+
+.fixed-cost-sheet__actions {
+  align-items: center;
+  background: var(--color-surface);
+  border-top: var(--border-width-thin) solid var(--color-outline-variant);
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  box-shadow: var(--shadow-soft);
+}
+
+.fixed-cost-cancel-btn,
+.fixed-cost-save-btn {
+  align-items: center;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 700;
+  justify-content: center;
+  min-height: calc(var(--space-8) + var(--space-2));
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast);
+}
+
+.fixed-cost-cancel-btn {
+  background: color-mix(in srgb, var(--color-destructive) 8%, var(--color-surface));
+  border: var(--border-width-thin) solid color-mix(in srgb, var(--color-destructive) 38%, var(--color-outline-variant));
+  border-radius: var(--radius-pill);
+  color: var(--color-destructive);
+  flex: 0 0 auto;
+  padding: 0 var(--space-5);
+}
+
+.fixed-cost-save-btn {
+  background: var(--bg-gradient-cta);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 18px 36px color-mix(in srgb, var(--color-warning) 18%, transparent);
+  color: var(--color-on-primary);
+  flex: 1 1 auto;
+  font-size: var(--size-font-lg);
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.fixed-cost-cancel-btn:hover,
+.fixed-cost-save-btn:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 560px) {
+  .fixed-cost-sheet__body,
+  .fixed-cost-sheet__actions {
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
+
+  .fixed-cost-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
