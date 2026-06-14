@@ -12,10 +12,10 @@
       (yieldValueChange)="form.yield = $event"
     ></app-category-form>
 
-    <app-ingredient-form
+    <app-recipe-ingredient-form
       [recipeIngredients]="recipeIngredients()"
       (recipeIngredientsChange)="recipeIngredients.set($event)"
-    ></app-ingredient-form>
+    ></app-recipe-ingredient-form>
 
     <app-cost-form
       [calculatedCost]="calculatedCost()"

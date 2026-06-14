@@ -10,7 +10,7 @@ import { RECIPE_CATEGORY_DISPLAY, RecipeCategory } from '../../../../core/models
   styleUrl: './category-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CategoriaFormComponent {
+export class CategoryFormComponent {
   category = input.required<RecipeCategory>();
   yieldValue = input.required<number>();
 
@@ -21,4 +21,10 @@ export class CategoriaFormComponent {
     key: key as RecipeCategory,
     label,
   }));
+
+  onYieldValueChange(value: number | null): void {
+    const nextValue = Number(value ?? 1);
+    const normalized = Number.isFinite(nextValue) ? Math.max(1, nextValue) : 1;
+    this.yieldValueChange.emit(normalized);
+  }
 }

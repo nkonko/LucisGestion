@@ -18,7 +18,7 @@
       class="ui-input"
       type="number"
       [ngModel]="yieldValue()"
-      (ngModelChange)="yieldValueChange.emit($event)"
+      (ngModelChange)="onYieldValueChange($event)"
       min="1"
       required
   /></label>

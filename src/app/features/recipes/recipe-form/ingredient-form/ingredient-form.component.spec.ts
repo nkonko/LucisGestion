@@ -4,11 +4,11 @@ import { vi } from 'vitest';
 
 import type { Ingredient, RecipeIngredient } from '../../../../core/models/ingredient';
 import { IngredientsStore } from '../../../../core/store/ingredients.store';
-import { IngredientFormComponent } from './ingredient-form.component';
+import { RecipeIngredientFormComponent } from './ingredient-form.component';
 
-describe('IngredientFormComponent', () => {
-  let fixture: ComponentFixture<IngredientFormComponent>;
-  let component: IngredientFormComponent;
+describe('RecipeIngredientFormComponent', () => {
+  let fixture: ComponentFixture<RecipeIngredientFormComponent>;
+  let component: RecipeIngredientFormComponent;
 
   const ingredients: Ingredient[] = [
     {
@@ -41,11 +41,11 @@ describe('IngredientFormComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [IngredientFormComponent],
+      imports: [RecipeIngredientFormComponent],
       providers: [{ provide: IngredientsStore, useValue: ingredientsStoreMock }],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(IngredientFormComponent);
+    fixture = TestBed.createComponent(RecipeIngredientFormComponent);
     component = fixture.componentInstance;
   });
 

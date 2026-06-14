@@ -6,14 +6,20 @@ import { Recipe, RecipeCategory } from '../../../core/models/recipe';
 import { RecipeIngredient } from '../../../core/models/ingredient';
 import { DIALOG_DATA, DIALOG_REF } from '../../../core/models/dialog/dialog-tokens.model';
 import { DialogRef } from '../../../core/models/dialog/dialog-ref.model';
-import { CategoriaFormComponent } from './category-form/category-form.component';
-import { IngredientFormComponent } from './ingredient-form/ingredient-form.component';
+import { CategoryFormComponent } from './category-form/category-form.component';
+import { RecipeIngredientFormComponent } from './ingredient-form/ingredient-form.component';
 import { CostFormComponent } from './cost-form/cost-form.component';
 import { UiIconComponent } from '../../../shared/ui/components';
 
 @Component({
   selector: 'app-recipe-form',
-  imports: [FormsModule, CategoriaFormComponent, IngredientFormComponent, CostFormComponent, UiIconComponent],
+  imports: [
+    FormsModule,
+    CategoryFormComponent,
+    RecipeIngredientFormComponent,
+    CostFormComponent,
+    UiIconComponent,
+  ],
   templateUrl: './recipe-form.component.html',
   styleUrl: './recipe-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

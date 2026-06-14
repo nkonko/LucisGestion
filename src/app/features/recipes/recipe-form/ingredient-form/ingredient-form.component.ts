@@ -14,13 +14,13 @@ import { IngredientsStore } from '../../../../core/store/ingredients.store';
 import { ArsPipe } from '../../../../shared/pipes/ars.pipe';
 
 @Component({
-  selector: 'app-ingredient-form',
+  selector: 'app-recipe-ingredient-form',
   imports: [FormsModule, ArsPipe],
   templateUrl: './ingredient-form.component.html',
   styleUrl: './ingredient-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class IngredientFormComponent {
+export class RecipeIngredientFormComponent {
   ingredientsStore = inject(IngredientsStore);
 
   recipeIngredients = input.required<RecipeIngredient[]>();
