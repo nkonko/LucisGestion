@@ -6,9 +6,12 @@ import {
   inject,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import {
+  FirebaseApp,
+  provideFirebaseApp,
+  initializeApp,
+} from '@angular/fire/app';
 import { provideFirestore, initializeFirestore } from '@angular/fire/firestore';
-import { getApp } from 'firebase/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { browserSessionPersistence, setPersistence } from '@angular/fire/auth';
 
@@ -25,14 +28,15 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     { provide: FirestoreService, useClass: DemoAwareFirestoreService },
     provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideFirestore(() =>
-      initializeFirestore(getApp(), {
+    provideFirestore((injector) =>
+      initializeFirestore(injector.get(FirebaseApp), {
         experimentalAutoDetectLongPolling: true,
       }),
     ),
-    provideAuth(() => getAuth()),
+    provideAuth((injector) => getAuth(injector.get(FirebaseApp))),
     provideAppInitializer(async () => {
-      const auth = getAuth();
+      const firebaseApp = inject(FirebaseApp);
+      const auth = getAuth(firebaseApp);
       await setPersistence(auth, browserSessionPersistence);
       inject(AuthService);
     }),
