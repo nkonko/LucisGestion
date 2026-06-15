@@ -33,20 +33,10 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3 build-essential expect
+          sudo apt-get install -y python3 build-essential
 
       - name: Install dependencies
-        run: |
-          # Try normal install first
-          if pnpm install --frozen-lockfile; then
-            echo "Dependencies installed successfully"
-          else
-            echo "Install failed, attempting to approve builds..."
-            # Approve all pending builds by answering 'y' to all prompts
-            (for i in {1..20}; do echo "y"; done) | pnpm approve-builds || true
-            # Try install again
-            pnpm install --frozen-lockfile
-          fi
+        run: pnpm install --no-frozen-lockfile
 
       - name: Run linter
         run: pnpm lint
