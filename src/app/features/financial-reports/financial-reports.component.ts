@@ -13,6 +13,7 @@ import { TopCustomersComponent } from './top-customers/top-customers.component';
 import { TopProductsComponent } from './top-products/top-products.component';
 import { LowStockComponent } from './low-stock/low-stock.component';
 import { FinancialReportPdfService } from './services/financial-report-pdf.service';
+import { FinancialReportExcelService } from './services/financial-report-excel.service';
 
 @Component({
   selector: 'app-financial-reports',
@@ -36,6 +37,7 @@ export class FinancialReportsComponent {
   private salesStore = inject(SalesStore);
   private ingredientsStore = inject(IngredientsStore);
   private financialReportPdf = inject(FinancialReportPdfService);
+  private financialReportExcel = inject(FinancialReportExcelService);
 
   readonly periodOptions: { value: Period; label: string }[] = [
     { value: 'today', label: 'Hoy' },
@@ -182,6 +184,26 @@ export class FinancialReportsComponent {
 
   async exportAsPdf(): Promise<void> {
     await this.financialReportPdf.exportReport({
+      periodLabel: this.periodLabel(),
+      generatedAt: new Date(),
+      monthlySales: this.monthlySales(),
+      periodVariableExpenses: this.periodVariableExpenses(),
+      periodFixedCosts: this.periodFixedCosts(),
+      netProfit: this.netProfit(),
+      variableCostRate: this.variableCostRate(),
+      fixedCostRate: this.fixedCostRate(),
+      profitRate: this.profitRate(),
+      productOpportunities: this.productOpportunities(),
+      expenseAnomalies: this.expenseAnomalies(),
+      priorityCustomers: this.priorityCustomers(),
+      topCustomers: this.topCustomerShare(),
+      topProducts: this.topProducts(),
+      lowStockItems: this.lowStockItems(),
+    });
+  }
+
+  async exportAsExcel(): Promise<void> {
+    await this.financialReportExcel.exportReport({
       periodLabel: this.periodLabel(),
       generatedAt: new Date(),
       monthlySales: this.monthlySales(),
