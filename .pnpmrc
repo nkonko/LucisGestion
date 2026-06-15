@@ -1,0 +1,5 @@
+shamefully-hoist=true
+allow-workspace-cycles=true
+# Allow core-js to build properly in CI environments
+# This prevents ERR_PNPM_IGNORED_BUILDS errors
+node-gyp-extra-python-dir=/usr/bin/python3
