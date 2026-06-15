@@ -1,0 +1,197 @@
+.recommendations-container {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+.recommendations-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.pager-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pager-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: var(--border-width-thin) solid var(--color-outline-variant);
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
+}
+
+.pager-btn:disabled {
+  color: var(--color-disabled-fg);
+  border-color: var(--color-disabled-bg);
+}
+
+.pager-counter {
+  font-size: var(--size-font-sm);
+  font-weight: 600;
+  color: var(--color-on-surface-variant);
+  min-width: 62px;
+  text-align: center;
+}
+
+.recommendations-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.recommendations-title {
+  margin: 0;
+  font-size: var(--size-font-lg);
+  font-weight: 600;
+  color: var(--color-on-surface);
+}
+
+.local-indicator {
+  display: inline-block;
+  margin-top: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  background-color: color-mix(in srgb, var(--color-warning) 15%, var(--color-surface));
+  color: var(--color-warning);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 30%, transparent);
+  border-radius: var(--space-1);
+  font-size: var(--size-font-2xs);
+  font-weight: 600;
+}
+
+.recommendations-description {
+  margin: var(--space-2) 0 0;
+  font-size: var(--size-font-sm);
+  color: var(--color-on-surface-variant);
+  line-height: 1.5;
+}
+
+.urgency-badge {
+  display: inline-block;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--space-1);
+  font-size: var(--size-font-2xs);
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--color-on-surface);
+  border: var(--border-width-thin) solid transparent;
+}
+
+.recommendations-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.actions-title {
+  margin: 0;
+  font-size: var(--size-font-sm);
+  font-weight: 600;
+  color: var(--color-on-surface);
+}
+
+.actions-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.action-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--size-font-sm);
+  color: var(--color-on-surface-variant);
+  line-height: 1.5;
+
+  ui-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--color-success);
+  }
+}
+
+.recommendations-footer {
+  padding: var(--space-3);
+  background-color: var(--color-surface-container);
+  border-radius: var(--space-1);
+  border-left: var(--border-width-thick) solid var(--color-primary);
+}
+
+.footer-note {
+  margin: 0;
+  font-size: var(--size-font-2xs);
+  color: var(--color-on-surface-variant);
+  line-height: 1.4;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+
+  .empty-icon {
+    color: var(--color-disabled-fg);
+  }
+
+  p {
+    margin: 0;
+    font-size: var(--size-font-sm);
+    color: var(--color-on-surface-variant);
+  }
+}
+
+// Dark mode support — CSS custom properties automatically adapt
+@media (prefers-color-scheme: dark) {
+  // No additional styles needed — all colors use CSS variables from :root
+}
+
+// ── Urgency badge variants ──────────────────────────────────────────────
+.urgency-alta {
+  background-color: color-mix(in srgb, var(--color-destructive) 12%, var(--color-surface));
+  color: var(--color-destructive);
+  border: 1px solid color-mix(in srgb, var(--color-destructive) 25%, transparent);
+}
+
+.urgency-media {
+  background-color: color-mix(in srgb, var(--color-warning) 12%, var(--color-surface));
+  color: var(--color-warning);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 25%, transparent);
+}
+
+.urgency-baja {
+  background-color: color-mix(in srgb, var(--color-success) 12%, var(--color-surface));
+  color: var(--color-success);
+  border: 1px solid color-mix(in srgb, var(--color-success) 25%, transparent);
+}
+
+@media (width <= 640px) {
+  .recommendations-toolbar {
+    align-items: stretch;
+  }
+
+  .pager-controls {
+    justify-content: center;
+    width: 100%;
+  }
+}

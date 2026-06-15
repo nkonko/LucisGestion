@@ -335,7 +335,6 @@ describe('FinancialReportsComponent', () => {
       expect(section).toBeTruthy();
       expect(section.textContent).toContain('Exportar PDF');
       expect(section.textContent).toContain('Exportar Excel');
-      expect(section.textContent).toContain('Compartir reporte');
       expect(section.textContent).toContain('Recomendaciones IA');
     });
 

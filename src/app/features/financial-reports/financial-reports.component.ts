@@ -1,8 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { UiIconComponent } from '../../shared/ui/components';
 import { MonthNavComponent } from '../../shared/month-nav/month-nav.component';
 import { FinancialInsightsService } from '../../core/services/financial-insights.service';
 import { DashboardMetricsService } from '../../core/services/dashboard-metrics.service';
+import { GeminiRecommendationsService } from '../../core/services/gemini-recommendations.service';
+import { BottomSheetService } from '../../core/services/bottom-sheet.service';
 import { DashboardStore } from '../../core/store/dashboard.store';
 import { SalesStore } from '../../core/store/sales.store';
 import { IngredientsStore } from '../../core/store/ingredients.store';
@@ -12,6 +14,7 @@ import { InsightsComponent } from './insights/insights.component';
 import { TopCustomersComponent } from './top-customers/top-customers.component';
 import { TopProductsComponent } from './top-products/top-products.component';
 import { LowStockComponent } from './low-stock/low-stock.component';
+import { RecommendationsBottomSheetComponent } from './recommendations-bottom-sheet/recommendations-bottom-sheet.component';
 import { FinancialReportPdfService } from './services/financial-report-pdf.service';
 import { FinancialReportExcelService } from './services/financial-report-excel.service';
 
@@ -33,11 +36,15 @@ import { FinancialReportExcelService } from './services/financial-report-excel.s
 export class FinancialReportsComponent {
   private financialInsights = inject(FinancialInsightsService);
   private metrics = inject(DashboardMetricsService);
+  private geminiRecommendations = inject(GeminiRecommendationsService);
+  private bottomSheetService = inject(BottomSheetService);
   private dashboardStore = inject(DashboardStore);
   private salesStore = inject(SalesStore);
   private ingredientsStore = inject(IngredientsStore);
   private financialReportPdf = inject(FinancialReportPdfService);
   private financialReportExcel = inject(FinancialReportExcelService);
+
+  readonly isLoadingRecommendations = signal(false);
 
   readonly periodOptions: { value: Period; label: string }[] = [
     { value: 'today', label: 'Hoy' },
@@ -220,5 +227,23 @@ export class FinancialReportsComponent {
       topProducts: this.topProducts(),
       lowStockItems: this.lowStockItems(),
     });
+  }
+
+  async openRecommendations(): Promise<void> {
+    this.isLoadingRecommendations.set(true);
+    try {
+      const recommendations = await this.geminiRecommendations.generateRecommendations(
+        this.periodLabel(),
+      );
+      this.bottomSheetService.open(RecommendationsBottomSheetComponent, {
+        data: {
+          recommendations,
+          periodLabel: this.periodLabel(),
+        },
+        title: 'Recomendaciones',
+      });
+    } finally {
+      this.isLoadingRecommendations.set(false);
+    }
   }
 }

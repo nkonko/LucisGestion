@@ -94,13 +94,19 @@
         <ui-icon name="receipt_long" [size]="16" [decorative]="true" />
         Exportar Excel
       </button>
-      <button type="button" class="ui-btn">
-        <ui-icon name="share" [size]="16" [decorative]="true" />
-        Compartir reporte
-      </button>
-      <button type="button" class="ui-btn ui-btn-primary">
-        <ui-icon name="history" [size]="16" [decorative]="true" />
-        Recomendaciones IA
+      <button
+        type="button"
+        class="ui-btn ui-btn-primary"
+        (click)="openRecommendations()"
+        [disabled]="isLoadingRecommendations()"
+        [attr.aria-busy]="isLoadingRecommendations()"
+      >
+        <ui-icon
+          [name]="isLoadingRecommendations() ? 'hourglass_bottom' : 'lightbulb'"
+          [size]="16"
+          [decorative]="true"
+        />
+        {{ isLoadingRecommendations() ? 'Generando...' : 'Recomendaciones IA' }}
       </button>
     </div>
   </section>
