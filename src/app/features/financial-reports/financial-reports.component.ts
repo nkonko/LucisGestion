@@ -1,7 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { PercentPipe } from '@angular/common';
-import { ArsPipe } from '../../shared/pipes/ars.pipe';
-import { UiIconComponent, KpiCardComponent, InsightCardComponent } from '../../shared/ui/components';
+import { UiIconComponent } from '../../shared/ui/components';
 import { MonthNavComponent } from '../../shared/month-nav/month-nav.component';
 import { FinancialInsightsService } from '../../core/services/financial-insights.service';
 import { DashboardMetricsService } from '../../core/services/dashboard-metrics.service';
@@ -9,10 +7,24 @@ import { DashboardStore } from '../../core/store/dashboard.store';
 import { SalesStore } from '../../core/store/sales.store';
 import { IngredientsStore } from '../../core/store/ingredients.store';
 import { Period } from '../../core/models/dashboard';
+import { KpiSummaryComponent } from './kpi-summary/kpi-summary.component';
+import { InsightsComponent } from './insights/insights.component';
+import { TopCustomersComponent } from './top-customers/top-customers.component';
+import { TopProductsComponent } from './top-products/top-products.component';
+import { LowStockComponent } from './low-stock/low-stock.component';
+import { FinancialReportPdfService } from './services/financial-report-pdf.service';
 
 @Component({
   selector: 'app-financial-reports',
-  imports: [ArsPipe, PercentPipe, UiIconComponent, MonthNavComponent, KpiCardComponent, InsightCardComponent],
+  imports: [
+    UiIconComponent,
+    MonthNavComponent,
+    KpiSummaryComponent,
+    InsightsComponent,
+    TopCustomersComponent,
+    TopProductsComponent,
+    LowStockComponent,
+  ],
   templateUrl: './financial-reports.component.html',
   styleUrl: './financial-reports.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,6 +35,7 @@ export class FinancialReportsComponent {
   private dashboardStore = inject(DashboardStore);
   private salesStore = inject(SalesStore);
   private ingredientsStore = inject(IngredientsStore);
+  private financialReportPdf = inject(FinancialReportPdfService);
 
   readonly periodOptions: { value: Period; label: string }[] = [
     { value: 'today', label: 'Hoy' },
@@ -34,6 +47,31 @@ export class FinancialReportsComponent {
   readonly selectedPeriod = this.dashboardStore.selectedPeriod;
   readonly periodLabel = this.dashboardStore.periodLabel;
   readonly isCurrentPeriod = this.dashboardStore.isCurrentMonth;
+  readonly disablePreviousPeriodNav = computed(() => this.selectedPeriod() === 'today');
+  readonly previousPeriodLabel = computed(() => {
+    switch (this.selectedPeriod()) {
+      case 'today':
+        return 'Día anterior';
+      case 'week':
+        return 'Semana anterior';
+      case 'year':
+        return 'Año anterior';
+      case 'month':
+        return 'Mes anterior';
+    }
+  });
+  readonly nextPeriodLabel = computed(() => {
+    switch (this.selectedPeriod()) {
+      case 'today':
+        return 'Día siguiente';
+      case 'week':
+        return 'Semana siguiente';
+      case 'year':
+        return 'Año siguiente';
+      case 'month':
+        return 'Mes siguiente';
+    }
+  });
 
   readonly monthlySales = this.metrics.monthlySales;
   readonly monthlyExpenses = this.metrics.monthlyExpenses;
@@ -140,5 +178,25 @@ export class FinancialReportsComponent {
 
   setPeriod(period: Period): void {
     this.dashboardStore.setPeriod(period);
+  }
+
+  async exportAsPdf(): Promise<void> {
+    await this.financialReportPdf.exportReport({
+      periodLabel: this.periodLabel(),
+      generatedAt: new Date(),
+      monthlySales: this.monthlySales(),
+      periodVariableExpenses: this.periodVariableExpenses(),
+      periodFixedCosts: this.periodFixedCosts(),
+      netProfit: this.netProfit(),
+      variableCostRate: this.variableCostRate(),
+      fixedCostRate: this.fixedCostRate(),
+      profitRate: this.profitRate(),
+      productOpportunities: this.productOpportunities(),
+      expenseAnomalies: this.expenseAnomalies(),
+      priorityCustomers: this.priorityCustomers(),
+      topCustomers: this.topCustomerShare(),
+      topProducts: this.topProducts(),
+      lowStockItems: this.lowStockItems(),
+    });
   }
 }

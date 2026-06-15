@@ -24,21 +24,21 @@ describe('DashboardStore (UI state)', () => {
       store.setSelectedDate({ year: 2024, month: 4 });
       store.goToPreviousMonth();
 
-      expect(store.selectedDate()).toEqual({ year: 2024, month: 3 });
+      expect(store.selectedDate()).toEqual({ year: 2024, month: 3, day: 1 });
     });
 
     it('should handle year transition when going to previous month from January', () => {
       store.setSelectedDate({ year: 2024, month: 0 });
       store.goToPreviousMonth();
 
-      expect(store.selectedDate()).toEqual({ year: 2023, month: 11 });
+      expect(store.selectedDate()).toEqual({ year: 2023, month: 11, day: 1 });
     });
 
     it('should update selectedDate when going to next month', () => {
       store.setSelectedDate({ year: 2024, month: 4 });
       store.goToNextMonth();
 
-      expect(store.selectedDate()).toEqual({ year: 2024, month: 5 });
+      expect(store.selectedDate()).toEqual({ year: 2024, month: 5, day: 1 });
     });
   });
 });

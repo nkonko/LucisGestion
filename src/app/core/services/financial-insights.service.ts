@@ -177,7 +177,7 @@ export class FinancialInsightsService {
         currentAmount,
         baselineAmount,
         increaseRatio,
-        title: `Aumento de costos en ${category}`,
+        title: `Aumento de costos en ${this.costCategoryLabel(category)}`,
         description: `El costo subió ${Math.round(increaseRatio * 100)}% frente al promedio de 3 meses previos.`,
         impact: `Mes actual: $${currentAmount.toLocaleString('es-AR')} vs promedio: $${baselineAmount.toLocaleString('es-AR')}.`,
         recommendation: 'Revisa contratos, consumo y opciones de negociación para esta categoría.',
@@ -270,6 +270,21 @@ export class FinancialInsightsService {
         return 'Promociones segmentadas para subir frecuencia.';
       default:
         return 'Contacto de reactivación con oferta puntual.';
+    }
+  }
+
+  private costCategoryLabel(category: CostCategory): string {
+    switch (category) {
+      case 'utilities':
+        return 'servicios';
+      case 'rent':
+        return 'alquiler';
+      case 'wages':
+        return 'sueldos';
+      case 'taxes':
+        return 'impuestos';
+      case 'other':
+        return 'otros';
     }
   }
 

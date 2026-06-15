@@ -1,34 +1,46 @@
 import { computed } from '@angular/core';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { DashboardState } from './state/dashboard.state';
-import { formatPeriodLabel, toMonthInputValue } from '../utils/dashboard.utils';
+import { formatPeriodLabel, getPeriodStart, toMonthInputValue } from '../utils/dashboard.utils';
 import { Period, SelectedDate } from '../models/dashboard';
 
 const now = new Date();
+
+function dateToSelectedDate(date: Date): SelectedDate {
+  return {
+    year: date.getFullYear(),
+    month: date.getMonth(),
+    day: date.getDate(),
+  };
+}
+
+function selectedDateToDate(selectedDate: SelectedDate): Date {
+  return new Date(selectedDate.year, selectedDate.month, selectedDate.day ?? 1);
+}
 
 export const DashboardStore = signalStore(
   { providedIn: 'root' },
   withState<DashboardState>({
     selectedPeriod: 'month',
-    selectedDate: { year: now.getFullYear(), month: now.getMonth() },
+    selectedDate: { year: now.getFullYear(), month: now.getMonth(), day: now.getDate() },
   }),
 
   withComputed((store) => ({
     periodLabel: computed(() => formatPeriodLabel(store.selectedDate(), store.selectedPeriod())),
     monthInputValue: computed(() => toMonthInputValue(store.selectedDate())),
     isCurrentMonth: computed(() => {
-      const today = new Date();
       const selected = store.selectedDate();
       const period = store.selectedPeriod();
-      if (period === 'today' || period === 'week') return true;
-      if (period === 'year') return selected.year === today.getFullYear();
-      return selected.year === today.getFullYear() && selected.month === today.getMonth();
+      const today = dateToSelectedDate(new Date());
+      const selectedStart = getPeriodStart(period, selected).getTime();
+      const currentStart = getPeriodStart(period, today).getTime();
+      return selectedStart === currentStart;
     }),
   })),
 
   withMethods((store) => ({
     setPeriod(period: Period) {
-      patchState(store, { selectedPeriod: period });
+      patchState(store, { selectedPeriod: period, selectedDate: dateToSelectedDate(new Date()) });
     },
 
     setSelectedDate(date: SelectedDate) {
@@ -36,22 +48,51 @@ export const DashboardStore = signalStore(
     },
 
     goToPreviousMonth() {
-      const { year, month } = store.selectedDate();
-      const newMonth = month === 0 ? 11 : month - 1;
-      const newYear = month === 0 ? year - 1 : year;
-      patchState(store, { selectedDate: { year: newYear, month: newMonth } });
+      const period = store.selectedPeriod();
+      if (period === 'today') {
+        return;
+      }
+
+      const selected = selectedDateToDate(store.selectedDate());
+      switch (period) {
+        case 'week':
+          selected.setDate(selected.getDate() - 7);
+          break;
+        case 'year':
+          selected.setFullYear(selected.getFullYear() - 1);
+          break;
+        case 'month':
+          selected.setMonth(selected.getMonth() - 1);
+          break;
+      }
+
+      patchState(store, { selectedDate: dateToSelectedDate(selected) });
     },
 
     goToNextMonth() {
-      const { year, month } = store.selectedDate();
-      const newMonth = month === 11 ? 0 : month + 1;
-      const newYear = month === 11 ? year + 1 : year;
-      patchState(store, { selectedDate: { year: newYear, month: newMonth } });
+      if (store.isCurrentMonth()) {
+        return;
+      }
+
+      const period = store.selectedPeriod();
+      const selected = selectedDateToDate(store.selectedDate());
+      switch (period) {
+        case 'week':
+          selected.setDate(selected.getDate() + 7);
+          break;
+        case 'year':
+          selected.setFullYear(selected.getFullYear() + 1);
+          break;
+        case 'month':
+          selected.setMonth(selected.getMonth() + 1);
+          break;
+      }
+
+      patchState(store, { selectedDate: dateToSelectedDate(selected) });
     },
 
     goToCurrentMonth() {
-      const today = new Date();
-      patchState(store, { selectedDate: { year: today.getFullYear(), month: today.getMonth() } });
+      patchState(store, { selectedDate: dateToSelectedDate(new Date()) });
     },
   })),
 );
