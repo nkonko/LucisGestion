@@ -1,16 +1,28 @@
 import { Period } from '../models/dashboard';
 import { SelectedDate } from '../models/dashboard';
 
+function toAnchorDate(selectedDate: SelectedDate): Date {
+  return new Date(selectedDate.year, selectedDate.month, selectedDate.day ?? 1);
+}
+
+function startOfDay(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function startOfWeek(date: Date): Date {
+  const day = date.getDay();
+  const diff = date.getDate() - day;
+  return new Date(date.getFullYear(), date.getMonth(), diff);
+}
+
 export function getPeriodStart(period: Period, selectedDate: SelectedDate): Date {
-  const now = new Date();
+  const anchor = toAnchorDate(selectedDate);
   switch (period) {
     case 'today': {
-      return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      return startOfDay(anchor);
     }
     case 'week': {
-      const day = now.getDay();
-      const diff = now.getDate() - day;
-      return new Date(now.getFullYear(), now.getMonth(), diff);
+      return startOfWeek(anchor);
     }
     case 'month': {
       return new Date(selectedDate.year, selectedDate.month, 1);
@@ -22,17 +34,17 @@ export function getPeriodStart(period: Period, selectedDate: SelectedDate): Date
 }
 
 export function getPeriodEnd(period: Period, selectedDate: SelectedDate): Date {
-  const now = new Date();
+  const anchor = toAnchorDate(selectedDate);
   switch (period) {
     case 'today': {
-      const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const tomorrow = startOfDay(anchor);
       tomorrow.setDate(tomorrow.getDate() + 1);
       return tomorrow;
     }
     case 'week': {
-      const day = now.getDay();
-      const diff = now.getDate() - day + 7;
-      return new Date(now.getFullYear(), now.getMonth(), diff);
+      const nextWeek = startOfWeek(anchor);
+      nextWeek.setDate(nextWeek.getDate() + 7);
+      return nextWeek;
     }
     case 'month': {
       return new Date(selectedDate.year, selectedDate.month + 1, 1);
@@ -44,11 +56,37 @@ export function getPeriodEnd(period: Period, selectedDate: SelectedDate): Date {
 }
 
 export function formatPeriodLabel(selectedDate: SelectedDate, period: Period = 'month'): string {
+  const selected = toAnchorDate(selectedDate);
+  const now = new Date();
+  const isToday =
+    selected.getFullYear() === now.getFullYear() &&
+    selected.getMonth() === now.getMonth() &&
+    selected.getDate() === now.getDate();
+
   switch (period) {
-    case 'today':
-      return 'Hoy';
-    case 'week':
-      return 'Esta semana';
+    case 'today': {
+      if (isToday) return 'Hoy';
+      return new Intl.DateTimeFormat('es-AR', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+      }).format(selected);
+    }
+    case 'week': {
+      const weekStart = getPeriodStart('week', selectedDate);
+      const weekEnd = getPeriodEnd('week', selectedDate);
+      weekEnd.setDate(weekEnd.getDate() - 1);
+      const startText = new Intl.DateTimeFormat('es-AR', {
+        day: '2-digit',
+        month: 'short',
+      }).format(weekStart);
+      const endText = new Intl.DateTimeFormat('es-AR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      }).format(weekEnd);
+      return `Semana ${startText} - ${endText}`;
+    }
     case 'year':
       return String(selectedDate.year);
     case 'month': {

@@ -1,0 +1,135 @@
+:host {
+  display: block;
+}
+
+.report-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.report-section__title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-on-surface);
+  margin: 0;
+}
+
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+
+  th {
+    text-align: left;
+    padding: var(--space-4) var(--space-6);
+    font-weight: 600;
+    color: var(--color-on-surface-variant);
+    background: var(--color-surface-container);
+    border-bottom: var(--border-width-thin) solid var(--color-border);
+
+    &.text-right {
+      text-align: right;
+    }
+  }
+
+  td {
+    padding: var(--space-4) var(--space-6);
+    border-bottom: var(--border-width-thin) solid var(--color-border);
+
+    &.text-right {
+      text-align: right;
+    }
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.product-table__name {
+  font-weight: 500;
+  color: var(--color-on-surface);
+}
+
+.margin-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-chip);
+
+  &--high {
+    background: color-mix(in srgb, var(--color-status-ok) 15%, var(--color-surface));
+    color: var(--color-status-ok);
+  }
+
+  &--mid {
+    background: color-mix(in srgb, var(--color-status-warning) 15%, var(--color-surface));
+    color: var(--color-status-warning);
+  }
+
+  &--low {
+    background: color-mix(in srgb, var(--color-status-danger) 15%, var(--color-surface));
+    color: var(--color-status-danger);
+  }
+}
+
+.text-muted {
+  color: var(--color-on-surface-variant);
+}
+
+.text-right {
+  text-align: right;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .product-table {
+    thead {
+      display: none;
+    }
+
+    tbody,
+    tr,
+    td {
+      display: block;
+      width: 100%;
+    }
+
+    tbody tr {
+      padding: var(--space-3) var(--space-4);
+      border-bottom: var(--border-width-thin) solid var(--color-border);
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    td {
+      border-bottom: none;
+      padding: var(--space-2) 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      text-align: left;
+    }
+
+    td::before {
+      content: attr(data-label);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--color-on-surface-variant);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+  }
+
+  .margin-badge {
+    margin-left: auto;
+  }
+}

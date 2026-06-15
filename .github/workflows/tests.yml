@@ -30,8 +30,13 @@ jobs:
           node-version: 22.22.3
           cache: pnpm
 
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 build-essential
+
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Run linter
         run: pnpm lint

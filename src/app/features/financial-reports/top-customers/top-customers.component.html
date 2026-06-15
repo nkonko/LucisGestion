@@ -1,0 +1,22 @@
+<section class="report-section" aria-label="Clientes destacados">
+  <h2 class="report-section__title">Top clientes</h2>
+  <div class="ui-card-surface">
+    <div class="customer-list">
+      @for (customer of customers(); track customer.name) {
+        <div class="customer-row">
+          <div class="customer-row__info">
+            <span class="customer-row__name">{{ customer.name }}</span>
+            <span class="customer-row__revenue">{{ customer.revenue | ars }} · {{ customer.share }}%</span>
+          </div>
+          <div class="ui-progress">
+            <div
+              class="ui-progress__bar"
+              [style.width.%]="customer.share"
+              style="background: var(--color-primary)"
+            ></div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>

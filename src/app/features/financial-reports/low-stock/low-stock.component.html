@@ -1,0 +1,16 @@
+<section class="report-section" aria-label="Alertas de stock">
+  <h2 class="report-section__title">Alertas de stock</h2>
+  <div class="ui-card-surface">
+    <div class="stock-list">
+      @for (item of items(); track item.id) {
+        <div class="stock-item">
+          <div class="stock-item__info">
+            <ui-icon name="inventory_2" [size]="18" class="stock-item__icon" />
+            <span>{{ item.name }}</span>
+          </div>
+          <span class="stock-item__count">{{ item.currentStock }}/{{ item.minimumStock }} {{ item.unit }}</span>
+        </div>
+      }
+    </div>
+  </div>
+</section>

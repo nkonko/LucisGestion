@@ -1,0 +1,34 @@
+<section class="report-section" aria-label="Resumen financiero">
+  <div class="kpi-grid">
+    <app-kpi-card
+      icon="trending_up"
+      label="Ingresos totales"
+      [value]="monthlySales() | ars"
+      variant="primary"
+    />
+
+    <app-kpi-card
+      icon="receipt"
+      label="Costos variables"
+      [value]="periodVariableExpenses() | ars"
+      variant="warning"
+      [subtitle]="hasSalesData() ? variableCostRate() + '% de ingresos' : null"
+    />
+
+    <app-kpi-card
+      icon="banknote"
+      label="Gastos fijos"
+      [value]="periodFixedCosts() | ars"
+      variant="warning"
+      [subtitle]="hasSalesData() ? fixedCostRate() + '% de ingresos' : null"
+    />
+
+    <app-kpi-card
+      [icon]="isProfitable() ? 'savings' : 'error'"
+      label="Beneficio neto"
+      [value]="netProfit() | ars"
+      [variant]="isProfitable() ? 'success' : 'danger'"
+      [subtitle]="hasSalesData() ? (isProfitable() ? '+' : '') + profitRate() + '%' : null"
+    />
+  </div>
+</section>

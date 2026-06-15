@@ -1,21 +1,24 @@
-<h2 class="section-heading mb-3">Historial de precios — {{ data.name }}</h2>
-
 @if (history().length === 0) {
-  <div class="text-center py-6 text-gray-400">
+  <div class="text-center py-8 text-gray-400">
     <ui-icon name="history" [size]="40" [decorative]="true" />
     <p>No hay cambios de precio registrados</p>
   </div>
 } @else {
   <ul class="space-y-2">
     @for (item of history(); track item.id) {
-      <li class="border border-gray-200 rounded-md p-2">
-        <div class="font-medium">{{ item.previousPrice | ars }} → {{ item.newPrice | ars }}</div>
-        <div class="text-xs text-gray-400">{{ item.date.toDate() | date: 'dd/MM/yyyy HH:mm' }}</div>
+      <li class="border border-gray-200 rounded-md p-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="font-medium">{{ item.previousPrice | ars }} → {{ item.newPrice | ars }}</div>
+            <div class="text-xs text-gray-400">{{ item.date.toDate() | date: 'dd/MM/yyyy HH:mm' }}</div>
+          </div>
+          <div class="text-right">
+            <div class="text-sm font-semibold" [class]="item.newPrice > item.previousPrice ? 'text-red-600' : 'text-green-600'">
+              {{ item.newPrice > item.previousPrice ? '+' : '-' }}{{ ((item.newPrice - item.previousPrice) / item.previousPrice * 100) | number: '1.0-0' }}%
+            </div>
+          </div>
+        </div>
       </li>
     }
   </ul>
 }
-
-<div class="flex justify-end mt-4">
-  <button class="ui-btn" type="button" (click)="close()">Cerrar</button>
-</div>
