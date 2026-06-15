@@ -32,7 +32,7 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Run tests
         run: pnpm test:ci
@@ -50,6 +50,11 @@ jobs:
           export const environment = {
             production: false,
             allowedEmails: [$ALLOWED_EMAILS_TS],
+            gemini: {
+              apiKey: '${{ vars.GEMINI_API_KEY }}',
+              model: '${{ vars.GEMINI_MODEL }}',
+              baseUrl: '${{ vars.GEMINI_BASE_URL }}',
+            },
             firebase: {
               apiKey: '${{ vars.FIREBASE_API_KEY }}',
               authDomain: '${{ vars.FIREBASE_AUTH_DOMAIN }}',

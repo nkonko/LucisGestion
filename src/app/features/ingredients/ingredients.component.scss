@@ -1,18 +1,55 @@
-.ingredient-list-main {
-  align-items: center;
-  display: flex;
-  gap: var(--space-3);
-  min-width: 0;
+.ingredients-subtitle {
+  color: var(--color-muted);
+  margin: -0.5rem 0 1rem;
 }
 
-.ingredient-list-icon {
+.ingredients-grid {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+
+.ingredient-tile {
+  align-items: flex-start;
+  border: 1px solid color-mix(in srgb, var(--color-border) 72%, transparent);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-height: 148px;
+  padding: 1rem;
+  text-align: left;
+  width: 100%;
+}
+
+.ingredient-tile__icon {
   align-items: center;
-  background: color-mix(in srgb, var(--color-secondary) 68%, var(--color-surface));
-  border-radius: 16px;
+  background: color-mix(in srgb, var(--color-secondary) 65%, var(--color-surface));
+  border-radius: 12px;
   display: inline-flex;
-  flex: 0 0 48px;
-  font-size: 1.45rem;
-  height: 48px;
+  font-size: 1.35rem;
+  height: 40px;
   justify-content: center;
-  width: 48px;
+  width: 40px;
+}
+
+.ingredient-tile__name {
+  color: var(--color-text);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.ingredient-tile__price {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.ingredient-tile__hint {
+  align-items: center;
+  color: var(--color-primary);
+  display: inline-flex;
+  font-size: 0.82rem;
+  font-weight: 600;
+  gap: 0.25rem;
+  margin-top: auto;
 }

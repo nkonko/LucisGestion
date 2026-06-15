@@ -1,0 +1,34 @@
+<section class="report-section" aria-label="Productos más vendidos">
+  <h2 class="report-section__title">Productos más vendidos</h2>
+  <div class="ui-card-surface" style="padding: 0">
+    <table class="product-table">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th class="text-right">Unidades</th>
+          <th class="text-right">Ingresos</th>
+          <th class="text-right">Margen</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (product of products(); track product.name) {
+          <tr>
+            <td class="product-table__name" data-label="Producto">{{ product.name }}</td>
+            <td class="text-right text-muted" data-label="Unidades">{{ product.quantity }}</td>
+            <td class="text-right font-semibold" data-label="Ingresos">{{ product.revenue | ars }}</td>
+            <td class="text-right" data-label="Margen">
+              <span
+                class="margin-badge"
+                [class.margin-badge--high]="product.margin >= 40"
+                [class.margin-badge--mid]="product.margin >= 20 && product.margin < 40"
+                [class.margin-badge--low]="product.margin < 20"
+              >
+                {{ product.margin }}%
+              </span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

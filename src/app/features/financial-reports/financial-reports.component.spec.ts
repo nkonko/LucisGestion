@@ -8,6 +8,8 @@ import { DashboardStore } from '../../core/store/dashboard.store';
 import { SalesStore } from '../../core/store/sales.store';
 import { IngredientsStore } from '../../core/store/ingredients.store';
 import type { CustomerImportance, ProductOpportunity, ExpenseAnomaly, PriorityCustomer } from '../../core/models/financial-report';
+import { FinancialReportPdfService } from './services/financial-report-pdf.service';
+import { FinancialReportExcelService } from './services/financial-report-excel.service';
 
 function mockTimestamp(isoDate?: string) {
   const d = isoDate ? new Date(isoDate) : new Date();
@@ -36,6 +38,8 @@ describe('FinancialReportsComponent', () => {
   let selectedPeriodSignal: ReturnType<typeof signal<string>>;
   let salesSignal: ReturnType<typeof signal<object[]>>;
   let lowStockSignal: ReturnType<typeof signal<object[]>>;
+  let financialReportPdfMock: { exportReport: ReturnType<typeof vi.fn> };
+  let financialReportExcelMock: { exportReport: ReturnType<typeof vi.fn> };
 
   const defaultSale = {
     id: 's0',
@@ -68,6 +72,8 @@ describe('FinancialReportsComponent', () => {
     selectedPeriodSignal = signal<string>('month');
     salesSignal = signal<object[]>([defaultSale]);
     lowStockSignal = signal<object[]>([]);
+    financialReportPdfMock = { exportReport: vi.fn().mockResolvedValue(undefined) };
+    financialReportExcelMock = { exportReport: vi.fn().mockResolvedValue(undefined) };
 
     TestBed.configureTestingModule({
       imports: [FinancialReportsComponent],
@@ -112,6 +118,14 @@ describe('FinancialReportsComponent', () => {
         {
           provide: IngredientsStore,
           useValue: { lowStock: lowStockSignal },
+        },
+        {
+          provide: FinancialReportPdfService,
+          useValue: financialReportPdfMock,
+        },
+        {
+          provide: FinancialReportExcelService,
+          useValue: financialReportExcelMock,
         },
       ],
     });
@@ -321,8 +335,23 @@ describe('FinancialReportsComponent', () => {
       expect(section).toBeTruthy();
       expect(section.textContent).toContain('Exportar PDF');
       expect(section.textContent).toContain('Exportar Excel');
-      expect(section.textContent).toContain('Compartir reporte');
       expect(section.textContent).toContain('Recomendaciones IA');
+    });
+
+    it('calls structured PDF exporter when clicking Exportar PDF', () => {
+      const buttons = fixture.debugElement.queryAll(By.css('[aria-label="Acciones rápidas"] .ui-btn'));
+      const exportPdfButton = buttons[0];
+      exportPdfButton.triggerEventHandler('click', null);
+
+      expect(financialReportPdfMock.exportReport).toHaveBeenCalled();
+    });
+
+    it('calls Excel exporter when clicking Exportar Excel', () => {
+      const buttons = fixture.debugElement.queryAll(By.css('[aria-label="Acciones rápidas"] .ui-btn'));
+      const exportExcelButton = buttons[1];
+      exportExcelButton.triggerEventHandler('click', null);
+
+      expect(financialReportExcelMock.exportReport).toHaveBeenCalled();
     });
   });
 

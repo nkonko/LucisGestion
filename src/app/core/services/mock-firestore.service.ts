@@ -511,6 +511,11 @@ export class MockFirestoreService {
   // ---------------------------------------------------------------------------
   private seed(): void {
     const ts = (y: number, m: number, d: number) => Timestamp.fromDate(new Date(y, m - 1, d));
+    const tsFromDate = (date: Date) =>
+      Timestamp.fromDate(new Date(date.getFullYear(), date.getMonth(), date.getDate()));
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth() + 1;
 
     // --- Ingredients (sorted by name asc) ------------------------------------
     const ingredients: Ingredient[] = [
@@ -1223,11 +1228,163 @@ export class MockFirestoreService {
       },
     ];
 
+    const startOfCurrentWeek = new Date(currentYear, currentMonth - 1, today.getDate() - today.getDay());
+    const midWeekDate = new Date(startOfCurrentWeek);
+    midWeekDate.setDate(startOfCurrentWeek.getDate() + 2);
+    const previousYearDate = new Date(currentYear - 1, currentMonth - 1, Math.min(15, today.getDate()));
+
+    const dynamicSales: Sale[] = [
+      {
+        id: 'ven-19',
+        date: tsFromDate(today),
+        customerId: 'cli-1',
+        customerName: 'Ana Martínez',
+        items: [
+          {
+            recipeId: 'rec-4',
+            name: 'Torta de Chocolate',
+            quantity: 1,
+            unitPrice: 7500,
+            unitCost: 4725,
+          },
+          {
+            recipeId: 'rec-2',
+            name: 'Budín de Limón',
+            quantity: 2,
+            unitPrice: 2500,
+            unitCost: 1400,
+          },
+        ],
+        total: 12500,
+        totalCost: 7525,
+        profit: 4975,
+        paymentMethod: 'transfer',
+        status: 'delivered',
+        notes: 'Venta demo para período hoy.',
+      },
+      {
+        id: 'ven-20',
+        date: tsFromDate(midWeekDate),
+        customerId: 'cli-4',
+        customerName: 'María López',
+        items: [
+          {
+            recipeId: 'rec-1',
+            name: 'Alfajores de Maicena (x12)',
+            quantity: 2,
+            unitPrice: 4500,
+            unitCost: 2760,
+          },
+        ],
+        total: 9000,
+        totalCost: 5520,
+        profit: 3480,
+        paymentMethod: 'cash',
+        status: 'delivered',
+        notes: 'Venta demo para período semana.',
+      },
+      {
+        id: 'ven-21',
+        date: tsFromDate(previousYearDate),
+        customerId: 'cli-3',
+        customerName: 'Lucía Fernández',
+        items: [
+          {
+            recipeId: 'rec-3',
+            name: 'Cheesecake',
+            quantity: 2,
+            unitPrice: 6500,
+            unitCost: 3725,
+          },
+        ],
+        total: 13000,
+        totalCost: 7450,
+        profit: 5550,
+        paymentMethod: 'mercadopago',
+        status: 'delivered',
+        notes: 'Venta demo para navegación anual.',
+      },
+    ];
+
+    sales.push(...dynamicSales);
+
+    const priceHistory = [
+      // Harina 0000 (ing-7) price changes
+      {
+        id: 'ph-1',
+        ingredientId: 'ing-7',
+        ingredientName: 'Harina 0000',
+        previousPrice: 750,
+        newPrice: 800,
+        date: ts(2026, 4, 15),
+      },
+      {
+        id: 'ph-2',
+        ingredientId: 'ing-7',
+        ingredientName: 'Harina 0000',
+        previousPrice: 700,
+        newPrice: 750,
+        date: ts(2026, 3, 5),
+      },
+      // Chocolate cobertura (ing-3) price changes
+      {
+        id: 'ph-3',
+        ingredientId: 'ing-3',
+        ingredientName: 'Chocolate cobertura',
+        previousPrice: 7200,
+        newPrice: 7500,
+        date: ts(2026, 5, 1),
+      },
+      {
+        id: 'ph-4',
+        ingredientId: 'ing-3',
+        ingredientName: 'Chocolate cobertura',
+        previousPrice: 6800,
+        newPrice: 7200,
+        date: ts(2026, 4, 10),
+      },
+      // Azúcar (ing-1) price changes
+      {
+        id: 'ph-5',
+        ingredientId: 'ing-1',
+        ingredientName: 'Azúcar',
+        previousPrice: 580,
+        newPrice: 600,
+        date: ts(2026, 5, 5),
+      },
+      {
+        id: 'ph-6',
+        ingredientId: 'ing-1',
+        ingredientName: 'Azúcar',
+        previousPrice: 550,
+        newPrice: 580,
+        date: ts(2026, 4, 20),
+      },
+      // Manteca (ing-10) price changes
+      {
+        id: 'ph-7',
+        ingredientId: 'ing-10',
+        ingredientName: 'Manteca',
+        previousPrice: 3300,
+        newPrice: 3500,
+        date: ts(2026, 4, 25),
+      },
+      // Crema de leche (ing-4) price changes
+      {
+        id: 'ph-8',
+        ingredientId: 'ing-4',
+        ingredientName: 'Crema de leche',
+        previousPrice: 2600,
+        newPrice: 2800,
+        date: ts(2026, 5, 10),
+      },
+    ];
+
     this.getOrCreate('ingredients').next(ingredients);
     this.getOrCreate('recipes').next(recipes);
     this.getOrCreate('customers').next(customers);
     this.getOrCreate('sales').next(sales);
-    this.getOrCreate('priceHistory').next([]);
+    this.getOrCreate('priceHistory').next(priceHistory);
     this.getOrCreate('stockMovements').next([]);
     this.getOrCreate('supplyExpenses').next([
       {
@@ -1254,6 +1411,14 @@ export class MockFirestoreService {
         total: 18750,
         items: [],
       },
+      {
+        id: 'sup-4',
+        date: tsFromDate(today),
+        description: 'Compra demo del período actual',
+        supplier: 'Distribuidora Demo',
+        total: 12600,
+        items: [],
+      },
     ]);
 
     // --- Fixed Costs (multi-month history) -----------------------------------
@@ -1268,6 +1433,16 @@ export class MockFirestoreService {
       { monthKey: '2026-04', rent: 140000, utilities: 45000, taxes: 33000, other: 12000 },
       { monthKey: '2026-05', rent: 150000, utilities: 65000, taxes: 55000, other: 18000 },
     ];
+
+    const currentMonthKey = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
+    if (!fcData.some((entry) => entry.monthKey === currentMonthKey)) {
+      fcData.push({ monthKey: currentMonthKey, rent: 152000, utilities: 68000, taxes: 56000, other: 19000 });
+    }
+
+    const previousYearMonthKey = `${currentYear - 1}-${String(currentMonth).padStart(2, '0')}`;
+    if (!fcData.some((entry) => entry.monthKey === previousYearMonthKey)) {
+      fcData.push({ monthKey: previousYearMonthKey, rent: 128000, utilities: 39000, taxes: 29500, other: 9500 });
+    }
 
     const fixedCostsByMonth: FixedCostMonthDoc[] = [];
     for (const fc of fcData) {

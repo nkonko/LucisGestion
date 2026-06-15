@@ -1,13 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { NotificationService } from '../../core/services/notification.service';
 import { IngredientsStore } from '../../core/store/ingredients.store';
 import { DEFAULT_INGREDIENT_ICON, Ingredient } from '../../core/models/ingredient';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
-import { IngredientFormComponent } from './ingredient-form/ingredient-form.component';
 import { PriceHistoryComponent } from './price-history.component';
 import { BottomSheetService } from '../../core/services/bottom-sheet.service';
 import { UiIconComponent } from '../../shared/ui/components';
-import { AuthStore } from '../../core/store/auth.store';
 
 @Component({
   selector: 'app-ingredients',
@@ -18,9 +15,7 @@ import { AuthStore } from '../../core/store/auth.store';
 })
 export class IngredientsComponent {
   readonly store = inject(IngredientsStore);
-  readonly auth = inject(AuthStore);
   private dialog = inject(BottomSheetService);
-  private notify = inject(NotificationService);
 
   searchTerm = signal('');
 
@@ -41,49 +36,12 @@ export class IngredientsComponent {
     return ingredient.icon || DEFAULT_INGREDIENT_ICON;
   }
 
-  getStockClass(i: Ingredient): string {
-    if (i.currentStock <= 0) return 'stock-danger';
-    if (i.currentStock <= i.minimumStock) return 'stock-warning';
-    return 'stock-ok';
-  }
-
-  create(): void {
-    const dialogRef = this.dialog.open<null, Ingredient>(IngredientFormComponent, {
-      maxWidth: '500px',
-      maxHeight: '90vh',
-      data: null,
-    });
-
-    dialogRef.afterClosed.subscribe(async (result) => {
-      if (result) {
-        await this.store.createIngredient(result);
-        this.notify.success('Ingrediente creado');
-      }
-    });
-  }
-
-  edit(ingredient: Ingredient): void {
-    const dialogRef = this.dialog.open<Ingredient, Ingredient | 'delete'>(IngredientFormComponent, {
-      maxWidth: '500px',
-      maxHeight: '90vh',
-      data: ingredient,
-    });
-
-    dialogRef.afterClosed.subscribe(async (result) => {
-      if (result === 'delete') {
-        await this.store.deleteIngredient(ingredient.id!);
-        this.notify.success('Ingrediente eliminado');
-      } else if (result) {
-        await this.store.updateIngredient(ingredient.id!, result);
-        this.notify.success('Ingrediente actualizado');
-      }
-    });
-  }
-
-  viewHistory(ingredient: Ingredient, event: Event): void {
-    event.stopPropagation();
+  openHistory(ingredient: Ingredient): void {
     this.dialog.open<{ id: string; name: string }, never>(PriceHistoryComponent, {
-      maxWidth: '450px',
+      title: 'Historial de precios',
+      section: ingredient.name,
+      maxWidth: '480px',
+      maxHeight: '90vh',
       data: { id: ingredient.id ?? '', name: ingredient.name },
     });
   }

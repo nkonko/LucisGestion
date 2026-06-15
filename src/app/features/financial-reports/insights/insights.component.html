@@ -1,0 +1,54 @@
+<section class="report-section" aria-label="Insights automáticos">
+  <h2 class="report-section__title">Insights automáticos</h2>
+  <div class="insight-grid">
+    @for (opportunity of productOpportunities(); track opportunity.id) {
+      <app-insight-card
+        icon="trending_up"
+        badge="OPORTUNIDAD"
+        [title]="opportunity.recipeName"
+        variant="opportunity"
+      >
+        <p>{{ opportunity.soldUnits }} unidades · {{ opportunity.estimatedRevenue | ars }}</p>
+        <p class="text-muted">{{ opportunity.recommendation }}</p>
+        <button type="button" class="ui-btn insight-action">
+          <ui-icon name="inventory_2" [size]="14" [decorative]="true" />
+          Ver producto
+        </button>
+      </app-insight-card>
+    }
+
+    @for (anomaly of expenseAnomalies(); track anomaly.id) {
+      <app-insight-card
+        [icon]="anomaly.severity === 'critical' ? 'error' : 'warning'"
+        [badge]="anomaly.severity === 'critical' ? 'CRÍTICO' : 'ALERTA'"
+        [title]="anomaly.title"
+        [variant]="anomaly.severity === 'critical' ? 'critical' : 'warning'"
+      >
+        <p>Actual: {{ anomaly.currentAmount | ars }} · Base: {{ anomaly.baselineAmount | ars }}</p>
+        <p class="font-semibold" [class.text-danger]="anomaly.severity === 'critical'" [class.text-warning]="anomaly.severity === 'warning'">
+          +{{ anomaly.increaseRatio | percent }} vs. promedio
+        </p>
+        <button type="button" class="ui-btn insight-action">
+          <ui-icon name="receipt" [size]="14" [decorative]="true" />
+          Analizar gastos
+        </button>
+      </app-insight-card>
+    }
+
+    @for (priorityCustomer of priorityCustomers(); track priorityCustomer.id) {
+      <app-insight-card
+        icon="emoji_events"
+        badge="ALTO IMPACTO"
+        [title]="priorityCustomer.customerName"
+        variant="impact"
+      >
+        <p>{{ priorityCustomer.purchasesCount }} compras · {{ priorityCustomer.billedAmount | ars }} facturados</p>
+        <p class="text-muted">{{ priorityCustomer.recommendation }}</p>
+        <button type="button" class="ui-btn insight-action">
+          <ui-icon name="people" [size]="14" [decorative]="true" />
+          Ver cliente
+        </button>
+      </app-insight-card>
+    }
+  </div>
+</section>

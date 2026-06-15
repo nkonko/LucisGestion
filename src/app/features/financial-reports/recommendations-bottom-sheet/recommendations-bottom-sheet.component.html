@@ -1,0 +1,78 @@
+@if (currentRecommendation(); as recommendation) {
+  <div class="recommendations-container">
+    <div class="recommendations-toolbar">
+      @if (hasMultipleRecommendations()) {
+        <div class="pager-controls" aria-label="Navegacion de recomendaciones">
+          <button
+            class="pager-btn"
+            type="button"
+            [disabled]="currentIndex() === 0"
+            (click)="previousRecommendation()"
+            aria-label="Recomendacion anterior"
+          >
+            <ui-icon name="chevron_left" [size]="18" [decorative]="true" />
+          </button>
+          <span class="pager-counter">{{ currentIndex() + 1 }} / {{ totalRecommendations }}</span>
+          <button
+            class="pager-btn"
+            type="button"
+            [disabled]="currentIndex() === totalRecommendations - 1"
+            (click)="nextRecommendation()"
+            aria-label="Siguiente recomendacion"
+          >
+            <ui-icon name="chevron_right" [size]="18" [decorative]="true" />
+          </button>
+        </div>
+      }
+
+      <button class="ui-btn" type="button" (click)="exportPdf()" aria-label="Descargar recomendaciones en PDF">
+        <ui-icon name="download" [size]="18" [decorative]="true" />
+        Descargar PDF
+      </button>
+    </div>
+
+    <div class="recommendations-header">
+      <div>
+        <h2 class="recommendations-title">{{ recommendation.title }}</h2>
+        @if (recommendation.isLocal) {
+          <span class="local-indicator">Respuesta Local</span>
+        }
+        <p class="recommendations-description">{{ recommendation.description }}</p>
+      </div>
+      <span
+        class="urgency-badge"
+        [class.urgency-alta]="recommendation.urgency === 'alta'"
+        [class.urgency-media]="recommendation.urgency === 'media'"
+        [class.urgency-baja]="recommendation.urgency === 'baja'"
+      >
+        {{ getUrgencyLabel(recommendation.urgency) }}
+      </span>
+    </div>
+
+    @if (recommendation.actionItems && recommendation.actionItems.length > 0) {
+      <div class="recommendations-actions">
+        <h3 class="actions-title">Acciones recomendadas:</h3>
+        <ul class="actions-list">
+          @for (action of recommendation.actionItems; track $index) {
+            <li class="action-item">
+              <ui-icon name="check_circle" [size]="18" [decorative]="true" />
+              <span>{{ action }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+
+    <div class="recommendations-footer">
+      <p class="footer-note">
+        💡 Estas recomendaciones se basan en tus datos financieros. Adáptalas a tu contexto
+        específico. No te fies de ellas, la IA no conoce tu negocio, ni tu contexto. Siempre verifica y ajusta según tu conocimiento.
+      </p>
+    </div>
+  </div>
+} @else {
+  <div class="empty-state">
+    <ui-icon name="lightbulb" [size]="48" class="empty-icon" />
+    <p>No se pudieron generar recomendaciones en este momento.</p>
+  </div>
+}

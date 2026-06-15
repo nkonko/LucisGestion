@@ -5,6 +5,11 @@
 export const environment = {
   production: false,
   allowedEmails: ['YOUR_EMAIL@example.com'],
+  gemini: {
+    apiKey: 'YOUR_GEMINI_API_KEY',
+    model: 'MODEL',
+    baseUrl: 'YOUR_GEMINI_BASE_URL',
+  },
   firebase: {
     apiKey: 'YOUR_API_KEY',
     authDomain: 'YOUR_PROJECT.firebaseapp.com',
