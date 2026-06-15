@@ -12,13 +12,13 @@ export interface GeminiRecommendation {
 }
 
 interface GeminiResponse {
-  candidates: Array<{
+  candidates: {
     content: {
-      parts: Array<{
+      parts: {
         text: string;
-      }>;
+      }[];
     };
-  }>;
+  }[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -231,10 +231,10 @@ Solo responde con JSON válido, sin markdown, comentarios adicionales o explicac
       ? Math.round((metrics.netProfit() / metrics.monthlySales()) * 100)
       : 0;
 
-    let title = 'Recomendaciones Automáticas';
-    let urgency: 'alta' | 'media' | 'baja' = 'media';
-    let description = '';
-    let actionItems: string[] = [];
+    let title: string;
+    let urgency: 'alta' | 'media' | 'baja';
+    let description: string;
+    let actionItems: string[];
 
     // Lógica simple para fallback local
     if (metrics.netProfit() < 0) {
