@@ -113,7 +113,15 @@ export class FinancialReportExcelService {
 
     this.styleHeaderRow(sheet.getRow(6), 'FF2B4C7E');
     this.styleSheetFrame(sheet, 2, 4, 2);
-    this.styleSheetFrame(sheet, 6, 9, 2);
+    this.styleSheetFrame(sheet, 7, 9, 2);
+    for (const cellAddress of ['A6', 'B6']) {
+      const cell = sheet.getCell(cellAddress);
+      cell.font = {
+        ...(cell.font ?? { name: 'Calibri', size: 11 }),
+        bold: true,
+        color: { argb: 'FFFFFFFF' },
+      };
+    }
 
     const healthLabelCell = sheet.getCell('A4');
     const healthValueCell = sheet.getCell('B4');
