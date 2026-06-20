@@ -1,387 +1,203 @@
-# 🚀 Guía de Despliegue — Lucis Gestión
+# Deployment Guide — Lucis Gestión
 
-## Índice
+This guide explains how to configure and deploy Lucis Gestión to Firebase Hosting for a production-like TFM review.
 
-1. [Pre-requisitos](#1-pre-requisitos)
-2. [Crear proyecto en Firebase](#2-crear-proyecto-en-firebase)
-3. [Configurar autenticación](#3-configurar-autenticación)
-4. [Configurar Firestore](#4-configurar-firestore)
-5. [Conectar el código con Firebase](#5-conectar-el-código-con-firebase)
-6. [Build y deploy](#6-build-y-deploy)
-7. [Verificaciones post-deploy](#7-verificaciones-post-deploy)
-8. [Cosas que faltan / Mejoras pendientes](#8-cosas-que-faltan--mejoras-pendientes)
-9. [Troubleshooting](#9-troubleshooting)
+## Current Public Deployment
 
----
+- **Application:** <https://lucis-gestion-6cea2.web.app/>
+- **Demo mode:** <https://lucis-gestion-6cea2.web.app/demo>
+- **Recommended evaluator access:** demo mode, because it does not require login and includes sample data.
 
-## 1. Pre-requisitos
+## 1. Prerequisites
 
-### Software necesario
-
-| Herramienta | Versión mínima | Comando para verificar |
+| Tool | Version / requirement | Check command |
 |---|---|---|
-| Node.js | 20+ | `node --version` |
-| pnpm | 10+ | `pnpm --version` |
-| Angular CLI | 21+ | `ng version` |
-| Firebase CLI | 13+ | `firebase --version` |
+| Node.js | `>=22.22.3` | `node --version` |
+| pnpm | `11.1.1` or compatible | `pnpm --version` |
+| Angular CLI | Compatible with Angular 22 | `pnpm ng version` |
+| Firebase CLI | Required for deploy | `firebase --version` |
 
-### Instalar Firebase CLI (si no lo tenés)
+Install dependencies:
+
+```bash
+pnpm install
+```
+
+Install Firebase CLI if it is not available:
 
 ```bash
 pnpm install -g firebase-tools
 ```
 
-### Iniciar sesión en Firebase desde la terminal
+Authenticate with Firebase:
 
 ```bash
 firebase login
 ```
 
-Se abrirá el navegador para autenticarte con tu cuenta de Google.
+## 2. Firebase Project Setup
 
----
+1. Open <https://console.firebase.google.com/>.
+2. Create or select a Firebase project.
+3. Register a web application.
+4. Enable Firebase Hosting during app registration.
+5. Copy the Firebase web configuration object.
 
-## 2. Crear proyecto en Firebase
+Example configuration shape:
 
-1. Ir a [Firebase Console](https://console.firebase.google.com/)
-2. Click en **"Agregar proyecto"** (o "Add project")
-3. Nombre: `lucis-gestion` (o el que quieras)
-4. **Desactivar Google Analytics** (no lo necesitamos, simplifica el setup)
-5. Click en **"Crear proyecto"**
-6. Esperar a que se cree → Click en "Continuar"
-
-### Registrar la Web App
-
-1. En la pantalla principal del proyecto, click en el ícono **Web** (`</>`)
-2. Nombre: `Lucis Gestión`
-3. **✅ Marcar** "Also set up Firebase Hosting"
-4. Click en "Register app"
-5. **⚠️ COPIAR la configuración** que aparece (la vas a necesitar en el paso 5):
-
-```javascript
+```ts
 const firebaseConfig = {
-  apiKey: "AIza...",
-  authDomain: "lucis-gestion-XXXXX.firebaseapp.com",
-  projectId: "lucis-gestion-XXXXX",
-  storageBucket: "lucis-gestion-XXXXX.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef"
+  apiKey: '...',
+  authDomain: 'lucis-gestion-6cea2.firebaseapp.com',
+  projectId: 'lucis-gestion-6cea2',
+  storageBucket: 'lucis-gestion-6cea2.appspot.com',
+  messagingSenderId: '...',
+  appId: '...',
 };
 ```
 
----
+## 3. Authentication Setup
 
-## 3. Configurar autenticación
+1. Go to **Firebase Console → Authentication**.
+2. Open **Sign-in method**.
+3. Enable **Google**.
+4. Add a support email.
+5. In **Settings → Authorized domains**, verify that the deployed domain is present:
+   - `lucis-gestion-6cea2.web.app`
+   - `localhost` for local development
 
-1. En Firebase Console → **Authentication** (menú lateral)
-2. Click en **"Comenzar"** / "Get Started"
-3. En la pestaña **"Sign-in method"**:
-   - Click en **Google**
-   - Activar el toggle
-   - Agregar un correo de soporte (el tuyo)
-   - Click en **Guardar**
-4. En la pestaña **"Settings" → "Authorized domains"**:
-   - Verificar que `lucis-gestion-XXXXX.web.app` esté listado
-   - Si vas a probar localmente, `localhost` ya debería estar
+## 4. Firestore Setup
 
----
+1. Go to **Firebase Console → Firestore Database**.
+2. Create a database.
+3. Select the closest region to the expected users.
+4. Start with temporary test rules only if the project is not public yet.
+5. Deploy the repository rules before real usage.
 
-## 4. Configurar Firestore
+The application creates collections automatically when data is written. Main collections include:
 
-1. En Firebase Console → **Firestore Database** (menú lateral)
-2. Click en **"Crear base de datos"** / "Create database"
-3. **Ubicación**: elegir la más cercana. Para Argentina: `southamerica-east1` (São Paulo)
-   > ⚠️ **LA UBICACIÓN NO SE PUEDE CAMBIAR DESPUÉS**
-4. Reglas de seguridad: elegir **"Empezar en modo de prueba"** (las vamos a reemplazar)
-5. Click en "Crear"
-
-### Subir las reglas de seguridad
-
-Las reglas ya están definidas en el archivo `firestore.rules` del proyecto. Se suben automáticamente con `firebase deploy`. Pero si querés verificar antes:
-
-1. En Firebase Console → Firestore → pestaña **"Reglas"**
-2. Copiar el contenido de `firestore.rules` del proyecto
-3. Click en "Publicar"
-
-### Colecciones que se crean automáticamente
-
-No necesitás crear colecciones manualmente. Se crean solas cuando la app escribe el primer documento:
-
-| Colección | Se crea cuando... |
+| Collection | Purpose |
 |---|---|
-| `users` | Primer login |
-| `ingredientes` | Se crea el primer ingrediente |
-| `recetas` | Se crea la primera receta |
-| `ventas` | Se registra la primera venta |
-| `clientes` | Se crea el primer cliente |
-| `movimientosStock` | Se registra la primera venta (automático) |
-| `gastosInsumos` | Se registra la primera compra de insumos |
-| `historialPrecios` | Se cambia el precio de un ingrediente |
+| `users` | Authenticated user profile and role |
+| `ingredientes` | Ingredients, stock, prices, and categories |
+| `recetas` | Recipes and cost information |
+| `ventas` | Orders and sales history |
+| `clientes` | Customer records |
+| `movimientosStock` | Inventory movements |
+| `gastosInsumos` | Ingredient purchase expenses |
+| `historialPrecios` | Ingredient price changes |
+| `costosFijos` | Monthly fixed costs |
 
----
+## 5. Environment Configuration
 
-## 5. Conectar el código con Firebase
+Create or update `src/environments/environment.ts` with the Firebase configuration:
 
-### 5.1 Archivo de environment
-
-Editar `src/environments/environment.ts` y reemplazar los placeholders:
-
-```typescript
+```ts
 export const environment = {
   production: false,
   firebase: {
-    apiKey: 'TU_API_KEY_REAL',
-    authDomain: 'lucis-gestion-XXXXX.firebaseapp.com',
-    projectId: 'lucis-gestion-XXXXX',
-    storageBucket: 'lucis-gestion-XXXXX.appspot.com',
-    messagingSenderId: 'TU_SENDER_ID',
-    appId: 'TU_APP_ID',
+    apiKey: 'YOUR_API_KEY',
+    authDomain: 'lucis-gestion-6cea2.firebaseapp.com',
+    projectId: 'lucis-gestion-6cea2',
+    storageBucket: 'lucis-gestion-6cea2.appspot.com',
+    messagingSenderId: 'YOUR_SENDER_ID',
+    appId: 'YOUR_APP_ID',
   },
 };
 ```
 
-### 5.2 Crear environment de producción
+For production builds, keep the production environment aligned with the same Firebase project and set `production: true` if a dedicated production file is used.
 
-Crear archivo `src/environments/environment.prod.ts`:
+## 6. Firebase Project Alias
 
-```typescript
-export const environment = {
-  production: true,
-  firebase: {
-    apiKey: 'TU_API_KEY_REAL',
-    authDomain: 'lucis-gestion-XXXXX.firebaseapp.com',
-    projectId: 'lucis-gestion-XXXXX',
-    storageBucket: 'lucis-gestion-XXXXX.appspot.com',
-    messagingSenderId: 'TU_SENDER_ID',
-    appId: 'TU_APP_ID',
-  },
-};
-```
-
-> ℹ️ Pueden ser iguales. La diferencia es el flag `production: true`.
-
-### 5.3 Archivo `.firebaserc`
-
-Editar `.firebaserc` y reemplazar el project ID:
+Ensure `.firebaserc` points to the intended Firebase project:
 
 ```json
 {
   "projects": {
-    "default": "lucis-gestion-XXXXX"
+    "default": "lucis-gestion-6cea2"
   }
 }
 ```
 
-> Usá el mismo `projectId` que copiaste de la configuración de Firebase.
+## 7. Local Verification Before Deploy
 
----
-
-## 6. Build y deploy
-
-### Probar en modo desarrollo (local)
+Run the Firebase-backed application:
 
 ```bash
-cd lucis-gestion
 pnpm start
 ```
 
-Abrir `http://localhost:4200` — verificar que el login con Google funcione.
-
-### Probar en modo mock (sin Firebase)
-
-Si querés verificar que la UI funciona antes de configurar Firebase:
+Run the mock/demo version without Firebase:
 
 ```bash
 pnpm start:mock
 ```
 
-Esto levanta la app con datos de prueba en memoria, sin necesidad de Firebase, sin login real. Ideal para hacer una primera revisión o demo rápida. Ver detalle en el [README](../README.md).
-
-### Build de producción
+Run checks before deployment:
 
 ```bash
-ng build
+pnpm test
+pnpm lint
+pnpm build
 ```
 
-Esperado: 0 errores, 0 warnings, ~997 kB initial bundle.
+## 8. Production Build and Deploy
 
-La salida va a `dist/lucis-gestion/browser/`.
+Build the application:
 
-### Deploy a Firebase Hosting
+```bash
+pnpm build
+```
+
+Deploy hosting, Firestore rules, and indexes:
 
 ```bash
 firebase deploy
 ```
 
-Esto sube:
-- ✅ La app (hosting)
-- ✅ Las reglas de Firestore (`firestore.rules`)
-- ✅ Los índices de Firestore (`firestore.indexes.json`)
-
-Al finalizar te da la URL:
-
-```
-✔ Deploy complete!
-
-Hosting URL: https://lucis-gestion-XXXXX.web.app
-```
-
-### (Opcional) Deploy solo hosting
+Deploy only hosting if rules and indexes did not change:
 
 ```bash
 firebase deploy --only hosting
 ```
 
-### (Opcional) Deploy solo reglas
+Deploy only Firestore rules and indexes:
 
 ```bash
-firebase deploy --only firestore:rules
+firebase deploy --only firestore
 ```
 
----
+Expected final output includes a Firebase Hosting URL similar to:
 
-## 7. Verificaciones post-deploy
-
-### Checklist obligatorio
-
-- [ ] **Abrir la URL** `https://lucis-gestion-XXXXX.web.app` en el celular
-- [ ] **Login con Google** funciona (no da error de dominio no autorizado)
-- [ ] **Primer usuario** se registra como `owner` en Firestore → verificar en Console: Firestore → colección `users`
-- [ ] **Crear un ingrediente** de prueba → verificar que aparece en Firestore
-- [ ] **Crear una receta** → verificar que calcula el costo
-- [ ] **Registrar una venta** → verificar que el stock se descuenta
-- [ ] **Instalar como PWA**: en Chrome mobile, debería aparecer el banner "Agregar a pantalla de inicio" o desde menú → "Instalar app"
-- [ ] **Modo offline**: apagar WiFi/datos, verificar que la app sigue mostrando datos cargados
-- [ ] **Segundo usuario**: iniciar sesión con otra cuenta → debe quedar como `ayudante`
-
-### Verificar en Firebase Console
-
-| Qué verificar | Dónde |
-|---|---|
-| Usuarios registrados | Authentication → Users |
-| Datos guardados | Firestore Database → colecciones |
-| Reglas activas | Firestore → Rules |
-| Tráfico hosting | Hosting → Dashboard |
-| Uso del free tier | Usage and billing |
-
----
-
-## 8. Cosas que faltan / Mejoras pendientes
-
-### 🔴 Crítico (hacer antes de dar acceso a usuarios)
-
-| # | Qué falta | Detalle |
-|---|---|---|
-| 1 | **Configurar Firebase real** | Reemplazar los placeholders en `environment.ts` y `.firebaserc` con valores reales del proyecto Firebase |
-| 2 | **Roles con Custom Claims** | Actualmente los roles se guardan en Firestore (`users/{uid}.role`), pero las Firestore rules usan `request.auth.token.role` (custom claims). **Hay un mismatch**: necesitás una Cloud Function o script Admin SDK que copie el rol de Firestore al token. Alternativa: cambiar las rules para leer de Firestore en vez de claims. Ver sección Troubleshooting |
-| 3 | **Environment de producción** | Crear `environment.prod.ts` y configurar `angular.json` para usarlo en build de producción |
-
-### 🟡 Importante (mejora la experiencia)
-
-| # | Qué falta | Detalle |
-|---|---|---|
-| 4 | **Ocultar UI según rol** | El ayudante ve botones de crear/editar ingredientes y recetas pero Firestore los rechaza. Conviene ocultar esos botones con `@if (auth.isOwner())` |
-| 5 | **Teléfonos WhatsApp con código país** | Si los teléfonos no incluyen código país (ej: `+54`), el link `wa.me` no funciona correctamente. Agregar validación o prefijo automático |
-| 6 | **Reponer stock en cancelación** | Si se cancela una venta, el stock NO se repone automáticamente. Decidir si implementar o dejarlo como ajuste manual |
-| 7 | **Error handling global** | No hay toasts/snackbar para errores de Firestore (offline, permisos). Agregar manejo en el store |
-| 8 | **Loading indicators** | El estado `loading` del store no se muestra en la UI. Agregar spinners en operaciones lentas |
-
-### 🟢 Nice-to-have (mejoras futuras)
-
-| # | Idea | Detalle |
-|---|---|---|
-| 9 | Fotos de recetas | Subir imagen con Firebase Storage |
-| 10 | Notificaciones push | FCM para avisar stock bajo |
-| 11 | Reportes exportables | Exportar ventas a CSV/Excel |
-| 12 | Multi-negocio | Soportar más de una pastelería con un solo login |
-| 13 | Backup automático | Firebase scheduled exports |
-| 14 | Tests unitarios | Actualmente 0 tests. Agregar al menos para el store |
-
----
-
-## 9. Troubleshooting
-
-### Error: "auth/unauthorized-domain"
-
-El dominio desde donde accedés no está autorizado en Firebase Auth.
-
-**Solución**: Firebase Console → Authentication → Settings → Authorized domains → Agregar tu dominio.
-
-### Error: "Missing or insufficient permissions" en Firestore
-
-Las Firestore rules requieren `request.auth.token.role` (Custom Claims), pero el sistema actual guarda el rol en un documento de Firestore, no en el token.
-
-**Solución rápida** — Cambiar las rules para leer de Firestore:
-
-```javascript
-function getUserRole() {
-  return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
-}
-
-function isOwner() {
-  return isSignedIn() && getUserRole() == 'owner';
-}
+```text
+Hosting URL: https://lucis-gestion-6cea2.web.app
 ```
 
-> ⚠️ Esto agrega 1 lectura extra de Firestore por cada operación. Es aceptable para volumen bajo (10-30 pedidos/semana) pero no escala. La solución ideal es una Cloud Function que setee Custom Claims.
+## 9. Post-deploy Checklist
 
-**Solución ideal** — Cloud Function para custom claims:
+- Open <https://lucis-gestion-6cea2.web.app/> and verify that the landing page loads.
+- Open <https://lucis-gestion-6cea2.web.app/demo> and verify that demo data appears without login.
+- Test Google login from the production entry point.
+- Verify direct navigation to nested routes such as `/demo/dashboard` and `/app/dashboard`.
+- Confirm Firestore rules are published from `firestore.rules`.
+- Confirm Firestore indexes are published from `firestore.indexes.json`.
+- Confirm the PWA manifest loads correctly.
 
-```javascript
-// functions/index.js
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
-admin.initializeApp();
+## 10. Troubleshooting
 
-exports.onUserCreated = functions.firestore
-  .document('users/{userId}')
-  .onCreate(async (snap, context) => {
-    const { role } = snap.data();
-    await admin.auth().setCustomUserClaims(context.params.userId, { role });
-  });
-```
-
-### El service worker cachea una versión vieja
-
-**Solución**: En Chrome DevTools → Application → Service Workers → "Update on reload" o "Unregister".
-
-### La PWA no se instala
-
-Requisitos:
-- Debe servirse por HTTPS (Firebase Hosting lo incluye)
-- Debe tener `manifest.webmanifest` válido (ya incluido)
-- Debe tener Service Worker registrado (ya incluido)
-- El usuario debe interactuar con la app al menos 30 segundos
-
-### Build supera el warning de 1 MB
-
-Actualmente el bundle es ~997 kB (muy justo). Si se agregan más features:
-- Usar `ng build` con `--stats-json` y analizar con `webpack-bundle-analyzer`
-- Verificar que todo sea lazy-loaded
-- Considerar quitar módulos de Material no usados
-
----
-
-## Resumen de archivos a modificar antes del deploy
-
-| Archivo | Qué cambiar |
-|---|---|
-| `src/environments/environment.ts` | Reemplazar TODOS los placeholders de Firebase config |
-| `src/environments/environment.prod.ts` | Crear con los mismos valores + `production: true` |
-| `.firebaserc` | Cambiar `YOUR_PROJECT_ID` por el ID real del proyecto |
-| `firestore.rules` | (Opcional) Cambiar de custom claims a lectura de Firestore — ver Troubleshooting |
-
----
-
-## Costos esperados (Plan Spark — Gratis)
-
-| Recurso | Límite gratuito | Uso estimado (10-30 pedidos/semana) |
+| Problem | Likely cause | Suggested fix |
 |---|---|---|
-| Firestore reads | 50,000/día | ~500-2,000/día ✅ |
-| Firestore writes | 20,000/día | ~50-200/día ✅ |
-| Firestore storage | 1 GB | < 10 MB ✅ |
-| Hosting storage | 10 GB | ~5 MB ✅ |
-| Hosting bandwidth | 10 GB/mes | ~100 MB/mes ✅ |
-| Auth users | Sin límite | 2-5 usuarios ✅ |
+| Blank page after deploy | Build output path mismatch | Check `firebase.json` hosting `public` directory |
+| Google login fails | Unauthorized domain | Add the domain in Firebase Authentication settings |
+| Firestore permission denied | Rules or user role mismatch | Review `firestore.rules` and user role in `users/{uid}` |
+| Local Firebase mode fails | Missing environment config | Update `src/environments/environment.ts` |
+| Demo mode data disappears | Expected in-memory behavior | Refreshing resets mock state by design |
 
-> Con el volumen esperado, **no hay riesgo de superar el plan gratuito**.
+## 11. Notes for TFM Evaluation
+
+The preferred evaluation path is the public demo URL because it avoids account creation and gives the reviewer immediate access to a representative bakery dataset:
+
+```text
+https://lucis-gestion-6cea2.web.app/demo
+```

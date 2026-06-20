@@ -1,359 +1,350 @@
-# 🧪 Manual de Casos de Prueba — Lucis Gestión
+# Functional Test Case Manual — Lucis Gestión
 
-## Modo Mock (ejecución rápida sin Firebase)
+This manual defines the functional checks for the TFM review of Lucis Gestión. The recommended review mode is the public demo route because it avoids account creation and includes representative sample data.
 
-Para ejecutar los casos de prueba sin necesidad de Firebase configurado:
+## Recommended Test Access
 
-```bash
-pnpm start:mock
-```
+- **Public deployment:** <https://lucis-gestion-6cea2.web.app/>
+- **Demo route:** <https://lucis-gestion-6cea2.web.app/demo>
+- **Local demo command:** `pnpm start:mock`
+- **Demo credentials:** none required
+- **Demo role:** owner
+- **Persistence:** in-memory; changes reset after refresh/restart
 
-La app se levanta con datos de ejemplo precargados (ingredientes, recetas, clientes y ventas). El usuario queda auto-logueado como owner. Los datos se pierden al refrescar.
+## Conventions
 
-> **Nota**: Los casos CP-01 a CP-04 (autenticación) y CP-27/CP-28 (PWA/offline) requieren Firebase real. El resto se pueden validar en modo mock.
+- **Precondition:** Required state before executing the case.
+- **Steps:** Ordered actions.
+- **Expected result:** Observable result if the feature works correctly.
+- **Status:** Pending until executed by the evaluator.
 
-## Convenciones
+## Authentication and Access
 
-- **Pre-condición**: Estado necesario antes de ejecutar el caso.
-- **Pasos**: Acciones a seguir en orden.
-- **Resultado esperado**: Lo que debe ocurrir si todo funciona correctamente.
-- ✅ = Pasó | ❌ = Falló | ⏳ = Pendiente
+### TC-01: Demo access without login
 
----
-
-## 1. Autenticación (Fase 4)
-
-### CP-01: Login con Google — Primer usuario (Owner)
-
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | No existe ningún documento en la colección `users` de Firestore |
-| **Pasos** | 1. Abrir la app → debería redirigir a `/login` <br> 2. Tocar "Continuar con Google" <br> 3. Seleccionar cuenta de Google |
-| **Resultado esperado** | ✅ Se crea documento en `users/{uid}` con `role: 'owner'` <br> ✅ Redirige a `/dashboard` <br> ✅ En el menú de usuario aparece badge "Dueña" |
-| **Estado** | ⏳ |
+| Precondition | Application deployed or running with `pnpm start:mock` |
+| Steps | 1. Open `/demo` or `/demo/dashboard` |
+| Expected result | The app opens the authenticated layout with sample data and no login prompt. |
+| Status | Pending |
 
-### CP-02: Login con Google — Segundo usuario (Ayudante)
+### TC-02: Google login for Firebase mode
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Ya existe al menos un usuario en `users` |
-| **Pasos** | 1. Abrir la app en otro navegador/incógnito <br> 2. Tocar "Continuar con Google" con otra cuenta |
-| **Resultado esperado** | ✅ Se crea documento con `role: 'ayudante'` <br> ✅ Badge muestra "Ayudante" |
-| **Estado** | ⏳ |
+| Precondition | Firebase Authentication configured with Google provider |
+| Steps | 1. Open `/login` 2. Click Google login 3. Select account |
+| Expected result | The user is authenticated and redirected to `/app/dashboard`. First user receives owner permissions. |
+| Status | Pending |
 
-### CP-03: Logout
+### TC-03: Logout
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Usuario logueado |
-| **Pasos** | 1. Tocar avatar en toolbar <br> 2. Tocar "Cerrar sesión" |
-| **Resultado esperado** | ✅ Redirige a `/login` <br> ✅ No se puede acceder a `/dashboard` directamente |
-| **Estado** | ⏳ |
+| Precondition | User authenticated in Firebase mode |
+| Steps | 1. Open the user menu 2. Click logout |
+| Expected result | Session closes and protected `/app/*` routes require authentication again. |
+| Status | Pending |
 
-### CP-04: Acceso sin autenticación
+### TC-04: Protected route access
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | No hay sesión activa |
-| **Pasos** | 1. Navegar directamente a `/dashboard`, `/recetas`, `/ventas` |
-| **Resultado esperado** | ✅ Redirige a `/login` en todos los casos |
-| **Estado** | ⏳ |
+| Precondition | No Firebase session is active |
+| Steps | 1. Navigate directly to `/app/dashboard`, `/app/recetas`, and `/app/ventas` |
+| Expected result | The app redirects unauthenticated users to login. |
+| Status | Pending |
 
----
+## Ingredients and Price History
 
-## 2. Ingredientes (Fase 1)
+### TC-05: Create ingredient
 
-### CP-05: Crear ingrediente
-
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Usuario logueado como owner |
-| **Pasos** | 1. Ir a Ingredientes (desde menú o `/ingredientes`) <br> 2. Tocar botón FAB (+) <br> 3. Completar: Nombre="Harina 000", Unidad="kg", Categoría="Secos", Precio=$500, Stock actual=10, Stock mínimo=2 <br> 4. Tocar "Crear" |
-| **Resultado esperado** | ✅ Aparece el ingrediente en la lista <br> ✅ Muestra precio `$500,00 / kg` <br> ✅ Stock en verde (10 > 2) |
-| **Estado** | ⏳ |
+| Precondition | Demo or owner user active |
+| Steps | 1. Open Ingredients 2. Add an ingredient 3. Fill name, unit, category, price, current stock, and minimum stock 4. Save |
+| Expected result | The ingredient appears in the list with formatted price and stock status. |
+| Status | Pending |
 
-### CP-06: Editar ingrediente — cambio de precio con cascada
+### TC-06: Edit ingredient price
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Ingrediente "Harina 000" existe y está usado en al menos 1 receta |
-| **Pasos** | 1. Tocar card del ingrediente <br> 2. Cambiar precio de $500 a $700 <br> 3. Tocar "Guardar" |
-| **Resultado esperado** | ✅ Snackbar dice "Ingrediente actualizado. Recetas recalculadas." <br> ✅ Todas las recetas que usan Harina muestran nuevo costo <br> ✅ Se crea registro en `historialPrecios` |
-| **Estado** | ⏳ |
+| Precondition | Ingredient used by at least one recipe exists |
+| Steps | 1. Edit ingredient 2. Change price 3. Save |
+| Expected result | The ingredient price updates, related recipe costs are recalculated, and price history records the change. |
+| Status | Pending |
 
-### CP-07: Buscar ingrediente
+### TC-07: Search ingredient
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Existen al menos 3 ingredientes |
-| **Pasos** | 1. Escribir "har" en la barra de búsqueda |
-| **Resultado esperado** | ✅ Solo se muestran ingredientes cuyo nombre contiene "har" <br> ✅ Al borrar el texto, vuelven todos |
-| **Estado** | ⏳ |
+| Precondition | Multiple ingredients exist |
+| Steps | 1. Type a partial ingredient name in the search field |
+| Expected result | The list filters case-insensitively and restores all items when the search is cleared. |
+| Status | Pending |
 
-### CP-08: Eliminar ingrediente (soft delete)
+### TC-08: Delete ingredient
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Ingrediente existente |
-| **Pasos** | 1. Tocar card del ingrediente <br> 2. Tocar "Eliminar" en el dialog |
-| **Resultado esperado** | ✅ Desaparece de la lista <br> ✅ En Firestore, `activo: false` (no se borra físicamente) |
-| **Estado** | ⏳ |
+| Precondition | Ingredient exists |
+| Steps | 1. Open ingredient details 2. Delete 3. Confirm |
+| Expected result | Ingredient disappears from active lists and remains soft-deleted in persisted mode. |
+| Status | Pending |
 
-### CP-09: Ver historial de precios
+### TC-09: Review price history
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Ingrediente con al menos un cambio de precio |
-| **Pasos** | 1. Tocar ícono de reloj (history) en la card del ingrediente |
-| **Resultado esperado** | ✅ Se abre dialog con lista de cambios <br> ✅ Muestra precio anterior → nuevo, con fecha <br> ✅ Flecha roja si subió, verde si bajó |
-| **Estado** | ⏳ |
+| Precondition | Ingredient has at least one price change |
+| Steps | 1. Open the ingredient price history action |
+| Expected result | A history view displays previous price, new price, date, and change direction. |
+| Status | Pending |
 
----
+## Recipes and Catalog
 
-## 3. Recetas (Fase 1)
+### TC-10: Create recipe with cost calculation
 
-### CP-10: Crear receta con cálculo de costo
-
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Existen ingredientes: Harina ($500/kg), Azúcar ($400/kg), Huevos ($200/doc) |
-| **Pasos** | 1. Ir a Recetas → FAB (+) <br> 2. Nombre="Torta Básica", Categoría="Tortas", Rendimiento=1 <br> 3. Agregar: Harina 0.5kg, Azúcar 0.3kg, Huevos 1doc <br> 4. Margen=60% <br> 5. Guardar |
-| **Resultado esperado** | ✅ Costo calculado = $500×0.5 + $400×0.3 + $200×1 = $570 <br> ✅ Precio sugerido = $570 × 1.6 = $912 <br> ✅ Aparece en la lista con los 3 valores |
-| **Estado** | ⏳ |
+| Precondition | Ingredients with prices exist |
+| Steps | 1. Open Recipes 2. Add recipe 3. Add ingredients and quantities 4. Set margin 5. Save |
+| Expected result | Total cost and suggested price are calculated from ingredient prices and margin. |
+| Status | Pending |
 
-### CP-11: Duplicar receta
+### TC-11: Duplicate recipe
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Existe receta "Torta Básica" |
-| **Pasos** | 1. Tocar ícono de 3 puntos (⋮) en la card <br> 2. Tocar "Duplicar" |
-| **Resultado esperado** | ✅ Aparece nueva receta "Torta Básica (copia)" <br> ✅ Mismos ingredientes, costo y precio que la original |
-| **Estado** | ⏳ |
+| Precondition | At least one recipe exists |
+| Steps | 1. Open recipe actions 2. Duplicate recipe |
+| Expected result | A copy appears with the same ingredients, cost, and suggested price. |
+| Status | Pending |
 
-### CP-12: Compartir catálogo
+### TC-12: Share catalog
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Existen al menos 2 recetas |
-| **Pasos** | 1. Tocar botón "Catálogo" en la esquina superior <br> 2. En el dialog, tocar "Compartir" (mobile) o verificar que se copia al portapapeles (desktop) |
-| **Resultado esperado** | ✅ En mobile: se abre el panel nativo de compartir con texto del catálogo <br> ✅ En desktop: alerta "Catálogo copiado al portapapeles" <br> ✅ El texto incluye nombre y precio de cada receta |
-| **Estado** | ⏳ |
+| Precondition | At least two recipes exist |
+| Steps | 1. Open catalog 2. Use the share/copy action |
+| Expected result | Mobile opens native share when available; desktop copies catalog text to clipboard. |
+| Status | Pending |
 
-### CP-13: Imprimir catálogo
+### TC-13: Print catalog
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Existen recetas |
-| **Pasos** | 1. Catálogo → tocar ícono de impresora |
-| **Resultado esperado** | ✅ Se abre ventana con vista para imprimir limpia <br> ✅ Muestra logo, nombre y lista de productos con precios |
-| **Estado** | ⏳ |
+| Precondition | Recipes exist |
+| Steps | 1. Open catalog 2. Click print |
+| Expected result | A clean print view opens with product names and prices. |
+| Status | Pending |
 
----
+## Sales and Inventory
 
-## 4. Ventas + Stock (Fase 2)
+### TC-14: Register sale and deduct stock
 
-### CP-14: Registrar venta con descuento de stock
-
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Receta "Torta Básica" existe (usa 0.5kg harina, 0.3kg azúcar, 1doc huevos). Ingredientes tienen stock suficiente. |
-| **Pasos** | 1. Ir a Ventas → FAB (+) <br> 2. Agregar 2x Torta Básica <br> 3. Seleccionar cliente (opcional) <br> 4. Medio de pago: Efectivo <br> 5. Confirmar |
-| **Resultado esperado** | ✅ Venta aparece en pestaña "Pendientes" <br> ✅ Stock de Harina baja 1kg (0.5×2) <br> ✅ Stock de Azúcar baja 0.6kg (0.3×2) <br> ✅ Stock de Huevos baja 2doc (1×2) <br> ✅ Se crean documentos en `movimientosStock` |
-| **Estado** | ⏳ |
+| Precondition | Recipe and ingredient stock are available |
+| Steps | 1. Open Sales 2. Create sale 3. Add recipe quantities 4. Select payment method 5. Confirm |
+| Expected result | Sale appears as pending and required ingredient stock is deducted according to recipe quantities. |
+| Status | Pending |
 
-### CP-15: Marcar venta como entregada
+### TC-15: Mark sale as delivered
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Venta en estado "pendiente" |
-| **Pasos** | 1. En pestaña Pendientes, tocar "Entregar ✓" |
-| **Resultado esperado** | ✅ Venta pasa a estado "entregado" <br> ✅ Chip cambia a color verde <br> ✅ Desaparece de pestaña Pendientes |
-| **Estado** | ⏳ |
+| Precondition | Pending sale exists |
+| Steps | 1. Click deliver/complete action |
+| Expected result | Sale status changes to delivered and it leaves the pending list. |
+| Status | Pending |
 
-### CP-16: Cancelar venta
+### TC-16: Cancel sale
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Venta pendiente |
-| **Pasos** | 1. Tocar "Cancelar" en venta pendiente |
-| **Resultado esperado** | ✅ Estado cambia a "cancelado" <br> ✅ Chip en rojo <br> ⚠️ **Nota**: El stock NO se repone automáticamente (por diseño) |
-| **Estado** | ⏳ |
+| Precondition | Pending sale exists |
+| Steps | 1. Click cancel 2. Confirm |
+| Expected result | Sale status changes to cancelled. Stock is not automatically restored unless explicitly implemented by business rules. |
+| Status | Pending |
 
-### CP-17: Buscar en historial de ventas
+### TC-17: Search sales history
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Existen varias ventas |
-| **Pasos** | 1. Ir a pestaña "Historial" <br> 2. Escribir nombre del cliente en búsqueda <br> 3. Seleccionar fecha "Desde" en datepicker |
-| **Resultado esperado** | ✅ Se filtran ventas por cliente <br> ✅ Se filtran ventas desde la fecha seleccionada <br> ✅ Ambos filtros funcionan combinados |
-| **Estado** | ⏳ |
+| Precondition | Several sales exist |
+| Steps | 1. Open sales history 2. Search by customer or filter by date |
+| Expected result | Sales list reflects the search and date filters. |
+| Status | Pending |
 
-### CP-18: Enviar pedido por WhatsApp desde ventas
+### TC-18: Send sale message by WhatsApp
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Venta pendiente con cliente que tiene teléfono cargado |
-| **Pasos** | 1. Tocar ícono de chat (WhatsApp) en la venta pendiente |
-| **Resultado esperado** | ✅ Se abre `wa.me` con número del cliente <br> ✅ Mensaje incluye nombre, detalle de productos, cantidades y total |
-| **Estado** | ⏳ |
+| Precondition | Sale has a customer with phone number |
+| Steps | 1. Click the WhatsApp action on the sale |
+| Expected result | A `wa.me` URL opens with customer phone and generated order details. |
+| Status | Pending |
 
-### CP-19: Stock semáforo
+### TC-19: Stock traffic-light view
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Un ingrediente con stock=0 (rojo), uno con stock≤mínimo (amarillo), uno OK (verde) |
-| **Pasos** | 1. Ir a la pestaña Stock |
-| **Resultado esperado** | ✅ Ingredientes ordenados: rojo primero, luego amarillo, luego verde <br> ✅ Barras de progreso con colores correctos <br> ✅ Los que están en 0 muestran barra vacía |
-| **Estado** | ⏳ |
+| Precondition | Ingredients have different stock levels |
+| Steps | 1. Open Stock |
+| Expected result | Out-of-stock, low-stock, and healthy-stock ingredients are visually differentiated and prioritized. |
+| Status | Pending |
 
----
+## Customers
 
-## 5. Clientes (Fase 2)
+### TC-20: Customer CRUD
 
-### CP-20: CRUD completo de clientes
-
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Usuario logueado |
-| **Pasos** | 1. Ir a Clientes → FAB (+) <br> 2. Crear: Nombre="María López", Teléfono="5491112345678", Dirección="Av. Siempre Viva 742" <br> 3. Guardar → verificar en lista <br> 4. Tocar para editar → cambiar dirección → guardar <br> 5. Tocar para editar → "Eliminar" |
-| **Resultado esperado** | ✅ Cliente aparece en lista después de crear <br> ✅ Muestra teléfono y dirección <br> ✅ Edición actualiza datos <br> ✅ Eliminación lo marca como `[eliminado]` |
-| **Estado** | ⏳ |
+| Precondition | Demo or authenticated user active |
+| Steps | 1. Open Customers 2. Create customer 3. Edit address or phone 4. Delete customer |
+| Expected result | Customer list reflects create, update, and soft-delete operations. |
+| Status | Pending |
 
-### CP-21: WhatsApp desde cliente
+### TC-21: WhatsApp from customer card
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Cliente con teléfono cargado |
-| **Pasos** | 1. Tocar ícono de chat en la card del cliente |
-| **Resultado esperado** | ✅ Se abre `wa.me/{telefono}` con saludo personalizado <br> ✅ No abre el formulario de edición (stopPropagation funciona) |
-| **Estado** | ⏳ |
+| Precondition | Customer has phone number |
+| Steps | 1. Click WhatsApp action on customer card |
+| Expected result | A `wa.me` URL opens without triggering the edit form. |
+| Status | Pending |
 
-### CP-22: Buscar cliente
+### TC-22: Search customer
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Existen al menos 3 clientes |
-| **Pasos** | 1. Escribir nombre parcial en barra de búsqueda <br> 2. Escribir número de teléfono parcial |
-| **Resultado esperado** | ✅ Filtra por nombre <br> ✅ Filtra por teléfono <br> ✅ Búsqueda es case-insensitive |
-| **Estado** | ⏳ |
+| Precondition | Multiple customers exist |
+| Steps | 1. Search by partial name 2. Search by partial phone |
+| Expected result | Customer list filters case-insensitively by name or phone. |
+| Status | Pending |
 
----
+## Dashboard and Reports
 
-## 6. Dashboard (Fase 3)
+### TC-23: KPI period selector
 
-### CP-23: KPIs con selector de período
-
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Ventas registradas en diferentes días |
-| **Pasos** | 1. Ir a Dashboard <br> 2. Selector en "Mes" → anotar valores <br> 3. Cambiar a "Hoy" <br> 4. Cambiar a "Semana" |
-| **Resultado esperado** | ✅ Ingresos, ganancia y "más vendido" cambian según período <br> ✅ "Hoy" solo muestra ventas del día actual <br> ✅ "Semana" desde el domingo <br> ✅ "Mes" desde el 1º del mes |
-| **Estado** | ⏳ |
+| Precondition | Sales exist in the selected period |
+| Steps | 1. Open Dashboard 2. Change between day, week, and month filters |
+| Expected result | Revenue, cost, profit, and best-selling product update according to the selected period. |
+| Status | Pending |
 
-### CP-24: Producto más vendido
+### TC-24: Best-selling product
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Múltiples ventas con diferentes productos |
-| **Pasos** | 1. Verificar card "Más vendido" en dashboard |
-| **Resultado esperado** | ✅ Muestra nombre del producto con más unidades vendidas en el período <br> ✅ Muestra cantidad de unidades <br> ✅ Tiene ícono de trofeo |
-| **Estado** | ⏳ |
+| Precondition | Sales contain different products |
+| Steps | 1. Review the best-selling product card |
+| Expected result | The card displays the product with the highest quantity sold in the period. |
+| Status | Pending |
 
-### CP-25: Gráfico Ingresos vs Costos
+### TC-25: Revenue versus cost visualization
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Ventas registradas |
-| **Pasos** | 1. Verificar sección "Ingresos vs Costos" en dashboard |
-| **Resultado esperado** | ✅ Barra verde (ingresos) es mayor que barra roja (costos) si hay ganancia <br> ✅ Valores en ARS al lado de cada barra <br> ✅ Proporciones son correctas |
-| **Estado** | ⏳ |
+| Precondition | Delivered or registered sales exist |
+| Steps | 1. Review dashboard financial comparison |
+| Expected result | Income and cost values are formatted in ARS and represented proportionally. |
+| Status | Pending |
 
-### CP-26: Alertas de stock bajo en dashboard
+### TC-26: Low-stock dashboard alert
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Al menos un ingrediente con stock ≤ stock mínimo |
-| **Pasos** | 1. Verificar sección "Stock bajo" en dashboard |
-| **Resultado esperado** | ✅ Lista cada ingrediente bajo con cantidad actual y mínimo <br> ✅ Badge de stock en el bottom nav muestra cantidad |
-| **Estado** | ⏳ |
+| Precondition | At least one ingredient is at or below minimum stock |
+| Steps | 1. Open Dashboard |
+| Expected result | Low-stock ingredients are listed with current and minimum quantities. |
+| Status | Pending |
 
----
+### TC-27: Financial report export
 
-## 7. PWA + Offline
-
-### CP-27: Instalación como PWA
-
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | App desplegada en HTTPS (Firebase Hosting) |
-| **Pasos** | 1. Abrir en Chrome mobile <br> 2. Menú → "Agregar a pantalla de inicio" / banner automático |
-| **Resultado esperado** | ✅ Se instala con ícono propio <br> ✅ Se abre sin barra de navegación del browser <br> ✅ Nombre: "Lucis Gestión" |
-| **Estado** | ⏳ |
+| Precondition | Financial report data is available |
+| Steps | 1. Open Financial Reports 2. Generate PDF or Excel export |
+| Expected result | A report file is generated with KPIs, top products/customers, and insights. |
+| Status | Pending |
 
-### CP-28: Funcionamiento offline
+### TC-28: Fixed costs
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | App cargada previamente con datos sincronizados |
-| **Pasos** | 1. Activar modo avión <br> 2. Navegar entre pantallas <br> 3. Registrar una venta |
-| **Resultado esperado** | ✅ Datos previamente cargados se muestran <br> ✅ Navegación funciona <br> ✅ Venta se guarda localmente y se sincroniza al volver online |
-| **Estado** | ⏳ |
+| Precondition | Demo or owner user active |
+| Steps | 1. Open Fixed Costs 2. Register a monthly fixed cost 3. Review the list |
+| Expected result | The cost is stored and included in the monthly financial context. |
+| Status | Pending |
 
----
+## PWA and Deployment
 
-## 8. Ciclo completo (E2E)
+### TC-29: PWA installation
 
-### CP-29: Ciclo de negocio completo
-
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | App vacía, usuario logueado como owner |
-| **Pasos** | 1. Crear 3 ingredientes: Harina ($500/kg, stock 10), Azúcar ($400/kg, stock 5), Huevos ($200/doc, stock 6) <br> 2. Crear receta "Torta Chocolate": Harina 0.5kg + Azúcar 0.3kg + Huevos 1doc, margen 60% <br> 3. Crear cliente "Ana García", tel 5491155551234 <br> 4. Registrar venta: 3x Torta Chocolate para Ana, efectivo <br> 5. Verificar stock: Harina=8.5, Azúcar=3.1, Huevos=3 <br> 6. Ir a Dashboard → KPIs en "Hoy" <br> 7. Entregar el pedido <br> 8. Enviar Whatsapp a Ana desde clientes |
-| **Resultado esperado** | ✅ Costo receta = $570, precio sugerido = $912 <br> ✅ Venta total = $2,736 (3 × $912) <br> ✅ Stock se descuenta correctamente <br> ✅ Dashboard muestra $2,736 en ingresos del día <br> ✅ "Torta Chocolate" aparece como más vendido <br> ✅ Pedido cambia a entregado <br> ✅ WhatsApp abre con saludo correcto |
-| **Estado** | ⏳ |
+| Precondition | App is opened through HTTPS deployment |
+| Steps | 1. Open in Chrome 2. Use install/add-to-home-screen option |
+| Expected result | The app installs with its manifest name and icon. |
+| Status | Pending |
 
-### CP-30: Verificación de roles — Ayudante
+### TC-30: Direct deployed route refresh
 
-| Campo | Detalle |
+| Field | Detail |
 |---|---|
-| **Pre-condición** | Segundo usuario logueado con rol `ayudante` |
-| **Pasos** | 1. Intentar crear/editar ingrediente <br> 2. Intentar crear/editar receta <br> 3. Registrar una venta <br> 4. Crear un cliente nuevo |
-| **Resultado esperado** | ⚠️ Con las Firestore rules actuales: <br> ✅ Puede leer ingredientes y recetas <br> ❌ No puede crear/editar ingredientes ni recetas (Firestore reject) <br> ✅ Puede crear ventas y clientes <br> 🔍 **Nota**: La UI no esconde botones todavía — el ayudante verá los formularios pero Firestore rechazará el write |
-| **Estado** | ⏳ |
+| Precondition | Application deployed to Firebase Hosting |
+| Steps | 1. Open `/demo/dashboard` directly 2. Refresh browser |
+| Expected result | Firebase Hosting rewrites to the Angular app and the route loads correctly. |
+| Status | Pending |
 
----
+## End-to-end Business Flow
 
-## Checklist rápido de ejecución
+### TC-31: Complete bakery workflow
 
-| # | Caso | Estado |
+| Field | Detail |
+|---|---|
+| Precondition | Demo mode active |
+| Steps | 1. Review ingredients 2. Create or inspect recipe cost 3. Create customer 4. Register sale 5. Verify stock 6. Deliver order 7. Review dashboard 8. Export report |
+| Expected result | The application supports the complete operational cycle from production data to sale and reporting. |
+| Status | Pending |
+
+## Quick Execution Checklist
+
+| ID | Test case | Status |
 |---|---|---|
-| CP-01 | Login primer usuario (owner) | ⏳ |
-| CP-02 | Login segundo usuario (ayudante) | ⏳ |
-| CP-03 | Logout | ⏳ |
-| CP-04 | Acceso sin auth | ⏳ |
-| CP-05 | Crear ingrediente | ⏳ |
-| CP-06 | Editar ingrediente + cascada | ⏳ |
-| CP-07 | Buscar ingrediente | ⏳ |
-| CP-08 | Eliminar ingrediente | ⏳ |
-| CP-09 | Historial de precios | ⏳ |
-| CP-10 | Crear receta + cálculo | ⏳ |
-| CP-11 | Duplicar receta | ⏳ |
-| CP-12 | Compartir catálogo | ⏳ |
-| CP-13 | Imprimir catálogo | ⏳ |
-| CP-14 | Venta + descuento stock | ⏳ |
-| CP-15 | Marcar entregada | ⏳ |
-| CP-16 | Cancelar venta | ⏳ |
-| CP-17 | Buscar historial ventas | ⏳ |
-| CP-18 | WhatsApp desde venta | ⏳ |
-| CP-19 | Stock semáforo | ⏳ |
-| CP-20 | CRUD clientes | ⏳ |
-| CP-21 | WhatsApp desde cliente | ⏳ |
-| CP-22 | Buscar cliente | ⏳ |
-| CP-23 | KPIs + período | ⏳ |
-| CP-24 | Producto más vendido | ⏳ |
-| CP-25 | Ingresos vs Costos | ⏳ |
-| CP-26 | Alertas stock bajo | ⏳ |
-| CP-27 | PWA instalación | ⏳ |
-| CP-28 | Modo offline | ⏳ |
-| CP-29 | Ciclo E2E completo | ⏳ |
-| CP-30 | Verificación roles ayudante | ⏳ |
+| TC-01 | Demo access without login | Pending |
+| TC-02 | Google login for Firebase mode | Pending |
+| TC-03 | Logout | Pending |
+| TC-04 | Protected route access | Pending |
+| TC-05 | Create ingredient | Pending |
+| TC-06 | Edit ingredient price | Pending |
+| TC-07 | Search ingredient | Pending |
+| TC-08 | Delete ingredient | Pending |
+| TC-09 | Review price history | Pending |
+| TC-10 | Create recipe with cost calculation | Pending |
+| TC-11 | Duplicate recipe | Pending |
+| TC-12 | Share catalog | Pending |
+| TC-13 | Print catalog | Pending |
+| TC-14 | Register sale and deduct stock | Pending |
+| TC-15 | Mark sale as delivered | Pending |
+| TC-16 | Cancel sale | Pending |
+| TC-17 | Search sales history | Pending |
+| TC-18 | Send sale message by WhatsApp | Pending |
+| TC-19 | Stock traffic-light view | Pending |
+| TC-20 | Customer CRUD | Pending |
+| TC-21 | WhatsApp from customer card | Pending |
+| TC-22 | Search customer | Pending |
+| TC-23 | KPI period selector | Pending |
+| TC-24 | Best-selling product | Pending |
+| TC-25 | Revenue versus cost visualization | Pending |
+| TC-26 | Low-stock dashboard alert | Pending |
+| TC-27 | Financial report export | Pending |
+| TC-28 | Fixed costs | Pending |
+| TC-29 | PWA installation | Pending |
+| TC-30 | Direct deployed route refresh | Pending |
+| TC-31 | Complete bakery workflow | Pending |
