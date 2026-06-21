@@ -73,6 +73,7 @@ Guidance for contributors:
 
 ## Installed Skills
 
-This workspace includes an Angular-focused skill path for implementation support.
+This workspace includes focused skill paths for implementation support.
 
 - `angular-developer` — use this skill for Angular-specific development guidance and code generation.[see](.agents/skills/angular-developer)
+- `playwright-cli` — use this skill for browser automation tasks, Playwright test execution, and E2E debugging workflows.[see](.agents/skills/playwright-cli)
