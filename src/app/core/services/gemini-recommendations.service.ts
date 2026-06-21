@@ -33,22 +33,30 @@ export class GeminiRecommendationsService {
   });
 
   async generateRecommendations(periodLabel: string): Promise<GeminiRecommendation[]> {
-    if (!this.isConfigured()) {
-      return [this.generateLocalRecommendations()];
-    }
+    return Sentry.startSpan(
+      {
+        name: 'generateRecommendations',
+        op: 'http.client',
+      },
+      async () => {
+        if (!this.isConfigured()) {
+          return [this.generateLocalRecommendations()];
+        }
 
-    try {
-      const prompt = this.buildPrompt(periodLabel);
-      const response = await this.callGeminiApi(prompt);
-      const parsed = this.parseGeminiResponse(response);
-      return parsed ?? [this.generateLocalRecommendations()];
-    } catch (error: unknown) {
-      this.captureGeminiException(error, 'generate_recommendations', {
-        periodLabel,
-      });
-      console.error('Error calling Gemini API:', error);
-      return [this.generateLocalRecommendations()];
-    }
+        try {
+          const prompt = this.buildPrompt(periodLabel);
+          const response = await this.callGeminiApi(prompt);
+          const parsed = this.parseGeminiResponse(response);
+          return parsed ?? [this.generateLocalRecommendations()];
+        } catch (error: unknown) {
+          this.captureGeminiException(error, 'generate_recommendations', {
+            periodLabel,
+          });
+          console.error('Error calling Gemini API:', error);
+          return [this.generateLocalRecommendations()];
+        }
+      },
+    );
   }
 
   private buildPrompt(periodLabel: string): string {

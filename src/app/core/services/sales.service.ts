@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import * as Sentry from '@sentry/angular';
 import { FirestoreService } from './firestore.service';
 import { StockService } from './stock.service';
 import { Sale, SaleInput } from '../models/sale';
@@ -9,47 +10,101 @@ export class SalesService {
   private stockService = inject(StockService);
 
   async registerSale(sale: SaleInput): Promise<string> {
-    this.stockService.validateStockForCreation(sale.items);
+    return Sentry.startSpan(
+      {
+        name: 'registerSale',
+        op: 'transaction',
+      },
+      async () => {
+        this.stockService.validateStockForCreation(sale.items);
 
-    const saleId = await this.firestoreService.addDocument<SaleInput>('sales', sale);
+        const saleId = await this.firestoreService.addDocument<SaleInput>('sales', sale);
 
-    const adjustments = this.stockService.buildStockAdjustments(sale.items, -1);
-    await this.firestoreService.applyStockAdjustments(saleId, 'sale_deduction', adjustments);
+        const adjustments = this.stockService.buildStockAdjustments(sale.items, -1);
+        await this.firestoreService.applyStockAdjustments(
+          saleId,
+          'sale_deduction',
+          adjustments,
+        );
 
-    return saleId;
+        return saleId;
+      },
+    );
   }
 
-  async updateSale(id: string, updatedSale: SaleInput, oldSale: Sale | undefined): Promise<void> {
-    if (oldSale && JSON.stringify(oldSale.items) !== JSON.stringify(updatedSale.items)) {
-      this.stockService.validateStockForEdition(oldSale.items, updatedSale.items);
+  async updateSale(
+    id: string,
+    updatedSale: SaleInput,
+    oldSale: Sale | undefined,
+  ): Promise<void> {
+    return Sentry.startSpan(
+      {
+        name: 'updateSale',
+        op: 'transaction',
+      },
+      async () => {
+        if (
+          oldSale &&
+          JSON.stringify(oldSale.items) !== JSON.stringify(updatedSale.items)
+        ) {
+          this.stockService.validateStockForEdition(oldSale.items, updatedSale.items);
 
-      const oldAdjustments = this.stockService.buildStockAdjustments(oldSale.items, 1);
-      await this.firestoreService.applyStockAdjustments(id, 'edit_restock', oldAdjustments);
+          const oldAdjustments = this.stockService.buildStockAdjustments(oldSale.items, 1);
+          await this.firestoreService.applyStockAdjustments(
+            id,
+            'edit_restock',
+            oldAdjustments,
+          );
 
-      const newAdjustments = this.stockService.buildStockAdjustments(updatedSale.items, -1);
-      await this.firestoreService.applyStockAdjustments(id, 'edit_deduction', newAdjustments);
-    }
+          const newAdjustments = this.stockService.buildStockAdjustments(
+            updatedSale.items,
+            -1,
+          );
+          await this.firestoreService.applyStockAdjustments(
+            id,
+            'edit_deduction',
+            newAdjustments,
+          );
+        }
 
-    await this.firestoreService.updateDocument('sales', id, {
-      items: updatedSale.items,
-      total: updatedSale.total,
-      totalCost: updatedSale.totalCost,
-      profit: updatedSale.profit,
-      deliveryDate: updatedSale.deliveryDate ?? null,
-      customerId: updatedSale.customerId,
-      customerName: updatedSale.customerName,
-      isPaid: updatedSale.isPaid ?? false,
-      paymentMethod: updatedSale.paymentMethod,
-      notes: updatedSale.notes,
-    });
+        await this.firestoreService.updateDocument('sales', id, {
+          items: updatedSale.items,
+          total: updatedSale.total,
+          totalCost: updatedSale.totalCost,
+          profit: updatedSale.profit,
+          deliveryDate: updatedSale.deliveryDate ?? null,
+          customerId: updatedSale.customerId,
+          customerName: updatedSale.customerName,
+          isPaid: updatedSale.isPaid ?? false,
+          paymentMethod: updatedSale.paymentMethod,
+          notes: updatedSale.notes,
+        });
+      },
+    );
   }
 
-  async updateSaleStatus(id: string, status: Sale['status'], sale: Sale | undefined): Promise<void> {
-    await this.firestoreService.updateDocument('sales', id, { status });
+  async updateSaleStatus(
+    id: string,
+    status: Sale['status'],
+    sale: Sale | undefined,
+  ): Promise<void> {
+    return Sentry.startSpan(
+      {
+        name: 'updateSaleStatus',
+        op: 'transaction',
+      },
+      async () => {
+        await this.firestoreService.updateDocument('sales', id, { status });
 
-    if (status === 'cancelled' && sale) {
-      const adjustments = this.stockService.buildStockAdjustments(sale.items, 1);
-      await this.firestoreService.applyStockAdjustments(id, 'cancellation_restock', adjustments);
-    }
+        if (status === 'cancelled' && sale) {
+          const adjustments = this.stockService.buildStockAdjustments(sale.items, 1);
+          await this.firestoreService.applyStockAdjustments(
+            id,
+            'cancellation_restock',
+            adjustments,
+          );
+        }
+      },
+    );
   }
 }

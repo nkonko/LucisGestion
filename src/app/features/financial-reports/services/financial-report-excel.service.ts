@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import * as Sentry from '@sentry/angular';
 import ExcelJS from 'exceljs';
 import type {
   ExpenseAnomaly,
@@ -59,23 +60,31 @@ export class FinancialReportExcelService {
   });
 
   async exportReport(data: FinancialReportExcelData): Promise<void> {
-    const workbook = new ExcelJS.Workbook();
-    workbook.creator = 'Lucis Gestion';
-    workbook.lastModifiedBy = 'Lucis Gestion';
-    workbook.created = new Date();
-    workbook.modified = new Date();
+    return Sentry.startSpan(
+      {
+        name: 'exportReportExcel',
+        op: 'function',
+      },
+      async () => {
+        const workbook = new ExcelJS.Workbook();
+        workbook.creator = 'Lucis Gestion';
+        workbook.lastModifiedBy = 'Lucis Gestion';
+        workbook.created = new Date();
+        workbook.modified = new Date();
 
-    this.addSummarySheet(workbook, data);
-    this.addInsightsSheet(workbook, data);
-    this.addTopCustomersSheet(workbook, data);
-    this.addTopProductsSheet(workbook, data);
-    this.addLowStockSheet(workbook, data);
+        this.addSummarySheet(workbook, data);
+        this.addInsightsSheet(workbook, data);
+        this.addTopCustomersSheet(workbook, data);
+        this.addTopProductsSheet(workbook, data);
+        this.addLowStockSheet(workbook, data);
 
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    });
-    this.downloadFile(blob, this.buildFileName(data.generatedAt));
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        });
+        this.downloadFile(blob, this.buildFileName(data.generatedAt));
+      },
+    );
   }
 
   private addSummarySheet(workbook: ExcelJS.Workbook, data: FinancialReportExcelData): void {

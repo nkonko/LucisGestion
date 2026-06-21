@@ -105,6 +105,11 @@ export class AuthService {
 
     const email = user.email?.toLowerCase() ?? '';
     if (!environment.allowedEmails.includes(email)) {
+      Sentry.captureMessage('Intento de login con email no autorizado', {
+        level: 'warning',
+        tags: { area: 'auth', operation: 'unauthorized_email' },
+        extra: { email },
+      });
       await signOut(this.auth);
       Sentry.setUser(null);
       this.authStore.setAuthState(null, true);

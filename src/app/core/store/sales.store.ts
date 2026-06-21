@@ -1,5 +1,6 @@
 import { computed, inject } from '@angular/core';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
+import * as Sentry from '@sentry/angular';
 import { FirestoreService } from '../services/firestore.service';
 import { Sale, SaleInput } from '../models/sale';
 import { orderBy } from '@angular/fire/firestore';
@@ -37,6 +38,9 @@ export const SalesStore = signalStore(
           patchState(store, { loading: false });
           return saleId;
         } catch (error: unknown) {
+          Sentry.captureException(error, {
+            tags: { area: 'store', store: 'SalesStore', operation: 'registerSale' },
+          });
           patchState(store, { loading: false, error: getErrorMessage(error) });
           throw error;
         }
@@ -49,6 +53,9 @@ export const SalesStore = signalStore(
           await salesService.updateSale(id, updatedSale, oldSale);
           patchState(store, { loading: false });
         } catch (error: unknown) {
+          Sentry.captureException(error, {
+            tags: { area: 'store', store: 'SalesStore', operation: 'updateSale' },
+          });
           patchState(store, { loading: false, error: getErrorMessage(error) });
           throw error;
         }
@@ -61,6 +68,9 @@ export const SalesStore = signalStore(
           await salesService.updateSaleStatus(id, status, sale);
           patchState(store, { loading: false });
         } catch (error: unknown) {
+          Sentry.captureException(error, {
+            tags: { area: 'store', store: 'SalesStore', operation: 'updateSaleStatus' },
+          });
           patchState(store, { loading: false, error: getErrorMessage(error) });
           throw error;
         }

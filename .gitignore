@@ -41,9 +41,13 @@ testem.log
 __screenshots__/
 firebase-debug.log
 .firebase/
+.atl/
 
 # Local-only environment overrides
 src/environments/environment.local.ts
+
+# Environment variables (SENTRY_AUTH_TOKEN, etc.)
+.env
 
 # System files
 .DS_Store
