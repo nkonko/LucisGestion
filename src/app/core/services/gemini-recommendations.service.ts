@@ -1,4 +1,5 @@
 import { computed, inject, Injectable } from '@angular/core';
+import * as Sentry from '@sentry/angular';
 import { environment } from '../../../environments/environment';
 import { FinancialInsightsService } from './financial-insights.service';
 import { DashboardMetricsService } from './dashboard-metrics.service';
@@ -41,7 +42,10 @@ export class GeminiRecommendationsService {
       const response = await this.callGeminiApi(prompt);
       const parsed = this.parseGeminiResponse(response);
       return parsed ?? [this.generateLocalRecommendations()];
-    } catch (error) {
+    } catch (error: unknown) {
+      this.captureGeminiException(error, 'generate_recommendations', {
+        periodLabel,
+      });
       console.error('Error calling Gemini API:', error);
       return [this.generateLocalRecommendations()];
     }
@@ -116,7 +120,7 @@ Solo responde con JSON válido, sin markdown, comentarios adicionales o explicac
       }
 
       return response.json() as Promise<GeminiResponse>;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Gemini API call failed:', {
         error: error instanceof Error ? error.message : String(error),
         apiKeyConfigured: !!apiKey && apiKey !== 'YOUR_GEMINI_API_KEY',
@@ -162,10 +166,27 @@ Solo responde con JSON válido, sin markdown, comentarios adicionales o explicac
 
       const single = this.normalizeRecommendation(parsed);
       return single ? [single] : null;
-    } catch (error) {
+    } catch (error: unknown) {
+      this.captureGeminiException(error, 'parse_response', {
+        candidateCount: response.candidates?.length ?? 0,
+      });
       console.error('Error parsing Gemini response:', error);
       return null;
     }
+  }
+
+  private captureGeminiException(
+    error: unknown,
+    operation: string,
+    extra?: Record<string, unknown>,
+  ): void {
+    Sentry.captureException(error, {
+      tags: {
+        area: 'gemini',
+        operation,
+      },
+      extra,
+    });
   }
 
   private normalizeRecommendation(input: unknown): GeminiRecommendation | null {
