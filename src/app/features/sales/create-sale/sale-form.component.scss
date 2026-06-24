@@ -195,6 +195,55 @@
   color: var(--color-on-surface);
 }
 
+.product-dropdown-item-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-on-primary);
+  background: linear-gradient(135deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 75%, black));
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--color-primary) 30%, transparent);
+  position: relative;
+  overflow: hidden;
+  line-height: 1.5;
+
+  &::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--color-on-primary) 55%, transparent);
+    flex-shrink: 0;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      transparent 100%
+    );
+    transform: translateX(-100%);
+    animation: badge-shimmer 3s ease-in-out infinite;
+  }
+}
+
+@keyframes badge-shimmer {
+  0%, 100% { transform: translateX(-100%); }
+  40% { transform: translateX(100%); }
+}
+
 /* ─── Customer Search ─── */
 
 .customer-search-wrapper {

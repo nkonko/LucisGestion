@@ -95,6 +95,21 @@ export class SaleFormComponent {
   totalCost = computed(() => this.items().reduce((sum, i) => sum + i.quantity * i.unitCost, 0));
   profit = computed(() => this.total() - this.totalCost());
 
+  /** Set of recipeIds that the selected customer has purchased in previous sales */
+  readonly customerRecipeHistory = computed(() => {
+    const customerId = this.selectedCustomerId();
+    if (!customerId) return new Set<string>();
+
+    const recipeIds = new Set<string>();
+    for (const sale of this.salesStore.sales()) {
+      if (sale.customerId !== customerId) continue;
+      for (const item of sale.items) {
+        recipeIds.add(item.recipeId);
+      }
+    }
+    return recipeIds;
+  });
+
   /** Top 3 most-sold products aggregated from all sales, filtered to active recipes only */
   readonly top3Recipes = computed(() => {
     const allRecipes = this.recipesStore.recipes();
@@ -117,15 +132,25 @@ export class SaleFormComponent {
       .slice(0, 3);
   });
 
-  /** Recipes filtered by productSearch name, case-insensitive, max 3, sorted alphabetically */
+  /** Recipes filtered by productSearch name, case-insensitive, max 3.
+   *  Previously purchased by the selected customer appear first, then alphabetical. */
   readonly filteredRecipes = computed(() => {
     const search = this.productSearch().toLowerCase().trim();
     if (!search) return [];
 
+    const history = this.customerRecipeHistory();
+
     return this.recipesStore
       .recipes()
       .filter((recipe) => recipe.name.toLowerCase().includes(search))
-      .sort((a, b) => a.name.localeCompare(b.name))
+      .sort((a, b) => {
+        const aPurchased = history.has(a.id!);
+        const bPurchased = history.has(b.id!);
+        if (aPurchased !== bPurchased) {
+          return aPurchased ? -1 : 1;
+        }
+        return a.name.localeCompare(b.name);
+      })
       .slice(0, 3);
   });
 

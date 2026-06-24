@@ -108,6 +108,9 @@
                   (click)="onProductSearchSelect(recipe)"
                 >
                   <span class="product-dropdown-item-name">{{ recipe.name }}</span>
+                  @if (customerRecipeHistory().has(recipe.id!)) {
+                    <span class="product-dropdown-item-badge">Ya compró</span>
+                  }
                 </li>
               }
             </ul>
