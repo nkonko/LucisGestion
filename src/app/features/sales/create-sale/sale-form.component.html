@@ -2,21 +2,120 @@
   <div class="sale-form-content">
     <section class="sale-form-section">
       <h3 class="sale-form-section-title">Cliente</h3>
-      <label class="ui-field">
-        <span>Cliente</span>
-        <select class="ui-select" [ngModel]="selectedCustomerId" (ngModelChange)="selectCustomerById($event)" [disabled]="isEdit()">
-          <option value="">Seleccionar cliente</option>
-          @for (c of customers(); track c.id) {
-            <option [value]="c.id">{{ c.name }} · {{ c.phone }}</option>
+
+      @if (isEdit() && selectedCustomer(); as customer) {
+        <div class="selected-customer">
+          <span class="selected-customer-info">{{ customer.name }} · {{ customer.phone }}</span>
+          <span class="selected-customer-badge">Edición</span>
+        </div>
+      } @else if (selectedCustomer(); as customer) {
+        <div class="selected-customer">
+          <span class="selected-customer-info">{{ customer.name }} · {{ customer.phone }}</span>
+          <button type="button" class="selected-customer-clear" (click)="clearCustomer()">
+            Cambiar cliente
+          </button>
+        </div>
+      } @else {
+        <div class="customer-search-wrapper">
+          <input
+            #customerSearchInput
+            class="ui-input"
+            type="text"
+            placeholder="Buscar cliente por nombre o teléfono..."
+            [ngModel]="customerSearch()"
+            (ngModelChange)="onSearchChange($event)"
+            (focus)="onSearchFocus()"
+            autocomplete="off"
+          />
+          @if (isDropdownOpen()) {
+            <ul class="customer-dropdown" role="listbox" aria-label="Resultados de búsqueda de clientes">
+              @if (filteredCustomers().length === 0) {
+                <li class="customer-dropdown-empty">Sin resultados</li>
+              }
+              @for (customer of filteredCustomers(); track customer.id) {
+                <li
+                  class="customer-dropdown-item"
+                  role="option"
+                  (click)="selectCustomer(customer)"
+                >
+                  <span class="customer-dropdown-item-name">{{ customer.name }}</span>
+                  <span class="customer-dropdown-item-phone">{{ customer.phone }}</span>
+                </li>
+              }
+            </ul>
           }
-        </select>
-      </label>
+        </div>
+      }
     </section>
 
     <section class="sale-form-section">
       <h3 class="sale-form-section-title">Productos</h3>
       <div class="recipe-rows" role="list" aria-label="Listado de productos para la venta">
-        @for (recipe of recipesStore.recipes(); track recipe.id) {
+        <!-- Top 3 most sold products (collapsible) -->
+        <div class="top3-section">
+          <button
+            class="top3-toggle"
+            type="button"
+            (click)="isTop3Collapsed.set(!isTop3Collapsed())"
+            [attr.aria-expanded]="!isTop3Collapsed()"
+            aria-label="Alternar productos más vendidos"
+          >
+            <span class="top3-toggle-icon" [class.top3-toggle-icon--collapsed]="isTop3Collapsed()">
+              ▼
+            </span>
+          <span class="top3-toggle-label">Más vendidos</span>
+          @if (isTop3Collapsed() && hasTop3Selection()) {
+            <span class="top3-toggle-dot" aria-label="Productos seleccionados"></span>
+          }
+          <span class="top3-toggle-count">{{ top3Recipes().length }}</span>
+          </button>
+          @if (!isTop3Collapsed()) {
+            <div class="top3-items">
+              @for (recipe of top3Recipes(); track recipe.id) {
+                <app-sale-product-item
+                  [recipe]="recipe"
+                  [quantity]="getItemQuantity(recipe.id!)"
+                  (increment)="addItem(recipe)"
+                  (decrement)="decrementItem(recipe.id!)"
+                />
+              }
+            </div>
+          }
+        </div>
+
+        <div class="product-section-divider" role="separator"></div>
+
+        <!-- Product search input -->
+        <div class="product-search-wrapper">
+          <input
+            class="ui-input"
+            type="text"
+            placeholder="Buscar producto por nombre..."
+            [ngModel]="productSearch()"
+            (ngModelChange)="onProductSearchChange($event)"
+            (focus)="onProductSearchFocus()"
+            autocomplete="off"
+          />
+          @if (isProductDropdownOpen()) {
+            <ul class="product-dropdown" role="listbox" aria-label="Resultados de búsqueda de productos">
+              @if (filteredRecipes().length === 0) {
+                <li class="product-dropdown-empty">Sin resultados</li>
+              }
+              @for (recipe of filteredRecipes(); track recipe.id) {
+                <li
+                  class="product-dropdown-item"
+                  role="option"
+                  (click)="onProductSearchSelect(recipe)"
+                >
+                  <span class="product-dropdown-item-name">{{ recipe.name }}</span>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+
+        <!-- Search-added products (not in top 3, quantity > 0) -->
+        @for (recipe of searchAddedRecipes(); track recipe.id) {
           <app-sale-product-item
             [recipe]="recipe"
             [quantity]="getItemQuantity(recipe.id!)"
