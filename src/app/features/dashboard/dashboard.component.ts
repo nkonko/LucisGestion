@@ -75,8 +75,12 @@ export class DashboardComponent {
 
   getStatusLabel(status: SaleStatus): string {
     switch (status) {
+      case 'draft':
+        return this.statusDisplay.draft;
       case 'pending':
         return this.statusDisplay.pending;
+      case 'production':
+        return this.statusDisplay.production;
       case 'delivered':
         return this.statusDisplay.delivered;
       case 'cancelled':
@@ -88,10 +92,14 @@ export class DashboardComponent {
 
   getStatusClass(status: SaleStatus): string {
     switch (status) {
+      case 'draft':
+        return this.statusClass.draft;
       case 'delivered':
         return this.statusClass.delivered;
       case 'pending':
         return this.statusClass.pending;
+      case 'production':
+        return this.statusClass.production;
       case 'cancelled':
         return this.statusClass.cancelled;
       default:

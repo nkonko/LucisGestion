@@ -19,4 +19,8 @@ export class NotificationService {
     const message = getErrorMessage(error, fallbackMessage);
     this.error(message, duration);
   }
+
+  info(message: string, duration = 4000): void {
+    this.toast.show(message, 'info', duration, 'ℹ');
+  }
 }

@@ -97,10 +97,11 @@ export class SalesComponent {
 
     if (!this.hasActiveFilters()) {
       const statusPriority: Record<SaleStatus, number> = {
-        pending: 0,
-        production: 1,
-        delivered: 2,
-        cancelled: 3,
+        draft: 0,
+        pending: 1,
+        production: 2,
+        delivered: 3,
+        cancelled: 4,
       };
 
       return [...items].sort((a, b) => {
@@ -142,7 +143,7 @@ export class SalesComponent {
 
   private validateStatus(rawValue: string): SaleStatus | null {
     const value = rawValue.trim();
-    const validStatuses: SaleStatus[] = ['pending', 'production', 'delivered', 'cancelled'];
+    const validStatuses: SaleStatus[] = ['draft', 'pending', 'production', 'delivered', 'cancelled'];
     return validStatuses.includes(value as SaleStatus) ? (value as SaleStatus) : null;
   }
 
@@ -171,10 +172,14 @@ export class SalesComponent {
     dialogRef.afterClosed.subscribe(async (result) => {
       if (result) {
         try {
-          await this.store.registerSale(result);
-          this.notify.success('Venta registrada. Stock actualizado.', 3000);
+          const { wasDraft } = await this.store.registerSale(result);
+          if (wasDraft) {
+            this.notify.info('Venta registrada como borrador — stock pendiente.', 4000);
+          } else {
+            this.notify.success('Venta registrada. Stock actualizado.', 3000);
+          }
         } catch (error: unknown) {
-          this.notify.errorFrom(error, 'No se pudo registrar la venta por stock insuficiente.');
+          this.notify.errorFrom(error, 'No se pudo registrar la venta.');
         }
       }
     });
@@ -198,13 +203,48 @@ export class SalesComponent {
     dialogRef.afterClosed.subscribe(async (result) => {
       if (result) {
         try {
-          await this.store.updateSale(saleId, result);
-          this.notify.success('Venta actualizada.', 3000);
+          const { forcedDraft } = await this.store.updateSale(saleId, result);
+          if (forcedDraft) {
+            this.notify.info('Venta movida a borrador por stock insuficiente.', 4000);
+          } else {
+            this.notify.success('Venta actualizada.', 3000);
+          }
         } catch (error: unknown) {
-          this.notify.errorFrom(error, 'No se pudo actualizar la venta por stock insuficiente.');
+          this.notify.errorFrom(error, 'No se pudo actualizar la venta.');
         }
       }
     });
+  }
+
+  async toggleSalePaid(sale: Sale): Promise<void> {
+    const saleId = sale.id;
+    if (!saleId) {
+      this.notify.error('Venta inválida.');
+      return;
+    }
+
+    try {
+      await this.store.toggleSalePaid(saleId);
+      const label = !sale.isPaid ? 'pagada' : 'marcada como no pagada';
+      this.notify.success(`Venta ${label}.`, 3000);
+    } catch (error: unknown) {
+      this.notify.errorFrom(error, 'No se pudo actualizar el estado de pago.');
+    }
+  }
+
+  async fulfillDraft(sale: Sale): Promise<void> {
+    const saleId = sale.id;
+    if (!saleId) {
+      this.notify.error('Venta inválida.');
+      return;
+    }
+
+    try {
+      await this.store.fulfillDraft(saleId);
+      this.notify.success('Venta confirmada. Stock actualizado.', 3000);
+    } catch (error: unknown) {
+      this.notify.errorFrom(error, 'Stock insuficiente para completar la venta.');
+    }
   }
 
   async changeStatus(sale: Sale, newStatus: Sale['status']): Promise<void> {
@@ -218,6 +258,8 @@ export class SalesComponent {
 
     const statusLabel = (() => {
       switch (newStatus) {
+        case 'draft':
+          return 'Borrador';
         case 'pending':
           return 'Pendiente';
         case 'production':
@@ -245,8 +287,8 @@ export class SalesComponent {
   }
 
   onEditRequested(sale: Sale): void {
-    if (sale.status !== 'pending' && sale.status !== 'production') {
-      this.notify.error('Solo se pueden modificar ventas pendientes o en producción.');
+    if (sale.status !== 'pending' && sale.status !== 'production' && sale.status !== 'draft') {
+      this.notify.error('Solo se pueden modificar ventas pendientes, en producción o borradores.');
       return;
     }
 
