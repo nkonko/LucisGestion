@@ -3,6 +3,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 
 import { SaleFormComponent } from './sale-form.component';
+import { CustomerSearchComponent } from './customer-search/customer-search.component';
+import { SaleFormService } from './sale-form.service';
 import { RecipesStore } from '../../../core/store/recipes.store';
 import { CustomersStore } from '../../../core/store/customers.store';
 import { SalesStore } from '../../../core/store/sales.store';
@@ -108,13 +110,14 @@ describe('SaleFormComponent', () => {
     vi.clearAllMocks();
 
     TestBed.configureTestingModule({
-      imports: [SaleFormComponent],
+      imports: [SaleFormComponent, CustomerSearchComponent],
       providers: [
         { provide: DIALOG_REF, useValue: dialogRefMock },
         { provide: DIALOG_DATA, useValue: dialogData },
         { provide: RecipesStore, useValue: recipesStoreMock },
         { provide: CustomersStore, useValue: customersStoreMock },
         { provide: SalesStore, useValue: salesStoreMock },
+        SaleFormService,
       ],
     });
 
@@ -139,37 +142,37 @@ describe('SaleFormComponent', () => {
     });
 
     it('filters customers by name when typing in search', () => {
-      component.onSearchChange('Maria');
+      component.formService.onSearchChange('Maria');
       fixture.detectChanges();
 
-      expect(component.filteredCustomers().length).toBe(1);
-      expect(component.filteredCustomers()[0].name).toBe('Maria Rodriguez');
+      expect(component.formService.filteredCustomers().length).toBe(1);
+      expect(component.formService.filteredCustomers()[0].name).toBe('Maria Rodriguez');
     });
 
     it('filters customers by phone when typing in search', () => {
-      component.onSearchChange('9900');
+      component.formService.onSearchChange('9900');
       fixture.detectChanges();
 
-      expect(component.filteredCustomers().length).toBe(1);
-      expect(component.filteredCustomers()[0].phone).toBe('9900112233');
+      expect(component.formService.filteredCustomers().length).toBe(1);
+      expect(component.formService.filteredCustomers()[0].phone).toBe('9900112233');
     });
 
     it('shows all customers when search is empty and dropdown is open', () => {
-      component.onSearchChange('');
+      component.formService.onSearchChange('');
       fixture.detectChanges();
 
-      expect(component.filteredCustomers().length).toBe(customers.length);
+      expect(component.formService.filteredCustomers().length).toBe(customers.length);
     });
 
     it('opens dropdown on search change', () => {
-      component.onSearchChange('Juan');
+      component.formService.onSearchChange('Juan');
       fixture.detectChanges();
 
-      expect(component.isDropdownOpen()).toBe(true);
+      expect(component.formService.isDropdownOpen()).toBe(true);
     });
 
     it('renders dropdown items when dropdown is open', () => {
-      component.onSearchChange('Carlos');
+      component.formService.onSearchChange('Carlos');
       fixture.detectChanges();
 
       const items = fixture.nativeElement.querySelectorAll('.customer-dropdown-item');
@@ -178,7 +181,7 @@ describe('SaleFormComponent', () => {
     });
 
     it('shows empty state when no customers match search', () => {
-      component.onSearchChange('ZZZZZZ');
+      component.formService.onSearchChange('ZZZZZZ');
       fixture.detectChanges();
 
       const empty = fixture.nativeElement.querySelector('.customer-dropdown-empty');
@@ -187,22 +190,22 @@ describe('SaleFormComponent', () => {
     });
 
     it('selects a customer and closes dropdown on click', () => {
-      component.onSearchChange('Maria');
+      component.formService.onSearchChange('Maria');
       fixture.detectChanges();
 
       const item = fixture.nativeElement.querySelector('.customer-dropdown-item');
       item.click();
       fixture.detectChanges();
 
-      expect(component.selectedCustomerId()).toBe('cust-2');
-      expect(component.isDropdownOpen()).toBe(false);
-      expect(component.selectedCustomer()).toBeTruthy();
-      expect(component.selectedCustomer()!.name).toBe('Maria Rodriguez');
+      expect(component.formService.selectedCustomerId()).toBe('cust-2');
+      expect(component.formService.isDropdownOpen()).toBe(false);
+      expect(component.formService.selectedCustomer()).toBeTruthy();
+      expect(component.formService.selectedCustomer()!.name).toBe('Maria Rodriguez');
     });
 
     it('shows selected customer info after selection', () => {
       const customer = customers[0];
-      component.selectCustomer(customer);
+      component.formService.selectCustomer(customer);
       fixture.detectChanges();
 
       const info = fixture.nativeElement.querySelector('.selected-customer-info');
@@ -212,24 +215,24 @@ describe('SaleFormComponent', () => {
     });
 
     it('clears customer selection and shows search input again', () => {
-      component.selectCustomer(customers[0]);
+      component.formService.selectCustomer(customers[0]);
       fixture.detectChanges();
 
-      component.clearCustomer();
+      component.formService.clearCustomer();
       fixture.detectChanges();
 
-      expect(component.selectedCustomerId()).toBe('');
+      expect(component.formService.selectedCustomerId()).toBe('');
       const input = fixture.nativeElement.querySelector('[placeholder*="Buscar cliente"]');
       expect(input).toBeTruthy();
     });
 
     it('sets canSubmit to false when no customer is selected and no items', () => {
-      expect(component.canSubmit()).toBe(false);
+      expect(component.formService.canSubmit()).toBe(false);
     });
 
     it('sets canSubmit to true when customer is selected', () => {
-      component.selectCustomer(customers[0]);
-      component.items.set([{
+      component.formService.selectCustomer(customers[0]);
+      component.formService.items.set([{
         recipeId: 'rec-1',
         name: 'Torta',
         quantity: 1,
@@ -238,11 +241,11 @@ describe('SaleFormComponent', () => {
       }]);
       fixture.detectChanges();
 
-      expect(component.canSubmit()).toBe(true);
+      expect(component.formService.canSubmit()).toBe(true);
     });
 
     it('prevents confirm when no customer is selected', () => {
-      component.items.set([{
+      component.formService.items.set([{
         recipeId: 'rec-1', name: 'Torta', quantity: 1, unitPrice: 100, unitCost: 50,
       }]);
       fixture.detectChanges();
@@ -253,11 +256,11 @@ describe('SaleFormComponent', () => {
     });
 
     it('closes dialog with sale input on confirm with selected customer', () => {
-      component.selectCustomer(customers[0]);
-      component.items.set([{
+      component.formService.selectCustomer(customers[0]);
+      component.formService.items.set([{
         recipeId: 'rec-1', name: 'Torta', quantity: 2, unitPrice: 100, unitCost: 50,
       }]);
-      component.deliveryDateInput = '2026-07-01';
+      component.formService.deliveryDateInput = '2026-07-01';
       fixture.detectChanges();
 
       component.confirm();
@@ -270,7 +273,7 @@ describe('SaleFormComponent', () => {
     });
 
     it('does not render edit badge in new sale mode', () => {
-      component.selectCustomer(customers[0]);
+      component.formService.selectCustomer(customers[0]);
       fixture.detectChanges();
 
       const badge = fixture.nativeElement.querySelector('.selected-customer-badge');
@@ -278,7 +281,7 @@ describe('SaleFormComponent', () => {
     });
 
     it('shows clear button in new sale mode when customer selected', () => {
-      component.selectCustomer(customers[0]);
+      component.formService.selectCustomer(customers[0]);
       fixture.detectChanges();
 
       const clearBtn = fixture.nativeElement.querySelector('.selected-customer-clear');
@@ -309,8 +312,8 @@ describe('SaleFormComponent', () => {
     });
 
     it('pre-selects the customer from the existing sale', () => {
-      expect(component.selectedCustomerId()).toBe('cust-1');
-      expect(component.isEdit()).toBe(true);
+      expect(component.formService.selectedCustomerId()).toBe('cust-1');
+      expect(component.formService.isEdit()).toBe(true);
     });
 
     it('shows customer info as read-only in edit mode', () => {
@@ -336,7 +339,7 @@ describe('SaleFormComponent', () => {
     });
 
     it('can submit with existing items in edit mode', () => {
-      expect(component.canSubmit()).toBe(true);
+      expect(component.formService.canSubmit()).toBe(true);
     });
 
     it('closes dialog with existing sale data on confirm', () => {
@@ -355,10 +358,10 @@ describe('SaleFormComponent', () => {
     it('re-filters when store customers change', () => {
       createComponent();
 
-      component.onSearchChange('Juan');
+      component.formService.onSearchChange('Juan');
       fixture.detectChanges();
 
-      expect(component.filteredCustomers().length).toBe(1);
+      expect(component.formService.filteredCustomers().length).toBe(1);
 
       // Simulate store update — no cache, reads directly from store signal
       customersSignal.set([
@@ -367,7 +370,7 @@ describe('SaleFormComponent', () => {
       ]);
       fixture.detectChanges();
 
-      expect(component.filteredCustomers().length).toBe(2);
+      expect(component.formService.filteredCustomers().length).toBe(2);
     });
   });
 
@@ -386,7 +389,7 @@ describe('SaleFormComponent', () => {
       recipesStoreMock.recipes.set([rec1, rec2, rec3]);
       fixture.detectChanges();
 
-      expect(component.top3Recipes()).toEqual([]);
+      expect(component.formService.top3Recipes()).toEqual([]);
     });
 
     it('returns recipes ranked by total quantity sold across all sales', () => {
@@ -408,7 +411,7 @@ describe('SaleFormComponent', () => {
       recipesStoreMock.recipes.set([rec1, rec2, rec3, rec4]);
       fixture.detectChanges();
 
-      const result = component.top3Recipes();
+      const result = component.formService.top3Recipes();
       expect(result).toHaveLength(3);
       expect(result[0].id).toBe('rec-1');
       expect(result[1].id).toBe('rec-2');
@@ -422,7 +425,7 @@ describe('SaleFormComponent', () => {
       recipesStoreMock.recipes.set([rec1]);
       fixture.detectChanges();
 
-      const result = component.top3Recipes();
+      const result = component.formService.top3Recipes();
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe('rec-1');
     });
@@ -442,7 +445,7 @@ describe('SaleFormComponent', () => {
       recipesStoreMock.recipes.set([rec1, rec2, rec3]);
       fixture.detectChanges();
 
-      const result = component.top3Recipes();
+      const result = component.formService.top3Recipes();
       expect(result).toHaveLength(3);
       expect(result[0].id).toBe('rec-1');
       expect(result[1].id).toBe('rec-2');
@@ -463,17 +466,17 @@ describe('SaleFormComponent', () => {
     });
 
     it('returns empty array when search is empty', () => {
-      component.productSearch.set('');
+      component.formService.productSearch.set('');
       fixture.detectChanges();
 
-      expect(component.filteredRecipes()).toEqual([]);
+      expect(component.formService.filteredRecipes()).toEqual([]);
     });
 
     it('matches recipes case-insensitively', () => {
-      component.productSearch.set('brown');
+      component.formService.productSearch.set('brown');
       fixture.detectChanges();
 
-      const result = component.filteredRecipes();
+      const result = component.formService.filteredRecipes();
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe('rec-b');
     });
@@ -487,10 +490,10 @@ describe('SaleFormComponent', () => {
       recipesStoreMock.recipes.set([recA, recB, recC, recD, ...extraRecipes]);
       fixture.detectChanges();
 
-      component.productSearch.set('c');
+      component.formService.productSearch.set('c');
       fixture.detectChanges();
 
-      const result = component.filteredRecipes();
+      const result = component.formService.filteredRecipes();
       // Should be: Cheesecake, Crepe, Croissant (sorted alpha, max 3)
       expect(result).toHaveLength(3);
       expect(result[0].id).toBe('rec-c');
@@ -499,22 +502,22 @@ describe('SaleFormComponent', () => {
     });
 
     it('returns empty array when no recipes match', () => {
-      component.productSearch.set('zzzzzz');
+      component.formService.productSearch.set('zzzzzz');
       fixture.detectChanges();
 
-      expect(component.filteredRecipes()).toEqual([]);
+      expect(component.formService.filteredRecipes()).toEqual([]);
     });
 
     it('updates when RecipesStore changes', () => {
-      component.productSearch.set('brown');
+      component.formService.productSearch.set('brown');
       fixture.detectChanges();
 
-      expect(component.filteredRecipes()).toHaveLength(1);
+      expect(component.formService.filteredRecipes()).toHaveLength(1);
 
       recipesStoreMock.recipes.set([recB, createRecipe({ id: 'rec-h', name: 'Brownie XL' })]);
       fixture.detectChanges();
 
-      expect(component.filteredRecipes()).toHaveLength(2);
+      expect(component.formService.filteredRecipes()).toHaveLength(2);
     });
   });
 
@@ -535,20 +538,20 @@ describe('SaleFormComponent', () => {
     });
 
     it('returns empty array when no items have been added', () => {
-      component.items.set([]);
+      component.formService.items.set([]);
       fixture.detectChanges();
 
-      expect(component.searchAddedRecipes()).toEqual([]);
+      expect(component.formService.searchAddedRecipes()).toEqual([]);
     });
 
     it('excludes top 3 recipes from search added section', () => {
-      component.items.set([
+      component.formService.items.set([
         { recipeId: 'rec-top', name: 'Top Product', quantity: 2, unitPrice: 100, unitCost: 50 },
         { recipeId: 'rec-added', name: 'Added Product', quantity: 1, unitPrice: 100, unitCost: 50 },
       ]);
       fixture.detectChanges();
 
-      const result = component.searchAddedRecipes();
+      const result = component.formService.searchAddedRecipes();
       // rec-top is in top 3 → excluded
       // rec-added has qty > 0 → included
       expect(result).toHaveLength(1);
@@ -556,38 +559,38 @@ describe('SaleFormComponent', () => {
     });
 
     it('includes items with quantity greater than 0', () => {
-      component.items.set([
+      component.formService.items.set([
         { recipeId: 'rec-added', name: 'Added Product', quantity: 3, unitPrice: 100, unitCost: 50 },
       ]);
       fixture.detectChanges();
 
-      const result = component.searchAddedRecipes();
+      const result = component.formService.searchAddedRecipes();
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe('rec-added');
     });
 
     it('excludes items with quantity 0', () => {
-      component.items.set([
+      component.formService.items.set([
         { recipeId: 'rec-zero', name: 'Zero Product', quantity: 0, unitPrice: 100, unitCost: 50 },
       ]);
       fixture.detectChanges();
 
-      const result = component.searchAddedRecipes();
+      const result = component.formService.searchAddedRecipes();
       expect(result).toEqual([]);
     });
 
     it('reactively updates when items change', () => {
-      component.items.set([
+      component.formService.items.set([
         { recipeId: 'rec-added', name: 'Added Product', quantity: 1, unitPrice: 100, unitCost: 50 },
       ]);
       fixture.detectChanges();
-      expect(component.searchAddedRecipes()).toHaveLength(1);
+      expect(component.formService.searchAddedRecipes()).toHaveLength(1);
 
-      component.items.set([
+      component.formService.items.set([
         { recipeId: 'rec-added', name: 'Added Product', quantity: 0, unitPrice: 100, unitCost: 50 },
       ]);
       fixture.detectChanges();
-      expect(component.searchAddedRecipes()).toHaveLength(0);
+      expect(component.formService.searchAddedRecipes()).toHaveLength(0);
     });
   });
 
@@ -602,31 +605,31 @@ describe('SaleFormComponent', () => {
 
     describe('onProductSearchChange', () => {
       it('updates the productSearch signal and opens the dropdown', () => {
-        component.onProductSearchChange('Alfajor');
+        component.formService.onProductSearchChange('Alfajor');
         fixture.detectChanges();
 
-        expect(component.productSearch()).toBe('Alfajor');
-        expect(component.isProductDropdownOpen()).toBe(true);
+        expect(component.formService.productSearch()).toBe('Alfajor');
+        expect(component.formService.isProductDropdownOpen()).toBe(true);
       });
     });
 
     describe('onProductSearchFocus', () => {
       it('opens the product dropdown', () => {
-        component.onProductSearchFocus();
+        component.formService.onProductSearchFocus();
         fixture.detectChanges();
 
-        expect(component.isProductDropdownOpen()).toBe(true);
+        expect(component.formService.isProductDropdownOpen()).toBe(true);
       });
     });
 
     describe('onProductSearchSelect', () => {
       it('adds item, clears search, and closes dropdown', () => {
-        component.onProductSearchSelect(recipe);
+        component.formService.onProductSearchSelect(recipe);
         fixture.detectChanges();
 
-        expect(component.getItemQuantity(recipe.id!)).toBe(1);
-        expect(component.productSearch()).toBe('');
-        expect(component.isProductDropdownOpen()).toBe(false);
+        expect(component.formService.getItemQuantity(recipe.id!)).toBe(1);
+        expect(component.formService.productSearch()).toBe('');
+        expect(component.formService.isProductDropdownOpen()).toBe(false);
       });
     });
   });
@@ -641,21 +644,21 @@ describe('SaleFormComponent', () => {
     });
 
     it('opens on focus', () => {
-      component.onProductSearchFocus();
+      component.formService.onProductSearchFocus();
       fixture.detectChanges();
 
-      expect(component.isProductDropdownOpen()).toBe(true);
+      expect(component.formService.isProductDropdownOpen()).toBe(true);
     });
 
     it('opens on search change', () => {
-      component.onProductSearchChange('test');
+      component.formService.onProductSearchChange('test');
       fixture.detectChanges();
 
-      expect(component.isProductDropdownOpen()).toBe(true);
+      expect(component.formService.isProductDropdownOpen()).toBe(true);
     });
 
     it('closes on outside click (click outside .product-search-wrapper)', () => {
-      component.isProductDropdownOpen.set(true);
+      component.formService.isProductDropdownOpen.set(true);
       fixture.detectChanges();
 
       const outsideClick = new MouseEvent('click', { bubbles: true });
@@ -663,11 +666,11 @@ describe('SaleFormComponent', () => {
       component.onDocumentClick(outsideClick);
       fixture.detectChanges();
 
-      expect(component.isProductDropdownOpen()).toBe(false);
+      expect(component.formService.isProductDropdownOpen()).toBe(false);
     });
 
     it('stays open when clicking inside .product-search-wrapper', () => {
-      component.isProductDropdownOpen.set(true);
+      component.formService.isProductDropdownOpen.set(true);
       fixture.detectChanges();
 
       const wrapper = fixture.nativeElement.querySelector('.product-search-wrapper') ?? document.createElement('div');
@@ -677,40 +680,37 @@ describe('SaleFormComponent', () => {
       component.onDocumentClick(insideClick);
       fixture.detectChanges();
 
-      expect(component.isProductDropdownOpen()).toBe(true);
+      expect(component.formService.isProductDropdownOpen()).toBe(true);
     });
 
     it('closes on selection and clears search', () => {
-      component.onProductSearchChange('Product');
+      component.formService.onProductSearchChange('Product');
       fixture.detectChanges();
 
-      expect(component.isProductDropdownOpen()).toBe(true);
+      expect(component.formService.isProductDropdownOpen()).toBe(true);
 
-      component.onProductSearchSelect(rec1);
+      component.formService.onProductSearchSelect(rec1);
       fixture.detectChanges();
 
-      expect(component.isProductDropdownOpen()).toBe(false);
-      expect(component.productSearch()).toBe('');
-      expect(component.getItemQuantity(rec1.id!)).toBe(1);
+      expect(component.formService.isProductDropdownOpen()).toBe(false);
+      expect(component.formService.productSearch()).toBe('');
+      expect(component.formService.getItemQuantity(rec1.id!)).toBe(1);
     });
 
     it('is independent from customer dropdown', () => {
-      component.onProductSearchChange('test');
-      component.onSearchChange('customer');
+      component.formService.onProductSearchChange('test');
+      component.formService.onSearchChange('customer');
       fixture.detectChanges();
 
-      expect(component.isProductDropdownOpen()).toBe(true);
-      expect(component.isDropdownOpen()).toBe(true);
+      expect(component.formService.isProductDropdownOpen()).toBe(true);
+      expect(component.formService.isDropdownOpen()).toBe(true);
 
-      // Close customer dropdown only
-      const customerClick = new MouseEvent('click', { bubbles: true });
-      Object.defineProperty(customerClick, 'target', { value: document.body });
-      component.onDocumentClick(customerClick);
+      // Click outside both wrappers — both HostListeners fire independently
+      document.body.click();
       fixture.detectChanges();
 
-      // Both close because body click is outside BOTH wrappers
-      expect(component.isDropdownOpen()).toBe(false);
-      expect(component.isProductDropdownOpen()).toBe(false);
+      expect(component.formService.isDropdownOpen()).toBe(false);
+      expect(component.formService.isProductDropdownOpen()).toBe(false);
     });
   });
 
@@ -734,7 +734,7 @@ describe('SaleFormComponent', () => {
 
     it('renders top 3 product items when they have quantity > 0', () => {
       // Given: top recipe has quantity > 0
-      component.items.set([
+      component.formService.items.set([
         { recipeId: 'rec-1', name: 'Top Torta', quantity: 2, unitPrice: 100, unitCost: 50 },
       ]);
       fixture.detectChanges();
@@ -744,7 +744,7 @@ describe('SaleFormComponent', () => {
     });
 
     it('renders top 3 products even when quantity is 0', () => {
-      component.items.set([]);
+      component.formService.items.set([]);
       fixture.detectChanges();
 
       const topProductEl = fixture.nativeElement.querySelector('.top3-items app-sale-product-item');
@@ -752,7 +752,7 @@ describe('SaleFormComponent', () => {
     });
 
     it('renders search-added products in the recipe-rows section', () => {
-      component.items.set([
+      component.formService.items.set([
         { recipeId: 'rec-2', name: 'Added Torta', quantity: 3, unitPrice: 150, unitCost: 75 },
       ]);
       fixture.detectChanges();
@@ -763,7 +763,7 @@ describe('SaleFormComponent', () => {
     });
 
     it('renders dropdown items when product search is active and has matches', () => {
-      component.onProductSearchChange('Top');
+      component.formService.onProductSearchChange('Top');
       fixture.detectChanges();
 
       const dropdownItems = fixture.nativeElement.querySelectorAll('.product-dropdown-item');
@@ -772,7 +772,7 @@ describe('SaleFormComponent', () => {
     });
 
     it('shows empty state in product dropdown when no matches', () => {
-      component.onProductSearchChange('ZZZZZZ');
+      component.formService.onProductSearchChange('ZZZZZZ');
       fixture.detectChanges();
 
       const empty = fixture.nativeElement.querySelector('.product-dropdown-empty');
@@ -781,15 +781,15 @@ describe('SaleFormComponent', () => {
     });
 
     it('adds item and closes dropdown when clicking a search result', () => {
-      component.onProductSearchChange('Top');
+      component.formService.onProductSearchChange('Top');
       fixture.detectChanges();
 
       const item = fixture.nativeElement.querySelector('.product-dropdown-item');
       item.click();
       fixture.detectChanges();
 
-      expect(component.getItemQuantity('rec-1')).toBe(1);
-      expect(component.productSearch()).toBe('');
+      expect(component.formService.getItemQuantity('rec-1')).toBe(1);
+      expect(component.formService.productSearch()).toBe('');
     });
   });
 
@@ -799,17 +799,17 @@ describe('SaleFormComponent', () => {
     });
 
     it('closes dropdown when clicking outside', () => {
-      component.isDropdownOpen.set(true);
+      component.formService.isDropdownOpen.set(true);
       fixture.detectChanges();
 
       document.body.click();
       fixture.detectChanges();
 
-      expect(component.isDropdownOpen()).toBe(false);
+      expect(component.formService.isDropdownOpen()).toBe(false);
     });
 
     it('keeps dropdown open when clicking inside the wrapper', () => {
-      component.onSearchChange('a');
+      component.formService.onSearchChange('a');
       fixture.detectChanges();
 
       const wrapper = fixture.nativeElement.querySelector('.customer-search-wrapper');
@@ -818,7 +818,7 @@ describe('SaleFormComponent', () => {
 
       // document:click fires on body, which is outside the wrapper
       // but we need to simulate properly
-      component.isDropdownOpen.set(true);
+      component.formService.isDropdownOpen.set(true);
       fixture.detectChanges();
 
       // Simulate click inside wrapper — should NOT close
@@ -827,7 +827,7 @@ describe('SaleFormComponent', () => {
       component.onDocumentClick(internalClick);
       fixture.detectChanges();
 
-      expect(component.isDropdownOpen()).toBe(true);
+      expect(component.formService.isDropdownOpen()).toBe(true);
     });
   });
 });

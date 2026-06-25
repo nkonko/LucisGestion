@@ -2,50 +2,18 @@
   <div class="sale-form-content">
     <section class="sale-form-section">
       <h3 class="sale-form-section-title">Cliente</h3>
-
-      @if (isEdit() && selectedCustomer(); as customer) {
-        <div class="selected-customer">
-          <span class="selected-customer-info">{{ customer.name }} · {{ customer.phone }}</span>
-          <span class="selected-customer-badge">Edición</span>
-        </div>
-      } @else if (selectedCustomer(); as customer) {
-        <div class="selected-customer">
-          <span class="selected-customer-info">{{ customer.name }} · {{ customer.phone }}</span>
-          <button type="button" class="selected-customer-clear" (click)="clearCustomer()">
-            Cambiar cliente
-          </button>
-        </div>
-      } @else {
-        <div class="customer-search-wrapper">
-          <input
-            #customerSearchInput
-            class="ui-input"
-            type="text"
-            placeholder="Buscar cliente por nombre o teléfono..."
-            [ngModel]="customerSearch()"
-            (ngModelChange)="onSearchChange($event)"
-            (focus)="onSearchFocus()"
-            autocomplete="off"
-          />
-          @if (isDropdownOpen()) {
-            <ul class="customer-dropdown" role="listbox" aria-label="Resultados de búsqueda de clientes">
-              @if (filteredCustomers().length === 0) {
-                <li class="customer-dropdown-empty">Sin resultados</li>
-              }
-              @for (customer of filteredCustomers(); track customer.id) {
-                <li
-                  class="customer-dropdown-item"
-                  role="option"
-                  (click)="selectCustomer(customer)"
-                >
-                  <span class="customer-dropdown-item-name">{{ customer.name }}</span>
-                  <span class="customer-dropdown-item-phone">{{ customer.phone }}</span>
-                </li>
-              }
-            </ul>
-          }
-        </div>
-      }
+      <app-customer-search
+        [selectedCustomer]="formService.selectedCustomer()"
+        [isEdit]="formService.isEdit()"
+        [filteredCustomers]="formService.filteredCustomers()"
+        [customerSearch]="formService.customerSearch()"
+        [isDropdownOpen]="formService.isDropdownOpen()"
+        (selectCustomer)="formService.selectCustomer($event)"
+        (clearCustomer)="formService.clearCustomer()"
+        (searchChange)="formService.onSearchChange($event)"
+        (searchFocus)="formService.onSearchFocus()"
+        (closeDropdown)="formService.isDropdownOpen.set(false)"
+      />
     </section>
 
     <section class="sale-form-section">
@@ -56,27 +24,27 @@
           <button
             class="top3-toggle"
             type="button"
-            (click)="isTop3Collapsed.set(!isTop3Collapsed())"
-            [attr.aria-expanded]="!isTop3Collapsed()"
+            (click)="formService.isTop3Collapsed.set(!formService.isTop3Collapsed())"
+            [attr.aria-expanded]="!formService.isTop3Collapsed()"
             aria-label="Alternar productos más vendidos"
           >
-            <span class="top3-toggle-icon" [class.top3-toggle-icon--collapsed]="isTop3Collapsed()">
+            <span class="top3-toggle-icon" [class.top3-toggle-icon--collapsed]="formService.isTop3Collapsed()">
               ▼
             </span>
           <span class="top3-toggle-label">Más vendidos</span>
-          @if (isTop3Collapsed() && hasTop3Selection()) {
+          @if (formService.isTop3Collapsed() && formService.hasTop3Selection()) {
             <span class="top3-toggle-dot" aria-label="Productos seleccionados"></span>
           }
-          <span class="top3-toggle-count">{{ top3Recipes().length }}</span>
+          <span class="top3-toggle-count">{{ formService.top3Recipes().length }}</span>
           </button>
-          @if (!isTop3Collapsed()) {
+          @if (!formService.isTop3Collapsed()) {
             <div class="top3-items">
-              @for (recipe of top3Recipes(); track recipe.id) {
+              @for (recipe of formService.top3Recipes(); track recipe.id) {
                 <app-sale-product-item
                   [recipe]="recipe"
-                  [quantity]="getItemQuantity(recipe.id!)"
-                  (increment)="addItem(recipe)"
-                  (decrement)="decrementItem(recipe.id!)"
+                  [quantity]="formService.getItemQuantity(recipe.id!)"
+                  (increment)="formService.addItem(recipe)"
+                  (decrement)="formService.decrementItem(recipe.id!)"
                 />
               }
             </div>
@@ -91,24 +59,24 @@
             class="ui-input"
             type="text"
             placeholder="Buscar producto por nombre..."
-            [ngModel]="productSearch()"
-            (ngModelChange)="onProductSearchChange($event)"
-            (focus)="onProductSearchFocus()"
+            [ngModel]="formService.productSearch()"
+            (ngModelChange)="formService.onProductSearchChange($event)"
+            (focus)="formService.onProductSearchFocus()"
             autocomplete="off"
           />
-          @if (isProductDropdownOpen()) {
+          @if (formService.isProductDropdownOpen()) {
             <ul class="product-dropdown" role="listbox" aria-label="Resultados de búsqueda de productos">
-              @if (filteredRecipes().length === 0) {
+              @if (formService.filteredRecipes().length === 0) {
                 <li class="product-dropdown-empty">Sin resultados</li>
               }
-              @for (recipe of filteredRecipes(); track recipe.id) {
+              @for (recipe of formService.filteredRecipes(); track recipe.id) {
                 <li
                   class="product-dropdown-item"
                   role="option"
-                  (click)="onProductSearchSelect(recipe)"
+                  (click)="formService.onProductSearchSelect(recipe)"
                 >
                   <span class="product-dropdown-item-name">{{ recipe.name }}</span>
-                  @if (customerRecipeHistory().has(recipe.id!)) {
+                  @if (formService.customerRecipeHistory().has(recipe.id!)) {
                     <span class="product-dropdown-item-badge">Ya compró</span>
                   }
                 </li>
@@ -118,12 +86,12 @@
         </div>
 
         <!-- Search-added products (not in top 3, quantity > 0) -->
-        @for (recipe of searchAddedRecipes(); track recipe.id) {
+        @for (recipe of formService.searchAddedRecipes(); track recipe.id) {
           <app-sale-product-item
             [recipe]="recipe"
-            [quantity]="getItemQuantity(recipe.id!)"
-            (increment)="addItem(recipe)"
-            (decrement)="decrementItem(recipe.id!)"
+            [quantity]="formService.getItemQuantity(recipe.id!)"
+            (increment)="formService.addItem(recipe)"
+            (decrement)="formService.decrementItem(recipe.id!)"
           />
         }
       </div>
@@ -134,8 +102,8 @@
       <div class="sale-form-inline-grid">
         <label class="ui-field">
           <span>Medio de pago</span>
-          <select class="ui-select" [(ngModel)]="paymentMethod">
-            @for (mp of paymentMethods; track mp.key) {
+          <select class="ui-select" [(ngModel)]="formService.paymentMethod">
+            @for (mp of formService.paymentMethods; track mp.key) {
               <option [value]="mp.key">{{ mp.label }}</option>
             }
           </select>
@@ -145,12 +113,12 @@
           <button
             class="payment-toggle ui-payment-toggle"
             type="button"
-            [class.ui-payment-toggle--paid]="isPaid"
-            (click)="isPaid = !isPaid"
-            [attr.aria-pressed]="isPaid"
-            [attr.aria-label]="isPaid ? 'Marcar como no pagado' : 'Marcar como pagado'"
+            [class.ui-payment-toggle--paid]="formService.isPaid"
+            (click)="formService.isPaid = !formService.isPaid"
+            [attr.aria-pressed]="formService.isPaid"
+            [attr.aria-label]="formService.isPaid ? 'Marcar como no pagado' : 'Marcar como pagado'"
           >
-            {{ isPaid ? 'Pagado' : 'No pagado' }}
+            {{ formService.isPaid ? 'Pagado' : 'No pagado' }}
           </button>
         </label>
       </div>
@@ -160,19 +128,19 @@
       <h3 class="sale-form-section-title">Entrega y notas</h3>
       <label class="ui-field">
         <span>Fecha de entrega</span>
-        <input class="ui-input" [(ngModel)]="deliveryDateInput" type="date" />
+        <input class="ui-input" [(ngModel)]="formService.deliveryDateInput" type="date" />
       </label>
       <label class="ui-field">
         <span>Notas</span>
-        <textarea class="ui-textarea" [(ngModel)]="notes" placeholder="Detalles adicionales..." rows="2"></textarea>
+        <textarea class="ui-textarea" [(ngModel)]="formService.notes" placeholder="Detalles adicionales..." rows="2"></textarea>
       </label>
     </section>
   </div>
 
   <div class="sale-form-summary">
     <div class="sale-form-actions">
-      <button class="sale-submit-btn ui-primary-cta-btn" type="button" (click)="confirm()" [disabled]="!canSubmit()">
-        {{ buttonLabel() }}
+      <button class="sale-submit-btn ui-primary-cta-btn" type="button" (click)="confirm()" [disabled]="!formService.canSubmit()">
+        {{ formService.buttonLabel() }}
       </button>
     </div>
   </div>
