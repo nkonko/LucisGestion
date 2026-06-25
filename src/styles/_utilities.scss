@@ -8,6 +8,8 @@
 .stock-warning { color: var(--color-status-warning); }
 .stock-danger { color: var(--color-status-danger); }
 
+.status-draft { color: var(--color-status-warning); }
+
 .touch-card {
   cursor: pointer;
   transition: box-shadow var(--transition-standard);

@@ -45,7 +45,7 @@ export class FinancialInsightsService {
     const end = getPeriodEnd(period, selectedDate);
 
     return this.salesStore.sales().filter((sale) => {
-      if (sale.status === 'cancelled') return false;
+      if (sale.status === 'cancelled' || sale.status === 'draft') return false;
       const saleDate = sale.date.toDate();
       return saleDate >= start && saleDate < end;
     });
@@ -59,7 +59,7 @@ export class FinancialInsightsService {
   readonly salesForSelectedMonth = computed(() => {
     const monthKey = this.selectedMonthKey();
     return this.salesStore.sales().filter((sale) => {
-      if (sale.status === 'cancelled') return false;
+      if (sale.status === 'cancelled' || sale.status === 'draft') return false;
       const saleDate = sale.date.toDate();
       const saleMonthKey = `${saleDate.getFullYear()}-${String(saleDate.getMonth() + 1).padStart(2, '0')}`;
       return saleMonthKey === monthKey;

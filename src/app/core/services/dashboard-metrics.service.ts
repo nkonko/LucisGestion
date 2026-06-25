@@ -26,6 +26,7 @@ export class DashboardMetricsService {
   private periodSales = computed(() => {
     const { start, end } = this.periodRange();
     return this.salesStore.sales().filter((sale) => {
+      if (sale.status === 'draft') return false;
       const saleDate = sale.date.toDate();
       return saleDate >= start && saleDate < end;
     });

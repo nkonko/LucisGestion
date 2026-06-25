@@ -1,0 +1,43 @@
+@if (isEdit() && selectedCustomer(); as customer) {
+  <div class="selected-customer">
+    <span class="selected-customer-info">{{ customer.name }} · {{ customer.phone }}</span>
+    <span class="selected-customer-badge">Edición</span>
+  </div>
+} @else if (selectedCustomer(); as customer) {
+  <div class="selected-customer">
+    <span class="selected-customer-info">{{ customer.name }} · {{ customer.phone }}</span>
+    <button type="button" class="selected-customer-clear" (click)="onClear()">
+      Cambiar cliente
+    </button>
+  </div>
+} @else {
+  <div class="customer-search-wrapper">
+    <input
+      #customerSearchInput
+      class="ui-input"
+      type="text"
+      placeholder="Buscar cliente por nombre o teléfono..."
+      [ngModel]="customerSearch()"
+      (ngModelChange)="onSearchChange($event)"
+      (focus)="onSearchFocus()"
+      autocomplete="off"
+    />
+    @if (isDropdownOpen()) {
+      <ul class="customer-dropdown" role="listbox" aria-label="Resultados de búsqueda de clientes">
+        @if (filteredCustomers().length === 0) {
+          <li class="customer-dropdown-empty">Sin resultados</li>
+        }
+        @for (customer of filteredCustomers(); track customer.id) {
+          <li
+            class="customer-dropdown-item"
+            role="option"
+            (click)="onSelect(customer)"
+          >
+            <span class="customer-dropdown-item-name">{{ customer.name }}</span>
+            <span class="customer-dropdown-item-phone">{{ customer.phone }}</span>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+}

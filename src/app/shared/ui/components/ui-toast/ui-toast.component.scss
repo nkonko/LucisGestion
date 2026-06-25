@@ -46,6 +46,10 @@
   background-color: var(--color-status-danger);
 }
 
+.ui-toast__item--info {
+  background-color: var(--color-status-warning);
+}
+
 .ui-toast__item--dismissing {
   animation: ui-toast-exit 350ms ease forwards;
   pointer-events: none;
