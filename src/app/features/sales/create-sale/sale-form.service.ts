@@ -18,7 +18,6 @@ export class SaleFormService {
 
   readonly existingSale: Signal<Sale | null> = signal(inject(DIALOG_DATA) as Sale | null);
 
-  // State signals
   items: WritableSignal<SaleItem[]> = signal<SaleItem[]>([]);
   selectedCustomerId: WritableSignal<string> = signal('');
   deliveryDateInput = '';
@@ -31,7 +30,6 @@ export class SaleFormService {
   isTop3Collapsed: WritableSignal<boolean> = signal(false);
   isDropdownOpen: WritableSignal<boolean> = signal(false);
 
-  // Computed signals
   readonly isEdit = computed(() => this.existingSale() !== null);
   readonly pageTitle = computed(() => (this.isEdit() ? 'Editar Venta' : 'Nueva Venta'));
   readonly buttonLabel = computed(() => (this.isEdit() ? 'Modificar' : 'Crear orden'));

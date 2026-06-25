@@ -363,7 +363,6 @@ describe('SaleFormComponent', () => {
 
       expect(component.formService.filteredCustomers().length).toBe(1);
 
-      // Simulate store update — no cache, reads directly from store signal
       customersSignal.set([
         ...customers,
         createCustomer({ id: 'cust-5', name: 'Juanita Alvarez', phone: '7788990011' }),
@@ -441,7 +440,6 @@ describe('SaleFormComponent', () => {
           ],
         }),
       ]);
-      // Only active recipes are in RecipesStore (rec-inactive is NOT included)
       recipesStoreMock.recipes.set([rec1, rec2, rec3]);
       fixture.detectChanges();
 
@@ -494,7 +492,6 @@ describe('SaleFormComponent', () => {
       fixture.detectChanges();
 
       const result = component.formService.filteredRecipes();
-      // Should be: Cheesecake, Crepe, Croissant (sorted alpha, max 3)
       expect(result).toHaveLength(3);
       expect(result[0].id).toBe('rec-c');
       expect(result[1].id).toBe('rec-f');
@@ -552,8 +549,6 @@ describe('SaleFormComponent', () => {
       fixture.detectChanges();
 
       const result = component.formService.searchAddedRecipes();
-      // rec-top is in top 3 → excluded
-      // rec-added has qty > 0 → included
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe('rec-added');
     });
@@ -707,7 +702,6 @@ describe('SaleFormComponent', () => {
       expect(component.formService.isProductDropdownOpen()).toBe(true);
       expect(component.formService.isDropdownOpen()).toBe(true);
 
-      // Click outside both wrappers — both HostListeners fire independently
       document.body.click();
       fixture.detectChanges();
 
@@ -735,7 +729,6 @@ describe('SaleFormComponent', () => {
     });
 
     it('renders top 3 product items when they have quantity > 0', () => {
-      // Given: top recipe has quantity > 0
       component.formService.items.set([
         { recipeId: 'rec-1', name: 'Top Torta', quantity: 2, unitPrice: 100, unitCost: 50 },
       ]);
@@ -759,7 +752,6 @@ describe('SaleFormComponent', () => {
       ]);
       fixture.detectChanges();
 
-      // Search input should be visible
       const searchInput = fixture.nativeElement.querySelector('[placeholder*="Buscar producto"]');
       expect(searchInput).toBeTruthy();
     });
@@ -818,12 +810,9 @@ describe('SaleFormComponent', () => {
       wrapper.click();
       fixture.detectChanges();
 
-      // document:click fires on body, which is outside the wrapper
-      // but we need to simulate properly
       component.formService.isDropdownOpen.set(true);
       fixture.detectChanges();
 
-      // Simulate click inside wrapper — should NOT close
       const internalClick = new MouseEvent('click', { bubbles: true });
       Object.defineProperty(internalClick, 'target', { value: wrapper });
       component.onDocumentClick(internalClick);

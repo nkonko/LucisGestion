@@ -45,8 +45,6 @@
   gap: var(--space-2);
 }
 
-/* ─── Top 3 Collapsible ─── */
-
 .top3-section {
   display: flex;
   flex-direction: column;
@@ -142,8 +140,6 @@
     outline-offset: var(--space-1);
   }
 }
-
-/* ─── Product Search ─── */
 
 .product-search-wrapper {
   position: relative;
@@ -244,8 +240,6 @@
   40% { transform: translateX(100%); }
 }
 
-/* ─── Customer Search ─── */
-
 .customer-search-wrapper {
   position: relative;
 }
@@ -301,8 +295,6 @@
   color: var(--color-on-surface-variant);
 }
 
-/* ─── Selected Customer ─── */
-
 .selected-customer {
   display: flex;
   align-items: center;
@@ -346,8 +338,6 @@
     outline-offset: var(--space-1);
   }
 }
-
-/* ─── Summary ─── */
 
 .sale-form-summary {
   display: block;

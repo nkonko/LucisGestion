@@ -19,7 +19,6 @@
     <section class="sale-form-section">
       <h3 class="sale-form-section-title">Productos</h3>
       <div class="recipe-rows" role="list" aria-label="Listado de productos para la venta">
-        <!-- Top 3 most sold products (collapsible) -->
         <div class="top3-section">
           <button
             class="top3-toggle"
@@ -53,7 +52,6 @@
 
         <div class="product-section-divider" role="separator"></div>
 
-        <!-- Product search input -->
         <div class="product-search-wrapper">
           <input
             class="ui-input"
@@ -85,7 +83,6 @@
           }
         </div>
 
-        <!-- Search-added products (not in top 3, quantity > 0) -->
         @for (recipe of formService.searchAddedRecipes(); track recipe.id) {
           <app-sale-product-item
             [recipe]="recipe"
