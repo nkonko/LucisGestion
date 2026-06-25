@@ -57,6 +57,7 @@
   @for (sale of filteredSales(); track sale.id) {
     <app-sales-card
       [sale]="sale"
+      [loading]="store.loading()"
       (togglePaid)="toggleSalePaid($event)"
       (editRequested)="onEditRequested($event)"
       (whatsappRequested)="sendWhatsApp($event)"
