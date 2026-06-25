@@ -105,8 +105,8 @@ export class SaleFormService {
       .recipes()
       .filter((recipe) => recipe.name.toLowerCase().includes(search))
       .sort((a, b) => {
-        const aPurchased = history.has(a.id!);
-        const bPurchased = history.has(b.id!);
+        const aPurchased = a.id ? history.has(a.id) : false;
+        const bPurchased = b.id ? history.has(b.id) : false;
         if (aPurchased !== bPurchased) {
           return aPurchased ? -1 : 1;
         }
@@ -117,15 +117,14 @@ export class SaleFormService {
 
   readonly searchAddedRecipes = computed(() => {
     const top3Ids = new Set(this.top3Recipes().map((r) => r.id));
-    const currentItems = this.items();
     return this.recipesStore.recipes().filter((recipe) => {
       if (top3Ids.has(recipe.id)) return false;
-      return this.getItemQuantity(recipe.id!) > 0;
+      return recipe.id ? this.getItemQuantity(recipe.id) > 0 : false;
     });
   });
 
   readonly hasTop3Selection = computed(() =>
-    this.top3Recipes().some((recipe) => this.getItemQuantity(recipe.id!) > 0),
+    this.top3Recipes().some((recipe) => (recipe.id ? this.getItemQuantity(recipe.id) > 0 : false)),
   );
 
   readonly canSubmit = computed(
@@ -185,15 +184,18 @@ export class SaleFormService {
   }
 
   addItem(recipe: Recipe): void {
+    const recipeId = recipe.id;
+    if (!recipeId) return;
+
     this.items.update((items) => {
-      const existing = items.find((i) => i.recipeId === recipe.id);
+      const existing = items.find((i) => i.recipeId === recipeId);
       if (existing) {
-        return items.map((i) => (i.recipeId === recipe.id ? { ...i, quantity: i.quantity + 1 } : i));
+        return items.map((i) => (i.recipeId === recipeId ? { ...i, quantity: i.quantity + 1 } : i));
       }
       return [
         ...items,
         {
-          recipeId: recipe.id!,
+          recipeId,
           name: recipe.name,
           quantity: 1,
           unitPrice: recipe.salePrice,

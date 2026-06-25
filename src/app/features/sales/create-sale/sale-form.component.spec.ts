@@ -200,7 +200,7 @@ describe('SaleFormComponent', () => {
       expect(component.formService.selectedCustomerId()).toBe('cust-2');
       expect(component.formService.isDropdownOpen()).toBe(false);
       expect(component.formService.selectedCustomer()).toBeTruthy();
-      expect(component.formService.selectedCustomer()!.name).toBe('Maria Rodriguez');
+      expect(component.formService.selectedCustomer()?.name).toBe('Maria Rodriguez');
     });
 
     it('shows selected customer info after selection', () => {
@@ -627,7 +627,8 @@ describe('SaleFormComponent', () => {
         component.formService.onProductSearchSelect(recipe);
         fixture.detectChanges();
 
-        expect(component.formService.getItemQuantity(recipe.id!)).toBe(1);
+        const recipeId = recipe.id ?? '';
+        expect(component.formService.getItemQuantity(recipeId)).toBe(1);
         expect(component.formService.productSearch()).toBe('');
         expect(component.formService.isProductDropdownOpen()).toBe(false);
       });
@@ -694,7 +695,8 @@ describe('SaleFormComponent', () => {
 
       expect(component.formService.isProductDropdownOpen()).toBe(false);
       expect(component.formService.productSearch()).toBe('');
-      expect(component.formService.getItemQuantity(rec1.id!)).toBe(1);
+      const recipeId = rec1.id ?? '';
+      expect(component.formService.getItemQuantity(recipeId)).toBe(1);
     });
 
     it('is independent from customer dropdown', () => {
