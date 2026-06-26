@@ -16,7 +16,7 @@ for (const routeCase of demoRoutes) {
   test(`carga ${routeCase.path}`, async ({ page }) => {
     await page.goto(routeCase.path);
 
-    await expect(page).toHaveURL(new RegExp(routeCase.path));
+    await expect(page).toHaveURL(routeCase.path);
     await expect(page.getByRole('heading', { name: routeCase.heading })).toBeVisible();
   });
 }
