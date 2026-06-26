@@ -40,15 +40,24 @@
 
 .stock-hero__link {
   align-items: center;
-  background: var(--color-surface);
-  border: var(--border-width-thin) solid var(--color-outline-variant);
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface));
+  border: var(--border-width-thin) solid color-mix(in srgb, var(--color-primary) 28%, var(--color-outline-variant));
   border-radius: var(--radius-pill);
-  color: var(--color-on-surface-variant);
+  color: color-mix(in srgb, var(--color-primary) 80%, var(--color-on-surface));
   display: inline-flex;
   flex: 0 0 auto;
+  font-weight: 700;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-4);
   text-decoration: none;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
+
+  &:hover {
+    background: color-mix(in srgb, var(--color-primary) 14%, var(--color-surface));
+    border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-outline-variant));
+    box-shadow: var(--shadow-soft);
+    transform: translateY(-1px);
+  }
 }
 
 .stock-alert {

@@ -86,11 +86,11 @@
   <!-- ==================== QUICK ACTIONS ==================== -->
   <section class="report-section" aria-label="Acciones rápidas">
     <div class="actions-bar">
-      <button type="button" class="ui-btn" (click)="exportAsPdf()">
+      <button type="button" class="ui-btn report-action-btn report-action-btn--pdf" (click)="exportAsPdf()">
         <ui-icon name="print" [size]="16" [decorative]="true" />
         Exportar PDF
       </button>
-      <button type="button" class="ui-btn" (click)="exportAsExcel()">
+      <button type="button" class="ui-btn report-action-btn report-action-btn--excel" (click)="exportAsExcel()">
         <ui-icon name="receipt_long" [size]="16" [decorative]="true" />
         Exportar Excel
       </button>

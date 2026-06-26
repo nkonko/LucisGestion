@@ -1,8 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RecipesStore } from '../../core/store/recipes.store';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
-import { DIALOG_REF } from '../../core/models/dialog/dialog-tokens.model';
-import { DialogRef } from '../../core/models/dialog/dialog-ref.model';
 import { UiIconComponent } from '../../shared/ui/components';
 
 @Component({
@@ -14,11 +12,6 @@ import { UiIconComponent } from '../../shared/ui/components';
 })
 export class CatalogDialogComponent {
   readonly store = inject(RecipesStore);
-  private dialogRef = inject(DIALOG_REF) as DialogRef<undefined>;
-
-  close(): void {
-    this.dialogRef.close(undefined);
-  }
 
   print(): void {
     const content = document.getElementById('catalog-content');

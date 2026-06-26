@@ -118,6 +118,30 @@
   gap: var(--space-3);
 }
 
+.report-action-btn {
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  padding-inline: var(--space-4);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+
+  &:hover {
+    box-shadow: var(--shadow-soft);
+    transform: translateY(-1px);
+  }
+}
+
+.report-action-btn--pdf {
+  background: color-mix(in srgb, var(--color-primary) 10%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-primary) 30%, var(--color-outline-variant));
+  color: color-mix(in srgb, var(--color-primary) 82%, var(--color-on-surface));
+}
+
+.report-action-btn--excel {
+  background: color-mix(in srgb, var(--color-status-ok) 14%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-status-ok) 36%, var(--color-outline-variant));
+  color: color-mix(in srgb, var(--color-status-ok) 88%, var(--color-on-surface));
+}
+
 // ── Empty state ──────────────────────────────────────────────────────────────
 .empty-state {
   display: flex;
