@@ -16,6 +16,7 @@ describe('SalesStore', () => {
     registerSale: ReturnType<typeof vi.fn>;
     updateSale: ReturnType<typeof vi.fn>;
     updateSaleStatus: ReturnType<typeof vi.fn>;
+    fulfillDraft: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -24,9 +25,10 @@ describe('SalesStore', () => {
       getCollection: vi.fn().mockReturnValue(sales$.asObservable()),
     };
     salesService = {
-      registerSale: vi.fn().mockResolvedValue('sale-1'),
-      updateSale: vi.fn().mockResolvedValue(undefined),
+      registerSale: vi.fn().mockResolvedValue({ saleId: 'sale-1', wasDraft: false }),
+      updateSale: vi.fn().mockResolvedValue({ forcedDraft: false }),
       updateSaleStatus: vi.fn().mockResolvedValue(undefined),
+      fulfillDraft: vi.fn().mockResolvedValue(undefined),
     };
 
     TestBed.configureTestingModule({
@@ -40,7 +42,7 @@ describe('SalesStore', () => {
     store = TestBed.inject(SalesStore);
   });
 
-  it('registers a sale via SalesService', async () => {
+  it('registers a sale via SalesService and returns compound result', async () => {
     const sale: SaleInput = {
       date: Timestamp.now(),
       customerId: null,
@@ -54,9 +56,9 @@ describe('SalesStore', () => {
       notes: '',
     };
 
-    const id = await store.registerSale(sale);
+    const result = await store.registerSale(sale);
 
-    expect(id).toBe('sale-1');
+    expect(result).toEqual({ saleId: 'sale-1', wasDraft: false });
     expect(salesService.registerSale).toHaveBeenCalledWith(sale);
   });
 
@@ -105,6 +107,103 @@ describe('SalesStore', () => {
 
     await registerPromise;
     expect(store.loading()).toBe(false);
+  });
+
+  it('fulfills a draft via SalesService', async () => {
+    sales$.next([
+      {
+        id: 'sale-1',
+        date: Timestamp.now(),
+        customerId: null,
+        customerName: 'CF',
+        items: [{ recipeId: 'rec-1', name: 'Torta', quantity: 2, unitPrice: 100, unitCost: 40 }],
+        total: 200,
+        totalCost: 80,
+        profit: 120,
+        paymentMethod: 'cash',
+        status: 'draft',
+        notes: '',
+      },
+    ]);
+
+    await store.fulfillDraft('sale-1');
+
+    expect(salesService.fulfillDraft).toHaveBeenCalledWith(
+      'sale-1',
+      expect.objectContaining({ id: 'sale-1', status: 'draft' }),
+    );
+  });
+
+  it('tracks loading state during fulfillDraft', async () => {
+    sales$.next([
+      {
+        id: 'sale-1',
+        date: Timestamp.now(),
+        customerId: null,
+        customerName: 'CF',
+        items: [],
+        total: 0,
+        totalCost: 0,
+        profit: 0,
+        paymentMethod: 'cash',
+        status: 'draft',
+        notes: '',
+      },
+    ]);
+
+    const fulfillPromise = store.fulfillDraft('sale-1');
+    expect(store.loading()).toBe(true);
+
+    await fulfillPromise;
+    expect(store.loading()).toBe(false);
+  });
+
+  it('pendingOrders excludes draft sales', () => {
+    sales$.next([
+      {
+        id: 'sale-draft',
+        date: Timestamp.now(),
+        customerId: null,
+        customerName: 'Draft',
+        items: [],
+        total: 0,
+        totalCost: 0,
+        profit: 0,
+        paymentMethod: 'cash',
+        status: 'draft',
+        notes: '',
+      },
+      {
+        id: 'sale-pending',
+        date: Timestamp.now(),
+        customerId: null,
+        customerName: 'Pending',
+        items: [],
+        total: 0,
+        totalCost: 0,
+        profit: 0,
+        paymentMethod: 'cash',
+        status: 'pending',
+        notes: '',
+      },
+      {
+        id: 'sale-production',
+        date: Timestamp.now(),
+        customerId: null,
+        customerName: 'Production',
+        items: [],
+        total: 0,
+        totalCost: 0,
+        profit: 0,
+        paymentMethod: 'cash',
+        status: 'production',
+        notes: '',
+      },
+    ]);
+
+    expect(store.pendingOrders().length).toBe(1);
+    expect(store.pendingOrders()[0].id).toBe('sale-pending');
+    expect(store.pendingOrdersCount()).toBe(1);
   });
 
   it('captures error on failure', async () => {

@@ -34,9 +34,9 @@ export const SalesStore = signalStore(
       async registerSale(sale: SaleInput) {
         patchState(store, { loading: true, error: null });
         try {
-          const saleId = await salesService.registerSale(sale);
+          const result = await salesService.registerSale(sale);
           patchState(store, { loading: false });
-          return saleId;
+          return result;
         } catch (error: unknown) {
           Sentry.captureException(error, {
             tags: { area: 'store', store: 'SalesStore', operation: 'registerSale' },
@@ -50,7 +50,34 @@ export const SalesStore = signalStore(
         patchState(store, { loading: true, error: null });
         try {
           const oldSale = store.sales().find((candidate) => candidate.id === id);
-          await salesService.updateSale(id, updatedSale, oldSale);
+          const result = await salesService.updateSale(id, updatedSale, oldSale);
+          patchState(store, { loading: false });
+          return result;
+        } catch (error: unknown) {
+          patchState(store, { loading: false, error: getErrorMessage(error) });
+          throw error;
+        }
+      },
+
+      async fulfillDraft(id: string) {
+        patchState(store, { loading: true, error: null });
+        try {
+          const sale = store.sales().find((candidate) => candidate.id === id);
+          if (!sale) throw new Error('Venta no encontrada');
+          await salesService.fulfillDraft(id, sale);
+          patchState(store, { loading: false });
+        } catch (error: unknown) {
+          patchState(store, { loading: false, error: getErrorMessage(error) });
+          throw error;
+        }
+      },
+
+      async toggleSalePaid(id: string) {
+        patchState(store, { loading: true, error: null });
+        try {
+          const sale = store.sales().find((candidate) => candidate.id === id);
+          if (!sale) throw new Error('Venta no encontrada');
+          await salesService.toggleSalePaid(id, !sale.isPaid);
           patchState(store, { loading: false });
         } catch (error: unknown) {
           Sentry.captureException(error, {

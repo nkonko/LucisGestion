@@ -5,7 +5,10 @@
       <span class="sale-status" [class]="statusClass">
         {{ statusLabel }}
       </span>
-      @if (sale().status === 'pending' || sale().status === 'production') {
+      <span class="sale-paid-badge" [class.sale-paid-badge--paid]="sale().isPaid" [class.sale-paid-badge--unpaid]="!sale().isPaid">
+        {{ sale().isPaid ? 'Pagado' : 'Impago' }}
+      </span>
+      @if (sale().status === 'pending' || sale().status === 'production' || sale().status === 'draft') {
         <button
           class="ui-icon-btn sale-edit-btn"
           type="button"
@@ -65,6 +68,16 @@
             <ui-icon name="chat" [decorative]="true" />
           </button>
         }
+        <button
+          class="ui-icon-btn"
+          [class.sale-btn-toggle-paid--paid]="sale().isPaid"
+          (click)="requestTogglePaid()"
+          [attr.aria-label]="sale().isPaid ? 'Marcar como no pagado' : 'Marcar como pagado'"
+          [title]="sale().isPaid ? 'Marcar como no pagado' : 'Marcar como pagado'"
+          type="button"
+        >
+          <ui-icon name="banknote" [decorative]="true" />
+        </button>
         @if (sale().status === 'pending') {
           <button class="ui-btn ui-btn-sm sale-btn-production" (click)="requestStatusChange('production')" type="button">
             Producción
@@ -72,7 +85,13 @@
           <button class="ui-btn ui-btn-sm ui-btn-primary" (click)="requestStatusChange('cancelled')" type="button">Cancelar</button>
         }
         @if (sale().status === 'production') {
-          <button class="ui-btn ui-btn-sm sale-btn-deliver" (click)="requestStatusChange('delivered')" type="button">Entregar</button>
+          @if (sale().isPaid) {
+            <button class="ui-btn ui-btn-sm sale-btn-deliver" (click)="requestStatusChange('delivered')" type="button">Entregar</button>
+          }
+          <button class="ui-btn ui-btn-sm ui-btn-primary" (click)="requestStatusChange('cancelled')" type="button">Cancelar</button>
+        }
+        @if (sale().status === 'draft') {
+          <button class="ui-btn ui-btn-sm sale-btn-fulfill" (click)="requestFulfill()" type="button" [disabled]="loading()">Verificar stock</button>
           <button class="ui-btn ui-btn-sm ui-btn-primary" (click)="requestStatusChange('cancelled')" type="button">Cancelar</button>
         }
       </div>

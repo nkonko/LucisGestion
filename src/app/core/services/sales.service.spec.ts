@@ -56,28 +56,32 @@ describe('SalesService', () => {
   });
 
   describe('registerSale', () => {
-    it('validates stock, adds document, applies adjustments, returns ID', async () => {
+    it('creates pending sale with stock deduction when stock is sufficient', async () => {
       const adjustments: StockAdjustmentInput[] = [
         { ingredientId: 'ing-1', ingredientName: 'Harina', delta: -4 },
       ];
       stockService.buildStockAdjustments.mockReturnValue(adjustments);
 
-      const id = await service.registerSale(saleInput);
+      const result = await service.registerSale(saleInput);
 
       expect(stockService.validateStockForCreation).toHaveBeenCalledWith(saleInput.items);
       expect(firestore.addDocument).toHaveBeenCalledWith('sales', saleInput);
       expect(stockService.buildStockAdjustments).toHaveBeenCalledWith(saleInput.items, -1);
       expect(firestore.applyStockAdjustments).toHaveBeenCalledWith('sale-1', 'sale_deduction', adjustments);
-      expect(id).toBe('sale-1');
+      expect(result).toEqual({ saleId: 'sale-1', wasDraft: false });
     });
 
-    it('propagates error from stock validation', async () => {
+    it('creates draft sale skipping stock deduction when stock is insufficient', async () => {
       stockService.validateStockForCreation.mockImplementation(() => {
         throw new Error('Stock insuficiente');
       });
 
-      await expect(service.registerSale(saleInput)).rejects.toThrow('Stock insuficiente');
-      expect(firestore.addDocument).not.toHaveBeenCalled();
+      const result = await service.registerSale(saleInput);
+
+      expect(firestore.addDocument).toHaveBeenCalledWith('sales', expect.objectContaining({ status: 'draft' }));
+      expect(stockService.buildStockAdjustments).not.toHaveBeenCalled();
+      expect(firestore.applyStockAdjustments).not.toHaveBeenCalled();
+      expect(result).toEqual({ saleId: 'sale-1', wasDraft: true });
     });
 
     it('propagates error when addDocument fails', async () => {
@@ -149,13 +153,70 @@ describe('SalesService', () => {
       );
     });
 
-    it('propagates error from stock validation on edition', async () => {
-      const updatedSale = { ...saleInput, items: [{ recipeId: 'rec-1', name: 'Torta', quantity: 10, unitPrice: 100, unitCost: 40 }] };
+    it('forces draft when stock validation fails on edition', async () => {
+      const updatedItems = [{ recipeId: 'rec-1', name: 'Torta', quantity: 10, unitPrice: 100, unitCost: 40 }];
+      const updatedSale = { ...saleInput, items: updatedItems };
+      const restockAdjustments: StockAdjustmentInput[] = [
+        { ingredientId: 'ing-1', ingredientName: 'Harina', delta: 4 },
+      ];
+      stockService.buildStockAdjustments.mockReturnValue(restockAdjustments);
       stockService.validateStockForEdition.mockImplementation(() => {
-        throw new Error('Stock insuficiente para modificar la venta');
+        throw new Error('Stock insuficiente');
       });
 
-      await expect(service.updateSale('sale-1', updatedSale, oldSale)).rejects.toThrow('Stock insuficiente para modificar la venta');
+      const result = await service.updateSale('sale-1', updatedSale, oldSale);
+
+      expect(stockService.validateStockForEdition).toHaveBeenCalledWith(saleInput.items, updatedItems);
+      expect(stockService.buildStockAdjustments).toHaveBeenCalledWith(saleInput.items, 1);
+      expect(firestore.applyStockAdjustments).toHaveBeenCalledWith('sale-1', 'edit_restock', restockAdjustments);
+      expect(firestore.updateDocument).toHaveBeenCalledWith('sales', 'sale-1', expect.objectContaining({ status: 'draft', items: updatedItems }));
+      expect(result).toEqual({ forcedDraft: true });
+    });
+
+    it('edits draft sale without stock operations', async () => {
+      const draftOldSale: Sale = { ...oldSale, status: 'draft' };
+      const updatedItems = [{ recipeId: 'rec-1', name: 'Torta', quantity: 3, unitPrice: 100, unitCost: 40 }];
+      const updatedSale = { ...saleInput, items: updatedItems };
+
+      const result = await service.updateSale('sale-1', updatedSale, draftOldSale);
+
+      expect(stockService.validateStockForEdition).not.toHaveBeenCalled();
+      expect(stockService.buildStockAdjustments).not.toHaveBeenCalled();
+      expect(firestore.applyStockAdjustments).not.toHaveBeenCalled();
+      expect(firestore.updateDocument).toHaveBeenCalledWith('sales', 'sale-1', expect.objectContaining({ items: updatedItems }));
+      expect(result).toEqual({ forcedDraft: false });
+    });
+  });
+
+  describe('fulfillDraft', () => {
+    const draftSale: Sale = {
+      id: 'sale-1',
+      ...saleInput,
+      status: 'draft',
+    };
+
+    it('validates stock, deducts, and updates status to pending when stock is sufficient', async () => {
+      const adjustments: StockAdjustmentInput[] = [
+        { ingredientId: 'ing-1', ingredientName: 'Harina', delta: -4 },
+      ];
+      stockService.buildStockAdjustments.mockReturnValue(adjustments);
+
+      await service.fulfillDraft('sale-1', draftSale);
+
+      expect(stockService.validateStockForCreation).toHaveBeenCalledWith(draftSale.items);
+      expect(stockService.buildStockAdjustments).toHaveBeenCalledWith(draftSale.items, -1);
+      expect(firestore.applyStockAdjustments).toHaveBeenCalledWith('sale-1', 'sale_deduction', adjustments);
+      expect(firestore.updateDocument).toHaveBeenCalledWith('sales', 'sale-1', { status: 'pending' });
+    });
+
+    it('throws error when stock is still insufficient', async () => {
+      stockService.validateStockForCreation.mockImplementation(() => {
+        throw new Error('Stock insuficiente');
+      });
+
+      await expect(service.fulfillDraft('sale-1', draftSale)).rejects.toThrow('Stock insuficiente');
+      expect(stockService.buildStockAdjustments).not.toHaveBeenCalled();
+      expect(firestore.applyStockAdjustments).not.toHaveBeenCalled();
       expect(firestore.updateDocument).not.toHaveBeenCalled();
     });
   });
@@ -189,6 +250,16 @@ describe('SalesService', () => {
 
     it('does not restock when cancelled but no sale provided', async () => {
       await service.updateSaleStatus('sale-1', 'cancelled', undefined);
+
+      expect(firestore.updateDocument).toHaveBeenCalledWith('sales', 'sale-1', { status: 'cancelled' });
+      expect(stockService.buildStockAdjustments).not.toHaveBeenCalled();
+      expect(firestore.applyStockAdjustments).not.toHaveBeenCalled();
+    });
+
+    it('does not restock when cancelling a draft sale', async () => {
+      const draftSale: Sale = { ...sale, status: 'draft' };
+
+      await service.updateSaleStatus('sale-1', 'cancelled', draftSale);
 
       expect(firestore.updateDocument).toHaveBeenCalledWith('sales', 'sale-1', { status: 'cancelled' });
       expect(stockService.buildStockAdjustments).not.toHaveBeenCalled();

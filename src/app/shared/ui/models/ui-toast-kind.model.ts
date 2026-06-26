@@ -1,1 +1,1 @@
-export type UiToastKind = 'success' | 'error';
+export type UiToastKind = 'success' | 'error' | 'info';
