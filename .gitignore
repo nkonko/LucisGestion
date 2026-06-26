@@ -43,11 +43,16 @@ firebase-debug.log
 .firebase/
 .atl/
 .sdd/
+.playwright-report/
+.test-results/
 # Generated PDF reports
 *.pdf
 
 # Local-only environment overrides
 src/environments/environment.local.ts
+
+# Environment variables (SENTRY_AUTH_TOKEN, etc.)
+.env
 
 # System files
 .DS_Store

@@ -38,6 +38,7 @@ jobs:
       - name: Generate production environment file
         env:
           ALLOWED_EMAILS: ${{ vars.ALLOWED_EMAILS }}
+          SENTRY_DSN: ${{ vars.SENTRY_DSN }}
           FIREBASE_API_KEY: ${{ vars.FIREBASE_API_KEY }}
           FIREBASE_AUTH_DOMAIN: ${{ vars.FIREBASE_AUTH_DOMAIN }}
           FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
@@ -85,8 +86,12 @@ jobs:
             baseUrl: clean(process.env.GEMINI_BASE_URL) || 'https://generativelanguage.googleapis.com/v1beta/models',
           };
 
+          const sentry = {
+            dsn: clean(process.env.SENTRY_DSN),
+          };
+
           const contents = `export const environment = ${JSON.stringify(
-            { production: true, allowedEmails: emails, firebase, gemini },
+            { production: true, sentry, allowedEmails: emails, firebase, gemini },
             null,
             2,
           )};\n`;

@@ -1,4 +1,5 @@
 import { Injectable, inject, isDevMode } from '@angular/core';
+import * as Sentry from '@sentry/angular';
 import {
   Auth,
   GoogleAuthProvider,
@@ -97,22 +98,46 @@ export class AuthService {
 
   private async handleAuthChange(user: User | null): Promise<void> {
     if (!user) {
+      Sentry.setUser(null);
       this.authStore.setAuthState(null, true);
       return;
     }
 
     const email = user.email?.toLowerCase() ?? '';
     if (!environment.allowedEmails.includes(email)) {
+      Sentry.captureMessage('Intento de login con email no autorizado', {
+        level: 'warning',
+        tags: { area: 'auth', operation: 'unauthorized_email' },
+        extra: { email },
+      });
       await signOut(this.auth);
+      Sentry.setUser(null);
       this.authStore.setAuthState(null, true);
       return;
     }
 
     try {
       const appUser = await this.loadOrCreateProfile(user);
+      Sentry.setUser({
+        id: appUser.uid,
+        email: appUser.email,
+        username: appUser.displayName,
+      });
+      Sentry.setTag('user_role', appUser.role);
       this.authStore.setAuthState(appUser, true);
     } catch (error: unknown) {
       if (isDevMode()) console.error('Login failed - unable to load user profile:', error);
+      Sentry.captureException(error, {
+        tags: {
+          area: 'auth',
+          operation: 'handle_auth_change',
+        },
+        extra: {
+          uid: user.uid,
+          email,
+        },
+      });
+      Sentry.setUser(null);
       this.authStore.setAuthState(null, true);
     }
   }

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import * as Sentry from '@sentry/angular';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import type {
@@ -66,6 +67,12 @@ export class FinancialReportPdfService {
   });
 
   async exportReport(data: FinancialReportPdfData): Promise<void> {
+    return Sentry.startSpan(
+      {
+        name: 'exportReportPdf',
+        op: 'function',
+      },
+      async () => {
     const business = this.getBusinessInfo();
     const logoDataUrl = await this.createCupcakeMarkDataUrl();
     const conclusions = this.buildConclusions(data);
@@ -200,6 +207,7 @@ export class FinancialReportPdfService {
 
     this.renderFooter(detailedPdf, 'Detalle financiero');
     detailedPdf.save(this.buildFileName(data.generatedAt));
+    });
   }
 
   private formatCurrency(amount: number): string {

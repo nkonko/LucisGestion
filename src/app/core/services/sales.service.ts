@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import * as Sentry from '@sentry/angular';
 import { FirestoreService } from './firestore.service';
 import { StockService } from './stock.service';
 import { Sale, SaleInput, SaleStatus } from '../models/sale';
@@ -110,12 +111,23 @@ export class SalesService {
     await this.firestoreService.updateDocument('sales', id, { isPaid });
   }
 
-  async updateSaleStatus(id: string, status: Sale['status'], sale: Sale | undefined): Promise<void> {
-    await this.firestoreService.updateDocument('sales', id, { status });
+  async updateSaleStatus(
+    id: string,
+    status: Sale['status'],
+    sale: Sale | undefined,
+  ): Promise<void> {
+    return Sentry.startSpan(
+      {
+        name: 'updateSaleStatus',
+        op: 'transaction',
+      },
+      async () => {
+        await this.firestoreService.updateDocument('sales', id, { status });
 
     if (status === 'cancelled' && sale && sale.status !== 'draft') {
       const adjustments = this.stockService.buildStockAdjustments(sale.items, 1);
       await this.firestoreService.applyStockAdjustments(id, 'cancellation_restock', adjustments);
     }
   }
+  )}
 }

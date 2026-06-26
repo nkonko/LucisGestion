@@ -1,14 +1,17 @@
 #!/usr/bin/env node
 import { execSync } from 'child_process';
+import { writeFileSync } from 'fs';
 import process from 'process';
 
 const args = process.argv.slice(2);
 const version = args[0];
+const skipUpload = args.includes('--skip-upload');
 
 // Validar que se pasó versión
 if (!version) {
   console.error('❌ Error: Debes pasar la versión como argumento');
   console.error('Uso: pnpm release -- v0.1.0');
+  console.error('     pnpm release -- v0.1.0 --skip-upload  (sin subir source maps)');
   process.exit(1);
 }
 
@@ -32,12 +35,38 @@ try {
   process.exit(1);
 }
 
-// Validar que no haya cambios pendientes
+const versionWithoutV = version.replace(/^v/, '');
+
+// 1. Actualizar version.ts
+console.log(`📝 Actualizando src/environments/version.ts a ${versionWithoutV}...`);
+writeFileSync(
+  'src/environments/version.ts',
+  `/**
+ * Version del proyecto, actualizada por create-release.mjs al hacer una release.
+ * No modificar manualmente.
+ */
+export const version = '${versionWithoutV}';
+`,
+  'utf-8',
+);
+console.log('✅ version.ts actualizado');
+
+// 2. Commitear el cambio de versión
+try {
+  execSync('git add src/environments/version.ts', { stdio: 'inherit' });
+  execSync(`git commit -m "chore: bump version to ${versionWithoutV}"`, { stdio: 'inherit' });
+  console.log(`✅ Commit de versión creado`);
+} catch {
+  console.error('❌ Error al commitear el cambio de versión');
+  process.exit(1);
+}
+
+// 3. Validar que no haya otros cambios pendientes
 try {
   const status = execSync('git status --porcelain').toString().trim();
   if (status) {
-    console.error('❌ Error: Hay cambios sin commitear. Commit primero con:');
-    console.error('   git add . && git commit -m "message"');
+    console.error(`❌ Error: Hay cambios sin commitear además del version.ts:`);
+    console.error(status);
     process.exit(1);
   }
 } catch {
@@ -45,7 +74,7 @@ try {
   process.exit(1);
 }
 
-// Verificar que el tag no existe ya
+// 4. Verificar que el tag no existe ya
 try {
   execSync(`git rev-parse ${version}`, { stdio: 'pipe' });
   console.error(`❌ Error: El tag '${version}' ya existe`);
@@ -55,9 +84,35 @@ try {
   // El tag no existe, está bien
 }
 
-// Crear el tag anotado
+// 5. Build de producción
+console.log('\n🏗️  Build de producción...');
 try {
-  console.log(`📝 Creando tag '${version}'...`);
+  execSync('pnpm build', { stdio: 'inherit' });
+  console.log('✅ Build completado');
+} catch {
+  console.error('❌ Error en el build');
+  process.exit(1);
+}
+
+// 6. Subir source maps a Sentry (a menos que se haya explicitado --skip-upload)
+if (!skipUpload) {
+  console.log('\n📤 Subiendo source maps a Sentry...');
+  try {
+    execSync(`node scripts/upload-sourcemaps.mjs ${version}`, {
+      stdio: 'inherit',
+    });
+  } catch {
+    console.error('❌ Error al subir source maps. Continuando con el release...');
+    console.error('   Podés subirlos después con:');
+    console.error(`   node scripts/upload-sourcemaps.mjs ${version}`);
+  }
+} else {
+  console.log('\n⏭️  Skip de upload de source maps');
+}
+
+// 7. Crear el tag anotado
+try {
+  console.log(`\n📝 Creando tag '${version}'...`);
   execSync(`git tag -a ${version} -m "Release ${version}"`, { stdio: 'inherit' });
   console.log(`✅ Tag '${version}' creado localmente`);
 } catch {
@@ -65,9 +120,9 @@ try {
   process.exit(1);
 }
 
-// Pushear el tag a origin
+// 8. Pushear el tag a origin
 try {
-  console.log(`📤 Pusheando tag '${version}' a origin...`);
+  console.log(`\n📤 Pusheando tag '${version}' a origin...`);
   execSync(`git push origin ${version}`, { stdio: 'inherit' });
   console.log(`✅ Tag '${version}' pusheado a GitHub`);
   console.log(`🚀 El workflow Firebase Release se ejecutará automáticamente`);
