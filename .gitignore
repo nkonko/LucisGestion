@@ -45,6 +45,7 @@ firebase-debug.log
 .sdd/
 .playwright-report/
 .test-results/
+
 # Generated PDF reports
 *.pdf
 
@@ -57,3 +58,8 @@ src/environments/environment.local.ts
 # System files
 .DS_Store
 Thumbs.db
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/

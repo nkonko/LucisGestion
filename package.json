@@ -15,7 +15,8 @@
     "screenshot:mock": "node scripts/capture-mock.mjs",
     "lint": "ng lint",
     "release": "node scripts/create-release.mjs",
-    "coverage:check": "node scripts/check-coverage.mjs"
+    "coverage:check": "node scripts/check-coverage.mjs",
+    "e2e": "ng e2e"
   },
   "private": true,
   "packageManager": "pnpm@11.1.1",
@@ -46,6 +47,7 @@
     "@angular/cli": "^22.0.4",
     "@angular/compiler-cli": "^22.0.2",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "1.61.0",
     "@tailwindcss/postcss": "^4.3.1",
     "@vitest/coverage-v8": "^4.1.9",
     "angular-eslint": "22.0.0",
@@ -53,7 +55,8 @@
     "eslint-plugin-unused-imports": "^4.4.1",
     "firebase-tools": "^15.22.2",
     "jsdom": "^29.1.1",
-    "playwright": "^1.61.1",
+    "playwright-ng-schematics": "^22.0.0",
+    "playwright": "1.61.0",
     "postcss": "^8.5.15",
     "prettier": "^3.8.4",
     "tailwindcss": "^4.3.1",

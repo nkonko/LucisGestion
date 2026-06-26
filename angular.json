@@ -3,9 +3,7 @@
   "version": 1,
   "cli": {
     "packageManager": "pnpm",
-    "schematicCollections": [
-      "angular-eslint"
-    ],
+    "schematicCollections": ["angular-eslint", "playwright-ng-schematics"],
     "analytics": false
   },
   "newProjectRoot": "projects",
@@ -98,6 +96,17 @@
           "builder": "@angular-eslint/builder:lint",
           "options": {
             "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
+          }
+        },
+        "e2e": {
+          "builder": "playwright-ng-schematics:playwright",
+          "options": {
+            "devServerTarget": "lucis-gestion:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "lucis-gestion:serve:production"
+            }
           }
         }
       }

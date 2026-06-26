@@ -1,5 +1,7 @@
 # Lucis Gestión
 
+[![E2E Playwright](https://github.com/nkonko/LucisGestion/actions/workflows/e2e.yml/badge.svg)](https://github.com/nkonko/LucisGestion/actions/workflows/e2e.yml)
+
 Sistema de gestión para pastelería artesanal. Permite administrar ingredientes, recetas con costeo automático, ventas con control de stock, clientes y dashboard de métricas.
 
 ## Tech Stack
@@ -32,6 +34,7 @@ pnpm install
 | `pnpm start:mock` | **Servidor con datos de prueba** (sin Firebase, sin login) |
 | `pnpm build` | Build de producción |
 | `pnpm test` | Tests unitarios con Vitest |
+| `pnpm e2e` | Tests E2E con Playwright |
 
 ## Modo Mock (demo sin Firebase)
 
