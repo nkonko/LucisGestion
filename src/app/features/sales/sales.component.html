@@ -24,6 +24,7 @@
     <span>Estado</span>
     <select class="ui-select" (change)="onStatusFilterChange($event)" [value]="selectedStatus() ?? ''">
       <option value="">Todos los estados</option>
+      <option value="draft">{{ statusDisplay.draft }}</option>
       <option value="pending">{{ statusDisplay.pending }}</option>
       <option value="production">{{ statusDisplay.production }}</option>
       <option value="delivered">{{ statusDisplay.delivered }}</option>
@@ -56,9 +57,12 @@
   @for (sale of filteredSales(); track sale.id) {
     <app-sales-card
       [sale]="sale"
+      [loading]="store.loading()"
+      (togglePaid)="toggleSalePaid($event)"
       (editRequested)="onEditRequested($event)"
       (whatsappRequested)="sendWhatsApp($event)"
       (statusChangeRequested)="onStatusChange($event)"
+      (fulfill)="fulfillDraft($event)"
     />
   }
 </div>

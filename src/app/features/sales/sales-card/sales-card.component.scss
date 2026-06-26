@@ -28,6 +28,10 @@
   height: calc(var(--size-icon-button) - var(--space-1));
 }
 
+.sale-btn-toggle-paid--paid {
+  color: var(--color-success);
+}
+
 .sale-customer-name {
   font-size: var(--size-font-md);
   font-weight: 600;
@@ -49,6 +53,26 @@
   font-size: var(--size-font-2xs);
   color: var(--color-on-surface-variant);
   text-transform: capitalize;
+}
+
+.sale-paid-badge {
+  font-size: var(--size-font-2xs);
+  font-weight: 600;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-chip);
+  white-space: nowrap;
+
+  &--paid {
+    background: var(--color-success);
+    color: var(--color-success-foreground);
+    border: var(--border-width-thin) solid var(--color-success);
+  }
+
+  &--unpaid {
+    background: var(--color-warning);
+    color: var(--color-on-primary);
+    border: var(--border-width-thin) solid var(--color-warning);
+  }
 }
 
 .sale-card-items {
@@ -162,6 +186,16 @@
 
 .sale-btn-deliver:hover:not(:disabled) {
   background: color-mix(in srgb, var(--color-success) 86%, black);
+}
+
+.sale-btn-fulfill {
+  background: var(--color-warning);
+  border-color: var(--color-warning);
+  color: var(--color-on-primary);
+}
+
+.sale-btn-fulfill:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-warning) 86%, black);
 }
 
 .sale-total {

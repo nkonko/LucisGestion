@@ -49,6 +49,9 @@ jobs:
           cat > src/environments/environment.ts <<EOF
           export const environment = {
             production: false,
+            sentry: {
+              dsn: '${{ vars.SENTRY_DSN }}',
+            },
             allowedEmails: [$ALLOWED_EMAILS_TS],
             gemini: {
               apiKey: '${{ vars.GEMINI_API_KEY }}',

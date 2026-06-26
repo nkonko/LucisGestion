@@ -1,6 +1,7 @@
-export type SaleStatus = 'pending' | 'production' | 'delivered' | 'cancelled';
+export type SaleStatus = 'draft' | 'pending' | 'production' | 'delivered' | 'cancelled';
 
 export const SALE_STATUS_DISPLAY: Record<SaleStatus, string> = {
+  draft: 'Borrador',
   pending: 'Pendiente',
   production: 'En Producción',
   delivered: 'Entregado',
@@ -8,6 +9,7 @@ export const SALE_STATUS_DISPLAY: Record<SaleStatus, string> = {
 };
 
 export const SALE_STATUS_CLASS: Record<SaleStatus, string> = {
+  draft: 'status-draft',
   pending: 'stock-warning',
   production: 'stock-warning',
   delivered: 'stock-ok',

@@ -13,13 +13,18 @@ import { SALE_STATUS_CLASS, SALE_STATUS_DISPLAY } from '../../../core/models/sal
 })
 export class SalesCardComponent {
   readonly sale = input.required<Sale>();
+  readonly loading = input(false);
 
+  readonly togglePaid = output<Sale>();
   readonly whatsappRequested = output<Sale>();
   readonly statusChangeRequested = output<{ sale: Sale; status: SaleStatus }>();
   readonly editRequested = output<Sale>();
+  readonly fulfill = output<Sale>();
 
   get statusLabel(): string {
     switch (this.sale().status) {
+      case 'draft':
+        return SALE_STATUS_DISPLAY.draft;
       case 'pending':
         return SALE_STATUS_DISPLAY.pending;
       case 'production':
@@ -35,6 +40,8 @@ export class SalesCardComponent {
 
   get statusClass(): string {
     switch (this.sale().status) {
+      case 'draft':
+        return SALE_STATUS_CLASS.draft;
       case 'pending':
         return SALE_STATUS_CLASS.pending;
       case 'production':
@@ -73,6 +80,14 @@ export class SalesCardComponent {
     return `${weekday} ${day} de ${month} de ${year}`;
   }
 
+  requestTogglePaid(): void {
+    this.togglePaid.emit(this.sale());
+  }
+
+  requestFulfill(): void {
+    this.fulfill.emit(this.sale());
+  }
+
   requestEdit(): void {
     this.editRequested.emit(this.sale());
   }
@@ -90,7 +105,8 @@ export class SalesCardComponent {
       case 'pending':
         return 'production';
       case 'production':
-        return 'delivered';
+        return this.sale().isPaid ? 'delivered' : null;
+      case 'draft':
       case 'delivered':
       case 'cancelled':
         return null;

@@ -1,5 +1,6 @@
 import { computed, inject } from '@angular/core';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
+import * as Sentry from '@sentry/angular';
 import { FirestoreService } from '../services/firestore.service';
 import {
   Ingredient,
@@ -59,6 +60,9 @@ export const IngredientsStore = signalStore(
           patchState(store, { loading: false });
           return id;
         } catch (error: unknown) {
+          Sentry.captureException(error, {
+            tags: { area: 'store', store: 'IngredientsStore', operation: 'createIngredient' },
+          });
           patchState(store, { loading: false, error: getErrorMessage(error) });
           throw error;
         }
@@ -88,6 +92,9 @@ export const IngredientsStore = signalStore(
 
           patchState(store, { loading: false });
         } catch (error: unknown) {
+          Sentry.captureException(error, {
+            tags: { area: 'store', store: 'IngredientsStore', operation: 'updateIngredient' },
+          });
           patchState(store, { loading: false, error: getErrorMessage(error) });
           throw error;
         }
@@ -97,6 +104,9 @@ export const IngredientsStore = signalStore(
         try {
           return await fs.softDelete('ingredients', id);
         } catch (error: unknown) {
+          Sentry.captureException(error, {
+            tags: { area: 'store', store: 'IngredientsStore', operation: 'deleteIngredient' },
+          });
           patchState(store, { error: getErrorMessage(error) });
           throw error;
         }
@@ -136,6 +146,9 @@ export const IngredientsStore = signalStore(
           patchState(store, { loading: false });
           return expenseId;
         } catch (error: unknown) {
+          Sentry.captureException(error, {
+            tags: { area: 'store', store: 'IngredientsStore', operation: 'registerSupplyPurchase' },
+          });
           patchState(store, { loading: false, error: getErrorMessage(error) });
           throw error;
         }

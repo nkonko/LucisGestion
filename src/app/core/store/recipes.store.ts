@@ -1,5 +1,6 @@
 import { computed, inject } from '@angular/core';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
+import * as Sentry from '@sentry/angular';
 import { FirestoreService } from '../services/firestore.service';
 import { Recipe, RecipeInput } from '../models/recipe';
 import { where, orderBy } from '@angular/fire/firestore';
@@ -63,6 +64,9 @@ export const RecipesStore = signalStore(
           patchState(store, { loading: false });
           return id;
         } catch (error: unknown) {
+          Sentry.captureException(error, {
+            tags: { area: 'store', store: 'RecipesStore', operation: 'createRecipe' },
+          });
           patchState(store, { loading: false, error: getErrorMessage(error) });
           throw error;
         }
@@ -84,6 +88,9 @@ export const RecipesStore = signalStore(
           await fs.updateDocument('recipes', id, nextChanges as Record<string, unknown>);
           patchState(store, { loading: false });
         } catch (error: unknown) {
+          Sentry.captureException(error, {
+            tags: { area: 'store', store: 'RecipesStore', operation: 'updateRecipe' },
+          });
           patchState(store, { loading: false, error: getErrorMessage(error) });
           throw error;
         }
@@ -98,6 +105,9 @@ export const RecipesStore = signalStore(
             active: true,
           } as RecipeInput);
         } catch (error: unknown) {
+          Sentry.captureException(error, {
+            tags: { area: 'store', store: 'RecipesStore', operation: 'duplicateRecipe' },
+          });
           patchState(store, { error: getErrorMessage(error) });
           throw error;
         }
@@ -107,6 +117,9 @@ export const RecipesStore = signalStore(
         try {
           return await fs.softDelete('recipes', id);
         } catch (error: unknown) {
+          Sentry.captureException(error, {
+            tags: { area: 'store', store: 'RecipesStore', operation: 'deleteRecipe' },
+          });
           patchState(store, { error: getErrorMessage(error) });
           throw error;
         }

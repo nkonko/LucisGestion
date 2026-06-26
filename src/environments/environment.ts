@@ -4,6 +4,9 @@
  */
 export const environment = {
   production: false,
+  sentry: {
+    dsn: 'https://f5df02e2752c73d6f764e87e570482c0@o4511600692035584.ingest.de.sentry.io/4511600698851408',
+  },
   allowedEmails: ['YOUR_EMAIL@example.com'],
   gemini: {
     apiKey: 'YOUR_GEMINI_API_KEY',

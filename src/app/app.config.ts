@@ -1,11 +1,12 @@
 import {
   ApplicationConfig,
+  ErrorHandler,
   provideAppInitializer,
   provideBrowserGlobalErrorListeners,
   isDevMode,
   inject,
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import {
   FirebaseApp,
   provideFirebaseApp,
@@ -21,6 +22,7 @@ import {
 import { routes } from './app.routes';
 import { provideServiceWorker } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import * as Sentry from '@sentry/angular';
 import { AuthService } from './core/services/auth.service';
 import { FirestoreService } from './core/services/firestore.service';
 import { DemoAwareFirestoreService } from './core/services/demo-aware-firestore.service';
@@ -33,6 +35,17 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
+    {
+      provide: ErrorHandler,
+      useValue: Sentry.createErrorHandler(),
+    },
+    {
+      provide: Sentry.TraceService,
+      deps: [Router],
+    },
+    provideAppInitializer(() => {
+      inject(Sentry.TraceService);
+    }),
     { provide: FirestoreService, useClass: DemoAwareFirestoreService },
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideFirestore((injector) =>

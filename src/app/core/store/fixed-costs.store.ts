@@ -1,6 +1,7 @@
 import { computed, inject } from '@angular/core';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { toSignal } from '@angular/core/rxjs-interop';
+import * as Sentry from '@sentry/angular';
 import { FirestoreService } from '../services/firestore.service';
 import {
   FixedCostMonthDoc,
@@ -146,6 +147,10 @@ export const FixedCostsStore = signalStore(
           });
           patchState(store, { loading: false });
         } catch (error: unknown) {
+          Sentry.captureException(error, {
+            tags: { area: 'store', store: 'FixedCostsStore', operation: 'createForMonth' },
+            extra: { monthKey },
+          });
           patchState(store, { loading: false, error: getErrorMessage(error) });
           throw error;
         }
@@ -172,6 +177,10 @@ export const FixedCostsStore = signalStore(
           });
           patchState(store, { loading: false });
         } catch (error: unknown) {
+          Sentry.captureException(error, {
+            tags: { area: 'store', store: 'FixedCostsStore', operation: 'updateForMonth' },
+            extra: { monthKey, lineageId },
+          });
           patchState(store, { loading: false, error: getErrorMessage(error) });
           throw error;
         }
@@ -189,6 +198,10 @@ export const FixedCostsStore = signalStore(
           await fs.deleteDocument(COLLECTION, id);
           patchState(store, { loading: false });
         } catch (error: unknown) {
+          Sentry.captureException(error, {
+            tags: { area: 'store', store: 'FixedCostsStore', operation: 'deleteForMonth' },
+            extra: { monthKey, lineageId },
+          });
           patchState(store, { loading: false, error: getErrorMessage(error) });
           throw error;
         }
@@ -203,6 +216,10 @@ export const FixedCostsStore = signalStore(
           }
           patchState(store, { loading: false });
         } catch (error: unknown) {
+          Sentry.captureException(error, {
+            tags: { area: 'store', store: 'FixedCostsStore', operation: 'revertMonthToInherited' },
+            extra: { monthKey },
+          });
           patchState(store, { loading: false, error: getErrorMessage(error) });
           throw error;
         }

@@ -4,6 +4,9 @@
  */
 export const environment = {
   production: false,
+  sentry: {
+    dsn: '',
+  },
   allowedEmails: ['YOUR_EMAIL@example.com'],
   gemini: {
     apiKey: 'YOUR_GEMINI_API_KEY',

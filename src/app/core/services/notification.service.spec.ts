@@ -50,4 +50,11 @@ describe('NotificationService', () => {
     expect(toastServiceMock.show).toHaveBeenCalledTimes(1);
     expect(toastServiceMock.show).toHaveBeenCalledWith('Error: No se pudo procesar', 'error', 4100, '✕');
   });
+
+  it('delegates info notifications preserving the message and duration', () => {
+    service.info('Operación completada parcialmente', 4500);
+
+    expect(toastServiceMock.show).toHaveBeenCalledTimes(1);
+    expect(toastServiceMock.show).toHaveBeenCalledWith('Operación completada parcialmente', 'info', 4500, 'ℹ');
+  });
 });

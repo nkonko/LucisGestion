@@ -1,4 +1,5 @@
 import { Injectable, InjectionToken, inject } from '@angular/core';
+import * as Sentry from '@sentry/angular';
 import {
   Firestore,
   collection,
@@ -107,87 +108,94 @@ export class FirestoreService {
   }
 
   async createBackup(onProgress?: BackupProgressCallback): Promise<AppBackupFile> {
-    onProgress?.(0);
-    const collections = this.createEmptyBackupCollections();
+    return this.runFirestoreOperation('create_backup', async () => {
+      onProgress?.(0);
+      const collections = this.createEmptyBackupCollections();
 
-    for (const [index, collectionName] of APP_DATA_COLLECTIONS.entries()) {
-      const ref = this.firestoreApi.collection(this.firestore, collectionName);
-      const snapshot = await this.firestoreApi.getDocs(ref);
-      this.setBackupDocuments(
+      for (const [index, collectionName] of APP_DATA_COLLECTIONS.entries()) {
+        const ref = this.firestoreApi.collection(this.firestore, collectionName);
+        const snapshot = await this.firestoreApi.getDocs(ref);
+        this.setBackupDocuments(
+          collections,
+          collectionName,
+          snapshot.docs.map((docSnapshot) => ({
+            id: docSnapshot.id,
+            data: this.serializeRecord(docSnapshot.data() as FirestoreData),
+          })),
+        );
+        onProgress?.(Math.round(((index + 1) / APP_DATA_COLLECTIONS.length) * 100));
+      }
+
+      return {
+        schema: 'lucis-gestion-backup',
+        version: 1,
+        generatedAt: new Date().toISOString(),
         collections,
-        collectionName,
-        snapshot.docs.map((docSnapshot) => ({
-          id: docSnapshot.id,
-          data: this.serializeRecord(docSnapshot.data() as FirestoreData),
-        })),
-      );
-      onProgress?.(Math.round(((index + 1) / APP_DATA_COLLECTIONS.length) * 100));
-    }
-
-    return {
-      schema: 'lucis-gestion-backup',
-      version: 1,
-      generatedAt: new Date().toISOString(),
-      collections,
-    };
+      };
+    });
   }
 
   async restoreBackup(backup: AppBackupFile, onProgress?: BackupProgressCallback): Promise<void> {
     this.assertBackupFile(backup);
-    onProgress?.(0);
 
-    const staleDocuments = new Map<string, string[]>();
-    let operationCount = 0;
+    await this.runFirestoreOperation('restore_backup', async () => {
+      onProgress?.(0);
 
-    for (const collectionName of APP_DATA_COLLECTIONS) {
-      const ref = this.firestoreApi.collection(this.firestore, collectionName);
-      const snapshot = await this.firestoreApi.getDocs(ref);
-      const ids = snapshot.docs.map((docSnapshot) => docSnapshot.id);
-      const backupDocuments = this.getBackupDocuments(backup.collections, collectionName);
-      const backupIds = new Set(backupDocuments.map((document) => document.id));
-      const staleIds = ids.filter((id) => !backupIds.has(id));
-      staleDocuments.set(collectionName, staleIds);
-      operationCount += staleIds.length + backupDocuments.length;
-    }
+      const staleDocuments = new Map<string, string[]>();
+      let operationCount = 0;
 
-    if (operationCount === 0) {
+      for (const collectionName of APP_DATA_COLLECTIONS) {
+        const ref = this.firestoreApi.collection(this.firestore, collectionName);
+        const snapshot = await this.firestoreApi.getDocs(ref);
+        const ids = snapshot.docs.map((docSnapshot) => docSnapshot.id);
+        const backupDocuments = this.getBackupDocuments(backup.collections, collectionName);
+        const backupIds = new Set(backupDocuments.map((document) => document.id));
+        const staleIds = ids.filter((id) => !backupIds.has(id));
+        staleDocuments.set(collectionName, staleIds);
+        operationCount += staleIds.length + backupDocuments.length;
+      }
+
+      if (operationCount === 0) {
+        onProgress?.(100);
+        return;
+      }
+
+      let completedOperations = 0;
+      const updateProgress = (completed: number): void => {
+        completedOperations += completed;
+        onProgress?.(Math.min(100, Math.round((completedOperations / operationCount) * 100)));
+      };
+
+      for (const collectionName of APP_DATA_COLLECTIONS) {
+        const documents = this.getBackupDocuments(backup.collections, collectionName);
+        for (const chunk of this.chunk(documents, 450)) {
+          const batch = this.firestoreApi.writeBatch(this.firestore);
+          for (const backupDocument of chunk) {
+            const ref = this.firestoreApi.doc(this.firestore, collectionName, backupDocument.id);
+            batch.set(ref, this.deserializeRecord(backupDocument.data));
+          }
+          await batch.commit();
+          updateProgress(chunk.length);
+        }
+      }
+
+      for (const collectionName of APP_DATA_COLLECTIONS) {
+        const ids = staleDocuments.get(collectionName) ?? [];
+        for (const chunk of this.chunk(ids, 450)) {
+          const batch = this.firestoreApi.writeBatch(this.firestore);
+          for (const id of chunk) {
+            const ref = this.firestoreApi.doc(this.firestore, collectionName, id);
+            batch.delete(ref);
+          }
+          await batch.commit();
+          updateProgress(chunk.length);
+        }
+      }
+
       onProgress?.(100);
-      return;
-    }
-
-    let completedOperations = 0;
-    const updateProgress = (completed: number): void => {
-      completedOperations += completed;
-      onProgress?.(Math.min(100, Math.round((completedOperations / operationCount) * 100)));
-    };
-
-    for (const collectionName of APP_DATA_COLLECTIONS) {
-      const documents = this.getBackupDocuments(backup.collections, collectionName);
-      for (const chunk of this.chunk(documents, 450)) {
-        const batch = this.firestoreApi.writeBatch(this.firestore);
-        for (const backupDocument of chunk) {
-          const ref = this.firestoreApi.doc(this.firestore, collectionName, backupDocument.id);
-          batch.set(ref, this.deserializeRecord(backupDocument.data));
-        }
-        await batch.commit();
-        updateProgress(chunk.length);
-      }
-    }
-
-    for (const collectionName of APP_DATA_COLLECTIONS) {
-      const ids = staleDocuments.get(collectionName) ?? [];
-      for (const chunk of this.chunk(ids, 450)) {
-        const batch = this.firestoreApi.writeBatch(this.firestore);
-        for (const id of chunk) {
-          const ref = this.firestoreApi.doc(this.firestore, collectionName, id);
-          batch.delete(ref);
-        }
-        await batch.commit();
-        updateProgress(chunk.length);
-      }
-    }
-
-    onProgress?.(100);
+    }, {
+      collectionCount: APP_DATA_COLLECTIONS.length,
+    });
   }
 
   parseBackupJson(content: string): AppBackupFile {
@@ -203,40 +211,58 @@ export class FirestoreService {
   }
 
   async addDocument<T extends object>(path: string, data: T): Promise<string> {
-    const ref = this.firestoreApi.collection(this.firestore, path);
-    const { id: _, ...dataWithoutId } = data as T & { id?: unknown };
-    const docRef = await this.firestoreApi.addDoc(ref, dataWithoutId as Record<string, unknown>);
-    return docRef.id;
+    return this.runFirestoreOperation('add_document', async () => {
+      const ref = this.firestoreApi.collection(this.firestore, path);
+      const { id: _, ...dataWithoutId } = data as T & { id?: unknown };
+      const docRef = await this.firestoreApi.addDoc(ref, dataWithoutId as Record<string, unknown>);
+      return docRef.id;
+    }, {
+      path,
+    });
   }
 
   async updateDocument(path: string, id: string, data: Record<string, unknown>): Promise<void> {
-    const ref = this.firestoreApi.doc(this.firestore, path, id);
-    const { id: _, ...dataWithoutId } = data;
-    await this.firestoreApi.updateDoc(ref, dataWithoutId);
+    await this.runFirestoreOperation('update_document', async () => {
+      const ref = this.firestoreApi.doc(this.firestore, path, id);
+      const { id: _, ...dataWithoutId } = data;
+      await this.firestoreApi.updateDoc(ref, dataWithoutId);
+    }, {
+      path,
+      id,
+    });
   }
 
   async deleteDocument(path: string, id: string): Promise<void> {
-    const ref = this.firestoreApi.doc(this.firestore, path, id);
-    await this.firestoreApi.deleteDoc(ref);
+    await this.runFirestoreOperation('delete_document', async () => {
+      const ref = this.firestoreApi.doc(this.firestore, path, id);
+      await this.firestoreApi.deleteDoc(ref);
+    }, {
+      path,
+      id,
+    });
   }
 
   async clearCustomerReferencesInSales(customerId: string): Promise<void> {
-    const salesRef = this.firestoreApi.collection(this.firestore, 'sales');
-    const salesQuery = this.firestoreApi.query(
-      salesRef,
-      this.firestoreApi.where('customerId', '==', customerId),
-    );
-    const salesSnapshot = await this.firestoreApi.getDocs(salesQuery);
+    await this.runFirestoreOperation('clear_customer_references_in_sales', async () => {
+      const salesRef = this.firestoreApi.collection(this.firestore, 'sales');
+      const salesQuery = this.firestoreApi.query(
+        salesRef,
+        this.firestoreApi.where('customerId', '==', customerId),
+      );
+      const salesSnapshot = await this.firestoreApi.getDocs(salesQuery);
 
-    const salesIds = salesSnapshot.docs.map((docSnapshot) => docSnapshot.id);
-    for (const chunk of this.chunk(salesIds, 450)) {
-      const batch = this.firestoreApi.writeBatch(this.firestore);
-      for (const saleId of chunk) {
-        const saleRef = this.firestoreApi.doc(this.firestore, 'sales', saleId);
-        batch.update(saleRef, { customerId: null, customerName: '' });
+      const salesIds = salesSnapshot.docs.map((docSnapshot) => docSnapshot.id);
+      for (const chunk of this.chunk(salesIds, 450)) {
+        const batch = this.firestoreApi.writeBatch(this.firestore);
+        for (const saleId of chunk) {
+          const saleRef = this.firestoreApi.doc(this.firestore, 'sales', saleId);
+          batch.update(saleRef, { customerId: null, customerName: '' });
+        }
+        await batch.commit();
       }
-      await batch.commit();
-    }
+    }, {
+      customerId,
+    });
   }
 
   async softDelete(path: string, id: string): Promise<void> {
@@ -250,63 +276,68 @@ export class FirestoreService {
   async registerSupplyPurchaseAtomic(
     input: SupplyPurchaseAtomicInput,
   ): Promise<{ expenseId: string; alreadyApplied: boolean }> {
-    const expenseRef = this.firestoreApi.doc(this.firestore, 'supplyExpenses', input.expenseId);
+    return this.runFirestoreOperation('register_supply_purchase_atomic', async () => {
+      const expenseRef = this.firestoreApi.doc(this.firestore, 'supplyExpenses', input.expenseId);
 
-    return this.firestoreApi.runTransaction(this.firestore, async (transaction) => {
-      const existingExpense = await transaction.get(expenseRef);
-      if (existingExpense.exists()) {
-        return { expenseId: input.expenseId, alreadyApplied: true };
-      }
-
-      const entries = await Promise.all(
-        input.items.map(async (item) => {
-          const ref = this.firestoreApi.doc(this.firestore, 'ingredients', item.ingredientId);
-          const snap = await transaction.get(ref);
-          return { item, ref, snap };
-        }),
-      );
-
-      transaction.set(expenseRef as DocumentReference, {
-        date: input.date,
-        description: input.description,
-        supplier: input.supplier,
-        total: input.total,
-        items: input.items.map((item) => ({
-          ingredientId: item.ingredientId,
-          name: item.ingredientName,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          totalPrice: item.quantity * item.unitPrice,
-        })),
-      });
-
-      for (const { item, ref, snap } of entries) {
-        if (!snap.exists()) {
-          continue;
+      return this.firestoreApi.runTransaction(this.firestore, async (transaction) => {
+        const existingExpense = await transaction.get(expenseRef);
+        if (existingExpense.exists()) {
+          return { expenseId: input.expenseId, alreadyApplied: true };
         }
 
-        const currentStock = Number(snap.data()['currentStock'] ?? 0);
-        transaction.update(ref, {
-          currentStock: currentStock + item.quantity,
-          unitPrice: item.unitPrice,
-          lastPurchase: input.date,
-        });
-
-        const movementRef = this.firestoreApi.doc(
-          this.firestoreApi.collection(this.firestore, 'stockMovements'),
+        const entries = await Promise.all(
+          input.items.map(async (item) => {
+            const ref = this.firestoreApi.doc(this.firestore, 'ingredients', item.ingredientId);
+            const snap = await transaction.get(ref);
+            return { item, ref, snap };
+          }),
         );
-        transaction.set(movementRef as DocumentReference, {
-          ingredientId: item.ingredientId,
-          ingredientName: item.ingredientName,
-          type: 'purchase',
-          quantity: item.quantity,
-          date: input.date,
-          saleId: null,
-          expenseId: input.expenseId,
-        });
-      }
 
-      return { expenseId: input.expenseId, alreadyApplied: false };
+        transaction.set(expenseRef as DocumentReference, {
+          date: input.date,
+          description: input.description,
+          supplier: input.supplier,
+          total: input.total,
+          items: input.items.map((item) => ({
+            ingredientId: item.ingredientId,
+            name: item.ingredientName,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            totalPrice: item.quantity * item.unitPrice,
+          })),
+        });
+
+        for (const { item, ref, snap } of entries) {
+          if (!snap.exists()) {
+            continue;
+          }
+
+          const currentStock = Number(snap.data()['currentStock'] ?? 0);
+          transaction.update(ref, {
+            currentStock: currentStock + item.quantity,
+            unitPrice: item.unitPrice,
+            lastPurchase: input.date,
+          });
+
+          const movementRef = this.firestoreApi.doc(
+            this.firestoreApi.collection(this.firestore, 'stockMovements'),
+          );
+          transaction.set(movementRef as DocumentReference, {
+            ingredientId: item.ingredientId,
+            ingredientName: item.ingredientName,
+            type: 'purchase',
+            quantity: item.quantity,
+            date: input.date,
+            saleId: null,
+            expenseId: input.expenseId,
+          });
+        }
+
+        return { expenseId: input.expenseId, alreadyApplied: false };
+      });
+    }, {
+      expenseId: input.expenseId,
+      itemCount: input.items.length,
     });
   }
 
@@ -317,39 +348,64 @@ export class FirestoreService {
   ): Promise<void> {
     if (adjustments.length === 0) return;
 
-    await this.firestoreApi.runTransaction(this.firestore, async (transaction) => {
-      const now = this.firestoreApi.timestampNow();
+    await this.runFirestoreOperation('apply_stock_adjustments', async () => {
+      await this.firestoreApi.runTransaction(this.firestore, async (transaction) => {
+        const now = this.firestoreApi.timestampNow();
 
-      for (const adjustment of adjustments) {
-        const ingredientRef = this.firestoreApi.doc(
-          this.firestore,
-          'ingredients',
-          adjustment.ingredientId,
-        );
-        const ingredientSnap = await transaction.get(ingredientRef);
-        if (!ingredientSnap.exists()) continue;
+        for (const adjustment of adjustments) {
+          const ingredientRef = this.firestoreApi.doc(
+            this.firestore,
+            'ingredients',
+            adjustment.ingredientId,
+          );
+          const ingredientSnap = await transaction.get(ingredientRef);
+          if (!ingredientSnap.exists()) continue;
 
-        const currentStock = Number(ingredientSnap.data()['currentStock'] ?? 0);
-        const newStock = Math.max(0, currentStock + adjustment.delta);
-        const appliedDelta = newStock - currentStock;
+          const currentStock = Number(ingredientSnap.data()['currentStock'] ?? 0);
+          const newStock = Math.max(0, currentStock + adjustment.delta);
+          const appliedDelta = newStock - currentStock;
 
-        transaction.update(ingredientRef, { currentStock: newStock });
+          transaction.update(ingredientRef, { currentStock: newStock });
 
-        if (appliedDelta === 0) continue;
+          if (appliedDelta === 0) continue;
 
-        const movementRef = this.firestoreApi.doc(
-          this.firestoreApi.collection(this.firestore, 'stockMovements'),
-        );
-        transaction.set(movementRef, {
-          ingredientId: adjustment.ingredientId,
-          ingredientName: adjustment.ingredientName,
-          type: movementType,
-          quantity: appliedDelta,
-          date: now,
-          saleId,
-        });
-      }
+          const movementRef = this.firestoreApi.doc(
+            this.firestoreApi.collection(this.firestore, 'stockMovements'),
+          );
+          transaction.set(movementRef, {
+            ingredientId: adjustment.ingredientId,
+            ingredientName: adjustment.ingredientName,
+            type: movementType,
+            quantity: appliedDelta,
+            date: now,
+            saleId,
+          });
+        }
+      });
+    }, {
+      saleId,
+      movementType,
+      adjustmentCount: adjustments.length,
     });
+  }
+
+  private async runFirestoreOperation<T>(
+    operation: string,
+    run: () => Promise<T>,
+    extra?: Record<string, unknown>,
+  ): Promise<T> {
+    try {
+      return await run();
+    } catch (error: unknown) {
+      Sentry.captureException(error, {
+        tags: {
+          area: 'firestore',
+          operation,
+        },
+        extra,
+      });
+      throw error;
+    }
   }
 
   private serializeRecord(data: FirestoreData): Record<string, BackupJsonValue> {
