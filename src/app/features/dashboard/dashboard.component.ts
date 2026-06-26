@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { AuthStore } from '../../core/store/auth.store';
 import { DashboardStore } from '../../core/store/dashboard.store';
 import { DashboardMetricsService } from '../../core/services/dashboard-metrics.service';
 import { IngredientsStore } from '../../core/store/ingredients.store';
@@ -12,6 +13,7 @@ import { NetProfitCardComponent } from './net-profit-card/net-profit-card.compon
 import { MonthNavComponent } from '../../shared/month-nav/month-nav.component';
 import { fromMonthInputValue } from '../../core/utils/dashboard.utils';
 import { SALE_STATUS_CLASS, SALE_STATUS_DISPLAY, SaleStatus } from '../../core/models/sale';
+import { DemoModeService } from '../../core/services/demo-mode.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -27,6 +29,17 @@ export class DashboardComponent {
   private salesStore = inject(SalesStore);
   private recipesStore = inject(RecipesStore);
   private customersStore = inject(CustomersStore);
+  private authStore = inject(AuthStore);
+  private demoMode = inject(DemoModeService);
+  private hour = signal(new Date().getHours());
+
+  readonly basePath = computed(() => this.demoMode.isDemoMode() ? '/demo' : '/app');
+
+  constructor() {
+    const destroyRef = inject(DestroyRef);
+    const id = setInterval(() => this.hour.set(new Date().getHours()), 60_000);
+    destroyRef.onDestroy(() => clearInterval(id));
+  }
 
   lowStock = this.ingredientsStore.lowStock;
   totalRecipes = this.recipesStore.totalRecipes;
@@ -48,6 +61,21 @@ export class DashboardComponent {
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     return `${today.getFullYear()}-${mm}`;
   })();
+
+  greetingName = computed(() => {
+    const user = this.authStore.appUser();
+    if (user?.displayName) return user.displayName;
+    if (user?.email) return user.email.split('@')[0];
+    return null;
+  });
+
+  greeting = computed(() => {
+    const h = this.hour();
+    if (h < 6) return 'El que madruga Dios le ayuda';
+    if (h < 12) return 'Buen día';
+    if (h < 20) return 'Buenas tardes';
+    return 'Buenas noches';
+  });
 
   max = computed(() => Math.max(this.monthlySales(), this.totalPeriodExpenses(), 1));
 

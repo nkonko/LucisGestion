@@ -1,4 +1,8 @@
-<h2 class="section-heading mb-4 mt-4">Hola! 👋</h2>
+@if (greetingName(); as name) {
+  <h2 class="section-heading mb-4 mt-4">{{ greeting() }}, {{ name }}! 👋</h2>
+} @else {
+  <h2 class="section-heading mb-4 mt-4">Hola! 👋</h2>
+}
 
 <app-month-nav
   class="mb-4 block"
@@ -43,13 +47,13 @@
 
 <div class="grid grid-cols-2 gap-3 mb-6">
 
-  <article class="ui-card-surface touch-card text-center py-3" routerLink="/recetas">
+  <article class="ui-card-surface touch-card text-center py-3" [routerLink]="basePath() + '/recetas'">
     <ui-icon name="menu_book" class="text-purple-600" [decorative]="true" />
     <div class="text-2xl font-bold">{{ totalRecipes() }}</div>
     <div class="text-xs text-gray-500">Recetas activas</div>
   </article>
 
-  <article class="ui-card-surface touch-card text-center py-3" routerLink="/pedidos">
+  <article class="ui-card-surface touch-card text-center py-3" [routerLink]="basePath() + '/ventas'">
     <ui-icon name="pending_actions" class="text-orange-600" [decorative]="true" />
     <div class="text-2xl font-bold">{{ pendingOrders() }}</div>
     <div class="text-xs text-gray-500">Pedidos pendientes</div>
@@ -57,7 +61,7 @@
 </div>
 
 @if (topSellingProduct(); as top) {
-  <article class="ui-card-surface mb-4 touch-card flex items-center gap-3 py-2">
+  <article class="ui-card-surface mb-4 flex items-center gap-3 py-2" style="pointer-events: none;">
     <ui-icon name="emoji_events" class="text-amber-500" [size]="32" [decorative]="true" />
     <div>
       <div class="text-xs text-gray-500">Más vendido</div>
@@ -102,7 +106,7 @@
   </h3>
   <section class="ui-card-surface mb-4 ui-list">
     @for (item of lowStock(); track item.id) {
-      <article class="ui-list-item">
+      <article class="ui-list-item touch-card" [routerLink]="basePath() + '/stock'">
         <ui-icon name="error" class="stock-danger" [size]="18" [decorative]="true" />
         <div>
           <div class="font-medium">{{ item.name }}</div>
