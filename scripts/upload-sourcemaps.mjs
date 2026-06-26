@@ -7,7 +7,7 @@
  * Requiere SENTRY_AUTH_TOKEN en el entorno.
  * El token se genera en Settings → Account → API → Auth Tokens con scope org:ci.
  */
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { existsSync } from 'fs';
 
 const args = process.argv.slice(2);
@@ -15,7 +15,7 @@ const version = args[0];
 
 if (!version) {
   console.error('❌ Error: Debes pasar la versión como argumento');
-  console.error('Uso: node scripts/upload-sourcemaps.mjs <version>');
+  console.error('Uso: node scripts/upload-sourcemaps.mjs [version]');
   process.exit(1);
 }
 
@@ -35,8 +35,8 @@ if (!existsSync(DIST_DIR)) {
   process.exit(1);
 }
 
-const sentry = (cmd) =>
-  execSync(`npx @sentry/cli ${cmd}`, {
+const sentry = (args) =>
+  execFileSync('npx', ['@sentry/cli', ...args], {
     stdio: 'inherit',
     env: {
       ...process.env,
@@ -49,19 +49,19 @@ const sentry = (cmd) =>
 try {
   // 1. Crear o actualizar la release en Sentry
   console.log(`\n📦 Creando release ${version} en Sentry...`);
-  sentry(`releases new ${version}`);
+  sentry(['releases', 'new', version]);
 
   // 2. Asociar commits de git
   console.log('\n🔗 Asociando commits...');
-  sentry(`releases set-commits ${version} --auto`);
+  sentry(['releases', 'set-commits', version, '--auto']);
 
   // 3. Subir source maps
   console.log('\n📤 Subiendo source maps...');
-  sentry(`sourcemaps upload --release=${version} ${DIST_DIR}`);
+  sentry(['sourcemaps', 'upload', `--release=${version}`, DIST_DIR]);
 
   // 4. Finalizar la release
   console.log('\n✅ Finalizando release...');
-  sentry(`releases finalize ${version}`);
+  sentry(['releases', 'finalize', version]);
 
   console.log(`\n🎉 Source maps subidos correctamente para ${version}`);
 } catch (error) {

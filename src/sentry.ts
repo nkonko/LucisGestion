@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/angular';
 import { environment } from './environments/environment';
 
-export const sentryDsn = environment.sentry?.dsn;
+export const sentryDsn = environment.sentry.dsn;
 
 export function initSentry(): void {
   Sentry.init({
