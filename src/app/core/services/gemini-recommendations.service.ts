@@ -176,7 +176,7 @@ Solo responde con JSON válido, sin markdown, comentarios adicionales o explicac
       return single ? [single] : null;
     } catch (error: unknown) {
       this.captureGeminiException(error, 'parse_response', {
-        candidateCount: response.candidates?.length ?? 0,
+        candidateCount: response.candidates.length,
       });
       console.error('Error parsing Gemini response:', error);
       return null;
