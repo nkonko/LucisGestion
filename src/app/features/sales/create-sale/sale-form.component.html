@@ -2,26 +2,93 @@
   <div class="sale-form-content">
     <section class="sale-form-section">
       <h3 class="sale-form-section-title">Cliente</h3>
-      <label class="ui-field">
-        <span>Cliente</span>
-        <select class="ui-select" [ngModel]="selectedCustomerId" (ngModelChange)="selectCustomerById($event)" [disabled]="isEdit()">
-          <option value="">Seleccionar cliente</option>
-          @for (c of customers(); track c.id) {
-            <option [value]="c.id">{{ c.name }} · {{ c.phone }}</option>
-          }
-        </select>
-      </label>
+      <app-customer-search
+        [selectedCustomer]="formService.selectedCustomer()"
+        [isEdit]="formService.isEdit()"
+        [filteredCustomers]="formService.filteredCustomers()"
+        [customerSearch]="formService.customerSearch()"
+        [isDropdownOpen]="formService.isDropdownOpen()"
+        (selectCustomer)="formService.selectCustomer($event)"
+        (clearCustomer)="formService.clearCustomer()"
+        (searchChange)="formService.onSearchChange($event)"
+        (searchFocus)="formService.onSearchFocus()"
+        (closeDropdown)="formService.isDropdownOpen.set(false)"
+      />
     </section>
 
     <section class="sale-form-section">
       <h3 class="sale-form-section-title">Productos</h3>
       <div class="recipe-rows" role="list" aria-label="Listado de productos para la venta">
-        @for (recipe of recipesStore.recipes(); track recipe.id) {
+        <div class="top3-section">
+          <button
+            class="top3-toggle"
+            type="button"
+            (click)="formService.isTop3Collapsed.set(!formService.isTop3Collapsed())"
+            [attr.aria-expanded]="!formService.isTop3Collapsed()"
+            aria-label="Alternar productos más vendidos"
+          >
+            <span class="top3-toggle-icon" [class.top3-toggle-icon--collapsed]="formService.isTop3Collapsed()">
+              ▼
+            </span>
+          <span class="top3-toggle-label">Más vendidos</span>
+          @if (formService.isTop3Collapsed() && formService.hasTop3Selection()) {
+            <span class="top3-toggle-dot" aria-label="Productos seleccionados"></span>
+          }
+          <span class="top3-toggle-count">{{ formService.top3Recipes().length }}</span>
+          </button>
+          @if (!formService.isTop3Collapsed()) {
+            <div class="top3-items">
+              @for (recipe of formService.top3Recipes(); track recipe.id) {
+                <app-sale-product-item
+                  [recipe]="recipe"
+                  [quantity]="formService.getItemQuantity(recipe.id!)"
+                  (increment)="formService.addItem(recipe)"
+                  (decrement)="formService.decrementItem(recipe.id!)"
+                />
+              }
+            </div>
+          }
+        </div>
+
+        <div class="product-section-divider" role="separator"></div>
+
+        <div class="product-search-wrapper">
+          <input
+            class="ui-input"
+            type="text"
+            placeholder="Buscar producto por nombre..."
+            [ngModel]="formService.productSearch()"
+            (ngModelChange)="formService.onProductSearchChange($event)"
+            (focus)="formService.onProductSearchFocus()"
+            autocomplete="off"
+          />
+          @if (formService.isProductDropdownOpen()) {
+            <ul class="product-dropdown" role="listbox" aria-label="Resultados de búsqueda de productos">
+              @if (formService.filteredRecipes().length === 0) {
+                <li class="product-dropdown-empty">Sin resultados</li>
+              }
+              @for (recipe of formService.filteredRecipes(); track recipe.id) {
+                <li
+                  class="product-dropdown-item"
+                  role="option"
+                  (click)="formService.onProductSearchSelect(recipe)"
+                >
+                  <span class="product-dropdown-item-name">{{ recipe.name }}</span>
+                  @if (formService.customerRecipeHistory().has(recipe.id!)) {
+                    <span class="product-dropdown-item-badge">Ya compró</span>
+                  }
+                </li>
+              }
+            </ul>
+          }
+        </div>
+
+        @for (recipe of formService.searchAddedRecipes(); track recipe.id) {
           <app-sale-product-item
             [recipe]="recipe"
-            [quantity]="getItemQuantity(recipe.id!)"
-            (increment)="addItem(recipe)"
-            (decrement)="decrementItem(recipe.id!)"
+            [quantity]="formService.getItemQuantity(recipe.id!)"
+            (increment)="formService.addItem(recipe)"
+            (decrement)="formService.decrementItem(recipe.id!)"
           />
         }
       </div>
@@ -32,8 +99,8 @@
       <div class="sale-form-inline-grid">
         <label class="ui-field">
           <span>Medio de pago</span>
-          <select class="ui-select" [(ngModel)]="paymentMethod">
-            @for (mp of paymentMethods; track mp.key) {
+          <select class="ui-select" [(ngModel)]="formService.paymentMethod">
+            @for (mp of formService.paymentMethods; track mp.key) {
               <option [value]="mp.key">{{ mp.label }}</option>
             }
           </select>
@@ -43,12 +110,12 @@
           <button
             class="payment-toggle ui-payment-toggle"
             type="button"
-            [class.ui-payment-toggle--paid]="isPaid"
-            (click)="isPaid = !isPaid"
-            [attr.aria-pressed]="isPaid"
-            [attr.aria-label]="isPaid ? 'Marcar como no pagado' : 'Marcar como pagado'"
+            [class.ui-payment-toggle--paid]="formService.isPaid"
+            (click)="formService.isPaid = !formService.isPaid"
+            [attr.aria-pressed]="formService.isPaid"
+            [attr.aria-label]="formService.isPaid ? 'Marcar como no pagado' : 'Marcar como pagado'"
           >
-            {{ isPaid ? 'Pagado' : 'No pagado' }}
+            {{ formService.isPaid ? 'Pagado' : 'No pagado' }}
           </button>
         </label>
       </div>
@@ -58,19 +125,19 @@
       <h3 class="sale-form-section-title">Entrega y notas</h3>
       <label class="ui-field">
         <span>Fecha de entrega</span>
-        <input class="ui-input" [(ngModel)]="deliveryDateInput" type="date" />
+        <input class="ui-input" [(ngModel)]="formService.deliveryDateInput" type="date" />
       </label>
       <label class="ui-field">
         <span>Notas</span>
-        <textarea class="ui-textarea" [(ngModel)]="notes" placeholder="Detalles adicionales..." rows="2"></textarea>
+        <textarea class="ui-textarea" [(ngModel)]="formService.notes" placeholder="Detalles adicionales..." rows="2"></textarea>
       </label>
     </section>
   </div>
 
   <div class="sale-form-summary">
     <div class="sale-form-actions">
-      <button class="sale-submit-btn ui-primary-cta-btn" type="button" (click)="confirm()" [disabled]="!canSubmit()">
-        {{ buttonLabel() }}
+      <button class="sale-submit-btn ui-primary-cta-btn" type="button" (click)="confirm()" [disabled]="!formService.canSubmit()">
+        {{ formService.buttonLabel() }}
       </button>
     </div>
   </div>

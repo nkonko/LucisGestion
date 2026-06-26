@@ -3,6 +3,7 @@
     <article
       class="ui-toast__item"
       [class.ui-toast__item--error]="toast.kind === 'error'"
+      [class.ui-toast__item--info]="toast.kind === 'info'"
       [class.ui-toast__item--dismissing]="toast.dismissing"
     >
       @if (toast.icon) {
