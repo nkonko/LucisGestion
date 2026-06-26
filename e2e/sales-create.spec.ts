@@ -9,7 +9,11 @@ test('crea una venta en demo desde el formulario', async ({ page }) => {
   const dialog = page.getByRole('dialog');
   await expect(dialog.getByRole('heading', { name: /Nueva Venta/i })).toBeVisible();
 
-  await dialog.getByRole('combobox', { name: /^Cliente$/i }).selectOption({ index: 1 });
+  // Customer selector is a search input with dropdown, not a <select>
+  await dialog.getByPlaceholder('Buscar cliente por nombre o teléfono...').fill('Ana');
+  await dialog.getByRole('option', { name: /Ana Martínez/i }).click();
+
+  // Cheesecake is in the top 3 best-sellers — add it via the "+" stepper button
   await dialog.getByRole('button', { name: /Agregar unidad de Cheesecake/i }).click();
   await dialog.getByRole('textbox', { name: /^Notas$/i }).fill(uniqueNote);
 
