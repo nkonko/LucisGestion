@@ -37,7 +37,8 @@ export class DateRangePickerComponent {
   }
 
   onDateFromInput(event: Event): void {
-    const newValue = String((event.target as HTMLInputElement).value);
+    if (!(event.target instanceof HTMLInputElement)) return;
+    const newValue = event.target.value;
     if (!newValue) return;
 
     const currentTo = this.dateTo();
@@ -53,7 +54,8 @@ export class DateRangePickerComponent {
   }
 
   onDateToInput(event: Event): void {
-    const newValue = String((event.target as HTMLInputElement).value);
+    if (!(event.target instanceof HTMLInputElement)) return;
+    const newValue = event.target.value;
     if (!newValue) return;
 
     const currentFrom = this.dateFrom();
