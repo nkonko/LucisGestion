@@ -81,8 +81,7 @@
   border: var(--border-width-thin) solid color-mix(in srgb, var(--color-destructive) 38%, var(--color-outline-variant));
   border-radius: var(--radius-pill);
   color: var(--color-destructive);
-  flex: 0 0 auto;
-  padding: 0 var(--space-5);
+  flex: 0 0 64px;
 }
 
 .customer-save-btn {
