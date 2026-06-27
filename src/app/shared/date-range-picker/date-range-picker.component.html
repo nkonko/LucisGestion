@@ -1,0 +1,41 @@
+<div class="ui-card-surface" role="group" aria-label="Selector de rango de fechas">
+  <fieldset class="date-range-card__fieldset">
+    <div class="date-range-card__fields">
+      <!-- DESDE -->
+      <label class="date-range-card__field">
+        <span class="date-range-card__label">Desde</span>
+        <div class="date-range-card__input-wrapper">
+          <input
+            type="date"
+            class="date-range-card__input"
+            [class.date-range-card__input--error]="validationError() !== null"
+            [value]="dateFrom() ?? ''"
+            (input)="onDateFromInput($event)"
+          />
+        </div>
+      </label>
+
+      <span class="date-range-card__separator" aria-hidden="true">—</span>
+
+      <!-- HASTA -->
+      <label class="date-range-card__field">
+        <span class="date-range-card__label">Hasta</span>
+        <div class="date-range-card__input-wrapper">
+          <input
+            type="date"
+            class="date-range-card__input"
+            [class.date-range-card__input--error]="validationError() !== null"
+            [value]="dateTo() ?? ''"
+            (input)="onDateToInput($event)"
+          />
+        </div>
+      </label>
+    </div>
+
+    @if (validationError(); as error) {
+      <div class="date-range-card__error" role="alert">
+        {{ error }}
+      </div>
+    }
+  </fieldset>
+</div>

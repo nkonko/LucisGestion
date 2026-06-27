@@ -76,6 +76,8 @@ describe('FinancialInsightsService', () => {
           useValue: {
             selectedPeriod: selectedPeriodSignal,
             selectedDate: selectedDateSignal,
+            dateFrom: signal<number | null>(null),
+            dateTo: signal<number | null>(null),
           },
         },
       ],

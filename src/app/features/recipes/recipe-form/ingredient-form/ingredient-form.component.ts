@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  HostListener,
   inject,
   input,
   output,
@@ -9,7 +10,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { Ingredient, RecipeIngredient } from '../../../../core/models/ingredient';
+import { DEFAULT_INGREDIENT_ICON, Ingredient, RecipeIngredient } from '../../../../core/models/ingredient';
 import { IngredientsStore } from '../../../../core/store/ingredients.store';
 import { ArsPipe } from '../../../../shared/pipes/ars.pipe';
 
@@ -21,12 +22,15 @@ import { ArsPipe } from '../../../../shared/pipes/ars.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RecipeIngredientFormComponent {
+  protected readonly DEFAULT_INGREDIENT_ICON = DEFAULT_INGREDIENT_ICON;
+
   ingredientsStore = inject(IngredientsStore);
 
   recipeIngredients = input.required<RecipeIngredient[]>();
   recipeIngredientsChange = output<RecipeIngredient[]>();
 
   ingredientSearch = signal('');
+  isDropdownOpen = signal(false);
 
   filteredIngredients = computed(() => {
     const term = this.ingredientSearch().toLowerCase();
@@ -41,12 +45,6 @@ export class RecipeIngredientFormComponent {
     });
   });
 
-  selectedIngredient = computed(() => {
-    const name = this.ingredientSearch().trim().toLowerCase();
-    if (!name) return null;
-    return this.filteredIngredients().find((item) => item.name.toLowerCase() === name) ?? null;
-  });
-
   addIngredient(ingredient: Ingredient): void {
     this.recipeIngredientsChange.emit([
       ...this.recipeIngredients(),
@@ -59,13 +57,16 @@ export class RecipeIngredientFormComponent {
       },
     ]);
     this.ingredientSearch.set('');
+    this.isDropdownOpen.set(false);
   }
 
-  addSelectedIngredient(): void {
-    const ingredient = this.selectedIngredient();
-    if (ingredient) {
-      this.addIngredient(ingredient);
-    }
+  onSearchChange(value: string): void {
+    this.ingredientSearch.set(value);
+    this.isDropdownOpen.set(true);
+  }
+
+  openDropdown(): void {
+    this.isDropdownOpen.set(true);
   }
 
   updateQuantity(index: number, quantity: number): void {
@@ -90,5 +91,13 @@ export class RecipeIngredientFormComponent {
 
   removeIngredient(index: number): void {
     this.recipeIngredientsChange.emit(this.recipeIngredients().filter((_, i) => i !== index));
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement | null;
+    if (!target || !target.closest('.ingredient-search-wrapper')) {
+      this.isDropdownOpen.set(false);
+    }
   }
 }
