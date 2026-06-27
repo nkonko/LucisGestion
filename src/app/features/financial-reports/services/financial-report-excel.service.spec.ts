@@ -36,8 +36,7 @@ describe('FinancialReportExcelService', () => {
   });
 
   it('should export report without errors', async () => {
-    const result = await service.exportReport(mockData);
-    expect(result).toBeUndefined();
+    await service.exportReport(mockData);
   });
 
   it('should handle export with top customers', async () => {
@@ -48,8 +47,7 @@ describe('FinancialReportExcelService', () => {
         { name: 'Customer B', revenue: 30000, share: 30, ordersCount: 8 },
       ],
     };
-    const result = await service.exportReport(dataWithCustomers);
-    expect(result).toBeUndefined();
+    await service.exportReport(dataWithCustomers);
   });
 
   it('should handle export with top products', async () => {
@@ -60,8 +58,7 @@ describe('FinancialReportExcelService', () => {
         { name: 'Product B', quantity: 80, revenue: 30000, margin: 25 },
       ],
     };
-    const result = await service.exportReport(dataWithProducts);
-    expect(result).toBeUndefined();
+    await service.exportReport(dataWithProducts);
   });
 
   it('should handle export with opportunities and anomalies', async () => {
@@ -98,8 +95,7 @@ describe('FinancialReportExcelService', () => {
         },
       ],
     };
-    const result = await service.exportReport(dataWithInsights);
-    expect(result).toBeUndefined();
+    await service.exportReport(dataWithInsights);
   });
 
   it('should export report with detailed transactions', async () => {
@@ -114,8 +110,7 @@ describe('FinancialReportExcelService', () => {
       detailedTransactions,
     };
 
-    const result = await service.exportReport(dataWithDetails);
-    expect(result).toBeUndefined();
+    await service.exportReport(dataWithDetails);
   });
 
   it('should handle export with empty detailed transactions', async () => {
@@ -124,7 +119,6 @@ describe('FinancialReportExcelService', () => {
       detailedTransactions: [],
     };
 
-    const result = await service.exportReport(dataWithEmptyDetails);
-    expect(result).toBeUndefined();
+    await service.exportReport(dataWithEmptyDetails);
   });
 });

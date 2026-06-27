@@ -95,8 +95,7 @@ export class RecipeIngredientFormComponent {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement | null;
-    if (!target || !target.closest('.ingredient-search-wrapper')) {
+    if (!(event.target instanceof HTMLElement) || !event.target.closest('.ingredient-search-wrapper')) {
       this.isDropdownOpen.set(false);
     }
   }
