@@ -49,20 +49,15 @@ describe('RecipeIngredientFormComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('adds ingredient only when exact ingredient name is selected', () => {
+  it('adds ingredient via addIngredient and clears search + closes dropdown', () => {
     fixture.componentRef.setInput('recipeIngredients', [] as RecipeIngredient[]);
     fixture.detectChanges();
 
     const emitSpy = vi.fn();
     component.recipeIngredientsChange.subscribe(emitSpy);
 
-    component.ingredientSearch.set('Choco');
-    component.addSelectedIngredient();
-
-    expect(emitSpy).not.toHaveBeenCalled();
-
-    component.ingredientSearch.set('Chocolate');
-    component.addSelectedIngredient();
+    component.isDropdownOpen.set(true);
+    component.addIngredient(ingredients[0]);
 
     expect(emitSpy).toHaveBeenCalledTimes(1);
     expect(emitSpy.mock.calls[0][0]).toEqual([
@@ -73,6 +68,33 @@ describe('RecipeIngredientFormComponent', () => {
       }),
     ]);
     expect(component.ingredientSearch()).toBe('');
+    expect(component.isDropdownOpen()).toBe(false);
+  });
+
+  it('filters out already-added ingredients from search', () => {
+    fixture.componentRef.setInput('recipeIngredients', [
+      { ingredientId: 'ing-1', name: 'Chocolate', quantity: 1, unit: 'kg', lineCost: 10 },
+    ] as RecipeIngredient[]);
+    fixture.detectChanges();
+
+    component.ingredientSearch.set('Choc');
+    expect(component.filteredIngredients()).toHaveLength(0);
+
+    component.ingredientSearch.set('Azu');
+    expect(component.filteredIngredients()).toHaveLength(1);
+    expect(component.filteredIngredients()[0].id).toBe('ing-2');
+  });
+
+  it('opens and closes dropdown via search change and outside click', () => {
+    component.isDropdownOpen.set(false);
+
+    component.onSearchChange('Cho');
+    expect(component.isDropdownOpen()).toBe(true);
+
+    const outsideEvent = new MouseEvent('click');
+    Object.defineProperty(outsideEvent, 'target', { value: document.body });
+    component.onDocumentClick(outsideEvent);
+    expect(component.isDropdownOpen()).toBe(false);
   });
 
   it('emits updated list with recomputed line cost on quantity update', () => {

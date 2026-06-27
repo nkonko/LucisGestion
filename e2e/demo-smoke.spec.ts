@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 const demoRoutes = [
-  { path: '/demo/dashboard', heading: /Hola!/i },
+  { path: '/demo/dashboard', heading: /Usuario Demo/i },
   { path: '/demo/ingredientes', heading: /Ingredientes/i },
   { path: '/demo/recetas', heading: /Recetas/i },
   { path: '/demo/ventas', heading: /Ventas/i },

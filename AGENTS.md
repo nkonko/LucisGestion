@@ -67,9 +67,9 @@ Guidance for contributors:
 
 ## Don'ts
 
-- No usar nombres de dos letras para inyecciones ni variables. Usa nombres descriptivos.
-- No agregar comentarios inline. El código debe ser autoexplicativo.
-- No tipar con `any`. Si se necesita un tipo, crearlo en `src/app/models/`.
+- Do not use two-letter names for injections or variables. Use descriptive names.
+- Do not add inline comments. The code should be self-explanatory.
+- Do not use `any`. If a type is needed, create it in `src/app/models/`.
 
 ## Installed Skills
 

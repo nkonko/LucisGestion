@@ -61,6 +61,8 @@ export class RecipesComponent {
 
   viewCatalog(): void {
     this.dialog.open<null, never>(CatalogDialogComponent, {
+      title: 'Catálogo de Precios',
+      section: 'Receta',
       maxWidth: '600px',
       maxHeight: '90vh',
       data: null,

@@ -23,6 +23,8 @@ export const DashboardStore = signalStore(
   withState<DashboardState>({
     selectedPeriod: 'month',
     selectedDate: { year: now.getFullYear(), month: now.getMonth(), day: now.getDate() },
+    dateFrom: null,
+    dateTo: null,
   }),
 
   withComputed((store) => ({
@@ -40,7 +42,15 @@ export const DashboardStore = signalStore(
 
   withMethods((store) => ({
     setPeriod(period: Period) {
-      patchState(store, { selectedPeriod: period, selectedDate: dateToSelectedDate(new Date()) });
+      patchState(store, { selectedPeriod: period, selectedDate: dateToSelectedDate(new Date()), dateFrom: null, dateTo: null });
+    },
+
+    setDateRange(from: Date, to: Date) {
+      patchState(store, { dateFrom: from.getTime(), dateTo: to.getTime() });
+    },
+
+    clearDateRange() {
+      patchState(store, { dateFrom: null, dateTo: null });
     },
 
     setSelectedDate(date: SelectedDate) {

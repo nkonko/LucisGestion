@@ -2,6 +2,23 @@
   display: block;
 }
 
+.recipes-catalog-btn {
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface));
+  border: var(--border-width-thin) solid color-mix(in srgb, var(--color-primary) 28%, var(--color-outline-variant));
+  border-radius: var(--radius-pill);
+  color: color-mix(in srgb, var(--color-primary) 80%, var(--color-on-surface));
+  font-weight: 700;
+  padding-inline: var(--space-4);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
+
+  &:hover {
+    background: color-mix(in srgb, var(--color-primary) 14%, var(--color-surface));
+    border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-outline-variant));
+    box-shadow: var(--shadow-soft);
+    transform: translateY(-1px);
+  }
+}
+
 .recipe-card {
   align-items: stretch;
   box-shadow: 0 12px 28px color-mix(in srgb, var(--color-on-surface) 8%, transparent);

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { UiIconComponent } from '../../shared/ui/components';
-import { MonthNavComponent } from '../../shared/month-nav/month-nav.component';
+import { DateRangePickerComponent } from '../../shared/date-range-picker/date-range-picker.component';
 import { FinancialInsightsService } from '../../core/services/financial-insights.service';
 import { DashboardMetricsService } from '../../core/services/dashboard-metrics.service';
 import { GeminiRecommendationsService } from '../../core/services/gemini-recommendations.service';
@@ -8,7 +8,10 @@ import { BottomSheetService } from '../../core/services/bottom-sheet.service';
 import { DashboardStore } from '../../core/store/dashboard.store';
 import { SalesStore } from '../../core/store/sales.store';
 import { IngredientsStore } from '../../core/store/ingredients.store';
-import { Period } from '../../core/models/dashboard';
+import { FixedCostsStore } from '../../core/store/fixed-costs.store';
+import type { FixedCostEntry } from '../../core/models/fixed-cost/fixed-cost-month.model';
+import { getPeriodStart, getPeriodEnd } from '../../core/utils/dashboard.utils';
+import { buildDetailedTransactionRows, computeIntersectingMonthKeys } from './utils/build-detailed-transactions';
 import { KpiSummaryComponent } from './kpi-summary/kpi-summary.component';
 import { InsightsComponent } from './insights/insights.component';
 import { TopCustomersComponent } from './top-customers/top-customers.component';
@@ -22,7 +25,7 @@ import { FinancialReportExcelService } from './services/financial-report-excel.s
   selector: 'app-financial-reports',
   imports: [
     UiIconComponent,
-    MonthNavComponent,
+    DateRangePickerComponent,
     KpiSummaryComponent,
     InsightsComponent,
     TopCustomersComponent,
@@ -41,46 +44,22 @@ export class FinancialReportsComponent {
   private dashboardStore = inject(DashboardStore);
   private salesStore = inject(SalesStore);
   private ingredientsStore = inject(IngredientsStore);
+  private fixedCostsStore = inject(FixedCostsStore);
   private financialReportPdf = inject(FinancialReportPdfService);
   private financialReportExcel = inject(FinancialReportExcelService);
 
   readonly isLoadingRecommendations = signal(false);
-
-  readonly periodOptions: { value: Period; label: string }[] = [
-    { value: 'today', label: 'Hoy' },
-    { value: 'week', label: 'Semana' },
-    { value: 'month', label: 'Mes' },
-    { value: 'year', label: 'Año' },
-  ];
-
-  readonly selectedPeriod = this.dashboardStore.selectedPeriod;
   readonly periodLabel = this.dashboardStore.periodLabel;
-  readonly isCurrentPeriod = this.dashboardStore.isCurrentMonth;
-  readonly disablePreviousPeriodNav = computed(() => this.selectedPeriod() === 'today');
-  readonly previousPeriodLabel = computed(() => {
-    switch (this.selectedPeriod()) {
-      case 'today':
-        return 'Día anterior';
-      case 'week':
-        return 'Semana anterior';
-      case 'year':
-        return 'Año anterior';
-      case 'month':
-        return 'Mes anterior';
+
+  constructor() {
+    if (this.dashboardStore.dateFrom() === null || this.dashboardStore.dateTo() === null) {
+      const period = this.dashboardStore.selectedPeriod();
+      const date = this.dashboardStore.selectedDate();
+      const from = getPeriodStart(period, date);
+      const to = getPeriodEnd(period, date);
+      this.dashboardStore.setDateRange(from, to);
     }
-  });
-  readonly nextPeriodLabel = computed(() => {
-    switch (this.selectedPeriod()) {
-      case 'today':
-        return 'Día siguiente';
-      case 'week':
-        return 'Semana siguiente';
-      case 'year':
-        return 'Año siguiente';
-      case 'month':
-        return 'Mes siguiente';
-    }
-  });
+  }
 
   readonly monthlySales = this.metrics.monthlySales;
   readonly monthlyExpenses = this.metrics.monthlyExpenses;
@@ -173,20 +152,46 @@ export class FinancialReportsComponent {
   readonly hasSalesData = computed(() => this.monthlySales() > 0);
   readonly hasAnySales = computed(() => this.salesStore.sales().length > 0);
 
-  goToPreviousMonth(): void {
-    this.dashboardStore.goToPreviousMonth();
+  readonly effectiveDateFrom = computed(() => {
+    const ts = this.dashboardStore.dateFrom();
+    return ts !== null ? new Date(ts) : getPeriodStart(this.dashboardStore.selectedPeriod(), this.dashboardStore.selectedDate());
+  });
+
+  readonly effectiveDateTo = computed(() => {
+    const ts = this.dashboardStore.dateTo();
+    return ts !== null ? new Date(ts) : getPeriodEnd(this.dashboardStore.selectedPeriod(), this.dashboardStore.selectedDate());
+  });
+
+  readonly dateFromInputValue = computed(() => this.toDateInputValue(this.effectiveDateFrom()));
+
+  readonly dateToInputValue = computed(() => {
+    const ts = this.dashboardStore.dateTo();
+    const date = ts !== null ? new Date(ts) : getPeriodEnd(this.dashboardStore.selectedPeriod(), this.dashboardStore.selectedDate());
+    date.setDate(date.getDate() - 1);
+    return this.toDateInputValue(date);
+  });
+
+  onDateFromChange(value: string): void {
+    if (!value) return;
+    const [y, m, d] = value.split('-').map(Number);
+    const from = new Date(y, m - 1, d);
+    const to = this.effectiveDateTo();
+    this.dashboardStore.setDateRange(from, to);
   }
 
-  goToNextMonth(): void {
-    this.dashboardStore.goToNextMonth();
+  onDateToChange(value: string): void {
+    if (!value) return;
+    const [y, m, d] = value.split('-').map(Number);
+    const from = this.effectiveDateFrom();
+    const to = new Date(y, m - 1, d + 1);
+    this.dashboardStore.setDateRange(from, to);
   }
 
-  goToCurrentMonth(): void {
-    this.dashboardStore.goToCurrentMonth();
-  }
-
-  setPeriod(period: Period): void {
-    this.dashboardStore.setPeriod(period);
+  private toDateInputValue(date: Date): string {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
   }
 
   async exportAsPdf(): Promise<void> {
@@ -210,6 +215,22 @@ export class FinancialReportsComponent {
   }
 
   async exportAsExcel(): Promise<void> {
+    const dateFrom = this.effectiveDateFrom();
+    const dateTo = this.effectiveDateTo();
+
+    const fixedCostsByMonth = new Map<string, readonly FixedCostEntry[]>();
+    for (const key of computeIntersectingMonthKeys(dateFrom, dateTo)) {
+      fixedCostsByMonth.set(key, this.fixedCostsStore.entriesForMonth(key));
+    }
+
+    const detailedTransactions = buildDetailedTransactionRows({
+      dateFrom,
+      dateTo,
+      sales: this.salesStore.sales(),
+      supplyExpenses: this.ingredientsStore.supplyExpenses(),
+      fixedCostsByMonth,
+    });
+
     await this.financialReportExcel.exportReport({
       periodLabel: this.periodLabel(),
       generatedAt: new Date(),
@@ -226,6 +247,7 @@ export class FinancialReportsComponent {
       topCustomers: this.topCustomerShare(),
       topProducts: this.topProducts(),
       lowStockItems: this.lowStockItems(),
+      detailedTransactions,
     });
   }
 

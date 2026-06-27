@@ -1,0 +1,41 @@
+<section class="gallery-section">
+  <div class="gallery-header">
+    <h2 class="section-heading">La app en acción</h2>
+    <p class="gallery-subtitle">Visualiza cómo Lucis Gestión te ayuda a controlar tu operación día a día</p>
+  </div>
+
+  <div class="gallery-container">
+    <!-- Vista previa principal -->
+    <div class="gallery-preview">
+      <div class="preview-image-wrapper">
+        <img [src]="selectedFeature.image" [alt]="selectedFeature.title" class="preview-image" loading="lazy" />
+        <div class="preview-overlay">
+          <span class="preview-icon">{{ selectedFeature.icon }}</span>
+          <h3>{{ selectedFeature.title }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selector de features -->
+    <div class="gallery-selector">
+      <div class="selector-description">
+        <p class="selector-title">{{ selectedFeature.title }}</p>
+        <p class="selector-text">{{ selectedFeature.description }}</p>
+      </div>
+
+      <div class="feature-buttons">
+        @for (feature of features; track feature.id) {
+        <button
+          (click)="selectFeature(feature)"
+          [class.active]="selectedFeature.id === feature.id"
+          class="feature-btn"
+          [attr.aria-pressed]="selectedFeature.id === feature.id"
+        >
+          <span class="btn-icon">{{ feature.icon }}</span>
+          <span class="btn-text">{{ feature.title }}</span>
+        </button>
+      }
+      </div>
+    </div>
+  </div>
+</section>

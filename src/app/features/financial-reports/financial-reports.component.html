@@ -3,44 +3,17 @@
   <!-- ==================== HEADER ==================== -->
   <header class="report-header">
     <div class="report-header__top">
-      <h1 class="report-header__title">Reportes financieros</h1>
+      <h2 class="section-heading mb-4">Reportes financieros</h2>
     </div>
 
     @if (hasAnySales()) {
       <div class="report-header__controls">
-        <div class="period-selector">
-          @for (opt of periodOptions; track opt.value) {
-            <button
-              type="button"
-              class="period-btn"
-              [class.period-btn--active]="selectedPeriod() === opt.value"
-              (click)="setPeriod(opt.value)"
-            >
-              {{ opt.label }}
-            </button>
-          }
-        </div>
-
-        <app-month-nav
-          [label]="periodLabel()"
-          [disablePrevious]="disablePreviousPeriodNav()"
-          [disableNext]="isCurrentPeriod()"
-          [previousLabel]="previousPeriodLabel()"
-          [nextLabel]="nextPeriodLabel()"
-          (previous)="goToPreviousMonth()"
-          (next)="goToNextMonth()"
-        >
-          @if (!isCurrentPeriod()) {
-            <button
-              type="button"
-              class="report-header__back-today"
-              mn-trailing
-              (click)="goToCurrentMonth()"
-            >
-              Volver al período actual
-            </button>
-          }
-        </app-month-nav>
+        <app-date-range-picker
+          [dateFrom]="dateFromInputValue()"
+          [dateTo]="dateToInputValue()"
+          (dateFromChange)="onDateFromChange($event)"
+          (dateToChange)="onDateToChange($event)"
+        />
       </div>
     }
   </header>
@@ -86,11 +59,11 @@
   <!-- ==================== QUICK ACTIONS ==================== -->
   <section class="report-section" aria-label="Acciones rápidas">
     <div class="actions-bar">
-      <button type="button" class="ui-btn" (click)="exportAsPdf()">
+      <button type="button" class="ui-btn report-action-btn report-action-btn--pdf" (click)="exportAsPdf()">
         <ui-icon name="print" [size]="16" [decorative]="true" />
         Exportar PDF
       </button>
-      <button type="button" class="ui-btn" (click)="exportAsExcel()">
+      <button type="button" class="ui-btn report-action-btn report-action-btn--excel" (click)="exportAsExcel()">
         <ui-icon name="receipt_long" [size]="16" [decorative]="true" />
         Exportar Excel
       </button>
