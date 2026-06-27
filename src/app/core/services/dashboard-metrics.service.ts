@@ -15,6 +15,11 @@ export class DashboardMetricsService {
   private recipesStore = inject(RecipesStore);
 
   private periodRange = computed(() => {
+    const dateFrom = this.dashboardStore.dateFrom();
+    const dateTo = this.dashboardStore.dateTo();
+    if (dateFrom !== null && dateTo !== null) {
+      return { start: new Date(dateFrom), end: new Date(dateTo) };
+    }
     const period = this.dashboardStore.selectedPeriod();
     const date = this.dashboardStore.selectedDate();
     return {

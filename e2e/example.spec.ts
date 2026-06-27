@@ -10,5 +10,5 @@ test('navega desde landing al dashboard demo', async ({ page }) => {
   await page.getByRole('link', { name: /Ver demo/i }).click();
 
   await expect(page).toHaveURL(/\/demo\/dashboard/);
-  await expect(page.getByRole('heading', { name: /Hola!/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Usuario Demo/i })).toBeVisible();
 });

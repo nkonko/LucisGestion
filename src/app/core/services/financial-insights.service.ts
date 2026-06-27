@@ -39,10 +39,10 @@ export class FinancialInsightsService {
   );
 
   readonly periodSales = computed(() => {
-    const period = this.dashboardStore.selectedPeriod();
-    const selectedDate = this.dashboardStore.selectedDate();
-    const start = getPeriodStart(period, selectedDate);
-    const end = getPeriodEnd(period, selectedDate);
+    const dateFrom = this.dashboardStore.dateFrom();
+    const dateTo = this.dashboardStore.dateTo();
+    const start = dateFrom !== null ? new Date(dateFrom) : getPeriodStart(this.dashboardStore.selectedPeriod(), this.dashboardStore.selectedDate());
+    const end = dateTo !== null ? new Date(dateTo) : getPeriodEnd(this.dashboardStore.selectedPeriod(), this.dashboardStore.selectedDate());
 
     return this.salesStore.sales().filter((sale) => {
       if (sale.status === 'cancelled' || sale.status === 'draft') return false;

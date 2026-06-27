@@ -7,6 +7,7 @@ import type {
   ProductOpportunity,
 } from '../../../core/models/financial-report';
 import type { Ingredient } from '../../../core/models/ingredient/ingredient.model';
+import type { DetailedTransactionRow } from '../utils/build-detailed-transactions';
 
 interface TopCustomerRow {
   name: string;
@@ -44,6 +45,7 @@ export interface FinancialReportExcelData {
   topCustomers: readonly TopCustomerRow[];
   topProducts: readonly TopProductRow[];
   lowStockItems: readonly Ingredient[];
+  detailedTransactions: readonly DetailedTransactionRow[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -77,6 +79,7 @@ export class FinancialReportExcelService {
         this.addTopCustomersSheet(workbook, data);
         this.addTopProductsSheet(workbook, data);
         this.addLowStockSheet(workbook, data);
+        this.addDetailedSheet(workbook, data);
 
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], {
@@ -303,6 +306,39 @@ export class FinancialReportExcelService {
     }
 
     this.styleTableSheet(sheet, 1, 'FFFFF7F3');
+    sheet.autoFilter = { from: 'A1', to: 'D1' };
+  }
+
+  private addDetailedSheet(workbook: ExcelJS.Workbook, data: FinancialReportExcelData): void {
+    const sheet = workbook.addWorksheet('Detalle', {
+      views: [{ state: 'frozen', ySplit: 1 }],
+    });
+
+    sheet.columns = [
+      { key: 'date', width: 16 },
+      { key: 'detail', width: 50 },
+      { key: 'income', width: 18 },
+      { key: 'expense', width: 18 },
+    ];
+
+    sheet.addRow(['Fecha', 'Detalle', 'Ingreso', 'Egreso']);
+    this.styleHeaderRow(sheet.getRow(1), 'FF2E5C6E');
+
+    for (const tx of data.detailedTransactions) {
+      sheet.addRow([tx.date, tx.detail, tx.income, tx.expense]);
+    }
+
+    if (sheet.rowCount === 1) {
+      sheet.addRow(['Sin datos', '', '', '']);
+    }
+
+    for (let rowIndex = 2; rowIndex <= sheet.rowCount; rowIndex += 1) {
+      sheet.getCell(`A${rowIndex}`).numFmt = 'dd/mm/yyyy';
+      sheet.getCell(`C${rowIndex}`).numFmt = '$ #,##0.00';
+      sheet.getCell(`D${rowIndex}`).numFmt = '$ #,##0.00';
+    }
+
+    this.styleTableSheet(sheet, 1, 'FFF4F9FB');
     sheet.autoFilter = { from: 'A1', to: 'D1' };
   }
 

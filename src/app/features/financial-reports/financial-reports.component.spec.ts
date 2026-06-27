@@ -10,6 +10,7 @@ import { IngredientsStore } from '../../core/store/ingredients.store';
 import type { CustomerImportance, ProductOpportunity, ExpenseAnomaly, PriorityCustomer } from '../../core/models/financial-report';
 import { FinancialReportPdfService } from './services/financial-report-pdf.service';
 import { FinancialReportExcelService } from './services/financial-report-excel.service';
+import { FixedCostsStore } from '../../core/store/fixed-costs.store';
 
 function mockTimestamp(isoDate?: string) {
   const d = isoDate ? new Date(isoDate) : new Date();
@@ -36,8 +37,14 @@ describe('FinancialReportsComponent', () => {
   let periodLabelSignal: ReturnType<typeof signal<string>>;
   let isCurrentMonthSignal: ReturnType<typeof signal<boolean>>;
   let selectedPeriodSignal: ReturnType<typeof signal<string>>;
+  let selectedDateSignal: ReturnType<typeof signal<{ year: number; month: number; day?: number }>>;
+  let dateFromSignal: ReturnType<typeof signal<number | null>>;
+  let dateToSignal: ReturnType<typeof signal<number | null>>;
+  let setDateRangeMock: ReturnType<typeof vi.fn>;
   let salesSignal: ReturnType<typeof signal<object[]>>;
   let lowStockSignal: ReturnType<typeof signal<object[]>>;
+  let supplyExpensesSignal: ReturnType<typeof signal<object[]>>;
+  let fixedCostsEntriesMock: ReturnType<typeof vi.fn>;
   let financialReportPdfMock: { exportReport: ReturnType<typeof vi.fn> };
   let financialReportExcelMock: { exportReport: ReturnType<typeof vi.fn> };
 
@@ -70,8 +77,14 @@ describe('FinancialReportsComponent', () => {
     periodLabelSignal = signal('Enero 2026');
     isCurrentMonthSignal = signal(true);
     selectedPeriodSignal = signal<string>('month');
+    selectedDateSignal = signal<{ year: number; month: number; day?: number }>({ year: 2026, month: 0, day: 1 });
+    dateFromSignal = signal<number | null>(null);
+    dateToSignal = signal<number | null>(null);
+    setDateRangeMock = vi.fn();
     salesSignal = signal<object[]>([defaultSale]);
     lowStockSignal = signal<object[]>([]);
+    supplyExpensesSignal = signal<object[]>([]);
+    fixedCostsEntriesMock = vi.fn().mockReturnValue([]);
     financialReportPdfMock = { exportReport: vi.fn().mockResolvedValue(undefined) };
     financialReportExcelMock = { exportReport: vi.fn().mockResolvedValue(undefined) };
 
@@ -105,10 +118,10 @@ describe('FinancialReportsComponent', () => {
             periodLabel: periodLabelSignal,
             isCurrentMonth: isCurrentMonthSignal,
             selectedPeriod: selectedPeriodSignal,
-            setPeriod: vi.fn(),
-            goToPreviousMonth: vi.fn(),
-            goToNextMonth: vi.fn(),
-            goToCurrentMonth: vi.fn(),
+            selectedDate: selectedDateSignal,
+            dateFrom: dateFromSignal,
+            dateTo: dateToSignal,
+            setDateRange: setDateRangeMock,
           },
         },
         {
@@ -117,7 +130,11 @@ describe('FinancialReportsComponent', () => {
         },
         {
           provide: IngredientsStore,
-          useValue: { lowStock: lowStockSignal },
+          useValue: { lowStock: lowStockSignal, supplyExpenses: supplyExpensesSignal },
+        },
+        {
+          provide: FixedCostsStore,
+          useValue: { entriesForMonth: fixedCostsEntriesMock },
         },
         {
           provide: FinancialReportPdfService,
@@ -307,28 +324,6 @@ describe('FinancialReportsComponent', () => {
     });
   });
 
-  describe('navigation', () => {
-    let store: { goToPreviousMonth: ReturnType<typeof vi.fn>; goToNextMonth: ReturnType<typeof vi.fn> };
-
-    beforeEach(() => {
-      store = TestBed.inject(DashboardStore) as unknown as { goToPreviousMonth: ReturnType<typeof vi.fn>; goToNextMonth: ReturnType<typeof vi.fn> };
-    });
-
-    it('calls goToPreviousMonth', () => {
-      const btn = fixture.nativeElement.querySelector('[aria-label="Mes anterior"]');
-      btn.click();
-      expect(store.goToPreviousMonth).toHaveBeenCalled();
-    });
-
-    it('calls goToNextMonth', () => {
-      isCurrentMonthSignal.set(false);
-      fixture.detectChanges();
-      const btn = fixture.nativeElement.querySelector('[aria-label="Mes siguiente"]');
-      btn.click();
-      expect(store.goToNextMonth).toHaveBeenCalled();
-    });
-  });
-
   describe('quick actions', () => {
     it('renders all action buttons', () => {
       const section = fixture.nativeElement.querySelector('[aria-label="Acciones rápidas"]');
@@ -353,30 +348,15 @@ describe('FinancialReportsComponent', () => {
 
       expect(financialReportExcelMock.exportReport).toHaveBeenCalled();
     });
-  });
 
-  describe('period selector', () => {
-    it('renders period options', () => {
-      expect(fixture.nativeElement.textContent).toContain('Hoy');
-      expect(fixture.nativeElement.textContent).toContain('Semana');
-      expect(fixture.nativeElement.textContent).toContain('Mes');
-      expect(fixture.nativeElement.textContent).toContain('Año');
-    });
+    it('passes detailedTransactions to Excel exporter', () => {
+      const buttons = fixture.debugElement.queryAll(By.css('[aria-label="Acciones rápidas"] .ui-btn'));
+      const exportExcelButton = buttons[1];
+      exportExcelButton.triggerEventHandler('click', null);
 
-    it('calls setPeriod on store when a period button is clicked', () => {
-      const store = TestBed.inject(DashboardStore) as unknown as { setPeriod: ReturnType<typeof vi.fn> };
-      const debugButtons = fixture.debugElement.queryAll(By.css('.period-btn'));
-      const hoyDebug = debugButtons[0];
-      hoyDebug.triggerEventHandler('click', null);
-      expect(store.setPeriod).toHaveBeenCalledWith('today');
-    });
-
-    it('highlights the active period button', () => {
-      selectedPeriodSignal.set('year');
-      fixture.detectChanges();
-      const debugButtons = fixture.debugElement.queryAll(By.css('.period-btn'));
-      const activeDebug = debugButtons.find((db) => db.nativeElement.classList.contains('period-btn--active'));
-      expect(activeDebug?.nativeElement.textContent).toContain('Año');
+      const callArg = financialReportExcelMock.exportReport.mock.calls[0][0];
+      expect(callArg).toHaveProperty('detailedTransactions');
+      expect(Array.isArray(callArg.detailedTransactions)).toBe(true);
     });
   });
 

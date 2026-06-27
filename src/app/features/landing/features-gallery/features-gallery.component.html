@@ -24,8 +24,8 @@
       </div>
 
       <div class="feature-buttons">
+        @for (feature of features; track feature.id) {
         <button
-          *ngFor="let feature of features"
           (click)="selectFeature(feature)"
           [class.active]="selectedFeature.id === feature.id"
           class="feature-btn"
@@ -34,6 +34,7 @@
           <span class="btn-icon">{{ feature.icon }}</span>
           <span class="btn-text">{{ feature.title }}</span>
         </button>
+      }
       </div>
     </div>
   </div>

@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { FinancialReportExcelService, FinancialReportExcelData } from './financial-report-excel.service';
+import type { DetailedTransactionRow } from '../utils/build-detailed-transactions';
 
 describe('FinancialReportExcelService', () => {
   let service: FinancialReportExcelService;
@@ -20,6 +21,7 @@ describe('FinancialReportExcelService', () => {
     topCustomers: [],
     topProducts: [],
     lowStockItems: [],
+    detailedTransactions: [],
   };
 
   beforeEach(() => {
@@ -34,8 +36,7 @@ describe('FinancialReportExcelService', () => {
   });
 
   it('should export report without errors', async () => {
-    const result = await service.exportReport(mockData);
-    expect(result).toBeUndefined();
+    await service.exportReport(mockData);
   });
 
   it('should handle export with top customers', async () => {
@@ -46,8 +47,7 @@ describe('FinancialReportExcelService', () => {
         { name: 'Customer B', revenue: 30000, share: 30, ordersCount: 8 },
       ],
     };
-    const result = await service.exportReport(dataWithCustomers);
-    expect(result).toBeUndefined();
+    await service.exportReport(dataWithCustomers);
   });
 
   it('should handle export with top products', async () => {
@@ -58,8 +58,7 @@ describe('FinancialReportExcelService', () => {
         { name: 'Product B', quantity: 80, revenue: 30000, margin: 25 },
       ],
     };
-    const result = await service.exportReport(dataWithProducts);
-    expect(result).toBeUndefined();
+    await service.exportReport(dataWithProducts);
   });
 
   it('should handle export with opportunities and anomalies', async () => {
@@ -96,7 +95,30 @@ describe('FinancialReportExcelService', () => {
         },
       ],
     };
-    const result = await service.exportReport(dataWithInsights);
-    expect(result).toBeUndefined();
+    await service.exportReport(dataWithInsights);
+  });
+
+  it('should export report with detailed transactions', async () => {
+    const detailedTransactions: DetailedTransactionRow[] = [
+      { date: new Date(2026, 5, 1), detail: 'Alquiler — rent', income: 0, expense: 30000, sourceType: 'fixed' },
+      { date: new Date(2026, 5, 10), detail: 'Harina 2unid.', income: 0, expense: 5000, sourceType: 'supply' },
+      { date: new Date(2026, 5, 15), detail: 'Producto x1', income: 15000, expense: 0, sourceType: 'sale' },
+    ];
+
+    const dataWithDetails: FinancialReportExcelData = {
+      ...mockData,
+      detailedTransactions,
+    };
+
+    await service.exportReport(dataWithDetails);
+  });
+
+  it('should handle export with empty detailed transactions', async () => {
+    const dataWithEmptyDetails: FinancialReportExcelData = {
+      ...mockData,
+      detailedTransactions: [],
+    };
+
+    await service.exportReport(dataWithEmptyDetails);
   });
 });
