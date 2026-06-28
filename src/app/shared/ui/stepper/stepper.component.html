@@ -1,0 +1,33 @@
+<nav role="tablist" aria-label="Progreso del formulario" class="stepper">
+  @for (step of steps(); track $index) {
+    <div class="stepper__item">
+      <button
+        type="button"
+        role="tab"
+        [attr.tabindex]="isActive($index) ? 0 : -1"
+        [attr.aria-selected]="isActive($index)"
+        [attr.aria-label]="
+          isCompleted($index)
+            ? 'Paso ' + ($index + 1) + ' completado'
+            : 'Paso ' + ($index + 1) + ': ' + step
+        "
+        class="stepper__indicator"
+        [class.stepper__indicator--completed]="isCompleted($index)"
+        [class.stepper__indicator--active]="isActive($index)"
+        [class.stepper__indicator--inactive]="isInactive($index)"
+        (click)="onStepClick($index)"
+        (keydown)="onKeydown($event, $index)"
+      >
+        @if (isCompleted($index)) {
+          <ui-icon name="check_circle" [size]="18" [decorative]="true" />
+        } @else {
+          <span class="stepper__number">{{ $index + 1 }}</span>
+        }
+      </button>
+      <span class="stepper__label">{{ step }}</span>
+      @if (!$last) {
+        <div class="stepper__connector" aria-hidden="true"></div>
+      }
+    </div>
+  }
+</nav>

@@ -1,22 +1,7 @@
-<div class="flex flex-col gap-3">
+<div class="ingredient-form">
   <h3 class="text-sm font-medium">Ingredientes</h3>
-  @for (ri of recipeIngredients(); track ri.ingredientId; let i = $index) {
-    <div class="grid grid-cols-[minmax(0,1fr)_140px_auto_80px_auto] gap-2 items-center">
-      <span class="text-sm truncate">{{ ri.name }}</span
-      ><input
-        class="ui-input"
-        type="number"
-        [ngModel]="ri.quantity"
-        (ngModelChange)="updateQuantity(i, $event)"
-        min="0"
-        step="0.1"
-      /><span class="text-xs text-gray-500 text-center min-w-[2rem]">{{ ri.unit }}</span
-      ><span class="text-xs font-medium text-right">{{ ri.lineCost | ars }}</span
-      ><button class="ui-btn ui-btn-danger text-center" type="button" (click)="removeIngredient(i)">
-        Quitar
-      </button>
-    </div>
-  }
+
+  <!-- Search input — always visible at the top -->
   <div class="ingredient-search-wrapper">
     <label class="ui-field">
       <span>Agregar ingrediente...</span>
@@ -47,4 +32,27 @@
       </ul>
     }
   </div>
+
+  <!-- Ingredient list — scrollable when it gets long -->
+  @if (recipeIngredients().length > 0) {
+    <div class="ingredient-list">
+      @for (ri of recipeIngredients(); track ri.ingredientId; let i = $index) {
+        <div class="grid grid-cols-[minmax(0,1fr)_140px_auto_80px_auto] gap-2 items-center">
+          <span class="text-sm truncate">{{ ri.name }}</span
+          ><input
+            class="ui-input"
+            type="number"
+            [ngModel]="ri.quantity"
+            (ngModelChange)="updateQuantity(i, $event)"
+            min="0"
+            step="0.1"
+          /><span class="text-xs text-gray-500 text-center min-w-[2rem]">{{ ri.unit }}</span
+          ><span class="text-xs font-medium text-right">{{ ri.lineCost | ars }}</span
+          ><button class="ui-btn ui-btn-danger text-center" type="button" (click)="removeIngredient(i)">
+            Quitar
+          </button>
+        </div>
+      }
+    </div>
+  }
 </div>
