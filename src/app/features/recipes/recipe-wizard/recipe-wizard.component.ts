@@ -52,14 +52,14 @@ export class RecipeWizardComponent {
 
   /** Measure the full panel content and set an explicit height so CSS transitions animate it. */
   private updatePanelHeight(): void {
-    const sheetPanel = this.hostElement.nativeElement.closest('.ui-bottom-sheet-panel') as HTMLElement | null;
+    const sheetPanel = this.hostElement.nativeElement.closest<HTMLElement>('.ui-bottom-sheet-panel');
     if (!sheetPanel) return;
 
     const host = this.hostElement.nativeElement;
-    const headerBar = sheetPanel.querySelector('.ui-bottom-sheet-header') as HTMLElement | null;
-    const stepperEl = host.querySelector('app-stepper') as HTMLElement | null;
-    const bodySection = host.querySelector('.wizard__body') as HTMLElement | null;
-    const footerBar = host.querySelector('.wizard__footer') as HTMLElement | null;
+    const headerBar = sheetPanel.querySelector<HTMLElement>('.ui-bottom-sheet-header');
+    const stepperEl = host.querySelector<HTMLElement>('app-stepper');
+    const bodySection = host.querySelector<HTMLElement>('.wizard__body');
+    const footerBar = host.querySelector<HTMLElement>('.wizard__footer');
 
     const headerHeight = headerBar?.offsetHeight ?? 0;
     const stepperHeight = stepperEl?.offsetHeight ?? 0;
@@ -74,7 +74,7 @@ export class RecipeWizardComponent {
       const paddingTop = parseFloat(style.paddingTop) || 0;
       const paddingBottom = parseFloat(style.paddingBottom) || 0;
       const gap = parseFloat(style.gap) || 0;
-      const bodyChildren = Array.from(bodySection.children) as HTMLElement[];
+      const bodyChildren = Array.from(bodySection.children).filter((c): c is HTMLElement => c instanceof HTMLElement);
       const childrenHeight = bodyChildren.reduce((sum, child) => sum + child.offsetHeight, 0);
       const gapsHeight = bodyChildren.length > 1 ? gap * (bodyChildren.length - 1) : 0;
       bodyHeight = paddingTop + paddingBottom + childrenHeight + gapsHeight;
@@ -180,21 +180,21 @@ export class RecipeWizardComponent {
     // Edit mode + dirty → free navigation, se puede mover entre pasos
     if (this.isEdit && this.isDirty()) {
       this.currentStep.set(n);
-      requestAnimationFrame(() => this.updatePanelHeight());
+      requestAnimationFrame(() => { this.updatePanelHeight(); });
       return;
     }
 
     // Ir para atrás siempre se permite
     if (n < this.currentStep()) {
       this.currentStep.set(n);
-      requestAnimationFrame(() => this.updatePanelHeight());
+      requestAnimationFrame(() => { this.updatePanelHeight(); });
       return;
     }
 
     // Ir para adelante: solo un paso a la vez y el paso actual debe ser válido
     if (n === this.currentStep() + 1 && this.isStepValid(this.currentStep())) {
       this.currentStep.set(n);
-      requestAnimationFrame(() => this.updatePanelHeight());
+      requestAnimationFrame(() => { this.updatePanelHeight(); });
       return;
     }
 
@@ -204,13 +204,13 @@ export class RecipeWizardComponent {
   next(): void {
     if (this.isStepValid(this.currentStep())) {
       this.currentStep.update((n) => n + 1);
-      requestAnimationFrame(() => this.updatePanelHeight());
+      requestAnimationFrame(() => { this.updatePanelHeight(); });
     }
   }
 
   prev(): void {
     this.currentStep.update((n) => n - 1);
-    requestAnimationFrame(() => this.updatePanelHeight());
+    requestAnimationFrame(() => { this.updatePanelHeight(); });
   }
 
   save(): void {
