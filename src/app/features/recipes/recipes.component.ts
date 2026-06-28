@@ -25,18 +25,20 @@ export class RecipesComponent {
   private notify = inject(NotificationService);
 
   readonly previewImageUrl = signal<string | null>(null);
-  readonly brokenImageKeys = signal<Record<string, true>>({});
+  readonly brokenImageKeys = signal<Map<string, true>>(new Map());
 
   isThumbnailVisible(recipe: Recipe): boolean {
     if (!recipe.imageUrl) return false;
-    return !this.brokenImageKeys()[this.getImageKey(recipe)];
+    return !this.brokenImageKeys().has(this.getImageKey(recipe));
   }
 
   onThumbnailError(recipe: Recipe): void {
     const imageKey = this.getImageKey(recipe);
     this.brokenImageKeys.update((current) => {
-      if (current[imageKey]) return current;
-      return { ...current, [imageKey]: true };
+      if (current.has(imageKey)) return current;
+      const next = new Map(current);
+      next.set(imageKey, true);
+      return next;
     });
   }
 

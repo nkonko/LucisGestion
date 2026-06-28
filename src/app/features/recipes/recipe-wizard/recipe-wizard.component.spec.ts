@@ -8,7 +8,7 @@ import { IngredientsStore } from '../../../core/store/ingredients.store';
 import { DIALOG_DATA, DIALOG_REF } from '../../../core/models/dialog/dialog-tokens.model';
 import { DialogRef } from '../../../core/models/dialog/dialog-ref.model';
 import { BottomSheetService } from '../../../core/services/bottom-sheet.service';
-import type { Ingredient, RecipeIngredient } from '../../../core/models/ingredient';
+import type { Ingredient } from '../../../core/models/ingredient';
 
 describe('RecipeWizardComponent', () => {
   let fixture: ComponentFixture<RecipeWizardComponent>;

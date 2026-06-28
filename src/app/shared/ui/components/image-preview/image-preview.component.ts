@@ -10,7 +10,7 @@ import { UiIconComponent } from '../ui-icon/ui-icon.component';
 })
 export class ImagePreviewComponent {
   readonly imageUrl = input.required<string>();
-  readonly closed = output<void>();
+  readonly closed = output();
 
   @HostListener('document:keydown.escape')
   onEscape(): void {

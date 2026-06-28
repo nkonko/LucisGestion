@@ -37,6 +37,7 @@ test('flujo del modal de recetas: crear con imagen y eliminar', async ({ page })
   await expect(editDialog.getByLabel('URL de imagen')).toHaveValue(imageUrl);
 
   await editDialog.getByRole('button', { name: /Eliminar receta/i }).click();
+  await page.getByRole('button', { name: /^Eliminar$/i }).click();
 
   await expect(page.locator('.recipe-card', { hasText: recipeName })).toHaveCount(0);
 });

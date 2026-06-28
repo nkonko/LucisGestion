@@ -298,7 +298,7 @@ export class SalesComponent {
           },
         },
       );
-      ref.afterClosed.subscribe((confirmed) => resolve(confirmed === true));
+      ref.afterClosed.subscribe((confirmed) => { resolve(confirmed === true); });
     });
   }
 

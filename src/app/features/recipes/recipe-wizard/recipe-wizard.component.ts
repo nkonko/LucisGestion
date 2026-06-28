@@ -41,42 +41,42 @@ export class RecipeWizardComponent {
   readonly isEdit = !!this.data;
 
   constructor() {
-    afterNextRender(() => this.updatePanelHeight());
+    afterNextRender(() => { this.updatePanelHeight(); });
 
     // Re-measure when ingredients change (add/remove/resize step 2)
     effect(() => {
       this.recipeIngredients();
-      requestAnimationFrame(() => this.updatePanelHeight());
+      requestAnimationFrame(() => { this.updatePanelHeight(); });
     });
   }
 
   /** Measure the full panel content and set an explicit height so CSS transitions animate it. */
   private updatePanelHeight(): void {
-    const panel = this.hostElement.nativeElement.closest('.ui-bottom-sheet-panel') as HTMLElement | null;
-    if (!panel) return;
+    const sheetPanel = this.hostElement.nativeElement.closest('.ui-bottom-sheet-panel') as HTMLElement | null;
+    if (!sheetPanel) return;
 
     const host = this.hostElement.nativeElement;
-    const header = panel.querySelector('.ui-bottom-sheet-header') as HTMLElement | null;
-    const stepper = host.querySelector('app-stepper') as HTMLElement | null;
-    const body = host.querySelector('.wizard__body') as HTMLElement | null;
-    const footer = host.querySelector('.wizard__footer') as HTMLElement | null;
+    const headerBar = sheetPanel.querySelector('.ui-bottom-sheet-header') as HTMLElement | null;
+    const stepperEl = host.querySelector('app-stepper') as HTMLElement | null;
+    const bodySection = host.querySelector('.wizard__body') as HTMLElement | null;
+    const footerBar = host.querySelector('.wizard__footer') as HTMLElement | null;
 
-    const headerHeight = header?.offsetHeight ?? 0;
-    const stepperHeight = stepper?.offsetHeight ?? 0;
-    const footerHeight = footer?.offsetHeight ?? 0;
+    const headerHeight = headerBar?.offsetHeight ?? 0;
+    const stepperHeight = stepperEl?.offsetHeight ?? 0;
+    const footerHeight = footerBar?.offsetHeight ?? 0;
 
     // Measure the natural body content height by summing its direct children
     // (not body.scrollHeight/offsetHeight, which returns the flex-stretched height
     // and causes stale measurements when going back to a shorter step).
     let bodyHeight = 0;
-    if (body) {
-      const style = getComputedStyle(body);
+    if (bodySection) {
+      const style = getComputedStyle(bodySection);
       const paddingTop = parseFloat(style.paddingTop) || 0;
       const paddingBottom = parseFloat(style.paddingBottom) || 0;
       const gap = parseFloat(style.gap) || 0;
-      const children = Array.from(body.children) as HTMLElement[];
-      const childrenHeight = children.reduce((sum, child) => sum + child.offsetHeight, 0);
-      const gapsHeight = children.length > 1 ? gap * (children.length - 1) : 0;
+      const bodyChildren = Array.from(bodySection.children) as HTMLElement[];
+      const childrenHeight = bodyChildren.reduce((sum, child) => sum + child.offsetHeight, 0);
+      const gapsHeight = bodyChildren.length > 1 ? gap * (bodyChildren.length - 1) : 0;
       bodyHeight = paddingTop + paddingBottom + childrenHeight + gapsHeight;
     }
 
@@ -89,7 +89,7 @@ export class RecipeWizardComponent {
     const total = headerHeight + stepperHeight + bodyHeight + footerHeight;
     const max = window.innerHeight * 0.92;
 
-    panel.style.height = Math.min(total, max) + 'px';
+    sheetPanel.style.height = Math.min(total, max) + 'px';
   }
 
   readonly stepLabels = ['Datos básicos', 'Ingredientes', 'Costos', 'Notas'];
