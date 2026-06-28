@@ -19,6 +19,40 @@ La app se levanta con datos de ejemplo precargados (ingredientes, recetas, clien
 - **Resultado esperado**: Lo que debe ocurrir si todo funciona correctamente.
 - ✅ = Pasó | ❌ = Falló | ⏳ = Pendiente
 
+## Cobertura E2E automatizada actual (Playwright)
+
+Los siguientes flujos ya tienen automatización en `e2e/*.spec.ts` y corren sobre `baseURL=http://localhost:4200` (normalmente con `pnpm start:mock`):
+
+| Spec E2E | Cobertura funcional actual | Casos CP relacionados |
+|---|---|---|
+| `e2e/example.spec.ts` | Landing: título, hero y navegación a demo | CP-29 (parcial, entrada al flujo) |
+| `e2e/navigation-flow.spec.ts` | Navegación por barra inferior (dashboard, recetas, ventas, stock, inicio) | CP-29 (parcial, navegación) |
+| `e2e/demo-smoke.spec.ts` | Carga de rutas demo: dashboard, ingredientes, recetas, ventas, stock, clientes, costos, reportes, backup | CP-19, CP-20, CP-23, CP-25, CP-26 (parcial: accesibilidad de pantallas) |
+| `e2e/account-menu.spec.ts` | Menú de cuenta: acceso a Reportes financieros y Backup/Restore | CP-25 (parcial), CP-29 (parcial) |
+| `e2e/recipes-modal-flow.spec.ts` | Crear receta con URL de imagen, reabrir edición y eliminar receta con confirmación | CP-10 (parcial), CP-11 (parcial), CP-13 (parcial) |
+| `e2e/sales-create.spec.ts` | Crear venta desde formulario con cliente y nota; ver estado pendiente | CP-14 (parcial), CP-15 (precondición) |
+| `e2e/sales-filters.spec.ts` | Filtros por cliente y por estado pendiente en ventas | CP-17 (parcial) |
+
+### Brechas actuales entre manual y E2E
+
+- **Autenticación real (CP-01 a CP-04)**: no está automatizada en E2E de demo/mock.
+- **Reglas de negocio con cálculo numérico**: costo/precio exacto de recetas, impacto en KPIs y descuento de stock no tienen assertion E2E fuerte todavía.
+- **Integraciones externas**: WhatsApp, impresión y PWA/offline siguen como validación manual.
+- **Roles y permisos (CP-30)**: requiere entorno Firebase real y no está automatizado en Playwright actual.
+
+### Ejecución recomendada de E2E
+
+```bash
+pnpm start:mock
+pnpm e2e
+```
+
+Para depurar una spec puntual:
+
+```bash
+npx playwright test e2e/recipes-modal-flow.spec.ts --project=chromium
+```
+
 ---
 
 ## 1. Autenticación (Fase 4)
@@ -303,7 +337,7 @@ La app se levanta con datos de ejemplo precargados (ingredientes, recetas, clien
 
 ## 8. Ciclo completo (E2E)
 
-### CP-29: Ciclo de negocio completo
+### CP-29: Ciclo de negocio completo (manual integrador)
 
 | Campo | Detalle |
 |---|---|
