@@ -7,11 +7,14 @@ import { RecipeWizardComponent } from './recipe-wizard.component';
 import { IngredientsStore } from '../../../core/store/ingredients.store';
 import { DIALOG_DATA, DIALOG_REF } from '../../../core/models/dialog/dialog-tokens.model';
 import { DialogRef } from '../../../core/models/dialog/dialog-ref.model';
+import { BottomSheetService } from '../../../core/services/bottom-sheet.service';
 import type { Ingredient, RecipeIngredient } from '../../../core/models/ingredient';
 
 describe('RecipeWizardComponent', () => {
   let fixture: ComponentFixture<RecipeWizardComponent>;
   let component: RecipeWizardComponent;
+  let bottomSheetMock: { open: ReturnType<typeof vi.fn> };
+  let confirmDialogRef: DialogRef<boolean>;
 
   const dialogRefMock: Pick<DialogRef<unknown>, 'close'> = {
     close: vi.fn(),
@@ -48,6 +51,10 @@ describe('RecipeWizardComponent', () => {
 
   function createComponent(data: unknown = null): void {
     vi.clearAllMocks();
+    confirmDialogRef = new DialogRef<boolean>();
+    bottomSheetMock = {
+      open: vi.fn().mockReturnValue(confirmDialogRef),
+    };
 
     TestBed.configureTestingModule({
       imports: [RecipeWizardComponent],
@@ -55,6 +62,7 @@ describe('RecipeWizardComponent', () => {
         { provide: DIALOG_REF, useValue: dialogRefMock },
         { provide: DIALOG_DATA, useValue: data },
         { provide: IngredientsStore, useValue: ingredientsStoreMock },
+        { provide: BottomSheetService, useValue: bottomSheetMock },
       ],
     });
 
@@ -364,9 +372,17 @@ describe('RecipeWizardComponent', () => {
       expect(deleteBtn).toBeTruthy();
     });
 
-    it('closes with "delete" on remove', () => {
+    it('closes with "delete" on remove when confirm dialog is accepted', () => {
       component.remove();
+      expect(bottomSheetMock.open).toHaveBeenCalledTimes(1);
+      confirmDialogRef.close(true);
       expect(dialogRefMock.close).toHaveBeenCalledWith('delete');
+    });
+
+    it('does not close with "delete" when confirm dialog is dismissed', () => {
+      component.remove();
+      confirmDialogRef.close(false);
+      expect(dialogRefMock.close).not.toHaveBeenCalled();
     });
   });
 });

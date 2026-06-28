@@ -11,6 +11,9 @@ import { CategoryFormComponent } from './category-form/category-form.component';
 import { RecipeIngredientFormComponent } from './ingredient-form/ingredient-form.component';
 import { CostFormComponent } from './cost-form/cost-form.component';
 import { UiIconComponent } from '../../../shared/ui/components';
+import { BottomSheetService } from '../../../core/services/bottom-sheet.service';
+import { ConfirmBottomSheetDialogComponent } from '../../../shared/ui-bottom-sheet/confirm-dialog/confirm-bottom-sheet-dialog.component';
+import { ConfirmDialogData } from '../../../shared/ui-bottom-sheet/confirm-dialog/confirm-dialog-data.model';
 
 const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif'] as const;
 
@@ -33,6 +36,7 @@ export class RecipeWizardComponent {
   private data = inject(DIALOG_DATA) as Recipe | null;
   private ingredientsStore = inject(IngredientsStore);
   private hostElement = inject<ElementRef<HTMLElement>>(ElementRef);
+  private bottomSheet = inject(BottomSheetService);
 
   readonly isEdit = !!this.data;
 
@@ -231,7 +235,23 @@ export class RecipeWizardComponent {
   }
 
   remove(): void {
-    this.dialogRef.close('delete');
+    const ref = this.bottomSheet.open<ConfirmDialogData, boolean>(
+      ConfirmBottomSheetDialogComponent,
+      {
+        maxWidth: '420px',
+        data: {
+          title: 'Eliminar receta',
+          message: '¿Seguro que querés eliminar esta receta? No se puede deshacer.',
+          confirmLabel: 'Eliminar',
+          destructive: true,
+        },
+      },
+    );
+    ref.afterClosed.subscribe((confirmed) => {
+      if (confirmed) {
+        this.dialogRef.close('delete');
+      }
+    });
   }
 
   cancel(): void {
