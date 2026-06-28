@@ -13,6 +13,9 @@ import {
 import { DIALOG_DATA, DIALOG_REF } from '../../../core/models/dialog/dialog-tokens.model';
 import { DialogRef } from '../../../core/models/dialog/dialog-ref.model';
 import { UiIconComponent } from '../../../shared/ui/components';
+import { BottomSheetService } from '../../../core/services/bottom-sheet.service';
+import { ConfirmBottomSheetDialogComponent } from '../../../shared/ui-bottom-sheet/confirm-dialog/confirm-bottom-sheet-dialog.component';
+import { ConfirmDialogData } from '../../../shared/ui-bottom-sheet/confirm-dialog/confirm-dialog-data.model';
 
 @Component({
   selector: 'app-ingredient-form',
@@ -24,6 +27,7 @@ import { UiIconComponent } from '../../../shared/ui/components';
 export class IngredientFormComponent {
   private dialogRef = inject(DIALOG_REF) as DialogRef<Ingredient | 'delete'>;
   private data = inject(DIALOG_DATA) as Ingredient | null;
+  private bottomSheet = inject(BottomSheetService);
 
   isEdit = !!this.data;
   icons = INGREDIENT_ICON_OPTIONS;
@@ -72,6 +76,22 @@ export class IngredientFormComponent {
   }
 
   remove(): void {
-    this.dialogRef.close('delete');
+    const ref = this.bottomSheet.open<ConfirmDialogData, boolean>(
+      ConfirmBottomSheetDialogComponent,
+      {
+        maxWidth: '420px',
+        data: {
+          title: 'Eliminar ingrediente',
+          message: '¿Seguro que querés eliminar este ingrediente? Si se usa en alguna receta, podría afectar los cálculos de costo.',
+          confirmLabel: 'Eliminar',
+          destructive: true,
+        },
+      },
+    );
+    ref.afterClosed.subscribe((confirmed) => {
+      if (confirmed) {
+        this.dialogRef.close('delete');
+      }
+    });
   }
 }

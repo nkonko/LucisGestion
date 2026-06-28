@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 import { Timestamp } from 'firebase/firestore';
 import type { Ingredient } from '../models/ingredient';
 import type { Recipe } from '../models/recipe';
@@ -104,7 +104,15 @@ export class MockFirestoreService {
   }
 
   getCollection<T>(path: string, ..._constraints: unknown[]): Observable<T[]> {
-    return this.getOrCreate(path).asObservable() as Observable<T[]>;
+    return this.getOrCreate(path).pipe(
+      map((items) =>
+        items.filter((item) => {
+          const doc = item as MockDocument;
+          // Filtrar solo cuando active está explícitamente en false (soft-delete)
+          return doc.active !== false;
+        }),
+      ),
+    ) as Observable<T[]>;
   }
 
   async addDocument<T extends Record<string, unknown>>(path: string, data: T): Promise<string> {
@@ -1303,6 +1311,29 @@ export class MockFirestoreService {
         paymentMethod: 'mercadopago',
         status: 'delivered',
         notes: 'Venta demo para navegación anual.',
+      },
+      {
+        id: 'ven-22',
+        date: tsFromDate(today),
+        deliveryDate: tsFromDate(today),
+        customerId: 'cli-2',
+        customerName: 'Carlos Rodríguez',
+        items: [
+          {
+            recipeId: 'rec-3',
+            name: 'Cheesecake',
+            quantity: 1,
+            unitPrice: 6500,
+            unitCost: 3725,
+          },
+        ],
+        total: 6500,
+        totalCost: 3725,
+        profit: 2775,
+        isPaid: false,
+        paymentMethod: 'cash',
+        status: 'pending',
+        notes: 'Entrega para hoy — demo.',
       },
     ];
 

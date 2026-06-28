@@ -13,3 +13,5 @@ export type { KpiVariant } from './kpi-card/kpi-card.component';
 
 export { InsightCardComponent } from './insight-card/insight-card.component';
 export type { InsightVariant } from './insight-card/insight-card.component';
+
+export { ImagePreviewComponent } from './image-preview/image-preview.component';

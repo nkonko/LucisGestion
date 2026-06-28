@@ -1,0 +1,17 @@
+@if (todayDeliveries().length > 0) {
+  <h3 class="text-base font-medium mb-2 flex items-center gap-1">
+    <ui-icon name="calendar_clock" class="text-amber-500" [size]="20" [decorative]="true" />
+    Entregas para hoy
+  </h3>
+  <section class="ui-card-surface mb-4 ui-list">
+    @for (sale of todayDeliveries(); track sale.id) {
+      <article class="ui-list-item" [routerLink]="basePath() + '/ventas'">
+        <ui-icon name="package" class="text-amber-600" [size]="18" [decorative]="true" />
+        <div class="flex items-center justify-between gap-2">
+          <span>{{ sale.customerName || 'Sin cliente' }} — {{ sale.total | ars }}</span>
+          <span class="ui-chip-static" [class]="getStatusClass(sale.status)">{{ getStatusLabel(sale.status) }}</span>
+        </div>
+      </article>
+    }
+  </section>
+}

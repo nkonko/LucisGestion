@@ -9,6 +9,8 @@ import { SaleFormComponent } from './create-sale/sale-form.component';
 import { BottomSheetService } from '../../core/services/bottom-sheet.service';
 import { UiIconComponent } from '../../shared/ui/components';
 import { SalesCardComponent } from './sales-card/sales-card.component';
+import { ConfirmBottomSheetDialogComponent } from '../../shared/ui-bottom-sheet/confirm-dialog/confirm-bottom-sheet-dialog.component';
+import { ConfirmDialogData } from '../../shared/ui-bottom-sheet/confirm-dialog/confirm-dialog-data.model';
 
 @Component({
   selector: 'app-sales',
@@ -239,6 +241,9 @@ export class SalesComponent {
       return;
     }
 
+    const confirmed = await this.confirmFulfillDraft(sale);
+    if (!confirmed) return;
+
     try {
       await this.store.fulfillDraft(saleId);
       this.notify.success('Venta confirmada. Stock actualizado.', 3000);
@@ -252,6 +257,11 @@ export class SalesComponent {
     if (!saleId) {
       this.notify.error('Venta inválida.');
       return;
+    }
+
+    if (newStatus === 'cancelled') {
+      const confirmed = await this.confirmCancelSale(sale);
+      if (!confirmed) return;
     }
 
     await this.store.updateSaleStatus(saleId, newStatus);
@@ -272,6 +282,41 @@ export class SalesComponent {
     })();
 
     this.notify.success(`Pedido marcado como ${statusLabel.toLowerCase()}`);
+  }
+
+  private confirmCancelSale(sale: Sale): Promise<boolean> {
+    return new Promise((resolve) => {
+      const ref = this.bottomSheet.open<ConfirmDialogData, boolean>(
+        ConfirmBottomSheetDialogComponent,
+        {
+          maxWidth: '420px',
+          data: {
+            title: 'Cancelar venta',
+            message: `¿Seguro que querés cancelar la venta de ${sale.customerName} por $${sale.total}? Esta acción no se puede deshacer desde la app.`,
+            confirmLabel: 'Cancelar venta',
+            destructive: true,
+          },
+        },
+      );
+      ref.afterClosed.subscribe((confirmed) => { resolve(confirmed === true); });
+    });
+  }
+
+  private confirmFulfillDraft(sale: Sale): Promise<boolean> {
+    return new Promise((resolve) => {
+      const ref = this.bottomSheet.open<ConfirmDialogData, boolean>(
+        ConfirmBottomSheetDialogComponent,
+        {
+          maxWidth: '420px',
+          data: {
+            title: 'Confirmar venta',
+            message: `¿Confirmás la venta de ${sale.customerName} por $${sale.total}? Se descontarán los ingredientes del stock.`,
+            confirmLabel: 'Confirmar venta',
+          },
+        },
+      );
+      ref.afterClosed.subscribe((confirmed) => { resolve(confirmed === true); });
+    });
   }
 
   sendWhatsApp(sale: Sale): void {

@@ -1,0 +1,122 @@
+<section class="wizard">
+  <app-stepper
+    [steps]="stepLabels"
+    [activeStep]="currentStep()"
+    (stepChange)="goToStep($event)"
+  />
+
+  <div class="wizard__body">
+    @switch (currentStep()) {
+      @case (0) {
+        <label class="ui-field wizard-field wizard-field--full">
+          <span>Nombre</span>
+          <input
+            data-initial-focus
+            class="ui-input"
+            [ngModel]="name()"
+            (ngModelChange)="name.set($event)"
+            required
+          />
+        </label>
+
+        <app-category-form
+          [category]="category()"
+          [yieldValue]="yieldValue()"
+          (categoryChange)="category.set($event)"
+          (yieldValueChange)="yieldValue.set($event)"
+        />
+      }
+
+      @case (1) {
+        <app-recipe-ingredient-form
+          [recipeIngredients]="recipeIngredients()"
+          (recipeIngredientsChange)="recipeIngredients.set($event)"
+        />
+      }
+
+      @case (2) {
+        <app-cost-form
+          [calculatedCost]="calculatedCost()"
+          [suggestedPrice]="suggestedPrice()"
+          [profitMargin]="profitMargin()"
+          [salePrice]="salePrice()"
+          (profitMarginChange)="profitMargin.set($event)"
+          (salePriceChange)="salePrice.set($event)"
+        />
+      }
+
+      @case (3) {
+        <label class="ui-field wizard-field wizard-field--full">
+          <span>Notas / Instrucciones</span>
+          <textarea
+            class="ui-textarea"
+            [ngModel]="notes()"
+            (ngModelChange)="notes.set($event)"
+            rows="3"
+          ></textarea>
+        </label>
+
+        <label class="ui-field wizard-field wizard-field--full">
+          <span>URL de imagen</span>
+          <input
+            class="ui-input"
+            type="url"
+            [ngModel]="imageUrl()"
+            (ngModelChange)="imageUrl.set($event)"
+            [attr.aria-invalid]="imageUrlValidationMessage() ? 'true' : null"
+            [class.wizard-field__input--invalid]="!!imageUrlValidationMessage()"
+          />
+
+          @if (imageUrlValidationMessage(); as imageUrlError) {
+            <p class="wizard-field__error" role="alert">{{ imageUrlError }}</p>
+          }
+        </label>
+      }
+    }
+  </div>
+
+  <footer class="wizard__footer">
+    <div>
+      @if (isEdit) {
+        <button
+          class="wizard__delete-btn"
+          type="button"
+          (click)="remove()"
+          aria-label="Eliminar receta"
+        >
+          <ui-icon name="delete" [decorative]="true" />
+        </button>
+      }
+    </div>
+
+    <div class="wizard__nav">
+      @if (currentStep() > 0) {
+        <button class="wizard__nav-btn wizard__nav-btn--prev" type="button" (click)="prev()">
+          Anterior
+        </button>
+      }
+
+      @if (currentStep() < 3) {
+        <button
+          class="wizard__nav-btn wizard__nav-btn--next"
+          type="button"
+          [disabled]="!isStepValid(currentStep())"
+          (click)="next()"
+        >
+          Siguiente
+        </button>
+      }
+
+      @if (currentStep() === 3) {
+        <button
+          class="wizard__submit-btn"
+          type="button"
+          [disabled]="!isStepValid(currentStep()) || (isEdit && !isDirty())"
+          (click)="save()"
+        >
+          {{ isEdit ? 'Guardar cambios' : 'Crear receta' }}
+        </button>
+      }
+    </div>
+  </footer>
+</section>
