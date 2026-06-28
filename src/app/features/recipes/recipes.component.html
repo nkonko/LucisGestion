@@ -25,6 +25,24 @@
         </span>
       </div>
 
+      @if (isThumbnailVisible(recipe)) {
+        <button
+          class="recipe-card-thumb"
+          type="button"
+          aria-label="Ver imagen de {{ recipe.name }}"
+          (click)="openPreview(recipe.imageUrl)"
+        >
+          <img
+            class="recipe-card-thumb__img"
+            [src]="recipe.imageUrl"
+            alt=""
+            loading="lazy"
+            (error)="onThumbnailError(recipe)"
+          />
+          <ui-icon class="recipe-card-thumb__zoom" name="search" [size]="16" />
+        </button>
+      }
+
       <div class="recipe-card-metrics">
         <div class="grid grid-cols-3 gap-2 text-center">
           <div>
@@ -66,4 +84,11 @@
   >
     <ui-icon name="add" [decorative]="true" />
   </button>
+}
+
+@if (previewImageUrl()) {
+  <app-image-preview
+    [imageUrl]="previewImageUrl()!"
+    (closed)="closePreview()"
+  />
 }

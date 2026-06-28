@@ -1,0 +1,18 @@
+<div class="preview__backdrop" (click)="onBackdropClick()">
+  <div class="preview__container" (click)="$event.stopPropagation()">
+    <button
+      class="preview__close"
+      type="button"
+      aria-label="Cerrar"
+      (click)="closed.emit()"
+    >
+      <ui-icon name="close" [size]="24" [decorative]="true" />
+    </button>
+
+    <img
+      class="preview__image"
+      [src]="imageUrl()"
+      alt="Vista previa de la receta"
+    />
+  </div>
+</div>

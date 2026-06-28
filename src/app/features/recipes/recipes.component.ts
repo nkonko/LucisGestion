@@ -1,17 +1,17 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { NotificationService } from '../../core/services/notification.service';
 import { RecipesStore } from '../../core/store/recipes.store';
 import { Recipe, RECIPE_CATEGORY_DISPLAY, RECIPE_CATEGORY_ICON } from '../../core/models/recipe';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
-import { RecipeFormComponent } from './recipe-form/recipe-form.component';
+import { RecipeWizardComponent } from './recipe-wizard/recipe-wizard.component';
 import { CatalogDialogComponent } from './catalog-dialog.component';
 import { BottomSheetService } from '../../core/services/bottom-sheet.service';
-import { UiIconComponent } from '../../shared/ui/components';
+import { ImagePreviewComponent, UiIconComponent } from '../../shared/ui/components';
 import { AuthStore } from '../../core/store/auth.store';
 
 @Component({
   selector: 'app-recipes',
-  imports: [ArsPipe, UiIconComponent],
+  imports: [ArsPipe, ImagePreviewComponent, UiIconComponent],
   templateUrl: './recipes.component.html',
   styleUrl: './recipes.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,11 +24,40 @@ export class RecipesComponent {
   private dialog = inject(BottomSheetService);
   private notify = inject(NotificationService);
 
+  readonly previewImageUrl = signal<string | null>(null);
+  readonly brokenImageKeys = signal<Record<string, true>>({});
+
+  isThumbnailVisible(recipe: Recipe): boolean {
+    if (!recipe.imageUrl) return false;
+    return !this.brokenImageKeys()[this.getImageKey(recipe)];
+  }
+
+  onThumbnailError(recipe: Recipe): void {
+    const imageKey = this.getImageKey(recipe);
+    this.brokenImageKeys.update((current) => {
+      if (current[imageKey]) return current;
+      return { ...current, [imageKey]: true };
+    });
+  }
+
+  private getImageKey(recipe: Recipe): string {
+    return `${recipe.id ?? recipe.name}:${recipe.imageUrl}`;
+  }
+
+  openPreview(url: string): void {
+    this.previewImageUrl.set(url);
+  }
+
+  closePreview(): void {
+    this.previewImageUrl.set(null);
+  }
+
   create(): void {
-    const dialogRef = this.dialog.open<null, Recipe>(RecipeFormComponent, {
+    const dialogRef = this.dialog.open<null, Recipe>(RecipeWizardComponent, {
       title: 'Nueva receta',
       section: 'Receta',
-      maxWidth: '500px',
+      maxWidth: '760px',
+      panelClass: 'recipe-wizard--mobile',
       data: null,
     });
 
@@ -41,10 +70,11 @@ export class RecipesComponent {
   }
 
   edit(recipe: Recipe): void {
-    const dialogRef = this.dialog.open<Recipe, Recipe | 'delete'>(RecipeFormComponent, {
+    const dialogRef = this.dialog.open<Recipe, Recipe | 'delete'>(RecipeWizardComponent, {
       title: 'Editar receta',
       section: 'Receta',
-      maxWidth: '500px',
+      maxWidth: '760px',
+      panelClass: 'recipe-wizard--mobile',
       data: recipe,
     });
 
