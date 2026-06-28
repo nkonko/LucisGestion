@@ -14,10 +14,11 @@ import { MonthNavComponent } from '../../shared/month-nav/month-nav.component';
 import { fromMonthInputValue } from '../../core/utils/dashboard.utils';
 import { SALE_STATUS_CLASS, SALE_STATUS_DISPLAY, SaleStatus } from '../../core/models/sale';
 import { DemoModeService } from '../../core/services/demo-mode.service';
+import { TodayDeliveriesComponent } from './today-deliveries/today-deliveries.component';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, ArsPipe, UiIconComponent, NetProfitCardComponent, MonthNavComponent],
+  imports: [RouterLink, ArsPipe, UiIconComponent, NetProfitCardComponent, MonthNavComponent, TodayDeliveriesComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

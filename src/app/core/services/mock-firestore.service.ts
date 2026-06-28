@@ -1312,6 +1312,29 @@ export class MockFirestoreService {
         status: 'delivered',
         notes: 'Venta demo para navegación anual.',
       },
+      {
+        id: 'ven-22',
+        date: tsFromDate(today),
+        deliveryDate: tsFromDate(today),
+        customerId: 'cli-2',
+        customerName: 'Carlos Rodríguez',
+        items: [
+          {
+            recipeId: 'rec-3',
+            name: 'Cheesecake',
+            quantity: 1,
+            unitPrice: 6500,
+            unitCost: 3725,
+          },
+        ],
+        total: 6500,
+        totalCost: 3725,
+        profit: 2775,
+        isPaid: false,
+        paymentMethod: 'cash',
+        status: 'pending',
+        notes: 'Entrega para hoy — demo.',
+      },
     ];
 
     sales.push(...dynamicSales);
