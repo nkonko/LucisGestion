@@ -1,0 +1,46 @@
+<section class="ui-card-surface dashboard-alerts" aria-label="Alertas del dashboard">
+  <header class="dashboard-alerts__header">
+    <h3 class="dashboard-alerts__title">
+      <ui-icon name="calendar_clock" class="dashboard-alerts__title-icon" [size]="20" [decorative]="true" />
+      Entregas para hoy
+    </h3>
+    <p class="dashboard-alerts__subtitle">{{ subtitle() }}</p>
+  </header>
+
+  @if (todayDeliveries().length > 0) {
+    <div class="dashboard-alerts__block">
+      @for (sale of todayDeliveries(); track sale.id) {
+        <article class="ui-list-item touch-card" [routerLink]="basePath() + '/ventas'">
+          <div class="dashboard-alerts__row-content">
+            <span>{{ sale.customerName || 'Sin cliente' }} — {{ sale.total | ars }}</span>
+            <span class="ui-chip-static" [class]="getStatusClass(sale.status)">{{ getStatusLabel(sale.status) }}</span>
+          </div>
+        </article>
+      }
+    </div>
+  } @else {
+    <p class="dashboard-alerts__empty">No hay entregas pendientes para hoy.</p>
+  }
+
+  <div class="dashboard-alerts__divider"></div>
+
+  <h4 class="dashboard-alerts__stock-title">
+    <ui-icon name="warning" class="stock-danger" [size]="18" [decorative]="true" />
+    Stock bajo
+  </h4>
+
+  @if (lowStock().length > 0) {
+    <div class="dashboard-alerts__block">
+      @for (item of lowStock(); track item.id) {
+        <article class="ui-list-item touch-card" [routerLink]="basePath() + '/stock'">
+          <div>
+            <div class="font-medium">{{ item.name }}</div>
+            <div class="text-xs text-gray-500">Quedan {{ item.currentStock }} {{ item.unit }} (mín: {{ item.minimumStock }})</div>
+          </div>
+        </article>
+      }
+    </div>
+  } @else {
+    <p class="dashboard-alerts__empty">No hay ingredientes con stock bajo.</p>
+  }
+</section>

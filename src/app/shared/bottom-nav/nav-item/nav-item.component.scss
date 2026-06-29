@@ -28,6 +28,10 @@
   display: block;
 }
 
+.nav-item__icon {
+  transition: color var(--transition-standard);
+}
+
 .nav-item__mobile-emoji {
   display: none;
   font-size: 20px;
@@ -38,11 +42,54 @@
   position: relative;
 }
 
+.nav-item--recipes:hover .nav-item__icon,
+.nav-item--recipes:focus-visible .nav-item__icon,
+.nav-item--recipes.active .nav-item__icon {
+  color: #9333ea;
+}
+
+.nav-item--sales:hover .nav-item__icon,
+.nav-item--sales:focus-visible .nav-item__icon,
+.nav-item--sales.active .nav-item__icon {
+  color: #eab308;
+}
+
+.nav-item--stock:hover .nav-item__icon,
+.nav-item--stock:focus-visible .nav-item__icon,
+.nav-item--stock.active .nav-item__icon {
+  color: #ea580c;
+}
+
+.nav-item--costs:hover .nav-item__icon,
+.nav-item--costs:focus-visible .nav-item__icon,
+.nav-item--costs.active .nav-item__icon {
+  color: #16a34a;
+}
+
+.nav-item--clients:hover .nav-item__icon,
+.nav-item--clients:focus-visible .nav-item__icon,
+.nav-item--clients.active .nav-item__icon {
+  color: #2563eb;
+}
+
 .badge {
   position: absolute;
   top: 2px;
-  right: 8px;
+  right: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
   border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-destructive);
+  color: var(--color-on-primary);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  border: 1px solid var(--color-surface);
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--color-destructive) 30%, transparent);
 }
 
 @media (min-width: 641px) {

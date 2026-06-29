@@ -127,4 +127,58 @@ export class DashboardMetricsService {
 
     return [...quantitiesByRecipe.values()].sort((a, b) => b.quantity - a.quantity)[0] ?? null;
   });
+
+  readonly topSellingProducts = computed(() => {
+    const sales = this.periodSales();
+    if (!sales.length) {
+      return [];
+    }
+
+    const recipeNamesById = new Map(
+      this.recipesStore.recipes().map((recipe) => [recipe.id, recipe.name] as const),
+    );
+
+    const quantitiesByRecipe = new Map<string, { id: string; name: string; quantity: number }>();
+    for (const sale of sales) {
+      for (const item of sale.items) {
+        const name = recipeNamesById.get(item.recipeId) ?? 'Receta eliminada';
+        const current = quantitiesByRecipe.get(item.recipeId);
+
+        if (current) {
+          current.quantity += item.quantity;
+        } else {
+          quantitiesByRecipe.set(item.recipeId, { id: item.recipeId, name, quantity: item.quantity });
+        }
+      }
+    }
+
+    return [...quantitiesByRecipe.values()].sort((a, b) => b.quantity - a.quantity);
+  });
+
+  readonly bestCustomers = computed(() => {
+    const sales = this.periodSales();
+    if (!sales.length) {
+      return [];
+    }
+
+    const totalsByCustomer = new Map<string, { id: string; name: string; total: number }>();
+
+    for (const sale of sales) {
+      const customerId = sale.customerId?.trim() || 'without-customer';
+      const customerName = sale.customerName?.trim() || 'Sin cliente';
+      const current = totalsByCustomer.get(customerId);
+
+      if (current) {
+        current.total += sale.total;
+      } else {
+        totalsByCustomer.set(customerId, {
+          id: customerId,
+          name: customerName,
+          total: sale.total,
+        });
+      }
+    }
+
+    return [...totalsByCustomer.values()].sort((a, b) => b.total - a.total);
+  });
 }

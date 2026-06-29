@@ -1,20 +1,32 @@
 <section class="net-profit-card" aria-label="Resumen financiero mensual">
   <header class="net-profit-card__header">
-    <p class="net-profit-card__period">{{ periodLabel() }}</p>
-    <p class="net-profit-card__title">Ganancia neta</p>
+    <p class="net-profit-card__title">GANANCIA NETA</p>
   </header>
 
-  <p class="net-profit-card__net-value">{{ netProfit() | ars }}</p>
+  <p
+    class="net-profit-card__net-value"
+    [class.net-profit-card__net-value--positive]="netProfit() > 0"
+    [class.net-profit-card__net-value--negative]="netProfit() < 0"
+    [class.net-profit-card__net-value--neutral]="netProfit() === 0"
+  >
+    {{ netProfit() | ars }}
+  </p>
 
   <div class="net-profit-card__metrics">
     <article class="net-profit-card__metric">
       <p class="net-profit-card__metric-label">Ingresos</p>
-      <p class="net-profit-card__metric-value">{{ income() | ars }}</p>
+      <p class="net-profit-card__metric-value net-profit-card__metric-value--income">{{ income() | ars }}</p>
     </article>
 
     <article class="net-profit-card__metric">
-      <p class="net-profit-card__metric-label">Gastos (costo de ingredientes + gastos fijos)</p>
-      <p class="net-profit-card__metric-value">{{ totalCosts() | ars }}</p>
+      <p class="net-profit-card__metric-label">Costos</p>
+      <p
+        class="net-profit-card__metric-value"
+        [class.net-profit-card__metric-value--costs]="totalCosts() !== 0"
+        [class.net-profit-card__metric-value--neutral]="totalCosts() === 0"
+      >
+        {{ totalCosts() | ars }}
+      </p>
     </article>
   </div>
 </section>

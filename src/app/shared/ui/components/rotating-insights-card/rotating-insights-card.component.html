@@ -1,0 +1,81 @@
+<section class="ui-card-surface rotating-insights" aria-label="Resumen rotativo de insights">
+  <header class="rotating-insights__header">
+    <h3 class="rotating-insights__title">Insights del período</h3>
+    <p class="rotating-insights__subtitle">
+      <span class="rotating-insights__subtitle-label">Vista activa:</span>
+      {{ subtitle() }}
+    </p>
+  </header>
+
+  <nav class="rotating-insights__tabs" aria-label="Tabs de insights">
+    @for (tab of tabs; track tab) {
+      <button
+        type="button"
+        class="rotating-insights__tab"
+        [class.is-active]="activeTab() === tab"
+        [class.tab-products]="tab === 'products'"
+        [class.tab-customers]="tab === 'customers'"
+        [class.tab-sales]="tab === 'sales'"
+        [attr.aria-label]="getTabLabel(tab)"
+        [attr.aria-selected]="activeTab() === tab"
+        (click)="setActiveTab(tab)"
+      >
+        <ui-icon [name]="getTabIcon(tab)" [size]="18" [decorative]="true" />
+        <span class="rotating-insights__tab-label">{{ getTabLabel(tab) }}</span>
+      </button>
+    }
+  </nav>
+
+  <div
+    class="rotating-insights__content"
+    [class.is-fading]="isFading()"
+    [class.tab-products]="activeTab() === 'products'"
+    [class.tab-customers]="activeTab() === 'customers'"
+    [class.tab-sales]="activeTab() === 'sales'"
+  >
+    @if (activeTab() === 'products') {
+      @if (visibleProducts().length > 0) {
+        <ul class="rotating-insights__list" role="list">
+          @for (product of visibleProducts(); track trackById($index, product)) {
+            <li class="rotating-insights__item">
+              <span class="rotating-insights__item-name">{{ product.name }}</span>
+              <span class="rotating-insights__item-meta">{{ product.quantity }} unidades</span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="rotating-insights__empty">Sin productos destacados para este período.</p>
+      }
+    }
+
+    @if (activeTab() === 'customers') {
+      @if (visibleCustomers().length > 0) {
+        <ul class="rotating-insights__list" role="list">
+          @for (customer of visibleCustomers(); track trackById($index, customer)) {
+            <li class="rotating-insights__item">
+              <span class="rotating-insights__item-name">{{ customer.name }}</span>
+              <span class="rotating-insights__item-meta">{{ customer.total | ars }}</span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="rotating-insights__empty">Sin clientes destacados para este período.</p>
+      }
+    }
+
+    @if (activeTab() === 'sales') {
+      @if (visibleSales().length > 0) {
+        <ul class="rotating-insights__list" role="list">
+          @for (sale of visibleSales(); track trackById($index, sale)) {
+            <li class="rotating-insights__item">
+              <span class="rotating-insights__item-name">{{ sale.customerName || 'Sin cliente' }}</span>
+              <span class="rotating-insights__item-meta">{{ sale.total | ars }}</span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="rotating-insights__empty">Sin pedidos recientes para mostrar.</p>
+      }
+    }
+  </div>
+</section>
