@@ -2,11 +2,18 @@
   display: block;
   padding: clamp(1rem, 2vw, 1.35rem);
   border-radius: var(--radius-xl);
-  border: var(--border-width-thin) solid color-mix(in srgb, var(--color-outline-variant) 72%, white);
+  border: var(--border-width-thin) solid color-mix(in srgb, var(--color-outline-variant) 70%, transparent);
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 96%, white) 0%, var(--color-surface) 100%),
-    var(--color-surface);
-  box-shadow: var(--shadow-soft);
+    radial-gradient(circle at 12% -16%, color-mix(in srgb, var(--color-primary-container) 24%, transparent) 0%, transparent 52%),
+    linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--color-surface) 80%, var(--color-primary-container) 20%) 0%,
+      color-mix(in srgb, var(--color-surface-container-low, var(--color-surface)) 86%, transparent) 52%,
+      color-mix(in srgb, var(--color-surface) 90%, var(--color-secondary-container) 10%) 100%
+    );
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--color-surface) 70%, transparent) inset,
+    0 14px 26px color-mix(in srgb, var(--color-on-surface) 10%, transparent);
 }
 
 .split-media-card__inner {
@@ -33,9 +40,9 @@
   min-height: clamp(240px, 30vw, 340px);
   border-radius: calc(var(--radius-xl) - 0.2rem);
   background:
-    radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--color-primary-container) 30%, transparent) 0, transparent 30%),
-    color-mix(in srgb, var(--color-surface-container) 86%, white);
-  border: var(--border-width-thin) solid color-mix(in srgb, var(--color-outline-variant) 70%, white);
+    radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--color-primary-container) 24%, transparent) 0, transparent 36%),
+    color-mix(in srgb, var(--color-surface-container) 74%, var(--color-surface));
+  border: var(--border-width-thin) solid color-mix(in srgb, var(--color-outline-variant) 66%, transparent);
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-surface) 85%, transparent);
 }
 
