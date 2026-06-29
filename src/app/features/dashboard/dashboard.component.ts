@@ -3,22 +3,19 @@ import { RouterLink } from '@angular/router';
 import { AuthStore } from '../../core/store/auth.store';
 import { DashboardStore } from '../../core/store/dashboard.store';
 import { DashboardMetricsService } from '../../core/services/dashboard-metrics.service';
-import { IngredientsStore } from '../../core/store/ingredients.store';
 import { SalesStore } from '../../core/store/sales.store';
 import { RecipesStore } from '../../core/store/recipes.store';
-import { CustomersStore } from '../../core/store/customers.store';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
-import { UiIconComponent } from '../../shared/ui/components';
+import { RotatingInsightsCardComponent, UiIconComponent } from '../../shared/ui/components';
 import { NetProfitCardComponent } from './net-profit-card/net-profit-card.component';
 import { MonthNavComponent } from '../../shared/month-nav/month-nav.component';
 import { fromMonthInputValue } from '../../core/utils/dashboard.utils';
-import { SALE_STATUS_CLASS, SALE_STATUS_DISPLAY, SaleStatus } from '../../core/models/sale';
 import { DemoModeService } from '../../core/services/demo-mode.service';
-import { TodayDeliveriesComponent } from './today-deliveries/today-deliveries.component';
+import { DashboardAlertsCardComponent } from './dashboard-alerts-card/dashboard-alerts-card.component';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, ArsPipe, UiIconComponent, NetProfitCardComponent, MonthNavComponent, TodayDeliveriesComponent],
+  imports: [RouterLink, ArsPipe, UiIconComponent, NetProfitCardComponent, MonthNavComponent, DashboardAlertsCardComponent, RotatingInsightsCardComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,10 +23,8 @@ import { TodayDeliveriesComponent } from './today-deliveries/today-deliveries.co
 export class DashboardComponent {
   readonly store = inject(DashboardStore);
   private metrics = inject(DashboardMetricsService);
-  private ingredientsStore = inject(IngredientsStore);
   private salesStore = inject(SalesStore);
   private recipesStore = inject(RecipesStore);
-  private customersStore = inject(CustomersStore);
   private authStore = inject(AuthStore);
   private demoMode = inject(DemoModeService);
   private hour = signal(new Date().getHours());
@@ -42,17 +37,17 @@ export class DashboardComponent {
     destroyRef.onDestroy(() => clearInterval(id));
   }
 
-  lowStock = this.ingredientsStore.lowStock;
   totalRecipes = this.recipesStore.totalRecipes;
   recentSales = this.salesStore.recentSales;
   pendingOrders = this.salesStore.pendingOrdersCount;
+  topSellingProducts = this.metrics.topSellingProducts;
+  bestCustomers = this.metrics.bestCustomers;
   monthlySales = this.metrics.monthlySales;
   monthlyExpenses = this.metrics.monthlyExpenses;
   periodVariableExpenses = this.metrics.periodVariableExpenses;
   periodFixedCosts = this.metrics.periodFixedCosts;
   totalPeriodExpenses = this.metrics.totalPeriodExpenses;
   netProfit = this.metrics.netProfit;
-  topSellingProduct = this.metrics.topSellingProduct;
   periodLabel = this.store.periodLabel;
   monthInputValue = this.store.monthInputValue;
   isCurrentMonth = this.store.isCurrentMonth;
@@ -85,55 +80,8 @@ export class DashboardComponent {
   fixedCostsBarWidth = computed(() => this.calculate(this.periodFixedCosts()));
   expensesBarWidth = computed(() => this.calculate(this.totalPeriodExpenses()));
 
-  readonly statusDisplay = SALE_STATUS_DISPLAY;
-  readonly statusClass = SALE_STATUS_CLASS;
-  readonly customersById = computed(
-    () => new Map(this.customersStore.customers().map((customer) => [customer.id, customer.name] as const)),
-  );
-
   calculate(value: number) {
     return (value / this.max()) * 100;
-  }
-
-  getCustomerName(customerId: string | null): string {
-    if (typeof customerId !== 'string' || !customerId.trim() || !this.customersById().has(customerId)) {
-      return 'Cliente eliminado';
-    }
-    return this.customersById().get(customerId) ?? 'Cliente eliminado';
-  }
-
-  getStatusLabel(status: SaleStatus): string {
-    switch (status) {
-      case 'draft':
-        return this.statusDisplay.draft;
-      case 'pending':
-        return this.statusDisplay.pending;
-      case 'production':
-        return this.statusDisplay.production;
-      case 'delivered':
-        return this.statusDisplay.delivered;
-      case 'cancelled':
-        return this.statusDisplay.cancelled;
-      default:
-        return status;
-    }
-  }
-
-  getStatusClass(status: SaleStatus): string {
-    switch (status) {
-      case 'draft':
-        return this.statusClass.draft;
-      case 'delivered':
-        return this.statusClass.delivered;
-      case 'pending':
-        return this.statusClass.pending;
-      case 'production':
-        return this.statusClass.production;
-      case 'cancelled':
-        return this.statusClass.cancelled;
-      default:
-        return '';
-    }
   }
 
   onMonthInputChange(event: Event): void {

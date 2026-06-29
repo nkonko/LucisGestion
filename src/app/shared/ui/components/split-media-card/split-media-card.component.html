@@ -1,0 +1,23 @@
+<div class="split-media-card__inner">
+  <figure class="split-media-card__media">
+    <span class="split-media-card__frame">
+      <img
+        [ngSrc]="imageSrc()"
+        [alt]="imageAlt()"
+        fill
+        sizes="(max-width: 48em) calc(100vw - 2rem), (max-width: 75em) 46vw, 33vw"
+      />
+    </span>
+  </figure>
+
+  <div class="split-media-card__content">
+    <div class="split-media-card__heading">
+      @if (eyebrow()) {
+        <p class="split-media-card__eyebrow">{{ eyebrow() }}</p>
+      }
+
+      <h3>{{ title() }}</h3>
+    </div>
+    <p>{{ description() }}</p>
+  </div>
+</div>

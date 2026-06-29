@@ -5,11 +5,17 @@
   class="nav-item ui-nav-item"
   [class.nav-item--secondary]="secondary()"
   [class.nav-item--badge]="badge() > 0"
+  [class.nav-item--recipes]="icon() === 'chef_hat'"
+  [class.nav-item--sales]="icon() === 'point_of_sale'"
+  [class.nav-item--stock]="icon() === 'inventory_2'"
+  [class.nav-item--costs]="icon() === 'receipt_long'"
+  [class.nav-item--clients]="icon() === 'people'"
 >
   <ui-icon
     [name]="icon()"
     [decorative]="true"
     [size]="20"
+    class="nav-item__icon"
     [class.nav-item__icon--mobile-replaced]="!!mobileEmoji()"
   />
   @if (mobileEmoji()) {

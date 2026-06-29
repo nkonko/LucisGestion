@@ -1,0 +1,19 @@
+h1 {
+  font-size: clamp(2rem, 4.6vw, 3.8rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 0 0 var(--space-4);
+  letter-spacing: -0.02em;
+  animation: hero-text-fade 1.2s ease-in-out both;
+}
+
+@keyframes hero-text-fade {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
