@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, output, signal } from '@angular/core';
-
-const COMPACT_BRAND_SCROLL_THRESHOLD = 24;
+import { isBrandCompactByScroll } from './brand-compact.util';
 
 @Component({
   selector: 'app-brand-header',
@@ -20,7 +19,7 @@ export class BrandHeaderComponent implements OnInit {
   }
 
   onWindowScroll(): void {
-    const nextState = globalThis.scrollY > COMPACT_BRAND_SCROLL_THRESHOLD;
+    const nextState = isBrandCompactByScroll(globalThis.scrollY);
     if (nextState === this.isCompact()) {
       return;
     }
