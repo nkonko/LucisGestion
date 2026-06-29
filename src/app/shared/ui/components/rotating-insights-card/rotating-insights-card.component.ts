@@ -54,7 +54,7 @@ export class RotatingInsightsCardComponent {
   private swapTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
-    this.rotationIntervalId = setInterval(() => this.goToNextTab(), 10_000);
+    this.rotationIntervalId = setInterval(() => { this.goToNextTab(); }, 10_000);
     this.destroyRef.onDestroy(() => {
       if (this.rotationIntervalId) {
         clearInterval(this.rotationIntervalId);
@@ -98,9 +98,9 @@ export class RotatingInsightsCardComponent {
   }
 
   private goToNextTab(): void {
-    const currentIndex = this.tabs.indexOf(this.activeTab());
-    const nextIndex = (currentIndex + 1) % this.tabs.length;
-    this.transitionTo(this.tabs[nextIndex]);
+    const current = this.activeTab();
+    const nextTab = current === 'products' ? 'customers' : current === 'customers' ? 'sales' : 'products';
+    this.transitionTo(nextTab);
   }
 
   private transitionTo(tab: InsightTab): void {
@@ -120,6 +120,6 @@ export class RotatingInsightsCardComponent {
     if (this.rotationIntervalId) {
       clearInterval(this.rotationIntervalId);
     }
-    this.rotationIntervalId = setInterval(() => this.goToNextTab(), 10_000);
+    this.rotationIntervalId = setInterval(() => { this.goToNextTab(); }, 10_000);
   }
 }
