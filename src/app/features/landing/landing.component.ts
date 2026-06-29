@@ -23,7 +23,7 @@ export class LandingComponent implements OnDestroy {
   protected readonly heroTexts = [
     'Impulsá tus ventas con el control total de todo tu negocio',
     'Controla tus ventas costos, inventario y clientes en una sola plataforma',
-    'Te cuesta seguir la economia de tu empresa? proba nuestra solucion',
+    'Te cuesta seguir la economia de tu empresa? Proba nuestra solucion',
     'Reportes y informacion sin esfuerzo',
   ];
 
