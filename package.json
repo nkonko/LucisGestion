@@ -34,7 +34,7 @@
     "@angular/service-worker": "^22.0.2",
     "@lucide/angular": "^1.21.0",
     "@ngrx/signals": "^21.1.1",
-    "@sentry/angular": "^10.59.0",
+    "@sentry/angular": "^10.62.0",
     "exceljs": "^4.4.0",
     "firebase": "^12.15.0",
     "jspdf": "^4.2.1",
