@@ -58,7 +58,7 @@
     "playwright-ng-schematics": "^22.0.0",
     "playwright": "1.61.0",
     "postcss": "^8.5.15",
-    "prettier": "^3.8.4",
+    "prettier": "^3.9.1",
     "tailwindcss": "^4.3.1",
     "typescript": "~6.0.3",
     "typescript-eslint": "8.62.0",
