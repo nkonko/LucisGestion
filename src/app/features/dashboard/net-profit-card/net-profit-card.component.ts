@@ -9,7 +9,6 @@ import { ArsPipe } from '../../../shared/pipes/ars.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NetProfitCardComponent {
-  periodLabel = input('Este mes');
   income = input(0);
   variableCosts = input(0);
   fixedCosts = input(0);

@@ -15,3 +15,7 @@ export { InsightCardComponent } from './insight-card/insight-card.component';
 export type { InsightVariant } from './insight-card/insight-card.component';
 
 export { ImagePreviewComponent } from './image-preview/image-preview.component';
+export { SplitMediaCardComponent } from './split-media-card/split-media-card.component';
+export type { SplitMediaCardImagePosition } from './split-media-card/split-media-card.component';
+export { RotatingInsightsCardComponent } from './rotating-insights-card/rotating-insights-card.component';
+export type { RotatingInsightProduct, RotatingInsightCustomer } from './rotating-insights-card/rotating-insights-card.component';

@@ -1,8 +1,33 @@
 <div class="landing-container">
-  <section class="hero">
+  <header class="landing-header">
+    <app-brand-header></app-brand-header>
+
+    <div class="nav-menu" [class.is-open]="menuOpen()" [class.is-closing]="menuClosing()">
+      <button
+        class="nav-toggle"
+        type="button"
+        aria-label="Abrir menu de navegacion"
+        [attr.aria-expanded]="menuOpen()"
+        (click)="toggleMenu()"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <button class="menu-overlay" type="button" aria-label="Cerrar menu" (click)="closeMenu()"></button>
+      <nav class="menu-panel" aria-label="Secciones de la landing">
+        <a href="#inicio" (click)="onMenuLinkClick()">Inicio</a>
+        <a href="#ventajas" (click)="onMenuLinkClick()">Ventajas</a>
+        <a href="#faqs" (click)="onMenuLinkClick()">FAQs</a>
+        <a href="#contactanos" (click)="onMenuLinkClick()">Contactanos</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero" id="inicio">
     <div class="hero-content">
       <p class="eyebrow">Plataforma para negocios</p>
-      <h1>Control total de tu operacion con una imagen profesional</h1>
+      <app-rotating-title [texts]="heroTexts" [interval]="10000"></app-rotating-title>
       <p class="description">
         Lucis Gestion unifica recetas, costos, inventario y ventas en una sola vista.
         Disenada para ayudarte a vender mejor y proteger tu margen.
@@ -48,71 +73,51 @@
     </div>
   </section>
 
-  <section class="showcase">
-    <div class="showcase-header">
-      <h2 class="section-heading">Una landing visualmente solida y orientada a negocio</h2>
+  <section class="showcase u-pt-section-xxl" id="ventajas">
+    <div class="showcase-header u-mb-block-lg mt-3 pt-3">
+      <h2 class="section-heading">Ventajas</h2>
       <p>
         Incorporamos recursos visuales para comunicar valor en segundos,
         reforzar confianza y elevar la percepcion de marca.
       </p>
     </div>
     <div class="showcase-grid">
-      <article class="showcase-card ui-card-surface">
-        <img src="/images/landing/inventory-showcase.svg" alt="Elaboracion en cocina" loading="lazy" />
-        <div>
-          <h3>Operacion y produccion</h3>
-          <p>Comunica orden, control y trazabilidad en tu flujo de trabajo diario.</p>
-        </div>
-      </article>
-      <article class="showcase-card ui-card-surface">
-        <img src="/images/landing/dashboard-preview.svg" alt="Decoracion artesanal" loading="lazy" />
-        <div>
-          <h3>Gestion operativa</h3>
-          <p>Evita quiebres de stock y mejora la planificacion de compras.</p>
-        </div>
-      </article>
-      <article class="showcase-card ui-card-surface">
-        <img src="/images/landing/analytics-showcase.svg" alt="Analisis financiero y reportes" loading="lazy" />
-        <div>
-          <h3>Indicadores financieros</h3>
-          <p>Muestra claridad sobre ventas, margen y rentabilidad mensual.</p>
-        </div>
-      </article>
+      @for (item of showcaseItems; track item.id) {
+        <app-split-media-card
+          [eyebrow]="item.eyebrow"
+          [title]="item.title"
+          [description]="item.description"
+          [imageSrc]="item.imageSrc"
+          [imageAlt]="item.imageAlt"
+          [imagePosition]="item.imagePosition"
+        />
+      }
     </div>
   </section>
 
-  <section class="features">
-    <h2 class="section-heading">Caracteristicas principales</h2>
-    <div class="features-grid">
-      <div class="feature-card ui-card-surface">
-        <h3>Dashboard integral</h3>
-        <p>Visualiza metricas clave y oportunidades de mejora al instante.</p>
-      </div>
-      <div class="feature-card ui-card-surface">
-        <h3>Gestion de recetas</h3>
-        <p>Calcula costos automaticamente por receta y por porcion.</p>
-      </div>
-      <div class="feature-card ui-card-surface">
-        <h3>Control de ventas</h3>
-        <p>Registra cada operacion y analiza comportamiento de clientes.</p>
-      </div>
-      <div class="feature-card ui-card-surface">
-        <h3>Gestion de stock</h3>
-        <p>Evita quiebres y sobrecompras con alertas y movimientos claros.</p>
-      </div>
-      <div class="feature-card ui-card-surface">
-        <h3>Reportes financieros</h3>
-        <p>Entiende margenes, costos fijos y rentabilidad por periodo.</p>
-      </div>
-      <div class="feature-card ui-card-surface">
-        <h3>Backup y restore</h3>
-        <p>Manten tus datos seguros para operar con tranquilidad.</p>
-      </div>
+  <section class="faq-section u-pt-section-xl u-pb-section-lg" id="faqs">
+    <h2 class="section-heading u-mb-block-md u-mb-block-md">Preguntas frecuentes</h2>
+    <div class="faq-list ">
+      <details class="faq-item ui-card-surface">
+        <summary>Sirve para pastelerias pequenas y medianas?</summary>
+        <p>Si. Lucis Gestion esta pensado para negocios que necesitan orden operativo sin complejidad tecnica.</p>
+      </details>
+      <details class="faq-item ui-card-surface">
+        <summary>Puedo ver costos y rentabilidad en tiempo real?</summary>
+        <p>Si. El sistema conecta recetas, ventas e inventario para mostrar indicadores clave de forma inmediata.</p>
+      </details>
+      <details class="faq-item ui-card-surface">
+        <summary>Que pasa si necesito recuperar informacion?</summary>
+        <p>Contas con funciones de respaldo y restauracion para mantener continuidad operativa ante imprevistos.</p>
+      </details>
     </div>
   </section>
 
-  <!-- Galería de características en acción -->
-  <app-features-gallery></app-features-gallery>
+  <section class="contact-section u-pt-section-xl u-pb-section-lg" id="contactanos">
+    <h2 class="section-heading">Contactanos</h2>
+    <p class="u-mb-block-lg pb-3">Queres una demo guiada para tu negocio? Escribinos y te ayudamos a implementar Lucis Gestion paso a paso.</p>
+    <a href="mailto:contacto@lucisgestion.com" class="ui-btn landing-btn-secondary u-inline-flex">contacto@lucisgestion.com</a>
+  </section>
 
   <section class="cta-section">
     <h2>Comienza hoy</h2>

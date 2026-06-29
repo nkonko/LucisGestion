@@ -38,7 +38,6 @@
 
 <app-net-profit-card
   class="mb-6"
-  [periodLabel]="periodLabel()"
   [income]="monthlySales()"
   [variableCosts]="periodVariableExpenses()"
   [fixedCosts]="periodFixedCosts()"
@@ -48,7 +47,7 @@
 <div class="grid grid-cols-2 gap-3 mb-6">
 
   <article class="ui-card-surface touch-card text-center py-3" [routerLink]="basePath() + '/recetas'">
-    <ui-icon name="menu_book" class="text-purple-600" [decorative]="true" />
+    <ui-icon name="chef_hat" class="text-purple-600" [decorative]="true" />
     <div class="text-2xl font-bold">{{ totalRecipes() }}</div>
     <div class="text-xs text-gray-500">Recetas activas</div>
   </article>
@@ -60,21 +59,10 @@
   </article>
 </div>
 
-<app-today-deliveries />
+<app-dashboard-alerts-card class="mb-4"></app-dashboard-alerts-card>
 
-@if (topSellingProduct(); as top) {
-  <article class="ui-card-surface mb-4 flex items-center gap-3 py-2" style="pointer-events: none;">
-    <ui-icon name="emoji_events" class="text-amber-500" [size]="32" [decorative]="true" />
-    <div>
-      <div class="text-xs text-gray-500">Más vendido</div>
-      <div class="font-bold">{{ top.name }}</div>
-      <div class="text-sm text-gray-400">{{ top.quantity }} unidades</div>
-    </div>
-  </article>
-}
-
-<h3 class="text-base font-medium mb-2">Ingresos vs Gastos</h3>
 <section class="ui-card-surface mb-4 py-3 flex flex-col">
+  <h3 class="text-base font-medium mb-2">Ingresos vs Gastos</h3>
   <div class="flex items-center gap-2 py-2">
     <span class="text-xs w-20 text-gray-500 shrink-0">Ingresos</span>
     <div class="flex-1 ui-progress"><div class="ui-progress__bar bg-green-500" [style.width.%]="incomeBarWidth()"></div></div>
@@ -101,35 +89,8 @@
   </div>
 </section>
 
-@if (lowStock().length > 0) {
-  <h3 class="text-base font-medium mb-2 flex items-center gap-1">
-    <ui-icon name="warning" class="text-red-500" [size]="20" [decorative]="true" />
-    Stock bajo
-  </h3>
-  <section class="ui-card-surface mb-4 ui-list">
-    @for (item of lowStock(); track item.id) {
-      <article class="ui-list-item touch-card" [routerLink]="basePath() + '/stock'">
-        <ui-icon name="error" class="stock-danger" [size]="18" [decorative]="true" />
-        <div>
-          <div class="font-medium">{{ item.name }}</div>
-          <div class="text-xs text-gray-500">Quedan {{ item.currentStock }} {{ item.unit }} (mín: {{ item.minimumStock }})</div>
-        </div>
-      </article>
-    }
-  </section>
-}
-
-@if (recentSales().length > 0) {
-  <h3 class="text-base font-medium mb-2">Últimas ventas</h3>
-  <section class="ui-card-surface ui-list">
-    @for (sale of recentSales(); track sale.id) {
-      <article class="ui-list-item">
-        <ui-icon name="receipt" [size]="18" [decorative]="true" />
-        <div class="flex items-center justify-between gap-2">
-          <span>{{ getCustomerName(sale.customerId) }} — {{ sale.total | ars }}</span>
-          <span class="ui-chip-static" [class]="getStatusClass(sale.status)">{{ getStatusLabel(sale.status) }}</span>
-        </div>
-      </article>
-    }
-  </section>
-}
+<app-rotating-insights-card
+  [topProducts]="topSellingProducts()"
+  [bestCustomers]="bestCustomers()"
+  [latestSales]="recentSales()"
+></app-rotating-insights-card>

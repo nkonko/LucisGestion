@@ -19,15 +19,7 @@
 .net-profit-card__header {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
   margin-bottom: var(--space-3);
-}
-
-.net-profit-card__period {
-  font-size: var(--size-font-md);
-  text-transform: uppercase;
-  letter-spacing: calc(var(--space-1) / 2);
-  opacity: 0.92;
 }
 
 .net-profit-card__title {
@@ -40,6 +32,19 @@
   font-weight: 700;
   line-height: 1.1;
   margin-bottom: var(--space-6);
+  color: var(--color-surface);
+}
+
+.net-profit-card__net-value--positive {
+  color: var(--color-success);
+}
+
+.net-profit-card__net-value--negative {
+  color: var(--color-destructive);
+}
+
+.net-profit-card__net-value--neutral {
+  color: var(--color-surface);
 }
 
 .net-profit-card__metrics {
@@ -67,4 +72,16 @@
   font-size: calc(var(--size-font-md) * 1.75);
   font-weight: 700;
   line-height: 1.1;
+}
+
+.net-profit-card__metric-value--income {
+  color: var(--color-success);
+}
+
+.net-profit-card__metric-value--costs {
+  color: var(--color-destructive);
+}
+
+.net-profit-card__metric-value--neutral {
+  color: var(--color-surface);
 }
