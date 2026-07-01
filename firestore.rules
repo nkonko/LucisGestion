@@ -30,63 +30,51 @@ service cloud.firestore {
       return isOwner() || isAssistant();
     }
 
-    // Ingredients: owner can CRUD, assistant can read
+    // Ingredients
     match /ingredients/{docId} {
-      allow read: if isTeamMember();
-      allow write: if isOwner();
+      allow read, write: if isTeamMember();
     }
 
-    // Recipes: owner can CRUD, assistant can read
+    // Recipes
     match /recipes/{docId} {
-      allow read: if isTeamMember();
-      allow write: if isOwner();
+      allow read, write: if isTeamMember();
     }
 
-    // Sales: both can read and create, only owner can update/delete
+    // Sales
     match /sales/{docId} {
-      allow read: if isTeamMember();
-      allow create: if isTeamMember();
-      allow update, delete: if isOwner();
+      allow read, write: if isTeamMember();
     }
 
-    // Customers: both can read and create, only owner can update/delete
+    // Customers
     match /customers/{docId} {
-      allow read: if isTeamMember();
-      allow create: if isTeamMember();
-      allow update, delete: if isOwner();
+      allow read, write: if isTeamMember();
     }
 
-    // Stock movements: both can read, created by system via sales
+    // Stock movements
     match /stockMovements/{docId} {
-      allow read: if isTeamMember();
-      allow create: if isTeamMember();
-      allow update, delete: if isOwner();
+      allow read, write: if isTeamMember();
     }
 
-    // Supply expenses: owner only
+    // Supply expenses
     match /supplyExpenses/{docId} {
-      allow read: if isTeamMember();
-      allow write: if isOwner();
+      allow read, write: if isTeamMember();
     }
 
-    // Users: anyone authenticated can create their own profile, owner can manage all
+    // Users
     match /users/{userId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn() && request.auth.uid == userId;
-      allow update, delete: if isOwner();
+      allow update, delete: if isTeamMember();
     }
 
-    // Price history: read for team, created by system on price changes
+    // Price history
     match /priceHistory/{docId} {
-      allow read: if isTeamMember();
-      allow create: if isTeamMember();
-      allow update, delete: if isOwner();
+      allow read, write: if isTeamMember();
     }
 
-    // Fixed costs: owner only
+    // Fixed costs
     match /fixedCostsByMonth/{docId} {
-      allow read: if isTeamMember();
-      allow write: if isOwner();
+      allow read, write: if isTeamMember();
     }
   }
 }
