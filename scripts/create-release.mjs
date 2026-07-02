@@ -54,8 +54,14 @@ console.log('✅ version.ts actualizado');
 // 2. Commitear el cambio de versión
 try {
   execSync('git add src/environments/version.ts', { stdio: 'inherit' });
-  execSync(`git commit -m "chore: bump version to ${versionWithoutV}"`, { stdio: 'inherit' });
-  console.log(`✅ Commit de versión creado`);
+  const hasStagedChanges = execSync('git diff --cached --name-only').toString().trim().length > 0;
+
+  if (hasStagedChanges) {
+    execSync(`git commit -m "chore: bump version to ${versionWithoutV}"`, { stdio: 'inherit' });
+    console.log('✅ Commit de versión creado');
+  } else {
+    console.log(`ℹ️ version.ts ya estaba en ${versionWithoutV}; se omite commit de bump`);
+  }
 } catch {
   console.error('❌ Error al commitear el cambio de versión');
   process.exit(1);
