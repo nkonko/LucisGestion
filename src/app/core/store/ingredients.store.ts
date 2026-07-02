@@ -71,15 +71,22 @@ export const IngredientsStore = signalStore(
       async updateIngredient(id: string, changes: Partial<Ingredient>) {
         patchState(store, { loading: true, error: null });
         try {
+          const current = store.ingredients().find((ingredient) => ingredient.id === id);
+          const previousPrice = current?.unitPrice;
+          const ingredientName = current?.name;
+
           await fs.updateDocument('ingredients', id, changes as Record<string, unknown>);
 
           if (changes.unitPrice !== undefined) {
-            const current = store.ingredients().find((ingredient) => ingredient.id === id);
-            if (current && current.unitPrice !== changes.unitPrice) {
+            if (
+              previousPrice !== undefined &&
+              ingredientName &&
+              previousPrice !== changes.unitPrice
+            ) {
               await fs.addDocument('priceHistory', {
                 ingredientId: id,
-                ingredientName: current.name,
-                previousPrice: current.unitPrice,
+                ingredientName,
+                previousPrice,
                 newPrice: changes.unitPrice,
                 date: Timestamp.now(),
               } as PriceHistory);

@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { Timestamp } from 'firebase/firestore';
 import { IngredientsStore } from './ingredients.store';
 import { FirestoreService } from '../services/firestore.service';
@@ -78,6 +78,59 @@ describe('IngredientsStore', () => {
     expect(firestore.addDocument).toHaveBeenCalledWith(
       'priceHistory',
       expect.objectContaining({ ingredientId: 'ing-1', previousPrice: 5, newPrice: 7 }),
+    );
+  });
+
+  it('registers price history even if the ingredients signal updates before the write resolves', async () => {
+    const ingredientsSubject = new BehaviorSubject([
+      {
+        id: 'ing-1',
+        name: 'Azúcar',
+        category: 'sugars',
+        unit: 'kg',
+        unitPrice: 5,
+        currentStock: 10,
+        minimumStock: 2,
+        lastPurchase: null,
+        active: true,
+      },
+    ]);
+
+    firestore.getCollection.mockImplementation((path: string) => {
+      if (path === 'ingredients') {
+        return ingredientsSubject.asObservable();
+      }
+
+      return of([]);
+    });
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [IngredientsStore, { provide: FirestoreService, useValue: firestore }],
+    });
+    store = TestBed.inject(IngredientsStore);
+
+    firestore.updateDocument.mockImplementation(async (_path: string, id: string, changes: { unitPrice?: number }) => {
+      ingredientsSubject.next([
+        {
+          id,
+          name: 'Azúcar',
+          category: 'sugars',
+          unit: 'kg',
+          unitPrice: changes.unitPrice ?? 5,
+          currentStock: 10,
+          minimumStock: 2,
+          lastPurchase: null,
+          active: true,
+        },
+      ]);
+    });
+
+    await store.updateIngredient('ing-1', { unitPrice: 9 });
+
+    expect(firestore.addDocument).toHaveBeenCalledWith(
+      'priceHistory',
+      expect.objectContaining({ ingredientId: 'ing-1', previousPrice: 5, newPrice: 9 }),
     );
   });
 
