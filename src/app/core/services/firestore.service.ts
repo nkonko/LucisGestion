@@ -313,11 +313,25 @@ export class FirestoreService {
           }
 
           const currentStock = Number(snap.data()['currentStock'] ?? 0);
+          const previousPrice = Number(snap.data()['unitPrice'] ?? 0);
           transaction.update(ref, {
             currentStock: currentStock + item.quantity,
             unitPrice: item.unitPrice,
             lastPurchase: input.date,
           });
+
+          if (previousPrice !== item.unitPrice) {
+            const priceHistoryRef = this.firestoreApi.doc(
+              this.firestoreApi.collection(this.firestore, 'priceHistory'),
+            );
+            transaction.set(priceHistoryRef as DocumentReference, {
+              ingredientId: item.ingredientId,
+              ingredientName: item.ingredientName,
+              previousPrice,
+              newPrice: item.unitPrice,
+              date: input.date,
+            });
+          }
 
           const movementRef = this.firestoreApi.doc(
             this.firestoreApi.collection(this.firestore, 'stockMovements'),

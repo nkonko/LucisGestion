@@ -181,11 +181,13 @@ export class MockFirestoreService {
 
     const ingredientsCol = this.getOrCreate('ingredients');
     const movementsCol = this.getOrCreate('stockMovements');
+    const priceHistoryCol = this.getOrCreate('priceHistory');
 
     const ingredients = ingredientsCol.value.map((item) => ({
       ...(item as Record<string, unknown>),
     }));
     const movements = [...movementsCol.value];
+    const priceHistory = [...priceHistoryCol.value];
 
     const expense = {
       id: input.expenseId,
@@ -207,12 +209,24 @@ export class MockFirestoreService {
       if (idx === -1) continue;
 
       const currentStock = Number(ingredients[idx]['currentStock'] ?? 0);
+      const previousPrice = Number(ingredients[idx]['unitPrice'] ?? 0);
       ingredients[idx] = {
         ...ingredients[idx],
         currentStock: currentStock + item.quantity,
         unitPrice: item.unitPrice,
         lastPurchase: input.date,
       };
+
+      if (previousPrice !== item.unitPrice) {
+        priceHistory.push({
+          id: 'mock-' + crypto.randomUUID().slice(0, 8),
+          ingredientId: item.ingredientId,
+          ingredientName: item.ingredientName,
+          previousPrice,
+          newPrice: item.unitPrice,
+          date: input.date,
+        });
+      }
 
       movements.push({
         id: 'mock-' + crypto.randomUUID().slice(0, 8),
@@ -228,6 +242,7 @@ export class MockFirestoreService {
 
     expensesCol.next([...expensesCol.value, expense]);
     ingredientsCol.next(ingredients);
+    priceHistoryCol.next(priceHistory);
     movementsCol.next(movements);
 
     return { expenseId: input.expenseId, alreadyApplied: false };

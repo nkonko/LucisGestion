@@ -96,6 +96,55 @@ describe('FirestoreService', () => {
     );
   });
 
+  it('registerSupplyPurchaseAtomic records price history when purchase price changes', async () => {
+    const update = vi.fn();
+    const set = vi.fn();
+    const get = vi
+      .fn()
+      .mockResolvedValueOnce({ exists: () => false })
+      .mockResolvedValueOnce({ exists: () => true, data: () => ({ currentStock: 2, unitPrice: 1200 }) });
+
+    firestoreApi.runTransaction.mockImplementation(async (_db: unknown, cb: unknown) =>
+      (cb as (ctx: unknown) => Promise<unknown>)({ get, update, set } as never),
+    );
+    firestoreApi.doc.mockReturnValue({} as never);
+    firestoreApi.collection.mockReturnValue({} as never);
+
+    const purchaseDate = { seconds: 123 };
+
+    await service.registerSupplyPurchaseAtomic({
+      expenseId: 'expense-1',
+      date: purchaseDate as never,
+      description: 'Compra mayorista',
+      supplier: 'Proveedor',
+      total: 5000,
+      items: [
+        {
+          ingredientId: 'ing-1',
+          ingredientName: 'Harina',
+          quantity: 3,
+          unitPrice: 1400,
+        },
+      ],
+    });
+
+    expect(update).toHaveBeenCalledWith(expect.anything(), {
+      currentStock: 5,
+      unitPrice: 1400,
+      lastPurchase: purchaseDate,
+    });
+    expect(set).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        ingredientId: 'ing-1',
+        ingredientName: 'Harina',
+        previousPrice: 1200,
+        newPrice: 1400,
+        date: purchaseDate,
+      }),
+    );
+  });
+
   it('parseBackupJson validates the expected schema', () => {
     const valid = JSON.stringify({
       schema: 'lucis-gestion-backup',
