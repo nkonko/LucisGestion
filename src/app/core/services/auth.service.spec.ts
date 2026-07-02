@@ -4,7 +4,9 @@ import { Auth } from '@angular/fire/auth';
 import { Firestore } from '@angular/fire/firestore';
 vi.mock('@angular/fire/auth', () => ({
   Auth: {} as never,
+  GoogleAuthProvider: vi.fn(),
   onAuthStateChanged: vi.fn(),
+  signInWithPopup: vi.fn(),
   signOut: vi.fn(),
 }));
 vi.mock('@angular/fire/firestore', () => ({
@@ -21,6 +23,7 @@ vi.mock('@angular/fire/firestore', () => ({
 import * as authApi from '@angular/fire/auth';
 import * as fsApi from '@angular/fire/firestore';
 import { AuthStore } from '../store/auth.store';
+import { environment } from '../../../environments/environment';
 
 const mockedAuthApi = vi.mocked(authApi);
 
@@ -76,5 +79,27 @@ describe('AuthService', () => {
     const profile = await privateService.loadOrCreateProfile({ uid: 'u2', email: 'assistant@example.com', displayName: 'Assistant', photoURL: '' });
 
     expect(profile.role).toBe('assistant');
+  });
+
+  it('creates auth change promise before popup login flow', async () => {
+    const originalAllowedEmails = [...environment.allowedEmails];
+    try {
+      environment.allowedEmails = [...originalAllowedEmails, 'owner@example.com'];
+
+      authStoreMock.appUser.mockReturnValue({ uid: 'u1' });
+      vi.spyOn(
+        service as unknown as { waitForAuthChange: () => Promise<void> },
+        'waitForAuthChange',
+      ).mockResolvedValue();
+      vi.spyOn(authApi, 'signInWithPopup').mockImplementation(async () => {
+        const privateService = service as unknown as { pendingAuthChange: Promise<void> | null };
+        expect(privateService.pendingAuthChange).not.toBeNull();
+        return { user: { email: 'owner@example.com' } } as never;
+      });
+
+      await service.loginWithGoogle();
+    } finally {
+      environment.allowedEmails = originalAllowedEmails;
+    }
   });
 });

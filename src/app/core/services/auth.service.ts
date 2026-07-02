@@ -36,18 +36,23 @@ export class AuthService {
     onAuthStateChanged(this.auth, (user) => {
       this.handleAuthChange(user).then(() => {
         this.authChangeResolver?.();
+        this.authChangeResolver = null;
+        this.pendingAuthChange = null;
       });
     });
   }
 
   private createAuthChangePromise(): Promise<void> {
-    return new Promise((resolve) => {
+    this.pendingAuthChange = new Promise((resolve) => {
       this.authChangeResolver = resolve;
-      this.pendingAuthChange = Promise.resolve();
     });
+
+    return this.pendingAuthChange;
   }
 
   async loginWithGoogle(): Promise<void> {
+    this.createAuthChangePromise();
+
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(this.auth, provider);
 
