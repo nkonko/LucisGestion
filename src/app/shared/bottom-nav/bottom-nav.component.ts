@@ -72,6 +72,7 @@ export class BottomNavComponent {
       await new Promise((resolve) => setTimeout(resolve, 200));
     }
     this.demoMode.exitDemoMode();
-    this.router.navigate(['/']);
+    await this.router.navigate(['/']);
+    window.location.reload();
   }
 }

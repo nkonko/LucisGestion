@@ -26,6 +26,7 @@ import * as Sentry from '@sentry/angular';
 import { AuthService } from './core/services/auth.service';
 import { FirestoreService } from './core/services/firestore.service';
 import { DemoAwareFirestoreService } from './core/services/demo-aware-firestore.service';
+import { AppUpdateService } from './core/services/app-update.service';
 
 function isDemoRoute(): boolean {
   return typeof window !== 'undefined' && window.location.pathname.startsWith('/demo');
@@ -68,6 +69,9 @@ export const appConfig: ApplicationConfig = {
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode() && environment.production,
       registrationStrategy: 'registerWhenStable:30000',
+    }),
+    provideAppInitializer(() => {
+      inject(AppUpdateService);
     }),
   ],
 };
