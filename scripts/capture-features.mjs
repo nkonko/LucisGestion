@@ -1,6 +1,5 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { spawn } from 'node:child_process';
 
 const HOST = '127.0.0.1';
 const PORT = 4200;

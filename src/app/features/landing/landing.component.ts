@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { FeaturesGalleryComponent } from './features-gallery/features-gallery.component';
+
 import { BrandHeaderComponent } from '../../shared/layout/brand-header/brand-header.component';
 import { RotatingTitleComponent } from '../../shared/rotating-title/rotating-title.component';
 import type { ShowcaseItem } from './models/showcase-item.model';

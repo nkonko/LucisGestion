@@ -8,7 +8,7 @@ import { NotificationService } from './notification.service';
 
 export const APP_RELOAD = new InjectionToken<() => void>('App reload function', {
   providedIn: 'root',
-  factory: () => () => window.location.reload(),
+  factory: () => () => { window.location.reload(); },
 });
 
 @Injectable({ providedIn: 'root' })

@@ -95,10 +95,6 @@ export class RecommendationsPdfService {
 
   private createCupcakeMarkDataUrl(): string | null {
     try {
-      if (!globalThis.document) {
-        return null;
-      }
-
       const canvas = globalThis.document.createElement('canvas');
       canvas.width = 160;
       canvas.height = 160;

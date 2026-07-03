@@ -25,13 +25,13 @@ describe('RecommendationsPdfService', () => {
   });
 
   it('should handle empty recommendations without error', () => {
-    expect(() => service.exportRecommendations([], 'Junio 2026')).not.toThrow();
+    expect(() => { service.exportRecommendations([], 'Junio 2026'); }).not.toThrow();
   });
 
   it('should export single recommendation', () => {
-    expect(() =>
-      service.exportRecommendations([mockRecommendation], 'Junio 2026'),
-    ).not.toThrow();
+    expect(() => {
+      service.exportRecommendations([mockRecommendation], 'Junio 2026');
+    }).not.toThrow();
   });
 
   it('should export multiple recommendations', () => {
@@ -53,7 +53,7 @@ describe('RecommendationsPdfService', () => {
       },
     ];
 
-    expect(() => service.exportRecommendations(recommendations, 'Junio 2026')).not.toThrow();
+    expect(() => { service.exportRecommendations(recommendations, 'Junio 2026'); }).not.toThrow();
   });
 
   it('should handle different urgency levels', () => {
@@ -63,9 +63,9 @@ describe('RecommendationsPdfService', () => {
       { ...mockRecommendation, urgency: 'baja' },
     ];
 
-    expect(() =>
-      service.exportRecommendations(recommendationsWithDifferentUrgencies, 'Junio 2026'),
-    ).not.toThrow();
+    expect(() => {
+      service.exportRecommendations(recommendationsWithDifferentUrgencies, 'Junio 2026');
+    }).not.toThrow();
   });
 
   it('should handle local and API recommendations', () => {
@@ -74,6 +74,6 @@ describe('RecommendationsPdfService', () => {
       { ...mockRecommendation, isLocal: false },
     ];
 
-    expect(() => service.exportRecommendations(recommendations, 'Junio 2026')).not.toThrow();
+    expect(() => { service.exportRecommendations(recommendations, 'Junio 2026'); }).not.toThrow();
   });
 });

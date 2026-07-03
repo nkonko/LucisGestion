@@ -526,7 +526,7 @@ export class MockFirestoreService {
     if (!this.collections.has(path)) {
       this.collections.set(path, new BehaviorSubject<unknown[]>([]));
     }
-    return this.collections.get(path)!;
+    return this.collections.get(path) as BehaviorSubject<unknown[]>;
   }
 
   // ---------------------------------------------------------------------------
