@@ -59,6 +59,13 @@
   font: inherit;
 }
 
+.cost-row__details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
 .cost-row__main:disabled {
   cursor: default;
 }
@@ -69,6 +76,16 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.cost-row__description {
+  color: var(--color-on-surface-variant);
+  display: -webkit-box;
+  font-size: var(--size-font-xs);
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 .cost-row__amount {

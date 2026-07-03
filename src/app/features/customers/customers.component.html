@@ -34,6 +34,12 @@
             <ui-icon name="place" class="icon-sm" [size]="14" [decorative]="true" /> {{ customer.address }}
           </div>
         }
+        @if (customer.notes.trim()) {
+          <div class="customer-notes text-sm text-gray-500">
+            <span class="customer-notes-label">Notas:</span>
+            <span class="customer-notes-text">{{ customer.notes }}</span>
+          </div>
+        }
       </div>
       <div class="text-right flex flex-col items-end gap-2 customer-card-actions">
         <div class="text-sm text-gray-400">{{ customer.totalPurchases }} compras</div>

@@ -131,6 +131,23 @@
   padding-top: var(--space-1);
 }
 
+.recipe-card-notes {
+  margin-top: var(--space-1);
+}
+
+.recipe-card-notes__label {
+  font-weight: 600;
+  margin-right: var(--space-1);
+}
+
+.recipe-card-notes__text {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
 .recipe-card-edit {
   align-items: center;
   background: transparent;

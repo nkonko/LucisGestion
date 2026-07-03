@@ -42,7 +42,12 @@
           (click)="auth.isOwner() ? edit(entry) : null"
           [disabled]="!auth.isOwner()"
         >
-          <span class="cost-row__name">{{ entry.name }}</span>
+          <span class="cost-row__details">
+            <span class="cost-row__name">{{ entry.name }}</span>
+            @if (entry.description.trim()) {
+              <span class="cost-row__description">{{ entry.description }}</span>
+            }
+          </span>
           <span class="cost-row__amount">{{ entry.amount | ars }}</span>
         </button>
         

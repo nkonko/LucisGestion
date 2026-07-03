@@ -65,6 +65,13 @@
           {{ recipe.ingredients.length }} ingredientes · rinde {{ recipe.yield }} u.
         </div>
       </div>
+
+      @if (recipe.notes.trim()) {
+        <div class="recipe-card-notes text-sm text-gray-500">
+          <span class="recipe-card-notes__label">Notas:</span>
+          <span class="recipe-card-notes__text">{{ recipe.notes }}</span>
+        </div>
+      }
     </div>
 
     @if (auth.isOwner()) {
