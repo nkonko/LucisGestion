@@ -106,6 +106,9 @@ jobs:
       - name: Upload sourcemaps to Sentry
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+          SENTRY_DSN: ${{ vars.SENTRY_DSN }}
         run: node scripts/upload-sourcemaps.mjs "${{ github.ref_name }}"
 
       - name: Authenticate to Google Cloud

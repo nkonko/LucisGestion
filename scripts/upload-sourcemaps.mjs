@@ -19,10 +19,26 @@ if (!version) {
   process.exit(1);
 }
 
-const ORG = 'pegasusteam';
-const PROJECT = 'lucis-gestion';
+const ORG = process.env.SENTRY_ORG?.trim() || 'pegasusteam';
+const PROJECT_FROM_ENV = process.env.SENTRY_PROJECT?.trim() || '';
+const PROJECT_FALLBACK = 'lucis-gestion';
 const DIST_DIR = './dist/lucis-gestion/browser';
 const ENVIRONMENT_FILE = './src/environments/environment.ts';
+
+function readProjectFromDsn() {
+  const dsn = process.env.SENTRY_DSN?.trim();
+  if (!dsn) {
+    return '';
+  }
+
+  try {
+    const parsed = new URL(dsn);
+    const segments = parsed.pathname.split('/').filter(Boolean);
+    return segments.at(-1) ?? '';
+  } catch {
+    return '';
+  }
+}
 
 function readTokenFromEnvironmentConfig() {
   if (!existsSync(ENVIRONMENT_FILE)) {
@@ -37,6 +53,8 @@ function readTokenFromEnvironmentConfig() {
 const authTokenFromEnv = process.env.SENTRY_AUTH_TOKEN?.trim() ?? '';
 const authTokenFromConfig = readTokenFromEnvironmentConfig();
 const sentryAuthToken = authTokenFromEnv || authTokenFromConfig;
+const projectFromDsn = readProjectFromDsn();
+const sentryProject = PROJECT_FROM_ENV || projectFromDsn || PROJECT_FALLBACK;
 
 if (!sentryAuthToken || sentryAuthToken === 'YOUR_SENTRY_AUTH_TOKEN') {
   console.error('❌ Error: Falta token de autenticación para Sentry');
@@ -52,33 +70,41 @@ if (!existsSync(DIST_DIR)) {
   process.exit(1);
 }
 
+if (!sentryProject) {
+  console.error('❌ Error: No se pudo resolver SENTRY_PROJECT para subir source maps');
+  console.error('   Definí SENTRY_PROJECT en el entorno o proveé un SENTRY_DSN válido');
+  process.exit(1);
+}
+
 const sentry = (args) =>
   execFileSync('npx', ['@sentry/cli', ...args], {
     stdio: 'inherit',
     env: {
       ...process.env,
       SENTRY_ORG: ORG,
-      SENTRY_PROJECT: PROJECT,
       SENTRY_AUTH_TOKEN: sentryAuthToken,
     },
   });
 
+const sentryRelease = (args) => sentry(['releases', '--org', ORG, ...args]);
+const sentrySourcemaps = (args) => sentry(['sourcemaps', '--org', ORG, '--project', sentryProject, ...args]);
+
 try {
   // 1. Crear o actualizar la release en Sentry
   console.log(`\n📦 Creando release ${version} en Sentry...`);
-  sentry(['releases', 'new', version]);
+  sentryRelease(['new', version]);
 
   // 2. Asociar commits de git
   console.log('\n🔗 Asociando commits...');
-  sentry(['releases', 'set-commits', version, '--auto']);
+  sentryRelease(['set-commits', version, '--auto']);
 
   // 3. Subir source maps
   console.log('\n📤 Subiendo source maps...');
-  sentry(['sourcemaps', 'upload', `--release=${version}`, DIST_DIR]);
+  sentrySourcemaps(['upload', `--release=${version}`, DIST_DIR]);
 
   // 4. Finalizar la release
   console.log('\n✅ Finalizando release...');
-  sentry(['releases', 'finalize', version]);
+  sentryRelease(['finalize', version]);
 
   console.log(`\n🎉 Source maps subidos correctamente para ${version}`);
 } catch (error) {

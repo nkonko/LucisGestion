@@ -120,6 +120,15 @@ Para modo real, completar los valores en src/environments/environment.ts (y opci
 | gemini.baseUrl | Endpoint base de Gemini |
 | sentry.dsn | DSN para monitoreo de errores |
 
+Variables de GitHub Environment para release con sourcemaps:
+
+| Clave | Tipo | Uso |
+|---|---|---|
+| SENTRY_DSN | Variable | Inicialización del SDK y fallback de project id |
+| SENTRY_ORG | Variable | Organización de Sentry para sentry-cli |
+| SENTRY_PROJECT | Variable | Slug del proyecto de Sentry para upload de sourcemaps |
+| SENTRY_AUTH_TOKEN | Secret | Autenticación de sentry-cli en CI |
+
 Guía paso a paso de despliegue y configuración completa en [read first/GUIA-DESPLIEGUE.md](read%20first/GUIA-DESPLIEGUE.md).
 
 ## Comandos
