@@ -51,7 +51,7 @@ export class AuthService {
   }
 
   async loginWithGoogle(): Promise<void> {
-    this.createAuthChangePromise();
+    void this.createAuthChangePromise();
 
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(this.auth, provider);
@@ -70,7 +70,7 @@ export class AuthService {
   }
 
   async logout(): Promise<void> {
-    this.createAuthChangePromise();
+    void this.createAuthChangePromise();
     await signOut(this.auth);
     // Esperar a que Firebase procese completamente el cambio de autenticación
     await this.waitForAuthChange();
@@ -82,7 +82,7 @@ export class AuthService {
           sessionStorage.removeItem(key);
         }
       });
-    } catch (e) {
+    } catch {
       // Ignorar errores de sessionStorage
     }
   }

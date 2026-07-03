@@ -1,6 +1,5 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { spawn } from 'node:child_process';
 
 const HOST = '127.0.0.1';
 const PORT = 4200;
@@ -14,7 +13,7 @@ async function waitForServer(timeoutMs = 60_000) {
     try {
       const response = await fetch(`${BASE_URL}/demo/dashboard`, { method: 'GET' });
       if (response.ok) return;
-    } catch (error) {
+    } catch {
       // Continuar esperando
     }
     await new Promise(r => setTimeout(r, 1000));

@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Sale, SaleInput } from '../../../core/models/sale';
+import { SaleInput } from '../../../core/models/sale';
 import { Timestamp } from '@angular/fire/firestore';
-import { DIALOG_REF, DIALOG_DATA } from '../../../core/models/dialog/dialog-tokens.model';
+import { DIALOG_REF } from '../../../core/models/dialog/dialog-tokens.model';
 import { DialogRef } from '../../../core/models/dialog/dialog-ref.model';
 import { CustomerSearchComponent } from './customer-search/customer-search.component';
 import { SaleProductItemComponent } from './product-item/sale-product-item.component';
@@ -18,7 +18,6 @@ import { SaleFormService } from './sale-form.service';
 })
 export class SaleFormComponent {
   private dialogRef = inject(DIALOG_REF) as DialogRef<SaleInput>;
-  private dialogData = inject(DIALOG_DATA) as Sale | null;
   readonly formService = inject(SaleFormService);
 
   @HostListener('document:click', ['$event'])

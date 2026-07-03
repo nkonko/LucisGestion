@@ -28,7 +28,7 @@ export class GeminiRecommendationsService {
   private metrics = inject(DashboardMetricsService);
 
   readonly isConfigured = computed(() => {
-    const apiKey = environment.gemini?.apiKey;
+    const apiKey = environment.gemini.apiKey;
     return apiKey && apiKey !== 'YOUR_GEMINI_API_KEY';
   });
 
@@ -96,9 +96,9 @@ Solo responde con JSON válido, sin markdown, comentarios adicionales o explicac
   }
 
   private async callGeminiApi(prompt: string): Promise<GeminiResponse> {
-    const apiKey = environment.gemini?.apiKey;
-    const model = environment.gemini?.model ?? 'gemini-2.5-flash';
-    const baseUrl = environment.gemini?.baseUrl ?? 'https://generativelanguage.googleapis.com/v1beta/models';
+    const apiKey = environment.gemini.apiKey;
+    const model = environment.gemini.model;
+    const baseUrl = environment.gemini.baseUrl;
 
     const url = `${baseUrl}/${model}:generateContent?key=${apiKey}`;
 
@@ -141,7 +141,7 @@ Solo responde con JSON válido, sin markdown, comentarios adicionales o explicac
 
   private parseGeminiResponse(response: GeminiResponse): GeminiRecommendation[] | null {
     try {
-      const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
+      const text = response.candidates[0]?.content?.parts?.[0]?.text;
       if (!text) {
         return null;
       }

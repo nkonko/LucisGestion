@@ -34,7 +34,7 @@ export class DashboardComponent {
   constructor() {
     const destroyRef = inject(DestroyRef);
     const id = setInterval(() => this.hour.set(new Date().getHours()), 60_000);
-    destroyRef.onDestroy(() => clearInterval(id));
+    destroyRef.onDestroy(() => { clearInterval(id); });
   }
 
   totalRecipes = this.recipesStore.totalRecipes;

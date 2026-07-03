@@ -29,8 +29,11 @@ jobs:
 
     steps:
       - name: Validate inputs
+        env:
+          INPUT_GIT_TAG: ${{ github.event.inputs.git_tag }}
+          INPUT_VERSION_ID: ${{ github.event.inputs.version_id }}
         run: |
-          if [ -z "${{ github.event.inputs.git_tag }}" ] && [ -z "${{ github.event.inputs.version_id }}" ]; then
+          if [ -z "$INPUT_GIT_TAG" ] && [ -z "$INPUT_VERSION_ID" ]; then
             echo "::error::You must provide either git_tag or version_id."
             exit 1
           fi
