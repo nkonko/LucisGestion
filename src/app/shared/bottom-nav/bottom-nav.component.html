@@ -7,7 +7,9 @@
 
   <!-- Secondary navigation items (hidden on mobile, in dropdown) -->
   <app-nav-item [route]="basePath() + '/clientes'" icon="people" label="Clientes" [secondary]="true" />
-  <app-nav-item [route]="basePath() + '/costos'" icon="receipt_long" label="Costos" [secondary]="true" />
+  @if (auth.isOwner()) {
+    <app-nav-item [route]="basePath() + '/costos'" icon="receipt_long" label="Costos" [secondary]="true" />
+  }
 
   <!-- More menu button (visible on mobile) -->
   <div class="nav-more-menu" (click)="onMoreMenuClick($event)">
@@ -24,16 +26,18 @@
     </button>
     @if (moreMenuOpen()) {
       <div class="ui-menu ui-menu--nav" role="menu">
-        <a
-          [routerLink]="basePath() + '/costos'"
-          routerLinkActive="active"
-          class="ui-menu-item ui-menu-link"
-          role="menuitem"
-          (click)="closeMenu()"
-        >
-          <ui-icon name="receipt_long" [decorative]="true" [size]="18" />
-          <span>Costos</span>
-        </a>
+        @if (auth.isOwner()) {
+          <a
+            [routerLink]="basePath() + '/costos'"
+            routerLinkActive="active"
+            class="ui-menu-item ui-menu-link"
+            role="menuitem"
+            (click)="closeMenu()"
+          >
+            <ui-icon name="receipt_long" [decorative]="true" [size]="18" />
+            <span>Costos</span>
+          </a>
+        }
         <a
           [routerLink]="basePath() + '/clientes'"
           routerLinkActive="active"
@@ -75,15 +79,17 @@
             </span>
           </div>
         </div>
-        <button
-          class="ui-menu-item"
-          type="button"
-          role="menuitem"
-          (click)="navigateToFinancialReports()"
-        >
-          <ui-icon name="banknote" [decorative]="true" [size]="18" />
-          <span>Reportes financieros</span>
-        </button>
+        @if (auth.isOwner()) {
+          <button
+            class="ui-menu-item"
+            type="button"
+            role="menuitem"
+            (click)="navigateToFinancialReports()"
+          >
+            <ui-icon name="banknote" [decorative]="true" [size]="18" />
+            <span>Reportes financieros</span>
+          </button>
+        }
         @if (auth.isOwner()) {
           <button
             class="ui-menu-item"
