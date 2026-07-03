@@ -3,17 +3,32 @@
 }
 
 .net-profit-card {
+  position: relative;
   border-radius: var(--space-8);
   padding: var(--space-6);
-  border: var(--border-width-thin) solid color-mix(in srgb, var(--color-surface) 24%, transparent);
+  border: var(--border-width-thin) solid color-mix(in srgb, #fff1dc 30%, transparent);
   background:
-    radial-gradient(circle at top right, color-mix(in srgb, var(--color-status-warning) 30%, transparent) 0%, transparent 60%),
+    radial-gradient(120% 100% at 12% 0%, color-mix(in srgb, #f0c38f 58%, transparent) 0%, transparent 52%),
+    radial-gradient(140% 120% at 88% 8%, color-mix(in srgb, #f7d7a6 48%, transparent) 0%, transparent 56%),
+    radial-gradient(130% 110% at 0% 100%, color-mix(in srgb, #c68955 50%, transparent) 0%, transparent 64%),
     linear-gradient(
-      120deg,
-      color-mix(in srgb, var(--color-primary) 75%, var(--color-on-surface) 25%) 0%,
-      color-mix(in srgb, var(--color-primary) 52%, var(--color-status-warning) 48%) 100%
+      100deg,
+      #441901 0%,
+      #b56524 28%,
+      #c78955 52%,
+      #b4764a 74%,
+      #a25f28 100%
     );
-  color: var(--color-surface);
+  color: #fff7ec;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff7ec 22%, transparent);
+}
+
+.net-profit-card--hover-positive:hover {
+  animation: net-profit-card-positive-breathing-glow 1.6s ease-in-out infinite;
+}
+
+.net-profit-card--hover-negative:hover {
+  animation: net-profit-card-negative-breathing-glow 1.6s ease-in-out infinite;
 }
 
 .net-profit-card__header {
@@ -117,5 +132,50 @@
 
   .net-profit-card__metric-value {
     font-size: clamp(var(--size-font-sm), 5vw, calc(var(--size-font-md) * 1.35));
+  }
+}
+
+@keyframes net-profit-card-positive-breathing-glow {
+  0% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-success) 34%, transparent),
+      0 0 10px color-mix(in srgb, var(--color-success) 20%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-success) 78%, transparent),
+      0 0 24px color-mix(in srgb, var(--color-success) 42%, transparent),
+      0 0 40px color-mix(in srgb, var(--color-success) 28%, transparent);
+  }
+  100% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-success) 34%, transparent),
+      0 0 10px color-mix(in srgb, var(--color-success) 20%, transparent);
+  }
+}
+
+@keyframes net-profit-card-negative-breathing-glow {
+  0% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-destructive) 34%, transparent),
+      0 0 10px color-mix(in srgb, var(--color-destructive) 20%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-destructive) 78%, transparent),
+      0 0 24px color-mix(in srgb, var(--color-destructive) 42%, transparent),
+      0 0 40px color-mix(in srgb, var(--color-destructive) 28%, transparent);
+  }
+  100% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-destructive) 34%, transparent),
+      0 0 10px color-mix(in srgb, var(--color-destructive) 20%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .net-profit-card--hover-positive:hover,
+  .net-profit-card--hover-negative:hover {
+    animation: none;
   }
 }

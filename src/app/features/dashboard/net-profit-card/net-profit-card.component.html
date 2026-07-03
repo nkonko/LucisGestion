@@ -1,4 +1,9 @@
-<section class="net-profit-card" aria-label="Resumen financiero mensual">
+<section
+  class="net-profit-card"
+  [class.net-profit-card--hover-positive]="netProfit() > 0"
+  [class.net-profit-card--hover-negative]="netProfit() < 0"
+  aria-label="Resumen financiero mensual"
+>
   <header class="net-profit-card__header">
     <p class="net-profit-card__title">GANANCIA NETA</p>
   </header>
