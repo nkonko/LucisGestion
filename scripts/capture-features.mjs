@@ -13,7 +13,7 @@ async function waitForServer(timeoutMs = 60_000) {
     try {
       const response = await fetch(`${BASE_URL}/demo/dashboard`, { method: 'GET' });
       if (response.ok) return;
-    } catch (error) {
+    } catch {
       // Continuar esperando
     }
     await new Promise(r => setTimeout(r, 1000));
