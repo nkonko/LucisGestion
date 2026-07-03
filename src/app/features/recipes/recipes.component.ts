@@ -94,7 +94,7 @@ export class RecipesComponent {
   }
 
   openDetail(recipe: Recipe): void {
-    this.dialog.open<Recipe, void>(RecipeDetailComponent, {
+    this.dialog.open<Recipe, never>(RecipeDetailComponent, {
       title: recipe.name,
       section: 'Receta',
       maxWidth: '500px',
