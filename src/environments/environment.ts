@@ -5,7 +5,8 @@
 export const environment = {
   production: false,
   sentry: {
-    dsn: 'https://f5df02e2752c73d6f764e87e570482c0@o4511600692035584.ingest.de.sentry.io/4511600698851408',
+    dsn: '',
+    authToken: 'YOUR_SENTRY_AUTH_TOKEN',
   },
   allowedEmails: ['YOUR_EMAIL@example.com'],
   gemini: {

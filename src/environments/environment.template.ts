@@ -6,6 +6,7 @@ export const environment = {
   production: false,
   sentry: {
     dsn: '',
+    authToken: 'YOUR_SENTRY_AUTH_TOKEN',
   },
   allowedEmails: ['YOUR_EMAIL@example.com'],
   gemini: {

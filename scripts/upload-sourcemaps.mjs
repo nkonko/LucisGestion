@@ -8,7 +8,7 @@
  * El token se genera en Settings → Account → API → Auth Tokens con scope org:ci.
  */
 import { execFileSync } from 'child_process';
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 
 const args = process.argv.slice(2);
 const version = args[0];
@@ -22,9 +22,26 @@ if (!version) {
 const ORG = 'pegasusteam';
 const PROJECT = 'lucis-gestion';
 const DIST_DIR = './dist/lucis-gestion/browser';
+const ENVIRONMENT_FILE = './src/environments/environment.ts';
 
-if (!process.env.SENTRY_AUTH_TOKEN) {
-  console.error('❌ Error: Falta SENTRY_AUTH_TOKEN en el entorno');
+function readTokenFromEnvironmentConfig() {
+  if (!existsSync(ENVIRONMENT_FILE)) {
+    return '';
+  }
+
+  const content = readFileSync(ENVIRONMENT_FILE, 'utf-8');
+  const authTokenMatch = content.match(/authToken\s*:\s*['\"]([^'\"]+)['\"]/);
+  return authTokenMatch?.[1]?.trim() ?? '';
+}
+
+const authTokenFromEnv = process.env.SENTRY_AUTH_TOKEN?.trim() ?? '';
+const authTokenFromConfig = readTokenFromEnvironmentConfig();
+const sentryAuthToken = authTokenFromEnv || authTokenFromConfig;
+
+if (!sentryAuthToken || sentryAuthToken === 'YOUR_SENTRY_AUTH_TOKEN') {
+  console.error('❌ Error: Falta token de autenticación para Sentry');
+  console.error('   Opción 1: export SENTRY_AUTH_TOKEN=<token>');
+  console.error(`   Opción 2: configurar sentry.authToken en ${ENVIRONMENT_FILE}`);
   console.error('   Creá un token en https://sentry.io/settings/account/api/auth-tokens/');
   console.error('   Scope necesario: org:ci (Source Map Upload, Release Creation)');
   process.exit(1);
@@ -42,7 +59,7 @@ const sentry = (args) =>
       ...process.env,
       SENTRY_ORG: ORG,
       SENTRY_PROJECT: PROJECT,
-      SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
+      SENTRY_AUTH_TOKEN: sentryAuthToken,
     },
   });
 

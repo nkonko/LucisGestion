@@ -136,7 +136,7 @@ Guía paso a paso de despliegue y configuración completa en [read first/GUIA-DE
 | pnpm test:ci | Tests de CI para entorno mock |
 | pnpm e2e | Tests E2E con Playwright |
 | pnpm coverage:check | Verificación de cobertura |
-| pnpm release -- vX.Y.Z | Proceso de release con tag |
+| pnpm release vX.Y.Z | Proceso de release con tag |
 
 ## Testing
 
@@ -167,15 +167,14 @@ Matriz de cobertura funcional y casos manuales: [read first/MANUAL-CASOS-DE-PRUE
 El comando release automatiza versionado, build, tag y push de tag.
 
 ```bash
-pnpm release -- v0.1.0
+pnpm release v0.1.0
 ```
 
 Opcional, sin subida de sourcemaps:
 
 ```bash
-pnpm release -- v0.1.0 --skip-upload
+pnpm release v0.1.0 --skip-upload
 ```
-
 Validaciones incluidas:
 
 - Formato de versión semántica vX.Y.Z.
