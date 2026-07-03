@@ -22,6 +22,12 @@ export class DashboardAlertsCardComponent {
   readonly basePath = computed(() => (this.demoMode.isDemoMode() ? '/demo' : '/app'));
   readonly lowStock = this.ingredientsStore.lowStock;
 
+  readonly unpaidOrdersCount = computed(() =>
+    this.salesStore
+      .sales()
+      .filter((sale: Sale) => sale.isPaid !== true && sale.status !== 'draft' && sale.status !== 'cancelled').length,
+  );
+
   readonly todayDeliveries = computed(() => {
     const today = new Date();
     const ty = today.getFullYear();
@@ -36,7 +42,7 @@ export class DashboardAlertsCardComponent {
     });
   });
 
-  readonly subtitle = computed(() => {
+  readonly pendingDeliveriesMesage = computed(() => {
     const deliveriesCount = this.todayDeliveries().length;
     if (deliveriesCount > 0) {
       return deliveriesCount === 1 ? 'Tenes 1 entrega pendiente para hoy.' : `Tenes ${deliveriesCount} entregas pendientes para hoy.`;
@@ -82,5 +88,13 @@ export class DashboardAlertsCardComponent {
       default:
         return '';
     }
+  }
+
+  getDeliveryStatusLabel(sale: Sale): string {
+    return sale.isPaid === true ? 'Pago' : 'Impago';
+  }
+
+  getDeliveryStatusClass(sale: Sale): string {
+    return sale.isPaid === true ? 'stock-ok' : 'stock-danger';
   }
 }

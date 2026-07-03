@@ -1,19 +1,25 @@
 <section class="ui-card-surface dashboard-alerts" aria-label="Alertas del dashboard">
   <header class="dashboard-alerts__header">
     <h3 class="dashboard-alerts__title">
-      <ui-icon name="calendar_clock" class="dashboard-alerts__title-icon" [size]="20" [decorative]="true" />
-      Entregas para hoy
+      Alertas
     </h3>
-    <p class="dashboard-alerts__subtitle">{{ subtitle() }}</p>
   </header>
 
+  <div class="dashboard-alerts__divider"></div>
+  
   @if (todayDeliveries().length > 0) {
     <div class="dashboard-alerts__block">
+      <h4 class="dashboard-alerts__stock-title">
+        <ui-icon name="calendar_clock" class="dashboard-alerts__title-icon" [size]="20" [decorative]="true" />
+        Entregas para hoy
+      </h4>
+      <p class="dashboard-alerts__subtitle">{{ pendingDeliveriesMesage() }}</p>
       @for (sale of todayDeliveries(); track sale.id) {
         <article class="ui-list-item touch-card" [routerLink]="basePath() + '/ventas'">
           <div class="dashboard-alerts__row-content">
             <span>{{ sale.customerName || 'Sin cliente' }} — {{ sale.total | ars }}</span>
             <span class="ui-chip-static" [class]="getStatusClass(sale.status)">{{ getStatusLabel(sale.status) }}</span>
+            <span class="ui-chip-static" [class]="getDeliveryStatusClass(sale)">{{ getDeliveryStatusLabel(sale) }}</span>
           </div>
         </article>
       }
@@ -42,5 +48,22 @@
     </div>
   } @else {
     <p class="dashboard-alerts__empty">No hay ingredientes con stock bajo.</p>
+  }
+
+  <div class="dashboard-alerts__divider"></div>
+
+  <h4 class="dashboard-alerts__stock-title">
+    <ui-icon name="receipt_long" class="stock-danger" [size]="18" [decorative]="true" />
+    Pedidos impagos
+  </h4>
+
+  @if (unpaidOrdersCount() > 0) {
+    <article class="ui-list-item touch-card" [routerLink]="basePath() + '/ventas'">
+      <div class="dashboard-alerts__row-content">
+        <span>{{ unpaidOrdersCount() === 1 ? 'Tenes 1 pedido impago.' : `Tenes ${unpaidOrdersCount()} pedidos impagos.` }}</span>
+      </div>
+    </article>
+  } @else {
+    <p class="dashboard-alerts__empty">No hay pedidos impagos.</p>
   }
 </section>
