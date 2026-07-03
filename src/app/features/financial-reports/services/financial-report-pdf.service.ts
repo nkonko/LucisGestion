@@ -237,10 +237,6 @@ export class FinancialReportPdfService {
 
   private async createCupcakeMarkDataUrl(): Promise<string | null> {
     try {
-      if (!globalThis.document) {
-        return null;
-      }
-
       const canvas = globalThis.document.createElement('canvas');
       canvas.width = 240;
       canvas.height = 240;

@@ -34,8 +34,7 @@ describe('FinancialReportPdfService', () => {
   });
 
   it('should export report without errors', async () => {
-    const result = await service.exportReport(mockData);
-    expect(result).toBeUndefined();
+    await service.exportReport(mockData);
   });
 
   it('should handle export with top customers', async () => {
@@ -46,8 +45,7 @@ describe('FinancialReportPdfService', () => {
         { name: 'Customer B', revenue: 30000, share: 30, ordersCount: 8 },
       ],
     };
-    const result = await service.exportReport(dataWithCustomers);
-    expect(result).toBeUndefined();
+    await service.exportReport(dataWithCustomers);
   });
 
   it('should handle export with product opportunities', async () => {
@@ -69,8 +67,7 @@ describe('FinancialReportPdfService', () => {
         },
       ],
     };
-    const result = await service.exportReport(dataWithOpportunities);
-    expect(result).toBeUndefined();
+    await service.exportReport(dataWithOpportunities);
   });
 
   it('should handle export with expense anomalies', async () => {
@@ -92,8 +89,7 @@ describe('FinancialReportPdfService', () => {
         },
       ],
     };
-    const result = await service.exportReport(dataWithAnomalies);
-    expect(result).toBeUndefined();
+    await service.exportReport(dataWithAnomalies);
   });
 
   it('should handle export with low stock items', async () => {
@@ -103,13 +99,16 @@ describe('FinancialReportPdfService', () => {
         {
           id: '1',
           name: 'Ingredient A',
-          quantity: 5,
+          unit: 'kg' as const,
+          unitPrice: 100,
+          currentStock: 5,
           minimumStock: 10,
-          unit: 'kg',
-        } as any,
+          category: 'dry' as const,
+          lastPurchase: null,
+          active: true,
+        },
       ],
     };
-    const result = await service.exportReport(dataWithLowStock);
-    expect(result).toBeUndefined();
+    await service.exportReport(dataWithLowStock);
   });
 });

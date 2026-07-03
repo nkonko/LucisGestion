@@ -83,11 +83,12 @@ export class RecipesComponent {
     });
 
     dialogRef.afterClosed.subscribe(async (result) => {
+      if (!recipe.id) return;
       if (result === 'delete') {
-        await this.store.deleteRecipe(recipe.id!);
+        await this.store.deleteRecipe(recipe.id);
         this.notify.success('Receta eliminada');
       } else if (result) {
-        await this.store.updateRecipe(recipe.id!, result);
+        await this.store.updateRecipe(recipe.id, result);
         this.notify.success('Receta actualizada');
       }
     });

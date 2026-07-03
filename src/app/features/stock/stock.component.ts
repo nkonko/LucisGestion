@@ -113,11 +113,12 @@ export class StockComponent {
     });
 
     dialogRef.afterClosed.subscribe(async (result) => {
+      if (!ingredient.id) return;
       if (result === 'delete') {
-        await this.store.deleteIngredient(ingredient.id!);
+        await this.store.deleteIngredient(ingredient.id);
         this.notify.success('Ingrediente eliminado');
       } else if (result) {
-        await this.store.updateIngredient(ingredient.id!, result);
+        await this.store.updateIngredient(ingredient.id, result);
         this.notify.success('Ingrediente actualizado');
       }
     });

@@ -2,13 +2,13 @@
 
 <div align="center">
 
-**Sistema de gestión para pastelería artesanal con control de costos, stock y ventas**
+## Sistema de gestión para pastelería artesanal con control de costos, stock y ventas
 
 [![Angular](https://img.shields.io/badge/Angular-22-DD0031?logo=angular)](https://angular.dev/)
 [![Firebase](https://img.shields.io/badge/Firebase-12-FFCA28?logo=firebase&logoColor=black)](https://firebase.google.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![NgRx Signals](https://img.shields.io/badge/NgRx_Signals-21-BA2BD2)](https://ngrx.io/)
-[![License](https://img.shields.io/badge/License-Proprietary-red)](#)
+[![License](https://img.shields.io/badge/License-Proprietary-red)](#licencia)
 
 [🚀 Live Demo](https://lucis-gestion-6cea2.web.app/) • [🐛 Reportar bug](https://github.com/nkonko/LucisGestion/issues) • [📚 Casos de prueba](read%20first/MANUAL-CASOS-DE-PRUEBA.md)
 
@@ -69,7 +69,7 @@ pnpm install
 pnpm start:mock
 ```
 
-- URL: http://localhost:4200
+- URL: <http://localhost:4200>
 - Login: automático como owner demo.
 - Datos: en memoria (se reinician al refrescar).
 
@@ -202,7 +202,7 @@ Validaciones incluidas:
 
 ### E2E fallan al iniciar
 
-- Confirmar app activa en http://localhost:4200.
+- Confirmar app activa en <http://localhost:4200>.
 - Limpiar estado previo del navegador de pruebas.
 - Correr una spec aislada para detectar flake más rápido.
 
@@ -242,6 +242,10 @@ src/
   environments/
   styles/
 ```
+
+## Licencia
+
+Proyecto de uso propietario. Todos los derechos reservados.
 
 ## Documentación adicional
 
