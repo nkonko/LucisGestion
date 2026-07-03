@@ -2,7 +2,7 @@
 
 <div align="center">
 
-### Sistema de gestión para pastelería artesanal con control de costos, stock y ventas
+## Sistema de gestión para pastelería artesanal con control de costos, stock y ventas
 
 [![Angular](https://img.shields.io/badge/Angular-22-DD0031?logo=angular)](https://angular.dev/)
 [![Firebase](https://img.shields.io/badge/Firebase-12-FFCA28?logo=firebase&logoColor=black)](https://firebase.google.com/)
@@ -242,6 +242,10 @@ src/
   environments/
   styles/
 ```
+
+## Licencia
+
+Proyecto de uso propietario. Todos los derechos reservados.
 
 ## Documentación adicional
 
