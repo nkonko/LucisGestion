@@ -1,0 +1,25 @@
+<div class="recipe-detail">
+  <div class="recipe-detail-header">
+    <h3 class="recipe-detail-title">{{ recipe.name }}</h3>
+    <div class="recipe-detail-yield">Rinde {{ recipe.yield }} u.</div>
+  </div>
+
+  <div class="recipe-detail-section">
+    <h4 class="recipe-detail-section-title">Ingredientes</h4>
+    <div class="recipe-detail-ingredients">
+      @for (ingredient of recipe.ingredients; track ingredient.ingredientId) {
+        <div class="recipe-detail-ingredient-row">
+          <span class="recipe-detail-ingredient-name">{{ ingredient.name }}</span>
+          <span class="recipe-detail-ingredient-qty">{{ ingredient.quantity }} {{ unitDisplay[ingredient.unit] }}</span>
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (recipe.notes.trim()) {
+    <div class="recipe-detail-section">
+      <h4 class="recipe-detail-section-title">Notas</h4>
+      <p class="recipe-detail-notes">{{ recipe.notes }}</p>
+    </div>
+  }
+</div>

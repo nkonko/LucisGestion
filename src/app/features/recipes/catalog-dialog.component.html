@@ -21,7 +21,9 @@
           <div class="font-medium">{{ recipe.name }}</div>
           <div class="catalog-category">{{ recipe.category }}</div>
         </div>
-        <div class="catalog-price">{{ recipe.salePrice | ars }}</div>
+        @if (auth.isOwner()) {
+          <div class="catalog-price">{{ recipe.salePrice | ars }}</div>
+        }
       </div>
     }
   </div>

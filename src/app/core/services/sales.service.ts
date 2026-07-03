@@ -122,6 +122,10 @@ export class SalesService {
         op: 'transaction',
       },
       async () => {
+        if (status === 'cancelled' && sale?.status === 'production') {
+          throw new Error('No se puede cancelar una venta en producción.');
+        }
+
         await this.firestoreService.updateDocument('sales', id, { status });
 
     if (status === 'cancelled' && sale && sale.status !== 'draft') {
