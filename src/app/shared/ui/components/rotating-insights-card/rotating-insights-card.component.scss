@@ -11,6 +11,7 @@
 .rotating-insights__header {
   display: grid;
   gap: var(--space-1);
+  min-width: 0;
 }
 
 .rotating-insights__title {
@@ -27,11 +28,16 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .rotating-insights__subtitle-label {
   font-weight: 600;
   color: var(--color-on-surface-variant);
+  flex-shrink: 0;
 }
 
 .rotating-insights__tabs {
@@ -62,6 +68,9 @@
 .rotating-insights__tab-label {
   font-size: var(--size-font-2xs);
   white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .rotating-insights__tab.tab-products.is-active {
@@ -148,12 +157,17 @@
   font-size: var(--size-font-sm);
   font-weight: 500;
   color: var(--color-on-surface);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .rotating-insights__item-meta {
   font-size: var(--size-font-sm);
   font-weight: 600;
   color: var(--color-on-surface-variant);
+  flex-shrink: 0;
 }
 
 .rotating-insights__empty {
@@ -163,4 +177,50 @@
   background: color-mix(in srgb, var(--color-primary-container) 16%, var(--color-surface));
   color: var(--color-on-surface-variant);
   font-size: var(--size-font-sm);
+}
+
+@media (max-width: 460px) {
+  .rotating-insights {
+    gap: var(--space-2);
+    padding: var(--space-3);
+  }
+
+  .rotating-insights__title {
+    font-size: var(--size-font-md);
+  }
+
+  .rotating-insights__subtitle {
+    font-size: var(--size-font-2xs);
+  }
+
+  .rotating-insights__tabs {
+    gap: var(--space-1);
+  }
+
+  .rotating-insights__tab {
+    min-height: 40px;
+    padding: 0 var(--space-2);
+  }
+}
+
+@media (max-width: 390px) {
+  .rotating-insights__tab {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    padding: 0;
+  }
+
+  .rotating-insights__tab-label {
+    display: none;
+  }
+
+  .rotating-insights__item {
+    padding: var(--space-2);
+  }
+
+  .rotating-insights__item-name,
+  .rotating-insights__item-meta,
+  .rotating-insights__empty {
+    font-size: var(--size-font-2xs);
+  }
 }
