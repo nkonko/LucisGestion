@@ -4,6 +4,8 @@ import { RecipesStore } from '../../core/store/recipes.store';
 import { Recipe, RECIPE_CATEGORY_DISPLAY, RECIPE_CATEGORY_ICON } from '../../core/models/recipe';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 import { RecipeWizardComponent } from './recipe-wizard/recipe-wizard.component';
+import { RecipeAssistantCardComponent } from './recipe-assistant-card/recipe-assistant-card.component';
+import { RecipeDetailComponent } from './recipe-detail/recipe-detail.component';
 import { CatalogDialogComponent } from './catalog-dialog.component';
 import { BottomSheetService } from '../../core/services/bottom-sheet.service';
 import { ImagePreviewComponent, UiIconComponent } from '../../shared/ui/components';
@@ -11,7 +13,7 @@ import { AuthStore } from '../../core/store/auth.store';
 
 @Component({
   selector: 'app-recipes',
-  imports: [ArsPipe, ImagePreviewComponent, UiIconComponent],
+  imports: [ArsPipe, ImagePreviewComponent, UiIconComponent, RecipeAssistantCardComponent],
   templateUrl: './recipes.component.html',
   styleUrl: './recipes.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -88,6 +90,15 @@ export class RecipesComponent {
         await this.store.updateRecipe(recipe.id!, result);
         this.notify.success('Receta actualizada');
       }
+    });
+  }
+
+  openDetail(recipe: Recipe): void {
+    this.dialog.open<Recipe, never>(RecipeDetailComponent, {
+      title: recipe.name,
+      section: 'Receta',
+      maxWidth: '500px',
+      data: recipe,
     });
   }
 

@@ -265,5 +265,16 @@ describe('SalesService', () => {
       expect(stockService.buildStockAdjustments).not.toHaveBeenCalled();
       expect(firestore.applyStockAdjustments).not.toHaveBeenCalled();
     });
+
+    it('throws when trying to cancel a sale in production', async () => {
+      const productionSale: Sale = { ...sale, status: 'production' };
+
+      await expect(service.updateSaleStatus('sale-1', 'cancelled', productionSale))
+        .rejects.toThrow('No se puede cancelar una venta en producción.');
+
+      expect(firestore.updateDocument).not.toHaveBeenCalled();
+      expect(stockService.buildStockAdjustments).not.toHaveBeenCalled();
+      expect(firestore.applyStockAdjustments).not.toHaveBeenCalled();
+    });
   });
 });

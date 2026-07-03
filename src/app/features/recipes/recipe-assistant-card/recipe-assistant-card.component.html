@@ -1,0 +1,47 @@
+<article class="assistant-card ui-card-surface touch-card" (click)="viewDetail.emit(recipe())">
+  <div class="assistant-card-content">
+    <div class="assistant-card-header">
+      <div class="assistant-card-name">{{ recipe().name }}</div>
+      <span class="ui-chip-static assistant-category-chip">
+        {{ categoryDisplay[recipe().category] }}
+        <span class="assistant-category-chip__emoji" aria-hidden="true">{{ categoryIcon[recipe().category] }}</span>
+      </span>
+    </div>
+
+    @if (recipe().imageUrl) {
+      <div class="assistant-card-thumb">
+        <img
+          class="assistant-card-thumb__img"
+          [src]="recipe().imageUrl"
+          alt=""
+          loading="lazy"
+        />
+      </div>
+    }
+
+    <div class="assistant-card-yield">
+      Rinde {{ recipe().yield }} u.
+    </div>
+
+    <div class="assistant-card-ingredients">
+      @for (ingredient of recipe().ingredients.slice(0, 4); track ingredient.ingredientId) {
+        <div class="assistant-ingredient-row">
+          <span class="assistant-ingredient-name">{{ ingredient.name }}</span>
+          <span class="assistant-ingredient-qty">{{ ingredient.quantity }} {{ unitDisplay[ingredient.unit] }}</span>
+        </div>
+      }
+      @if (recipe().ingredients.length > 4) {
+        <div class="assistant-ingredients-more">
+          +{{ recipe().ingredients.length - 4 }} ingredientes más
+        </div>
+      }
+    </div>
+
+    @if (recipe().notes.trim()) {
+      <div class="assistant-card-notes text-sm text-gray-500">
+        <span class="assistant-card-notes__label">Notas:</span>
+        <span class="assistant-card-notes__text">{{ recipe().notes }}</span>
+      </div>
+    }
+  </div>
+</article>

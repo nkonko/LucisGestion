@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RecipesStore } from '../../core/store/recipes.store';
+import { AuthStore } from '../../core/store/auth.store';
 import { ArsPipe } from '../../shared/pipes/ars.pipe';
 import { UiIconComponent } from '../../shared/ui/components';
 
@@ -12,6 +13,7 @@ import { UiIconComponent } from '../../shared/ui/components';
 })
 export class CatalogDialogComponent {
   readonly store = inject(RecipesStore);
+  readonly auth = inject(AuthStore);
 
   print(): void {
     const content = document.getElementById('catalog-content');
@@ -42,9 +44,15 @@ export class CatalogDialogComponent {
 
   async share(): Promise<void> {
     const recipes = this.store.recipes();
+    const lines = recipes.map((r) => {
+      if (this.auth.isOwner()) {
+        return `• ${r.name}: $${r.salePrice}`;
+      }
+      return `• ${r.name}`;
+    });
     const text =
       `🧁 Lucis Pastelería — Catálogo\n\n` +
-      recipes.map((r) => `• ${r.name}: $${r.salePrice}`).join('\n') +
+      lines.join('\n') +
       `\n\n¡Hacé tu pedido!`;
 
     if (navigator.share) {

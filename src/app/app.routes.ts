@@ -113,6 +113,7 @@ export const routes: Routes = [
       },
       {
         path: 'reportes-financieros',
+        canActivate: [ownerGuard],
         loadComponent: () =>
           import('./features/financial-reports/financial-reports.component').then(
             (m) => m.FinancialReportsComponent,
@@ -120,6 +121,7 @@ export const routes: Routes = [
       },
       {
         path: 'costos',
+        canActivate: [ownerGuard],
         loadComponent: () =>
           import('./features/fixed-costs/fixed-costs.component').then((m) => m.FixedCostsComponent),
       },

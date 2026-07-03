@@ -15,71 +15,73 @@
 }
 
 @for (recipe of store.recipes(); track recipe.id) {
-  <article class="recipe-card ui-card-surface touch-card mb-3">
-    <div class="recipe-card-content">
-      <div class="recipe-card-header">
-        <div class="recipe-card-name">{{ recipe.name }}</div>
-        <span class="ui-chip-static recipe-category-chip">
-          {{ categoryDisplay[recipe.category] }}
-          <span class="recipe-category-chip__emoji" aria-hidden="true">{{ categoryIcon[recipe.category] }}</span>
-        </span>
-      </div>
+  @if (auth.isOwner()) {
+    <article class="recipe-card ui-card-surface touch-card mb-3">
+      <div class="recipe-card-content">
+        <div class="recipe-card-header">
+          <div class="recipe-card-name">{{ recipe.name }}</div>
+          <span class="ui-chip-static recipe-category-chip">
+            {{ categoryDisplay[recipe.category] }}
+            <span class="recipe-category-chip__emoji" aria-hidden="true">{{ categoryIcon[recipe.category] }}</span>
+          </span>
+        </div>
 
-      @if (isThumbnailVisible(recipe)) {
-        <button
-          class="recipe-card-thumb"
-          type="button"
-          aria-label="Ver imagen de {{ recipe.name }}"
-          (click)="openPreview(recipe.imageUrl)"
-        >
-          <img
-            class="recipe-card-thumb__img"
-            [src]="recipe.imageUrl"
-            alt=""
-            loading="lazy"
-            (error)="onThumbnailError(recipe)"
-          />
-          <ui-icon class="recipe-card-thumb__zoom" name="search" [size]="16" />
-        </button>
-      }
+        @if (isThumbnailVisible(recipe)) {
+          <button
+            class="recipe-card-thumb"
+            type="button"
+            aria-label="Ver imagen de {{ recipe.name }}"
+            (click)="openPreview(recipe.imageUrl)"
+          >
+            <img
+              class="recipe-card-thumb__img"
+              [src]="recipe.imageUrl"
+              alt=""
+              loading="lazy"
+              (error)="onThumbnailError(recipe)"
+            />
+            <ui-icon class="recipe-card-thumb__zoom" name="search" [size]="16" />
+          </button>
+        }
 
-      <div class="recipe-card-metrics">
-        <div class="grid grid-cols-3 gap-2 text-center">
-          <div>
-            <div class="text-xs text-gray-500">Costo</div>
-            <div class="font-semibold text-red-600">{{ recipe.calculatedCost | ars }}</div>
-          </div>
-          <div>
-            <div class="text-xs text-gray-500">Margen</div>
-            <div class="font-semibold">{{ recipe.profitMargin }}%</div>
-          </div>
-          <div>
-            <div class="text-xs text-gray-500">Precio</div>
-            <div class="font-semibold text-green-600">{{ recipe.salePrice | ars }}</div>
+        <div class="recipe-card-metrics">
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div>
+              <div class="text-xs text-gray-500">Costo</div>
+              <div class="font-semibold text-red-600">{{ recipe.calculatedCost | ars }}</div>
+            </div>
+            <div>
+              <div class="text-xs text-gray-500">Margen</div>
+              <div class="font-semibold">{{ recipe.profitMargin }}%</div>
+            </div>
+            <div>
+              <div class="text-xs text-gray-500">Precio</div>
+              <div class="font-semibold text-green-600">{{ recipe.salePrice | ars }}</div>
+            </div>
           </div>
         </div>
+
+        <div class="recipe-card-meta">
+          <div class="text-xs text-gray-400">
+            {{ recipe.ingredients.length }} ingredientes · rinde {{ recipe.yield }} u.
+          </div>
+        </div>
+
+        @if (recipe.notes.trim()) {
+          <div class="recipe-card-notes text-sm text-gray-500">
+            <span class="recipe-card-notes__label">Notas:</span>
+            <span class="recipe-card-notes__text">{{ recipe.notes }}</span>
+          </div>
+        }
       </div>
 
-      <div class="recipe-card-meta">
-        <div class="text-xs text-gray-400">
-          {{ recipe.ingredients.length }} ingredientes · rinde {{ recipe.yield }} u.
-        </div>
-      </div>
-
-      @if (recipe.notes.trim()) {
-        <div class="recipe-card-notes text-sm text-gray-500">
-          <span class="recipe-card-notes__label">Notas:</span>
-          <span class="recipe-card-notes__text">{{ recipe.notes }}</span>
-        </div>
-      }
-    </div>
-
-    @if (auth.isOwner()) {
       <button class="recipe-card-edit" type="button" aria-label="Editar receta" (click)="edit(recipe)">
         <ui-icon name="edit" [size]="22" [decorative]="true" />
       </button>
-    }
-  </article>
+    </article>
+  } @else {
+    <app-recipe-assistant-card [recipe]="recipe" (viewDetail)="openDetail($event)" />
+  }
 }
 
 @if (auth.isOwner()) {
