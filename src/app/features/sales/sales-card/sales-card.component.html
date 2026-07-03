@@ -88,7 +88,6 @@
           @if (sale().isPaid) {
             <button class="ui-btn ui-btn-sm sale-btn-deliver" (click)="requestStatusChange('delivered')" type="button">Entregar</button>
           }
-          <button class="ui-btn ui-btn-sm ui-btn-primary" (click)="requestStatusChange('cancelled')" type="button">Cancelar</button>
         }
         @if (sale().status === 'draft') {
           <button class="ui-btn ui-btn-sm sale-btn-fulfill" (click)="requestFulfill()" type="button" [disabled]="loading()">Verificar stock</button>

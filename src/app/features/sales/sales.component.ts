@@ -260,6 +260,10 @@ export class SalesComponent {
     }
 
     if (newStatus === 'cancelled') {
+      if (sale.status === 'production') {
+        this.notify.error('No se puede cancelar una venta en producción.');
+        return;
+      }
       const confirmed = await this.confirmCancelSale(sale);
       if (!confirmed) return;
     }
