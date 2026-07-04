@@ -10,13 +10,13 @@
 [![NgRx Signals](https://img.shields.io/badge/NgRx_Signals-21-BA2BD2)](https://ngrx.io/)
 [![License](https://img.shields.io/badge/License-Proprietary-red)](#licencia)
 
-[🚀 Live Demo](https://lucis-gestion-6cea2.web.app/) • [🐛 Reportar bug](https://github.com/nkonko/LucisGestion/issues) • [📚 Casos de prueba](read%20first/MANUAL-CASOS-DE-PRUEBA.md)
+[🚀 Live Demo](https://lucis-gestion-6cea2.web.app/) • [🎬 Demo video](https://youtu.be/te-rB-1-45k?si=G-i6dePxisAVUsmo) • [🐛 Reportar bug](https://github.com/nkonko/LucisGestion/issues) • [📚 Casos de prueba](read%20first/MANUAL-CASOS-DE-PRUEBA.md)
 
 </div>
 
 ---
 
-[![Tests & Lint](https://github.com/nkonko/LucisGestion/actions/workflows/tests.yml/badge.svg)](https://github.com/nkonko/LucisGestion/actions/workflows/tests.yml) [![E2E Playwright](https://github.com/nkonko/LucisGestion/actions/workflows/e2e.yml/badge.svg)](https://github.com/nkonko/LucisGestion/actions/workflows/e2e.yml) [![Firebase Preview](https://github.com/nkonko/LucisGestion/actions/workflows/firebase-preview.yml/badge.svg)](https://github.com/nkonko/LucisGestion/actions/workflows/firebase-preview.yml) [![Firebase Release](https://github.com/nkonko/LucisGestion/actions/workflows/firebase-release.yml/badge.svg)](https://github.com/nkonko/LucisGestion/actions/workflows/firebase-release.yml)
+[![Tests & Lint](https://github.com/nkonko/LucisGestion/actions/workflows/tests.yml/badge.svg)](https://github.com/nkonko/LucisGestion/actions/workflows/tests.yml) [![E2E Playwright](https://githu[...]
 
 Lucis Gestión permite administrar ingredientes, recetas con costeo automático, ventas con control de stock, clientes y métricas operativas para un negocio de pastelería artesanal.
 
