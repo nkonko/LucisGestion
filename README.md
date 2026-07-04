@@ -16,7 +16,7 @@
 
 ---
 
-[![Tests & Lint](https://github.com/nkonko/LucisGestion/actions/workflows/tests.yml/badge.svg)](https://github.com/nkonko/LucisGestion/actions/workflows/tests.yml) [![E2E Playwright](https://githu[...]
+[![Tests & Lint](https://github.com/nkonko/LucisGestion/actions/workflows/tests.yml/badge.svg)](https://github.com/nkonko/LucisGestion/actions/workflows/tests.yml) [![E2E Playwright](https://github.com/nkonko/LucisGestion/actions/workflows/e2e.yml/badge.svg)](https://github.com/nkonko/LucisGestion/actions/workflows/e2e.yml)
 
 Lucis Gestión permite administrar ingredientes, recetas con costeo automático, ventas con control de stock, clientes y métricas operativas para un negocio de pastelería artesanal.
 
