@@ -37,8 +37,8 @@ importers:
         specifier: ^22.0.4
         version: 22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.2))(rxjs@7.8.2)
       '@lucide/angular':
-        specifier: ^1.22.0
-        version: 1.22.0(@angular/common@22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.2))
+        specifier: ^1.23.0
+        version: 1.23.0(@angular/common@22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.2))
       '@ngrx/signals':
         specifier: ^21.1.1
         version: 21.1.1(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.2))(rxjs@7.8.2)
@@ -401,6 +401,7 @@ packages:
   '@angular/platform-browser-dynamic@21.2.12':
     resolution: {integrity: sha512-9WBflv/ewh7yjeXL3YrSQcrsquvBYSBzgpKpX39zH9YBDnSNAv7ic0psmfyLkb1bjrWM+CFJBbR543CLTCOCRA==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
+    deprecated: '@angular/platform-browser-dynamic is deprecated. Use `@angular/platform-browser` instead.'
     peerDependencies:
       '@angular/common': 21.2.12
       '@angular/compiler': 21.2.12
@@ -1609,8 +1610,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@lucide/angular@1.22.0':
-    resolution: {integrity: sha512-ls9PAZek1hdtochL1K0Kl5xO/qtj7rjJc9f8X8zSgzCFUQ61VwQs1nRdjn1rC/yhsMCY4gl+QYipEua6XDVsPQ==}
+  '@lucide/angular@1.23.0':
+    resolution: {integrity: sha512-zLt2s9EynuYO/kUd+b8dVeAER/ra8Pwcl5LVH31XRSc5TIoSNXCPQINN9LjTMqaZAeAw2ghwOTWO5FVumB8Ppw==}
     peerDependencies:
       '@angular/common': '>=17.0.0'
       '@angular/core': '>=17.0.0'
@@ -7452,7 +7453,7 @@ snapshots:
   '@lmdb/lmdb-win32-x64@3.5.4':
     optional: true
 
-  '@lucide/angular@1.22.0(@angular/common@22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.2))':
+  '@lucide/angular@1.23.0(@angular/common@22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.2))':
     dependencies:
       '@angular/common': 22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.2))(rxjs@7.8.2)
       '@angular/core': 22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.2)
