@@ -1,0 +1,47 @@
+.ai-recipe-generator {
+  padding: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+mat-chip {
+  background-color: #e0e7ff;
+  color: #3730a3;
+}
+
+mat-chip mat-icon {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+}
+
+.mat-card {
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+mat-card-header {
+  padding-bottom: 0;
+}
+
+mat-card-header mat-card-title {
+  display: flex;
+  align-items: center;
+}
+
+.list-disc {
+  padding-left: 1.5rem;
+}
+
+.list-decimal {
+  padding-left: 1.5rem;
+}
+
+button {
+  min-width: 120px;
+}
